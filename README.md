@@ -1,4 +1,8 @@
-# pysoot
+# Scalpel.
+
+## Introduction
+Scalpel is a comprehensive and fundenmental tool for Python program anaysis. 
+
 ## TODO (Core)
 - [x] get_class
 - [x] get_fun_call
