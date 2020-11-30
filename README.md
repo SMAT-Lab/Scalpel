@@ -7,7 +7,7 @@ Scalpel is a comprehensive and fundenmental tool for Python program anaysis.
 - [x] get_class
 - [x] get_fun_call
 - [x] get member functions
-- [x ] get class inheritence
+- [x] get class inheritence
 - [ ] package dependency
 - [x] entry point detection
 - [x] cross reference	
