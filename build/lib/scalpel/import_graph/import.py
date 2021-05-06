@@ -189,87 +189,41 @@ def tree_infer_levels(root_node):
         # to do 
         #module_level_graph(root_node, tmp_node)
         working_queue.extend(tmp_node.children)
-    #G = nx.DiGraph()
-    G = nx.Graph()
 
     # visit all elements from the stack
-    all_edges = []
     for node in leaf_stack:
-        if node.class_pair is None:
+        # private modules
+        if node.name!='__init__.py' and node.name[0]=='_':
             continue
-        for k, v in node.class_pair.items():
-            all_edges += [(v, k)]
-            # v is the parent
+        module_item_dict = parse_import(node.ast)
+        if module_item_dict is None:
+            continue
+        for k, v in module_item_dict.items():
+            if k is None or isinstance(k, int):
+                continue
+            dst_node = go_to_that_node(root_node, node, k)
+            if dst_node  is not None:
+            # from  to 
+                all_edges += [(dst_node.full_name, node.full_name)]
+    #print(len(all_edges))
+    all_edges = list(set(all_edges))
+    print(len(all_edges))
+    
 
-    all_node_names  = []
-    for e in all_edges:
-        all_node_names += [e[0]]
-        all_node_names += [e[1]]
-    all_node_names =  list(set(all_node_names))
-    G.add_nodes_from(all_node_names)
-    G.add_edges_from(all_edges)
-    N_node = G.number_of_nodes()
-    N_edge = G.number_of_edges()
-    N_cluster = nx.number_connected_components(G)
-    #print(N_node, N_edge, N_cluster)
-    print( N_cluster)
-
+    for node in leaf_stack:
+        if node.class_pair is not None:
+            for ch_class,parent_class in node.class_pair.items():
+                if parent_class is None:
+                    continue
+                if parent_class in node.cargo:
+                    for k, v in node.cargo[parent_class].items():
+                        if k not in node.cargo[ch_class]:  # child class
+                            node.cargo[ch_class][k] = v 
+        API_prefix = leaf2root(node) 
+        #node_API_lst = make_API_full_name(node.cargo, API_prefix)
+        #API_name_lst.extend(node_API_lst)
 
     return API_name_lst
-
-def search_targets(root_dir, targets):
-     entry_points = []
-     for root, dirs, files in os.walk(root_dir):
-         n_found = 0
-         for t in targets:
-             if t in dirs :
-                entry_points.append(os.path.join(root, t))
-                n_found += 1
-             elif t+'.py' in files:
-                 entry_points.append(os.path.join(root, t+'.py'))
-                 n_found += 1
-         if n_found == len(targets):
-             return entry_points
-     return None
-# filter wheel
-# notice we will add egginfo soon
-#def filter_wheel(path):
-
-
-def process_wheel(path, l_name):
-    # there will be multiple wheel files
-    res = []
-    all_file_names = os.listdir(path)
-    whl_final = ''
-    max_py_ver = ''
-    for fn in all_file_names:
-        if fn.endswith('.whl') and (fn.find('linux')>=0 or fn.find('any')>=0):  # this is a wheel
-            whl_path = os.path.join(path, fn)
-            try:
-                output = inspect_wheel(whl_path)
-                if output['pyver'][-1]> max_py_ver:  # -1 means the last one. Use the biggest version number
-                    max_py_ver = output['pyver'][-1]
-                    whl_final = fn
-            except Exception as e:
-                print("failed to handle {}".format(whl_path))
-                print(e)
-    if whl_final != '':
-        whl_path = os.path.join(path, whl_final)
-        output = inspect_wheel(whl_path)
-        #print(output.keys())
-        if 'top_level' not in output['dist_info']:
-            top_levels = [l_name]
-        else:
-            top_levels = output['dist_info']['top_level']
-
-        with ZipFile(whl_path, 'r') as zipObj:
-           # Extract all the contents of zip file in current directory
-           source_dir = os.path.join(path, 'tmp')
-           if not os.path.exists(source_dir):
-               zipObj.extractall(source_dir)
-        entry_points = search_targets(source_dir, top_levels)
-        return entry_points
-    return None
 
 def process_single_module(module_path):
     API_name_lst = []
@@ -333,7 +287,7 @@ def test_parse_imports():
     for k, v in res.items():
         print(k, v)
     return 0
-#if __name__ == '__main__':
+if __name__ == '__main__':
     #main()
     #process_lib()
-#    process_lib_single()
+    process_lib_single()

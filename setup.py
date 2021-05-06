@@ -6,6 +6,7 @@ setup(name='Scalpel',
       author='Jiawei Wang',
       author_email='jiawei.wang1@monash.edu',
       url='https://www.monash.edu',
-      packages=['scalpel', 'scalpel.call_graph', 'scalpel.import_graph'],
+      packages=['scalpel', 'scalpel.call_graph', 'scalpel.import_graph',
+          'scalpel.CFG'],
      )
 
