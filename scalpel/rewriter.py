@@ -24,11 +24,16 @@ class Rewriter(ast.NodeVisitor):
         self.src = src
         self.ast = None
         self.ast = ast.parse(self.src, mode='exec')
+
     def search_for_pos(self, stmt_lst, pattern): 
         for i, stmt in enumerate(stmt_lst):
             if pattern(stmt):
                 return i
         return -1
+
+    def rewrite(self):
+        self.generic_visit(self.ast)
+        return ast.fix_missing_locations(self.ast)
 
     # once or all 
     def insert(self):
@@ -83,54 +88,110 @@ class Rewriter(ast.NodeVisitor):
         self.ast.body[pos] = new_stmt
         return ast.fix_missing_locations(self.ast)
 
+    def visit_Name(self, node):
+        if node.id in self.pattern['Name']:
+            new_name = self.pattern['Name'][node.id]
+            node.id = new_name
+    def visit_Attribute(self, node):
+        self.generic_visit(node)
+        return node
     def visit_FunctionDef(self, node):
-        pass
+        self.generic_visit(node)
+        return node
+
+    def get_func_name(self, node):
+        if hasattr(node, "id"):
+            return node.id
+        elif hasattr(node,"attr"):
+            return self.get_func_name(node.value)+"."+node.attr
+        else:
+            pass
+
+    def visit_Call(self, node):
+        func_name = self.get_func_name(node.func)
+        if func_name in self.pattern["Call"]:
+            new_func_name = self.pattern["Call"][func_name]
+            node.func.id = new_func_name
+
+        self.generic_visit(node)
+        return node
+
     def visit_AsyncFunctionDef(self, node):
-        pass
+        self.generic_visit(node)
+        return node
+
     def visit_ClassDef(self, node):
-        pass
+        self.generic_visit(node)
+        return node
+
     def visit_Return(self, node):
-        pass
+        self.generic_visit(node)
+        return node
+
     def visit_Delete(self, node):
-        pass
+        self.generic_visit(node)
+        return node
+
     def visit_Assign(self, node):
-        pass
+        self.generic_visit(node)
+        return node
+        
     def visit_AugAssign(self, node):
-        pass
+        self.generic_visit(node)
+        return node
+        
     def visit_AnnAssign(self, node):
-        pass
+        self.generic_visit(node)
+        return node
     def visit_For(self, node):
-        pass
+        self.generic_visit(node)
+        return node
     def visit_AsyncFor(self, node):
-        pass
+        self.generic_visit(node)
+        return node
     def visit_While(self, node):
-        pass
+        self.generic_visit(node)
+        return node
     def visit_If(self, node):
-        pass
+        self.generic_visit(node)
+        return node
     def visit_With(self, node):
-        pass
+        self.generic_visit(node)
+        return node
     def visit_AsyncWith(self, node):
-        pass
+        self.generic_visit(node)
+        return node
     def visit_Raise(self, node):
-        pass
+        self.generic_visit(node)
+        return node
     def visit_Try(self, node):
-        pass
+        self.generic_visit(node)
+        return node
     def visit_Assert(self, node):
-        pass
+        self.generic_visit(node)
+        return node
     def visit_Import(self, node):
-        pass
+        self.generic_visit(node)
+        return node
     def visit_ImportFrom(self, node):
-        pass
+        self.generic_visit(node)
+        return node
     def visit_Global(self, node):
-        pass
+        self.generic_visit(node)
+        return node
     def visit_Nonlocal(self, node):
-        pass
+        self.generic_visit(node)
+        return node
     def visit_Expr(self, node):
-        pass
+        self.generic_visit(node)
+        return node
     def visit_Pass(self, node):
-        pass
+        self.generic_visit(node)
+        return node
     def visit_Break(self, node):
-        pass
+        self.generic_visit(node)
+        return node
     def visit_Continue(self, node):
-        pass
+        self.generic_visit(node)
+        return node
 

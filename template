@@ -1,10 +1,11 @@
 [Name]
-a -> c
+a -> b
 b ->  a
 c -> 100
 
 [Call]
 str -> int
+print -> type
 
 [Stmt]
 
