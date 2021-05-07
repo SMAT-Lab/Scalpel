@@ -1,5 +1,10 @@
-stmt->stmt
-stmt->None
-None->stmt
-stmt-> assign|For|While|...
+[Name]
+a -> c
+b ->  a
+c -> 100
+
+[Call]
+str -> int
+
+[Stmt]
 
