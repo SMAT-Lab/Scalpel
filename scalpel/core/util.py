@@ -1,6 +1,7 @@
 import ast
 from  _ast import *
 import pkgutil
+import astor
 
 def iter_fields(node):
     """
@@ -24,6 +25,20 @@ def iter_child_nodes(node):
         elif isinstance(field, list):
             for item in field:
                 if isinstance(item, AST):
+                    yield item
+
+def iter_stmt_children(node):
+    """
+    Yield all direct child nodes of *node*, that is, all fields that are nodes
+    and all items of fields that are lists of nodes.
+    """
+    children = []
+    for name, field in iter_fields(node):
+        if isinstance(field, ast.stmt):
+            yield field
+        elif isinstance(field, list):
+            for item in field:
+                if isinstance(item, ast.stmt):
                     yield item
 
 def find_local_modules(import_smts):
@@ -65,6 +80,100 @@ def get_path_by_extension(root_dir, num_of_required_paths, flag='.ipynb'):
                     return paths
     return paths
 
+class StmtUnit:
+    def __init__(self, node, parent):
+        self.node = node
+        self.parent = parent
+        # other params such lineno, col offset
+        # block info
+
+    def __str__(self):
+        # string representation
+        return ast.dump(self.node)
+
+    def search_for_pos(self, stmt_lst, current_stmt):
+        for i, stmt in enumerate(stmt_lst):
+            print(astor.to_source(stmt), astor.to_source(current_stmt))
+            if stmt == current_stmt:
+                return i
+        return -1
+
+    def insert_before(self, new_stmt):
+        if self.parent is not None and hasattr(self.parent, "body"):
+            try:
+                pos = self.parent.body.index(self.node)
+                self.parent.body.insert(pos, new_stmt)
+            except Exception as e:
+                raise "Insertion Failure"
+        else:
+            raise "Error!!"
+
+    def insert_after(self, new_stmt):
+        if self.parent is not None and hasattr(self.parent, "body"):
+            try:
+                pos = self.parent.body.index(self.node)
+                self.parent.body.insert(pos+1, new_stmt)
+            except Exception as e:
+                raise "Insertion Failure"
+        else:
+            raise "Error!!"
+
+    def remove():
+        return None
+
+    def replace():
+        return 0
 
 
+def StmtWalker(module_node):
+    # this code is adapted from the implementation of ast.walk
+    # it does only handle statment level
+    """
+    Recursively yield all descendant nodes in the tree starting at *node*
+    (including *node* itself), in no specified order.  This is useful if you
+    only want to modify nodes in place and don't care about the context.
+    """
+    from collections import deque
+    init_stmts = []
+    for node in module_node.body:
+        node.parent = module_node
+        init_stmts += [node]
+    todo = deque(init_stmts)
+    parent = module_node
+    while todo:
+        node = todo.popleft()
+        yield StmtUnit(node, node.parent)
+        if hasattr(node, "body"):
+            for ch_node in  node.body:
+                ch_node.parent = node
+                todo.append(ch_node)
+
+class StmtIterator:
+
+    def __init__(self, src):
+        self.src = src
+        self.ast = ast.parse(src)
+        assert hasattr(self.ast, "body")
+        self.working_stack = [self.ast.body]
+
+    def __iter__(self):
+        return self
+
+    def __next__(self): 
+        # needs to return statement with the block information to allow
+        # insertion and removal
+        current_loc = 0
+        raise "StopIteration"
+
+    def insert_before(self, new_stmt):
+        pass
+
+    def insert_after(self, new_stmt):
+        pass
+
+    def remove(self):
+        pass
+
+    def replace(self, new_stmt):
+        pass
 

@@ -111,7 +111,10 @@ class Rewriter(ast.NodeVisitor):
         func_name = self.get_func_name(node.func)
         if func_name in self.pattern["Call"]:
             new_func_name = self.pattern["Call"][func_name]
+            if new_func_name is None:
+                return None
             node.func.id = new_func_name
+
 
         self.generic_visit(node)
         return node
@@ -135,35 +138,55 @@ class Rewriter(ast.NodeVisitor):
     def visit_Assign(self, node):
         self.generic_visit(node)
         return node
-        
+
     def visit_AugAssign(self, node):
         self.generic_visit(node)
         return node
-        
+
     def visit_AnnAssign(self, node):
         self.generic_visit(node)
         return node
+
     def visit_For(self, node):
         self.generic_visit(node)
         return node
+
     def visit_AsyncFor(self, node):
         self.generic_visit(node)
         return node
+
     def visit_While(self, node):
         self.generic_visit(node)
         return node
-    def visit_If(self, node):
+
+    def visit_If(self, node): 
+        if "if" in self.pattern["Stmt"]:
+            alt_stmt = self.pattern["Stmt"]["if"]
+            if alt_stmt is None:
+                return None
+
+        self.generic_visit(node)
+
+        return node
+    def visit_IfExp(self, node): 
+        if "if" in self.pattern["Stmt"]:
+            alt_stmt = self.pattern["Stmt"]["if"]
+            if alt_stmt is None:
+                return None
         self.generic_visit(node)
         return node
     def visit_With(self, node):
         self.generic_visit(node)
         return node
+
     def visit_AsyncWith(self, node):
         self.generic_visit(node)
         return node
+
     def visit_Raise(self, node):
         self.generic_visit(node)
         return node
+
     def visit_Try(self, node):
         self.generic_visit(node)
         return node
