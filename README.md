@@ -18,5 +18,11 @@ Scalpel is a comprehensive and fundenmental tool for Python program anaysis.
 ## Issues
 - [] class in classes
 - [] function in functions (def)
- 
+
+## acknowledgement
+
+fuzzingbook
+staticCFG:
+PyCallGraph
+
 
