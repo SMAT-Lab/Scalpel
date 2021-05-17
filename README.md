@@ -1,6 +1,7 @@
 # Scalpel.
 ## Introduction
 Scalpel is a comprehensive and fundenmental tool for Python program anaysis. 
+build an graph, to test reachbility for compitibity
 
 ## TODO (Core)
 - [x] get_class
@@ -20,8 +21,8 @@ Scalpel is a comprehensive and fundenmental tool for Python program anaysis.
 - [] function in functions (def)
 
 ## acknowledgement
-
 fuzzingbook
+debugging book
 staticCFG:
 PyCallGraph
 
