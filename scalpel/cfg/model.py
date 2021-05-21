@@ -7,7 +7,7 @@ import ast
 import re
 import astor
 import graphviz as gv
-from util import tell_type
+#from util import tell_type
 
 
 class Block(object):
@@ -19,13 +19,14 @@ class Block(object):
     a list of Links that represent control flow jumps.
     """
 
-    __slots__ = ["id", "statements", "func_calls", "predecessors", "exits"]
+    __slots__ = ["id", "statements", "ssa_form", "func_calls", "predecessors", "exits"]
 
     def __init__(self, id):
         # Id of the block.
         self.id = id
         # Statements in the block.
         self.statements = []
+        self.ssa_form = {}
         # Calls to functions inside the block (represents context switches to
         # some functions' CFGs).
         self.func_calls = []
@@ -208,8 +209,7 @@ class CFG(object):
         if block.id in visited:
             return
 
-        nodelabel = block.get_source()
- 
+        nodelabel = block.get_source() 
         graph.node(str(block.id), label=nodelabel)
 
         visited.append(block.id)
@@ -256,10 +256,25 @@ class CFG(object):
                         return ifstmt.test
         return None
 
+    def bfs(self):
+        import queue
+        all_blocks = []
+        visited = set()
+        working_queue = queue.Queue() 
+        working_queue.put(self.entryblock)
+
+        while not working_queue.empty():
+            block = working_queue.get()
+            all_blocks.append(block)
+            visited.add(block.id)
+            for suc_link in block.exits:
+                if suc_link.target.id not in visited:
+                    working_queue.put(suc_link.target)
+        return all_blocks
+
     def backward(self, block, value, is_visited, visit_link):
         # if not found in the current block, get all lookup results of the predecessors block 
         # recursively traceback
-
         if not isinstance(value, ast.Name):
             return value
 
@@ -291,26 +306,10 @@ class CFG(object):
 
         # when  reaches here, no def found so far. Then return all the
         # possible lookup results
-
         for pre_link in block.predecessors:
            # condition_str = pre_link.get_exitcase() 
             return self.backward(pre_link.source, value, is_visited, pre_link)
-
         return None
-
-    def test(self):
-        for name, subcfg in self.functioncfgs.items():
-            for  block in subcfg.finalblocks:
-                # there can be multiple final blocks
-                return_value = self.get_return_value(block)
-                if return_value is None:
-                    return None
-                node_type = tell_type(return_value)
-                if node_type == "ID":
-                    # use the var name to do backward
-                    def_node = self.backward(block, return_value )
-                    tell_type(def_node)
-
 
     def build_visual(self, filepath, format, calls=True, show=True):
         """

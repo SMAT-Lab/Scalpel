@@ -8,7 +8,7 @@ Control flow graph builder.
 import ast
 from .model import Block, Link, CFG
 import sys
-from core.func_call_visitor import get_func_calls
+from ..core.func_call_visitor import get_func_calls
 
 
 def is_py38_or_higher():

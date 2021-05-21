@@ -80,7 +80,7 @@ def get_path_by_extension(root_dir, num_of_required_paths, flag='.ipynb'):
                     return paths
     return paths
 
-class StmtUnit:
+class UnitUnit:
     def __init__(self, node, parent):
         self.node = node
         self.parent = parent
@@ -124,15 +124,10 @@ class StmtUnit:
     def replace():
         return 0
 
-
 def StmtWalker(module_node):
     # this code is adapted from the implementation of ast.walk
     # it does only handle statment level
-    """
-    Recursively yield all descendant nodes in the tree starting at *node*
-    (including *node* itself), in no specified order.  This is useful if you
-    only want to modify nodes in place and don't care about the context.
-    """
+    # offset to the first
     from collections import deque
     init_stmts = []
     for node in module_node.body:
