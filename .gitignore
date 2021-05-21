@@ -1,5 +1,8 @@
  __pycache__/
- __pycache__/*
+ *.pyc
  *.swp
  *.pyc
-
+ **/*.pyc
+*.pdf
+test-cases/
+dev/
