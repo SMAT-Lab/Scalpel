@@ -1,7 +1,10 @@
 # Scalpel.
 ## Introduction
 Scalpel is a comprehensive and fundenmental tool for Python program anaysis. 
-build an graph, to test reachbility for compitibity
+
+## TODO (Apps)
+- [ ] build an graph, to test reachbility for compitibity
+- [ ] intra-lib dependency  and inter-lib dependeny
 
 ## TODO (Core)
 - [x] get_class
@@ -17,8 +20,8 @@ build an graph, to test reachbility for compitibity
 - [x] Control Flow Graph
 - [x] access attributes
 ## Issues
-- [] class in classes
-- [] function in functions (def)
+- [ ] class in classes
+- [ ] function in functions (def)
 
 ## acknowledgement
 fuzzingbook
