@@ -13,7 +13,7 @@ See xxx for complete documentation.
 - [ ] build an graph, to test reachbility for compitibity
 - [ ] intra-lib dependency  and inter-lib dependeny
 
-## TODO (Core)
+## TODO (Done)
 - [x] get_class
 - [x] get_fun_call
 - [x] get member functions
@@ -26,14 +26,18 @@ See xxx for complete documentation.
 - [x] import flow of classes
 - [x] Control Flow Graph
 - [x] access attributes
-## Issues
-- [ ] class in classes
-- [ ] function in functions (def)
+- [x] class in classes
+- [x] function in functions (def)
 
-## acknowledgement
-fuzzingbook
-debugging book
-staticCFG:
-PyCallGraph
+## Acknowledgement
+This project has been inspired and supported by the following work. Some implementation of functionalities are taken from published work.
+
+1. [Fuzzyingbook](https://www.fuzzingbook.org/).
+
+2. [Debugging book](https://www.debuggingbook.org/).
+
+3. [StaticCFG](https://github.com/coetaur0/staticfg).
+
+4. [Vitalis Salis, Thodoris Sotiropoulos, Panos Louridas, Diomidis Spinellis and Dimitris Mitropoulos. PyCG: Practical Call Graph Generation in Python. In 43rd International Conference on Software Engineering, 2021](https://vitsalis.com/papers/pycg.pdf). 
 
 
