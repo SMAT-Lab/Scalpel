@@ -30,10 +30,15 @@ See xxx for complete documentation.
 - [ ] class in classes
 - [ ] function in functions (def)
 
-## acknowledgement
-fuzzingbook
-debugging book
-staticCFG:
-PyCallGraph
+## Acknowledgement
+This project has been inspired and supported by the following work. Some implementation of functionalities are taken from published work.
+
+1. [Fuzzyingbook](https://www.fuzzingbook.org/).
+
+2. [Debugging book](https://www.debuggingbook.org/).
+
+3. [StaticCFG](https://github.com/coetaur0/staticfg).
+
+4. [Vitalis Salis, Thodoris Sotiropoulos, Panos Louridas, Diomidis Spinellis and Dimitris Mitropoulos. PyCG: Practical Call Graph Generation in Python. In 43rd International Conference on Software Engineering, 2021](https://vitsalis.com/papers/pycg.pdf). 
 
 
