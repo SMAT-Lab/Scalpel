@@ -13,7 +13,7 @@ See xxx for complete documentation.
 - [ ] build an graph, to test reachbility for compitibity
 - [ ] intra-lib dependency  and inter-lib dependeny
 
-## TODO (Core)
+## TODO (Done)
 - [x] get_class
 - [x] get_fun_call
 - [x] get member functions
@@ -26,9 +26,8 @@ See xxx for complete documentation.
 - [x] import flow of classes
 - [x] Control Flow Graph
 - [x] access attributes
-## Issues
-- [ ] class in classes
-- [ ] function in functions (def)
+- [x] class in classes
+- [x] function in functions (def)
 
 ## Acknowledgement
 This project has been inspired and supported by the following work. Some implementation of functionalities are taken from published work.
