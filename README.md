@@ -12,6 +12,9 @@ See xxx for complete documentation.
 ## TODO (Apps)
 - [ ] build an graph, to test reachbility for compitibity
 - [ ] intra-lib dependency  and inter-lib dependeny
+- [ ] User guid
+- [ ] SSA-> None object not handled to see if there are in real Jupyter projects
+- [ ] simplying syntax 
 
 ## TODO (Done)
 - [x] get_class
