@@ -1,13 +1,24 @@
 import ast
+
 class VarsVisitor(ast.NodeVisitor):
     def __init__(self):
         self.result = list()
 
     def visit_Name(self, node):
+        var_info = {"name": node.id, "lineno": node.lineno, "col_offset":
+                node.col_offset}
         if isinstance(node.ctx, ast.Load):
-            self.result += [(node.id, "load")]
-        if isinstance(node.ctx, ast.Store):
-            self.result += [(node.id, "store")]
+            var_info["usage"] = "load"
+            #self.result += [(node.id, "load")]
+        elif isinstance(node.ctx, ast.Store):
+            var_info["usage"] = "store"
+            #self.result += [(node.id, "store")]
+        elif isinstance(node.ctx, ast.Del):
+            var_info["usage"] = "del"
+        else:
+            raise "unknown variable context"
+        self.result.append(var_info)
+
 
     def visit_BoolOp(self, node):
         for v in node.values:
@@ -80,8 +91,7 @@ class VarsVisitor(ast.NodeVisitor):
             self.visit(c)
 
     def visit_Call(self, node):
-        if not isinstance(node.func, ast.Name) and not isinstance(node.func, ast.Call) and not isinstance(node.func, ast.Lambda):
-            self.visit(node.func.value)
+        #self.visit(node.func)
         for arg in node.args:
             self.visit(arg)
         for keyword in node.keywords:
@@ -91,13 +101,32 @@ class VarsVisitor(ast.NodeVisitor):
         self.visit(node.value)
 
     def visit_Attribute(self, node):
-        if not isinstance(node.value, ast.Name):
-            self.visit(node.value)
-        else:
-            if isinstance(node.value.ctx, ast.Load):
-                self.result.append((node.value.id, 'load'))
-            else:
-                self.result.append((node.value.id, 'store'))
+        full_name = self.get_attr_name(node)
+        var_info = {"name": full_name, "lineno": node.lineno, "col_offset":
+                node.col_offset}
+        self.result.append(var_info)
+
+    def get_attr_name (self, node):
+        if isinstance(node, ast.Call):
+            # to be test
+            return self.get_attr_name(node.func)
+        if isinstance(node, ast.Name):
+            return node.id
+        elif isinstance(node, ast.Attribute):
+            return self.get_attr_name(node.value)+"."+node.attr
+        elif isinstance(node, ast.Subscript):
+            return self.get_attr_name(node.value)
+        #pass
+        #
+        #
+        #self.visit(node.value)
+        #if not isinstance(node.value, ast.Name):
+        #    self.visit(node.value)
+        #else:
+        #    if isinstance(node.value.ctx, ast.Load):
+        #        self.result.append((node.value.id, 'load'))
+        #    else:
+        #        self.result.append((node.value.id, 'store'))
 
     def slicev(self, node):
         if isinstance(node, ast.Slice):
@@ -131,8 +160,11 @@ class VarsVisitor(ast.NodeVisitor):
         for el in node.elts:
             self.visit(el)
 
-    def visit_FunctionDef(self_r, node):
-        return node
+    def visit_FunctionDef(self, node): 
+ 
+        for stmt in node.body:
+            self.visit(stmt)
+        #return node
 
     def visit_Assign(self, node):
         if not isinstance(node.value, ast.Lambda):

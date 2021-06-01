@@ -6,14 +6,51 @@ from copy import deepcopy
 class CallTransformer(ast.NodeTransformer):
     def __init__(self):
         self.call_names = []
-    #def visit_FunctionDef(self, node):
-    #    node.decorator_list = []
-    #    self.generic_visit(node)
-    #    return node
 
     def visit_Attribute(self, node):
 #        self.generic_visit(node.value)
         return node
+
+    def param2str(self, param):
+        def get_func(node):
+           if type(node.func) is ast.Name:
+               mid = node.func.id
+           elif type(node.func) is ast.Attribute:
+               mid = node.func.attr
+           elif type(node.func) is ast.Call:
+               mid = get_func(node.func)
+           else:
+               raise Exception(str(type(node.func)))
+           return mid
+
+        if isinstance(param, ast.Subscript):
+            return self.param2str(param.value)
+        if isinstance(param, ast.Call):
+            return get_func(param)
+        elif isinstance(param, ast.Name):
+            return param.id
+        elif isinstance(param, ast.Num):
+            return param.value
+        elif isinstance(param, ast.List):
+            return "List"
+        elif isinstance(param, ast.ListComp):
+            return "List"
+        elif isinstance(param, ast.Tuple):
+            return "Tuple"
+        elif isinstance(param, (ast.Dict, ast.DictComp)):
+            return "Dict"
+        elif isinstance(param, (ast.Set, ast.SetComp)):
+            return "Set"
+        elif isinstance(param, ast.Str):
+            return param.s
+        elif isinstance(param, ast.NameConstant):
+            return param.value
+        elif isinstance(param, ast.Constant):
+            return param.value
+        elif isinstance(param, ast.Expr):
+            return "Expr"
+        else:
+            return "unknown"
 
     def visit_Call(self, node):
 
@@ -24,11 +61,18 @@ class CallTransformer(ast.NodeTransformer):
         callvisitor = FuncCallVisitor()
         callvisitor.visit(tmp_fun_node)
 
-        self.call_names += [callvisitor.name]
+        call_info  = {  "name": callvisitor.name, 
+                        "lineno": tmp_fun_node.lineno, 
+                        "col_offset": tmp_fun_node.col_offset,
+                        "params": []
+                     }
+        self.call_names += [call_info]
         for arg in node.args:
+            call_info["params"] += [self.param2str(arg)]
             self.generic_visit(arg)
 
         for kw in node.keywords:
+            call_info["params"] += [self.param2str(kw.value)]
             self.generic_visit(kw) 
         self.generic_visit(tmp_fun_node)
 
@@ -110,31 +154,19 @@ def get_call_type(tree):
             func_calls += [(callvisitor.name, get_args(node))]
     return func_calls
 
+def get_call_type(tree):
+    # how to remove 
+    func_calls = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Call):
+            callvisitor = FuncCallVisitor()
+            callvisitor.visit(node.func)
+            func_calls += [(callvisitor.name, get_args(node))]
+    return func_calls
+
 def get_func_calls(tree):
     node = deepcopy(tree)
     transformer = CallTransformer()
     transformer.visit(node)
     return transformer.call_names
 
-def get_func_calls1(tree):
-    func_calls = []
-    for node in ast.walk(tree):
-        if isinstance(node, ast.Call):
-            callvisitor = FuncCallVisitor()
-            callvisitor.visit(node.func)
-            func_calls += [callvisitor.name]
-    return func_calls
-
-#def get_func_calls(tree, extended=False):
-#    func_calls = []
-#    for node in ast.walk(tree):
-#        if isinstance(node, ast.Call):
-#            if  (extended==True) or (not isinstance(node.func, ast.Attribute)):  # skip object memeber calls
-#                callvisitor = FuncCallVisitor()
-#                callvisitor.visit(node.func)
-#                func_calls += [callvisitor.name]
-        #elif isinstance(node, ast.FunctionDef):
-        #    func_calls += [(node.name, "def")]
-        #elif isinstance(node, ast.Assign) and isinstance(node.value, ast.Lambda):
-        #    func_calls += [(node.targets[0].id, "def")]
-    return func_calls

@@ -80,7 +80,7 @@ def get_path_by_extension(root_dir, num_of_required_paths, flag='.ipynb'):
                     return paths
     return paths
 
-class UnitUnit:
+class Unit:
     def __init__(self, node, parent):
         self.node = node
         self.parent = parent
@@ -93,7 +93,7 @@ class UnitUnit:
 
     def search_for_pos(self, stmt_lst, current_stmt):
         for i, stmt in enumerate(stmt_lst):
-            print(astor.to_source(stmt), astor.to_source(current_stmt))
+    #        print(astor.to_source(stmt), astor.to_source(current_stmt))
             if stmt == current_stmt:
                 return i
         return -1
@@ -124,7 +124,7 @@ class UnitUnit:
     def replace():
         return 0
 
-def StmtWalker(module_node):
+def UnitWalker(module_node):
     # this code is adapted from the implementation of ast.walk
     # it does only handle statment level
     # offset to the first
@@ -137,7 +137,7 @@ def StmtWalker(module_node):
     parent = module_node
     while todo:
         node = todo.popleft()
-        yield StmtUnit(node, node.parent)
+        yield Unit(node, node.parent)
         if hasattr(node, "body"):
             for ch_node in  node.body:
                 ch_node.parent = node
