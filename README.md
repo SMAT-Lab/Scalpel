@@ -38,6 +38,6 @@ This project has been inspired and supported by the following work. Some impleme
 
 3. [StaticCFG](https://github.com/coetaur0/staticfg).
 
-4. [Vitalis Salis, Thodoris Sotiropoulos, Panos Louridas, Diomidis Spinellis and Dimitris Mitropoulos. PyCG: Practical Call Graph Generation in Python. In 43rd International Conference on Software Engineering, 2021](https://vitsalis.com/papers/pycg.pdf). 
+4. [PyCG: Practical Call Graph Generation in Python. In 43rd International Conference on Software Engineering, 2021](https://vitsalis.com/papers/pycg.pdf). 
 
 
