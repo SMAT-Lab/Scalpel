@@ -2,7 +2,7 @@ import os
 import sys
 import ast
 
-# In python there are in total 23 statements to be considered 
+""" In python there are in total 23 statements to be considered 
 # the user must specify the match pattern as well as insert pattern
 # for instance.
 # it can be  Call - >  another_callname for instance
@@ -15,12 +15,13 @@ import ast
 # the second step is to think about how to write template rules
 # make it easy, format string! such as the new stmt =
 # "print("","").format(stmt.targets[0])
-
-class Rewriter(ast.NodeVisitor):
-    def __init__(self,src, pattern, new_stmt):
+"""
+class Rewriter(ast.NodeTransformer):
+    #def __init__(self,src, pattern, new_stmt):
+    def __init__(self, src):
         # pattern
-        self.pattern = pattern
-        self.new_stmt = new_stmt
+#        self.pattern = pattern
+#        self.new_stmt = new_stmt
         self.src = src
         self.ast = None
         self.ast = ast.parse(self.src, mode='exec')
@@ -33,6 +34,7 @@ class Rewriter(ast.NodeVisitor):
 
     def rewrite(self):
         self.generic_visit(self.ast)
+       
         return ast.fix_missing_locations(self.ast)
 
     # once or all 
@@ -89,9 +91,11 @@ class Rewriter(ast.NodeVisitor):
         return ast.fix_missing_locations(self.ast)
 
     def visit_Name(self, node):
-        if node.id in self.pattern['Name']:
-            new_name = self.pattern['Name'][node.id]
-            node.id = new_name
+        #if node.id in self.pattern['Name']:
+        #    new_name = self.pattern['Name'][node.id]
+        #    node.id = new_name
+        return node
+
     def visit_Attribute(self, node):
         self.generic_visit(node)
         return node
@@ -109,11 +113,11 @@ class Rewriter(ast.NodeVisitor):
 
     def visit_Call(self, node):
         func_name = self.get_func_name(node.func)
-        if func_name in self.pattern["Call"]:
-            new_func_name = self.pattern["Call"][func_name]
-            if new_func_name is None:
-                return None
-            node.func.id = new_func_name
+        #if func_name in self.pattern["Call"]:
+        #    new_func_name = self.pattern["Call"][func_name]
+        #    if new_func_name is None:
+        #        return None
+        #    node.func.id = new_func_name
 
 
         self.generic_visit(node)
@@ -136,6 +140,40 @@ class Rewriter(ast.NodeVisitor):
         return node
 
     def visit_Assign(self, node):
+        # to rewrite
+
+        if len(node.targets) ==1 and isinstance(node.value, ast.Lambda):
+            if isinstance(node.targets[0], ast.Name):
+                fun_name = node.targets[0].id
+                return_stmt = ast.Return(node.value.body)
+                body_stmts = [return_stmt]
+                decorator_list = []
+                return ast.FunctionDef(fun_name, node.value.args, body_stmts, decorator_list)
+
+        if len(node.targets) ==1 and isinstance(node.value, ast.ListComp):
+            print(ast.dump(node.value))
+
+            iter = node.value.generators[0].iter
+            ifs  = node.value.generators[0].ifs
+            target_name = node.value.generators[0].target.id
+            target = ast.Name(id=target_name, ctx=ast.Store())
+
+            orelse = []
+            new_lst_name = "_hidden_" + node.targets[0].id
+            if len(ifs) == 0:
+                append_attr = ast.Attribute(value=ast.Name(id=new_lst_name, ctx=ast.Load()),attr='append', ctx=ast.Load())  
+                append_call = ast.Call(append_attr, [node.value.elt], [])
+                append_stmt = ast.Expr(append_call)
+                body_stmts = [append_stmt]
+            else:
+                append_attr = ast.Attribute(value=ast.Name(id=new_lst_name, ctx=ast.Load()),attr='append', ctx=ast.Load())  
+                append_call = ast.Call(append_attr, [node.value.elt], [])
+                append_stmt = ast.Expr(append_call)
+                if_body_stmts = [append_stmt]
+                if_stmt = ast.If(ifs[0], if_body_stmts, [])
+                body_stmts = [if_stmt]
+                pass
+            return ast.For(target, iter, body_stmts, orelse)
         self.generic_visit(node)
         return node
 
@@ -159,20 +197,21 @@ class Rewriter(ast.NodeVisitor):
         self.generic_visit(node)
         return node
 
+
     def visit_If(self, node): 
-        if "if" in self.pattern["Stmt"]:
-            alt_stmt = self.pattern["Stmt"]["if"]
-            if alt_stmt is None:
-                return None
+        #if "if" in self.pattern["Stmt"]:
+        #    alt_stmt = self.pattern["Stmt"]["if"]
+        #    if alt_stmt is None:
+        #        return None
 
         self.generic_visit(node)
 
         return node
     def visit_IfExp(self, node): 
-        if "if" in self.pattern["Stmt"]:
-            alt_stmt = self.pattern["Stmt"]["if"]
-            if alt_stmt is None:
-                return None
+        #if "if" in self.pattern["Stmt"]:
+        #    alt_stmt = self.pattern["Stmt"]["if"]
+        #    if alt_stmt is None:
+        #        return None
         self.generic_visit(node)
         return node
     def visit_With(self, node):
