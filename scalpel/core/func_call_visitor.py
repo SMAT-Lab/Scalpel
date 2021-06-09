@@ -1,7 +1,15 @@
+import sys
 import ast
 from collections import deque
 from ast import NodeVisitor
 from copy import deepcopy
+
+def is_py38_or_higher():
+    if sys.version_info.major == 3 and sys.version_info.minor >= 8:
+        return True
+    return False
+
+NAMECONSTANT_TYPE = ast.Constant if is_py38_or_higher() else ast.NameConstant
 
 class CallTransformer(ast.NodeTransformer):
     def __init__(self):
@@ -30,6 +38,8 @@ class CallTransformer(ast.NodeTransformer):
         elif isinstance(param, ast.Name):
             return param.id
         elif isinstance(param, ast.Num):
+            # python 3.6  
+            return param.n
             return param.value
         elif isinstance(param, ast.List):
             return "List"
