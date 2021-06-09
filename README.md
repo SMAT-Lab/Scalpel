@@ -6,15 +6,17 @@ Scalpel is a Python module integrating classical program anaysis algorithms
 with tailored features for Python language. It aims to provide simple and
 efficient solutions to software engineering researchers that are accessible to
 everybody and reusable in various contexts.
-See xxx for complete documentation.
+See xxx and xx for complete documentation and user guide.
 
 ## Introduction
 ## TODO (Apps)
 - [ ] build an graph, to test reachbility for compitibity
+- [ ] Fix issues in CFG module including testing 
 - [ ] intra-lib dependency  and inter-lib dependeny
-- [ ] User guid
+- [ ] User GUID
 - [ ] SSA-> None object not handled to see if there are in real Jupyter projects
-- [ ] simplying syntax 
+- [ ] SSA-> undefined variable tests 
+- [ ] simplying syntax such as lambda expressions as well as list compression
 
 ## TODO (Done)
 - [x] get_class
