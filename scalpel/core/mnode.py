@@ -15,6 +15,18 @@ from ..core.vars_visitor import get_vars
 from ..core.func_call_visitor import get_func_calls
 from scalpel.core.util import UnitWalker
 
+
+def get_attr_name (node):
+    if isinstance(node, ast.Call):
+        # to be test
+        return get_attr_name(node.func)
+    if isinstance(node, ast.Name):
+        return node.id
+    elif isinstance(node, ast.Attribute):
+        return get_attr_name(node.value)+"."+node.attr
+    elif isinstance(node, ast.Subscript):
+        return get_attr_name(node.value)
+
 class ImportRelation:
 
     def __init__(self):
@@ -199,6 +211,12 @@ class MNode:
         for stmt in import_stmts:
             if isinstance(stmt, ast.Import):
                 items = [nn.__dict__ for nn in stmt.names]
+                import_stmt += [stmt]
+
+        import_dict = {}
+        for stmt in import_stmts:
+            if isinstance(node, ast.Import):
+                items = [nn.__dict__ for nn in node.names]
                 for d in items:
                     if d['asname'] is None:  # alias name not found, use its imported name
                         import_dict[d['name']] = d['name']
@@ -241,19 +259,30 @@ class MNode:
         results["assign_pairs"]  = assign_pairs
         results["other_calls"]  = other_calls
         return results 
+    def _process_base_names(self, bases):
+        base_names = []
+        for b_node in bases:
+            if isinstance(b_node, ast.Name):
+                base_names.append(b_node.id)
+            elif isinstance(b_node, ast.Attribute):
+                base_names.append(get_attr_name(b_node))
+        return base_names
+            
     def parse_function_body(self):
         """
         Prase all function/class definitions
         """
         func_records = {}
+        base_records = {}
         for stmt in self.ast.body:
             if isinstance(stmt, ast.FunctionDef):
                 func_records[stmt.name] = self.retrieve_meta(stmt)
             if isinstance(stmt, ast.ClassDef):
+                base_records[stmt.name] = self._process_base_names(stmt.bases)
                 for c_stmt in stmt.body:
                     if isinstance(c_stmt, ast.FunctionDef):
                         func_records[stmt.name+'.' + c_stmt.name] = self.retrieve_meta(c_stmt)
-        return func_records
+        return func_records, base_records
 
     def make_unit_walker(self):
         """
