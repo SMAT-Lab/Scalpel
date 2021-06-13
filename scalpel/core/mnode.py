@@ -136,6 +136,9 @@ class MNode:
             elif isinstance(node, ast.ClassDef):
                 #visit class body
                 # to consider class records
+                def_info = {"scope":scope, "name": node.name, "arg": [], "kws": [],
+                        "lineno":node.lineno, "col_offset":node.col_offset}
+                def_records.append(def_info)
                 self._parse_func_defs(node.body, def_records, scope=node.name)
                 pass
             # assignment statements are useful for assignment graph
@@ -194,7 +197,7 @@ class MNode:
         self._parse_func_defs(self.ast.body, def_records, scope = "mod")
         return def_records
 
-    def parse_import_stmt(self):
+    def parse_import_stmts(self):
         """
         Return a dictionary data structure to map the imported name, from which
         module and its aliases.
@@ -202,6 +205,12 @@ class MNode:
         import_stmts = []
         for stmt in self.ast.body:
             if isinstance(stmt, (ast.ImportFrom, ast.Import)):
+                import_stmts += [stmt]
+
+        import_dict = {}
+        for stmt in import_stmts:
+            if isinstance(stmt, ast.Import):
+                items = [nn.__dict__ for nn in stmt.names]
                 import_stmt += [stmt]
 
         import_dict = {}
@@ -213,15 +222,16 @@ class MNode:
                         import_dict[d['name']] = d['name']
                     else:
                         import_dict[d['asname']] = d['name'] # otherwise , use alias name
-            if isinstance(node, ast.ImportFrom) and node.module is not None:
+            if isinstance(stmt, ast.ImportFrom) and stmt.module is not None:
                 # for import from statements
                 # module names are the head of a API name
-                items = [nn.__dict__ for nn in node.names]
+                items = [nn.__dict__ for nn in stmt.names]
                 for d in items:
                     if d['asname'] is None: # alias name not found
-                        import_dict[d['name']] = node.module+'.'+d['name']
+                        import_dict[d['name']] = stmt.module+'.'+d['name']
                     else:
-                        import_dict[d['asname']] = node.module+'.'+d['name']
+                        import_dict[d['asname']] = stmt.module+'.'+d['name']
+        return import_dict
 
     def retrieve_meta(self, node):
         results = {"assign_pairs":[], "other_calls":[]}

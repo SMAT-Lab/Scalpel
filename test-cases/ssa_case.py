@@ -29,6 +29,5 @@ else:
 # type check 
 # nameerror c not found 
 s = obj.fun() +a + c
-
 obj.fun()
 
