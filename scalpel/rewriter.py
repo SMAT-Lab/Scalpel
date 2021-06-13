@@ -2,7 +2,7 @@ import os
 import sys
 import ast
 
-# In python there are in total 23 statements to be considered 
+""" In python there are in total 23 statements to be considered 
 # the user must specify the match pattern as well as insert pattern
 # for instance.
 # it can be  Call - >  another_callname for instance
@@ -15,7 +15,7 @@ import ast
 # the second step is to think about how to write template rules
 # make it easy, format string! such as the new stmt =
 # "print("","").format(stmt.targets[0])
-
+"""
 class Rewriter(ast.NodeVisitor):
     def __init__(self,src, pattern, new_stmt):
         # pattern
