@@ -16,8 +16,6 @@ See xxx and xx for complete documentation and user guide.
 - [ ] User GUID
 - [ ] SSA-> None object not handled to see if there are in real Jupyter projects
 - [ ] SSA-> undefined variable tests 
-- [ ] simplying syntax such as lambda expressions as well as list compression
-
 ## TODO (Done)
 - [x] get_class
 - [x] get_fun_call
