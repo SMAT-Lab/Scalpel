@@ -8,6 +8,8 @@ efficient solutions to software engineering researchers that are accessible to
 everybody and reusable in various contexts.
 See xxx and xx for complete documentation and user guide.
 
+![title](res/scalpel_diagram.png)
+
 ## Introduction
 ## TODO (Apps)
 - [ ] build an graph, to test reachbility for compitibity
