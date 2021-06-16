@@ -7,7 +7,6 @@ from scalpel.core.func_call_visitor import get_func_calls
 from scalpel.SSA.ssa import SSA
 
 # we need to define cretieras for variables
-
 def test_single_case(code_str, expected_name):
     ast_node = ast.parse(code_str)
     calls = get_func_calls(ast_node)
