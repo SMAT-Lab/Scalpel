@@ -98,7 +98,7 @@ class Unit:
                 return i
         return -1
 
-    def insert_before(self, new_stmt):
+    def insert_stmt_before(self, new_stmt):
         if self.parent is not None and hasattr(self.parent, "body"):
             try:
                 pos = self.parent.body.index(self.node)
@@ -108,6 +108,15 @@ class Unit:
         else:
             raise "Error!!"
 
+    def insert_stmts_before(self, new_stmts):
+        if self.parent is not None and hasattr(self.parent, "body"):
+            try:
+                pos = self.parent.body.index(self.node)
+                self.parent.body[pos:pos+1] = new_stmts
+            except Exception as e:
+                raise "Insertion Failure"
+        else:
+            raise "Error!!"
     def insert_after(self, new_stmt):
         if self.parent is not None and hasattr(self.parent, "body"):
             try:

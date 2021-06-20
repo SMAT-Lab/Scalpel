@@ -211,12 +211,6 @@ class MNode:
         for stmt in import_stmts:
             if isinstance(stmt, ast.Import):
                 items = [nn.__dict__ for nn in stmt.names]
-                import_stmt += [stmt]
-
-        import_dict = {}
-        for stmt in import_stmts:
-            if isinstance(node, ast.Import):
-                items = [nn.__dict__ for nn in node.names]
                 for d in items:
                     if d['asname'] is None:  # alias name not found, use its imported name
                         import_dict[d['name']] = d['name']
