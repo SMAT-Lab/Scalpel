@@ -150,7 +150,7 @@ class SSA:
         generate an SSA graph.
         """
         cfg = CFGBuilder().build("toy", self.module_ast)
-        #cfg.build_visual('cfg', 'pdf')
+        cfg.build_visual('cfg', 'pdf')
         self.get_global_live_vars()
         # visit all blocks in bfs order 
         #cfg = CFGBuilder(self.module_ast)
@@ -166,7 +166,6 @@ class SSA:
                     continue
 
                 actual_value = parse_val(right)
-
                 if left.id in self.numbering:
                     var_no = self.numbering[left.id]+1
                     self.numbering[left.id] = var_no
@@ -210,6 +209,11 @@ class SSA:
                 if -1 in numbers and ident_name not in self.global_live_idents and ident_name not in BUILT_IN_FUNCTIONS:
                     print(ident_name, numbers)
                     pass
+
+        for block in all_blocks:
+            if len(block.exits) == 0:
+                for ident_name, phi_rec in block.ssa_form.items():
+                    print(ident_name, phi_rec)
 
 
     def is_undefined(self, load_idents):

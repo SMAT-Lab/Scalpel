@@ -59,7 +59,6 @@ class Block(object):
     def is_empty(self):
         """
         Check if the block is empty.
-
         Returns:
             A boolean indicating if the block is empty (True) or not (False).
         """
@@ -113,7 +112,7 @@ class Block(object):
                 src += (astor.to_source(statement)).split('\n')[0] + "...\n"
             else:
                 src += astor.to_source(statement)
-        
+ 
         return src
 
     def get_calls(self):
@@ -265,6 +264,9 @@ class CFG(object):
 
         while not working_queue.empty():
             block = working_queue.get()
+            # this block has been visited 
+            if block.id in visited:
+                continue
             all_blocks.append(block)
             visited.add(block.id)
             for suc_link in block.exits:

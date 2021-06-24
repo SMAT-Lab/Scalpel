@@ -327,6 +327,55 @@ class CFGBuilder(ast.NodeVisitor):
         self.current_block = successblock
         self.goto_new_block(node)
 
+    def visit_Try(self, node):
+        # Add the try statement at the end of the current block.
+        self.add_statement(self.current_block, node)
+
+        # Create a new block for the body of try.
+        try_block = self.new_block()
+        self.add_exit(self.current_block, try_block, ast.Constant(True))
+        for child in node.body:
+            self.visit(child) 
+
+        # Create a block for the code after the if-else.
+        n_handlers = len(node.handlers)
+        handler_blocks = []
+        for i in range(n_handlers):
+            h_block = self.new_block()
+            handler_blocks += [h_block]
+
+        after_try_block = self.new_block()
+        #self.add_exit(self.current_block, after_try_block, ast.Constant(False))
+
+        current_block = self.current_block
+        self.current_block = try_block
+        for child in node.body:
+            self.visit(child)
+        self.add_exit(self.current_block, after_try_block)
+
+        for i in range(n_handlers):
+            self.current_block = current_block
+            handler = node.handlers[i]
+            self.add_exit(self.current_block, handler_blocks[i], handler.type)
+            self.current_block = handler_blocks[i]
+            self.visit(handler)
+            self.add_exit(self.current_block, after_try_block)
+
+        #if not self.current_block.exits:
+        #    self.add_exit(self.current_block, after_try_block)
+        # Continue building the CFG in the after-if block.
+
+        self.current_block = after_try_block
+
+        #populate the block in the try
+        #self.current_block = try_block
+        #for child in node.body:
+        #    self.visit(child)
+        #if not self.current_block.exits:
+        #   self.add_exit(self.current_block, after_try_block)
+
+
+        #self.current_block = after_try_block
     def visit_If(self, node):
         # Add the If statement at the end of the current block.
         self.add_statement(self.current_block, node)
