@@ -95,11 +95,11 @@ class Block(object):
             prev_toktype = toktype
             last_col = ecol
             last_lineno = elineno
+
     def get_source(self):
         """
         Get a string containing the Python source code corresponding to the
         statements in the block.
-
         Returns:
             A string containing the source code of the statements.
         """
@@ -107,12 +107,15 @@ class Block(object):
         for statement in self.statements:
             if type(statement) in [ast.If, ast.For, ast.While]:
                 src += (astor.to_source(statement)).split('\n')[0] + "\n"
+            if type(statement) == ast.Try:
+                src += (astor.to_source(statement)).split('\n')[0] + "\n"
+            #    tmp = (astor.to_source(statement)).split('\n')[0] + "\n"
             elif type(statement) == ast.FunctionDef or\
                  type(statement) == ast.AsyncFunctionDef:
                 src += (astor.to_source(statement)).split('\n')[0] + "...\n"
             else:
                 src += astor.to_source(statement)
- 
+
         return src
 
     def get_calls(self):

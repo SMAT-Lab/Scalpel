@@ -334,8 +334,6 @@ class CFGBuilder(ast.NodeVisitor):
         # Create a new block for the body of try.
         try_block = self.new_block()
         self.add_exit(self.current_block, try_block, ast.Constant(True))
-        for child in node.body:
-            self.visit(child) 
 
         # Create a block for the code after the if-else.
         n_handlers = len(node.handlers)
@@ -343,10 +341,8 @@ class CFGBuilder(ast.NodeVisitor):
         for i in range(n_handlers):
             h_block = self.new_block()
             handler_blocks += [h_block]
-
         after_try_block = self.new_block()
         #self.add_exit(self.current_block, after_try_block, ast.Constant(False))
-
         current_block = self.current_block
         self.current_block = try_block
         for child in node.body:

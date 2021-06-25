@@ -141,9 +141,7 @@ class SSA:
                 phi_fun += [(ident_name, -1)]
             else:
                 phi_fun += block_phi_fun
-
         return phi_fun
-
 
     def gen(self):
         """
