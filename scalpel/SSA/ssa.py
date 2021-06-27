@@ -112,7 +112,6 @@ class SSA:
         idents = []
         if ast_node is None:
             return idents
-
         if isinstance(ast_node, (ast.ListComp, ast.SetComp)):
             ast_node = ast_node.generators[0].iter
         for tmp_node in ast.walk(ast_node):
@@ -127,9 +126,11 @@ class SSA:
         for suc_link in block.predecessors:
             is_this_path_done = False
             parent_block = suc_link.source
+
             # this is a back edge, discard it 
-            if parent_block.id > block.id:
-                continue
+            #if parent_block.id > block.id:
+            #    continue
+
             target_ssa_left = reversed(parent_block.ssa_form.keys())
             block_phi_fun = []
             for tmp_var_no in target_ssa_left:
@@ -139,9 +140,11 @@ class SSA:
                     break
             # this is one block 
             #phi_fun += block_phi_fun
+
             if is_this_path_done:
                 phi_fun += block_phi_fun
                 continue
+
             if len(block_phi_fun) == 0:
                 # not found in this parent_block
                 if len(parent_block.predecessors)!=0 and parent_block.id not in visited:
@@ -201,7 +204,6 @@ class SSA:
                     visited = set()
                     phi_fun_incoming = self.backward_query(block, var_name, visited)
                     phi_fun += phi_fun_incoming
-
                 block.ssa_form[(left.id, var_no)] = phi_fun
 
         for block in all_blocks:
@@ -214,16 +216,35 @@ class SSA:
                         ident_phi_fun[item[0]] += [item[1]]
             for ident_name, numbers in ident_phi_fun.items():
                 if -1 in numbers and ident_name not in self.global_live_idents and ident_name not in BUILT_IN_FUNCTIONS:
-                    print(ident_name, numbers)
+                    #print(ident_name, numbers)
                     pass
+            #for ident_name, phi_fun in ident_phi_fun.items():
+            #    print(ident_name, phi_fun)
 
+        # when there is only one exit block, compute SSA for all the vars in
+        # numbering make a if statement here to see if this is a module
+        # 
+        final_phi_fun = {}
+        def_reach = {}
         for block in all_blocks:
             if len(block.exits) == 0:
-                for ident_name, phi_rec in block.ssa_form.items():
-                    print(ident_name, phi_rec)
+                #for ident_name, phi_rec in block.ssa_form.items():
+                #    print(ident_name, phi_rec)
+                for ident_name, number in self.numbering.items():
+        #            if ident_name != 'IntProgress':
+        #                continue
+                    visited = set()
+                    phi_fun_incoming = self.backward_query(block, ident_name, visited)
+                    if ident_name not in def_reach:
+                        def_reach[ident_name] = [tmp[1] for tmp in
+                                phi_fun_incoming]
+                    for ident_name, nums in def_reach.items():
+                        print(ident_name, set(nums))
+                break
 
-        for ident_name, numbers in self.numbering.items():
-            print(ident_name, numbers)
+        # to fix identifiers in the last block!!!!! such as ___author___
+        #for ident_name, numbers in self.numbering.items():
+        #    print(ident_name, numbers)
 
     def is_undefined(self, load_idents):
         ident_phi_fun = {}
