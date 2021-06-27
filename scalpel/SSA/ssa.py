@@ -82,8 +82,19 @@ class SSA:
                 elif isinstance(stmt.target, ast.Tuple):
                     for item in stmt.target.elts:
                         assign_stmts.append((item,  stmt.iter))
-
-
+            elif isinstance(stmt, ast.Import):
+                for name in stmt.names:
+                    if name.asname is not None:
+                        assign_stmts.append((ast.Name(name.asname, ast.Store()),  None))
+                    else:
+                        assign_stmts.append((ast.Name(name.name, ast.Store()),  None))
+                pass
+            elif isinstance(stmt, ast.ImportFrom):
+                for name in stmt.names:
+                    if name.asname is not None:
+                        assign_stmts.append((ast.Name(name.asname, ast.Store()),  None))
+                    else:
+                        assign_stmts.append((ast.Name(name.name, ast.Store()),  None))
         return assign_stmts
 
     def get_attribute_stmts(self, stmts):
@@ -99,6 +110,8 @@ class SSA:
             ast_node: AST node.
         """
         idents = []
+        if ast_node is None:
+            return idents
 
         if isinstance(ast_node, (ast.ListComp, ast.SetComp)):
             ast_node = ast_node.generators[0].iter
@@ -194,7 +207,6 @@ class SSA:
         for block in all_blocks:
             ident_phi_fun = {}
             for k, v in block.ssa_form.items():
-                #rint(k, '---->', v)
                 for item in v:
                     if item[0] not in ident_phi_fun:
                         ident_phi_fun[item[0]] = [item[1]]
@@ -210,6 +222,8 @@ class SSA:
                 for ident_name, phi_rec in block.ssa_form.items():
                     print(ident_name, phi_rec)
 
+        for ident_name, numbers in self.numbering.items():
+            print(ident_name, numbers)
 
     def is_undefined(self, load_idents):
         ident_phi_fun = {}
@@ -234,5 +248,5 @@ class SSA:
         # need to have test cases
         # need to merge test code and code rewrite part
         # need to the executability of notebooks
-        # 
+        # need to add consider import statement into SSA form 
         pass

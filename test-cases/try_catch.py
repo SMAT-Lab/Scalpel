@@ -11,9 +11,10 @@ Usage:
 from __future__ import division, absolute_import
 # import compatibility functions and utilities
 import sys
+import os, ast, json
 from ._utils import _range
 # to inherit from the tqdm class
-from ._tqdm import tqdm
+from ._tqdm import tqdm as t 
 
 # import IPython/Jupyter base widget and display utilities
 #try:  # IPython 4.x

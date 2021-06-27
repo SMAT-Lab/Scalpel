@@ -282,7 +282,6 @@ class MNode:
     def gen_cfg(self):
         cfg = CFGBuilder().build("toy", self.ast)
         return cfg
-        #cfg.build_visual('cfg', 'pdf')
 
     def make_unit_walker(self):
         """
