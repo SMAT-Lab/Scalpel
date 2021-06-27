@@ -107,15 +107,17 @@ class Block(object):
         for statement in self.statements:
             if type(statement) in [ast.If, ast.For, ast.While]:
                 src += (astor.to_source(statement)).split('\n')[0] + "\n"
-            if type(statement) == ast.Try:
+            elif type(statement) == ast.Try:
                 src += (astor.to_source(statement)).split('\n')[0] + "\n"
-            #    tmp = (astor.to_source(statement)).split('\n')[0] + "\n"
+            #elif type(statement) == ast.If:
+            #    src += (astor.to_source(statement)).split('\n')[0] + "\n"
             elif type(statement) == ast.FunctionDef or\
                  type(statement) == ast.AsyncFunctionDef:
                 src += (astor.to_source(statement)).split('\n')[0] + "...\n"
+            elif type(statement) == ast.ClassDef:
+                src += (astor.to_source(statement)).split('\n')[0] + "...\n"
             else:
                 src += astor.to_source(statement)
-
         return src
 
     def get_calls(self):
