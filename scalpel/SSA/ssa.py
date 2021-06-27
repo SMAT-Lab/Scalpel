@@ -143,12 +143,12 @@ class SSA:
                 phi_fun += block_phi_fun
         return phi_fun
 
-    def gen(self):
+    def compute_SSA(self, cfg):
         """
         generate an SSA graph.
         """
-        cfg = CFGBuilder().build("toy", self.module_ast)
-        cfg.build_visual('cfg', 'pdf')
+        #cfg = CFGBuilder().build("toy", self.module_ast)
+        #cfg.build_visual('cfg', 'pdf')
         self.get_global_live_vars()
         # visit all blocks in bfs order 
         #cfg = CFGBuilder(self.module_ast)
@@ -162,7 +162,6 @@ class SSA:
                 left, right = ar
                 if left == None:
                     continue
-
                 actual_value = parse_val(right)
                 if left.id in self.numbering:
                     var_no = self.numbering[left.id]+1
@@ -172,7 +171,6 @@ class SSA:
                     var_no = 1
                     self.numbering[left.id] = var_no
                     self.var_values[(left.id,var_no)] = actual_value
-
                 phi_fun = []
                 right_vars = self.get_identifiers(right)
                 for var_name in right_vars:
@@ -192,7 +190,6 @@ class SSA:
                     phi_fun += phi_fun_incoming
 
                 block.ssa_form[(left.id, var_no)] = phi_fun
-
 
         for block in all_blocks:
             ident_phi_fun = {}
@@ -226,5 +223,16 @@ class SSA:
     def build_viz(self):
         pass
 
+    # if we hope to direct program flow
+    # we need to inject condition testing value
+    # we need to replace try catch blocks to a sequential structure 
+
     def test(self):
+        # for each of scopes, we look at the largest numbered variable value
+        # range. There will be a dictionary to store var and value range For its subscopes, we will look at its accessed variable
+        # this is a top-down strategy
+        # need to have test cases
+        # need to merge test code and code rewrite part
+        # need to the executability of notebooks
+        # 
         pass

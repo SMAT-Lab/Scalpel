@@ -2,7 +2,7 @@ import os
 import sys
 import ast
 import astor
-from scalpel.core.module_graph import MNode, ModuleGraph
+from scalpel.core.mnode import MNode
 from scalpel.SSA.ssa import SSA
 
 # we need to define cretieras for variables
@@ -49,9 +49,10 @@ def test_SSA():
     mnode.source = source
     mnode.gen_ast()
     ast_node = mnode.ast
-    m_ssa = SSA(source)
-    m_ssa.gen()
-    m_ssa.test()
+    cfgs = mnode.gen_cfg()
+    #m_ssa = SSA(source)
+    #m_ssa.compute_SSA()
+    #m_ssa.test()
 
 
 if __name__ == '__main__':

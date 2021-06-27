@@ -14,7 +14,7 @@ from copy import deepcopy
 from ..core.vars_visitor import get_vars
 from ..core.func_call_visitor import get_func_calls
 from scalpel.core.util import UnitWalker
-
+from ..cfg.builder import CFGBuilder
 
 def get_attr_name (node):
     if isinstance(node, ast.Call):
@@ -43,7 +43,6 @@ class MNode:
     file.
 
     """
-
     def __init__(self, name):
         """
         Args:
@@ -177,7 +176,8 @@ class MNode:
                     return node
                 if scope.split('.')[0] == node.name:
                     return self._retrieve_by_scope(node, scope.lstrip(node.name+'.'))
-
+        #cfg = CFGBuilder().build("toy", self.module_ast)
+        #cfg.build_visual('cfg', 'pdf')
             # assignment statements are useful for assignment graph
             elif isinstance(node, ast.Assign):
                 pass
@@ -253,6 +253,7 @@ class MNode:
         results["assign_pairs"]  = assign_pairs
         results["other_calls"]  = other_calls
         return results 
+
     def _process_base_names(self, bases):
         base_names = []
         for b_node in bases:
@@ -261,7 +262,7 @@ class MNode:
             elif isinstance(b_node, ast.Attribute):
                 base_names.append(get_attr_name(b_node))
         return base_names
-            
+
     def parse_function_body(self):
         """
         Prase all function/class definitions
@@ -278,10 +279,13 @@ class MNode:
                         func_records[stmt.name+'.' + c_stmt.name] = self.retrieve_meta(c_stmt)
         return func_records, base_records
 
+    def gen_cfg(self):
+        cfg = CFGBuilder().build("toy", self.ast)
+        return cfg
+        #cfg.build_visual('cfg', 'pdf')
+
     def make_unit_walker(self):
         """
         Returns a generator of units at statement level
         """
         return UnitWalker(self.ast)
- 
-
