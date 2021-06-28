@@ -225,6 +225,27 @@ class CFGBuilder(ast.NodeVisitor):
                                                               self.current_id)
         self.current_id = func_builder.current_id + 1
 
+    def new_ClassCFG(self, node, asynchr=False):
+        """
+        Create a new sub-CFG for a class definition and add it to the
+        function CFGs of the CFG being built.
+
+        Args:
+            node: The AST node containing the function definition.
+            async: Boolean indicating whether the function for which the CFG is
+                   being built is asynchronous or not.
+        """
+        self.current_id += 1
+        # A new sub-CFG is created for the body of the function definition and
+        # added to the function CFGs of the current CFG.
+        func_body = ast.Module(body=node.body)
+        func_builder = CFGBuilder()
+        self.cfg.class_cfgs[node.name] = func_builder.build(node.name,
+                                                              func_body,
+                                                              asynchr,
+                                                              self.current_id)
+        self.current_id = func_builder.current_id + 1
+
     def clean_cfg(self, block, visited=[]):
         """
         Remove the useless (empty) blocks from a CFG.
@@ -369,9 +390,8 @@ class CFGBuilder(ast.NodeVisitor):
         #    self.visit(child)
         #if not self.current_block.exits:
         #   self.add_exit(self.current_block, after_try_block)
-
-
         #self.current_block = after_try_block
+
     def visit_If(self, node):
         # Add the If statement at the end of the current block.
         self.add_statement(self.current_block, node)
@@ -406,6 +426,7 @@ class CFGBuilder(ast.NodeVisitor):
 
         # Continue building the CFG in the after-if block.
         self.current_block = afterif_block
+
 
     def visit_While(self, node):
         loop_guard = self.new_loopguard()
@@ -489,6 +510,8 @@ class CFGBuilder(ast.NodeVisitor):
         self.new_functionCFG(node, asynchr=True)
 
     def visit_ClassDef(self, node):
+        self.add_statement(self.current_block, node)
+        self.new_ClassCFG(node, asynchr=True)
         return node
 
     def visit_Await(self, node):
@@ -498,7 +521,6 @@ class CFGBuilder(ast.NodeVisitor):
         self.current_block = afterawait_block
 
     def visit_Return(self, node):
-
         self.add_statement(self.current_block, node)
         self.cfg.finalblocks.append(self.current_block)
         # Continue in a new block but without any jump to it -> all code after

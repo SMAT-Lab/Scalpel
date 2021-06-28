@@ -111,8 +111,8 @@ class Block(object):
                 src += (astor.to_source(statement)).split('\n')[0] + "\n"
             #elif type(statement) == ast.If:
             #    src += (astor.to_source(statement)).split('\n')[0] + "\n"
-            elif type(statement) == ast.FunctionDef or\
-                 type(statement) == ast.AsyncFunctionDef:
+            elif type(statement) in [ast.FunctionDef,ast.AsyncFunctionDef,
+                    ast.ClassDef]:
                 src += (astor.to_source(statement)).split('\n')[0] + "...\n"
             elif type(statement) == ast.ClassDef:
                 src += (astor.to_source(statement)).split('\n')[0] + "...\n"
@@ -201,6 +201,7 @@ class CFG(object):
         self.finalblocks = []
         # Sub-CFGs for functions defined inside the current CFG.
         self.functioncfgs = {}
+        self.class_cfgs = {}
 
     def __str__(self):
         return "CFG for {}".format(self.name)
