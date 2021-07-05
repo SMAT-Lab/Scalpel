@@ -17,14 +17,12 @@ BUILT_IN_FUNCTIONS = set([ "abs","delattr",
         "classmethod", "getattr", "locals", "repr", "repr", "zip", "compile", "globals", "map", "reversed",  "__import__", "complex", "hasattr", "max", "round"]
         )
 
-
 def parse_val(node):
    # does not return anything
    if isinstance(node, ast.Constant):
        return node.value
    if isinstance(node, ast.Str):
        return node.value
-
    return "other"
 
 class SSA:
@@ -45,6 +43,7 @@ class SSA:
         self.m_node.source = self.src
         self.m_node.gen_ast() 
         self.global_live_idents = []
+        self.ssa_blocks = []
 
     def get_global_live_vars(self):
         import_dict = self.m_node.parse_import_stmts()
@@ -126,11 +125,9 @@ class SSA:
         for suc_link in block.predecessors:
             is_this_path_done = False
             parent_block = suc_link.source
-
             # this is a back edge, discard it 
             #if parent_block.id > block.id:
             #    continue
-
             target_ssa_left = reversed(parent_block.ssa_form.keys())
             block_phi_fun = []
             for tmp_var_no in target_ssa_left:
@@ -140,11 +137,9 @@ class SSA:
                     break
             # this is one block 
             #phi_fun += block_phi_fun
-
             if is_this_path_done:
                 phi_fun += block_phi_fun
                 continue
-
             if len(block_phi_fun) == 0:
                 # not found in this parent_block
                 if len(parent_block.predecessors)!=0 and parent_block.id not in visited:
@@ -152,20 +147,20 @@ class SSA:
                     #phi_fun += block_phi_fun
             #else:
             #    phi_fun += block_phi_fun
-
             if len(block_phi_fun) == 0:
                 phi_fun += [(ident_name, -1)]
             else:
                 phi_fun += block_phi_fun
         return phi_fun
 
-    def compute_SSA(self, cfg):
+    def compute_SSA(self, cfg, live_ident_table={}, is_final=False):
         """
         generate an SSA graph.
         """
-        #cfg = CFGBuilder().build("toy", self.module_ast)
-        #cfg.build_visual('cfg', 'pdf')
+        # to consider single line function call / single line attributes/
+        # return statements
         self.get_global_live_vars()
+        #self.numbering = {}
         # visit all blocks in bfs order 
         #cfg = CFGBuilder(self.module_ast)
         all_blocks = cfg.bfs()
@@ -205,43 +200,13 @@ class SSA:
                     phi_fun_incoming = self.backward_query(block, var_name, visited)
                     phi_fun += phi_fun_incoming
                 block.ssa_form[(left.id, var_no)] = phi_fun
-
-        for block in all_blocks:
-            ident_phi_fun = {}
-            for k, v in block.ssa_form.items():
-                for item in v:
-                    if item[0] not in ident_phi_fun:
-                        ident_phi_fun[item[0]] = [item[1]]
-                    else:
-                        ident_phi_fun[item[0]] += [item[1]]
-            for ident_name, numbers in ident_phi_fun.items():
-                if -1 in numbers and ident_name not in self.global_live_idents and ident_name not in BUILT_IN_FUNCTIONS:
-                    #print(ident_name, numbers)
-                    pass
-            #for ident_name, phi_fun in ident_phi_fun.items():
-            #    print(ident_name, phi_fun)
-
-        # when there is only one exit block, compute SSA for all the vars in
-        # numbering make a if statement here to see if this is a module
-        # 
-        final_phi_fun = {}
-        def_reach = {}
-        for block in all_blocks:
-            if len(block.exits) == 0:
-                #for ident_name, phi_rec in block.ssa_form.items():
-                #    print(ident_name, phi_rec)
-                for ident_name, number in self.numbering.items():
-        #            if ident_name != 'IntProgress':
-        #                continue
-                    visited = set()
-                    phi_fun_incoming = self.backward_query(block, ident_name, visited)
-                    if ident_name not in def_reach:
-                        def_reach[ident_name] = [tmp[1] for tmp in
-                                phi_fun_incoming]
-                    for ident_name, nums in def_reach.items():
-                        print(ident_name, set(nums))
-                break
-
+        self.ssa_blocks = all_blocks
+        #for fun_name, fun_cfg in cfg.class_cfgs.items():
+        #    print('----------', fun_name, '-------------')
+        #    self.compute_SSA(fun_cfg)
+        #for fun_name, fun_cfg in cfg.functioncfgs.items():
+        #    print('----------', fun_name, '-------------')
+        #    self.compute_SSA(fun_cfg)
         # to fix identifiers in the last block!!!!! such as ___author___
         #for ident_name, numbers in self.numbering.items():
         #    print(ident_name, numbers)
@@ -258,16 +223,43 @@ class SSA:
     def build_viz(self):
         pass
 
-    # if we hope to direct program flow
-    # we need to inject condition testing value
-    # we need to replace try catch blocks to a sequential structure 
+    def compute_final_idents(self):
+        # when there is only one exit block, compute SSA for all the vars in
+        # numbering make a if statement here to see if this is a module
+        final_phi_fun = {}
+        def_reach = {}
+        for block in self.ssa_blocks:
+            if len(block.exits) == 0:
+                #for ident_name, phi_rec in block.ssa_form.items():
+                #    print(ident_name, phi_rec)
+                for ident_name, number in self.numbering.items():
+                    visited = set()
+                    phi_fun_incoming = self.backward_query(block, ident_name, visited)
+                    if ident_name not in def_reach:
+                        def_reach[ident_name] = set([tmp[1] for tmp in phi_fun_incoming])
+                #for ident_name, nums in def_reach.items():
+                #    print(ident_name, set(nums))
+        return def_reach
 
-    def test(self):
-        # for each of scopes, we look at the largest numbered variable value
-        # range. There will be a dictionary to store var and value range For its subscopes, we will look at its accessed variable
-        # this is a top-down strategy
-        # need to have test cases
-        # need to merge test code and code rewrite part
-        # need to the executability of notebooks
-        # need to add consider import statement into SSA form 
+    def test(self, live_ident_table=[]):
+        for block in self.ssa_blocks:
+            ident_phi_fun = {}
+            for k, v in block.ssa_form.items():
+                for item in v:
+                    if item[0] not in ident_phi_fun:
+                        ident_phi_fun[item[0]] = [item[1]]
+                    else:
+                        ident_phi_fun[item[0]] += [item[1]]
+            for ident_name, numbers in ident_phi_fun.items():
+                #print(ident_name)
+                if ident_name in live_ident_table[0] and -1 in live_ident_table[0][ident_name]:
+                    print(ident_name, numbers)
+                elif ident_name in live_ident_table[0] and -1 in live_ident_table[1][ident_name]:
+                    print(ident_name, numbers)
+                elif -1 in numbers and ident_name not in self.global_live_idents and ident_name not in BUILT_IN_FUNCTIONS:
+                    #print(ident_name, numbers)
+                    pass
+            #for ident_name, phi_fun in ident_phi_fun.items():
+            #    print(ident_name, phi_fun)
+
         pass
