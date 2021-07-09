@@ -2,9 +2,9 @@ import os
 import sys
 import ast
 import astor
-from scalpel.core.module_graph import MNode, ModuleGraph
-from scalpel.core.func_call_visitor import get_func_calls
-from scalpel.SSA.ssa import SSA
+from .core.module_graph import MNode, ModuleGraph
+from .core.func_call_visitor import get_func_calls
+from .SSA.ssa import SSA
 
 # we need to define cretieras for variables
 def test_single_case(code_str, expected_name):

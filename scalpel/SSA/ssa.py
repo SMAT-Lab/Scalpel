@@ -44,6 +44,7 @@ class SSA:
         self.m_node.gen_ast() 
         self.global_live_idents = []
         self.ssa_blocks = []
+        self.error_paths = []
 
     def get_global_live_vars(self):
         import_dict = self.m_node.parse_import_stmts()
@@ -118,9 +119,10 @@ class SSA:
                 idents.append(tmp_node.id)
         return idents
 
-    def backward_query(self, block, ident_name, visited):
+    def backward_query(self, block, ident_name, visited, path = []):
         phi_fun = []
         visited.add(block.id)
+        path.append(block.id)
         # all the incoming path
         for suc_link in block.predecessors:
             is_this_path_done = False
@@ -143,14 +145,17 @@ class SSA:
             if len(block_phi_fun) == 0:
                 # not found in this parent_block
                 if len(parent_block.predecessors)!=0 and parent_block.id not in visited:
-                    block_phi_fun = self.backward_query(parent_block, ident_name, visited)
+                    block_phi_fun = self.backward_query(parent_block,
+                            ident_name, visited, path = path)
                     #phi_fun += block_phi_fun
             #else:
             #    phi_fun += block_phi_fun
             if len(block_phi_fun) == 0:
                 phi_fun += [(ident_name, -1)]
+                self.error_paths.append(path.copy())
             else:
                 phi_fun += block_phi_fun
+        path.pop()
         return phi_fun
 
     def compute_SSA(self, cfg, live_ident_table={}, is_final=False):
@@ -261,5 +266,5 @@ class SSA:
                     pass
             #for ident_name, phi_fun in ident_phi_fun.items():
             #    print(ident_name, phi_fun)
-
+        print(self.error_paths)
         pass
