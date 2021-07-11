@@ -319,7 +319,7 @@ class CFG(object):
             return self.backward(pre_link.source, value, is_visited, pre_link)
         return None
 
-    def build_visual(self, filepath, format, calls=True, show=True):
+    def build_visual(self, format, calls=True, show=True):
         """
         Build a visualisation of the CFG with graphviz and output it in a DOT
         file.
@@ -332,7 +332,8 @@ class CFG(object):
                   file after building the visualisation.
         """
         graph = self._build_visual(format, calls)
-        graph.render(filepath, view=show)
+        return graph
+        #graph.render(filepath, view=show)
 
     def __iter__(self):
         """
