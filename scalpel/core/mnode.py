@@ -280,7 +280,7 @@ class MNode:
         return func_records, base_records
 
     def gen_cfg(self):
-        cfg = CFGBuilder().build("toy", self.ast)
+        cfg = CFGBuilder().build("", self.ast)
         return cfg
 
     def make_unit_walker(self):
