@@ -22,7 +22,10 @@ def parse_val(node):
    if isinstance(node, ast.Constant):
        return node.value
    if isinstance(node, ast.Str):
-       return node.value
+       if hasattr(node, "value"):
+           return node.value
+       else:
+           return node.s
    return "other"
 
 class SSA:
@@ -130,7 +133,7 @@ class SSA:
             # this is a back edge, discard it 
             #if parent_block.id > block.id:
             #    continue
-            target_ssa_left = reversed(parent_block.ssa_form.keys())
+            target_ssa_left = reversed(list(parent_block.ssa_form.keys()))
             block_phi_fun = []
             for tmp_var_no in target_ssa_left:
                 if tmp_var_no[0] == ident_name:
@@ -179,6 +182,8 @@ class SSA:
                 if left == None:
                     continue
                 actual_value = parse_val(right)
+                if isinstance(left, ast.Tuple):
+                    continue
                 if left.id in self.numbering:
                     var_no = self.numbering[left.id]+1
                     self.numbering[left.id] = var_no
@@ -191,7 +196,7 @@ class SSA:
                 right_vars = self.get_identifiers(right)
                 for var_name in right_vars:
                    # last assignment occur in the same block
-                    for tmp_var_no in reversed(block.ssa_form.keys()):
+                    for tmp_var_no in reversed(list(block.ssa_form.keys())):
                         if var_name == tmp_var_no[0]:
                             phi_fun.append(tmp_var_no)
                             break
@@ -247,8 +252,10 @@ class SSA:
         return def_reach
 
     def test(self, live_ident_table=[]):
+        n_scopes = len(live_ident_table)
         for block in self.ssa_blocks:
             ident_phi_fun = {}
+        
             for k, v in block.ssa_form.items():
                 for item in v:
                     if item[0] not in ident_phi_fun:
@@ -257,14 +264,11 @@ class SSA:
                         ident_phi_fun[item[0]] += [item[1]]
             for ident_name, numbers in ident_phi_fun.items():
                 #print(ident_name)
-                if ident_name in live_ident_table[0] and -1 in live_ident_table[0][ident_name]:
-                    print(ident_name, numbers)
-                elif ident_name in live_ident_table[0] and -1 in live_ident_table[1][ident_name]:
-                    print(ident_name, numbers)
-                elif -1 in numbers and ident_name not in self.global_live_idents and ident_name not in BUILT_IN_FUNCTIONS:
-                    #print(ident_name, numbers)
-                    pass
-            #for ident_name, phi_fun in ident_phi_fun.items():
-            #    print(ident_name, phi_fun)
-        print(self.error_paths)
-        pass
+                for i in range(n_scopes):
+                    if ident_name in live_ident_table[-i] and -1 in live_ident_table[-i][ident_name]:
+                        #print(ident_name, numbers)
+                        return False
+                    elif -1 in numbers and ident_name not in self.global_live_idents and ident_name not in BUILT_IN_FUNCTIONS:
+                        return False
+        #print(self.error_paths)
+        return True
