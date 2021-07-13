@@ -54,6 +54,15 @@ class SSA:
         def_records = self.m_node.parse_func_defs()
         def_idents = [r['name'] for r in def_records if r['scope'] == 'mod']
         self.global_live_idents = def_idents + list(import_dict.keys())
+    def flatten_tuple(ast_tuple):
+        """
+        input: ast tuple object
+        return a list of elements in the given tuple
+        """
+        output =[]
+        first = ast_tuple[0]
+        second = ast_tuple[1]  
+
 
     def get_assign_raw(self, stmts):
         """
@@ -64,9 +73,15 @@ class SSA:
         assign_stmts = []
         for stmt in stmts:
             if isinstance(stmt,ast.Assign):
-                for target in stmt.targets:
-                    if hasattr(target, "id"):
-                        assign_stmts.append((target, stmt.value))
+                if isinstance(stmt.targets, list):
+                    for target in stmt.targets:
+                        if hasattr(target, "id"):
+                            assign_stmts.append((target, stmt.value))
+                        elif isinstance(target, ast.Tuple):
+                            for elt in target.elts:
+                                if hasattr(elt, "id"):
+                                    assign_stmts.append((elt, stmt.value))
+
             elif isinstance(stmt,ast.AnnAssign):
                 if hasattr(stmt.target, "id"):
                     assign_stmts.append((stmt.target, stmt.value))
@@ -84,14 +99,17 @@ class SSA:
                     assign_stmts.append((stmt.target,  stmt.iter))
                 elif isinstance(stmt.target, ast.Tuple):
                     for item in stmt.target.elts:
-                        assign_stmts.append((item,  stmt.iter))
+                        if isinstance(item, ast.Tuple):
+                            for elt in item.elts:
+                                assign_stmts.append((elt,  stmt.iter))
+                        else:
+                            assign_stmts.append((item,  stmt.iter))
             elif isinstance(stmt, ast.Import):
                 for name in stmt.names:
                     if name.asname is not None:
                         assign_stmts.append((ast.Name(name.asname, ast.Store()),  None))
                     else:
                         assign_stmts.append((ast.Name(name.name, ast.Store()),  None))
-                pass
             elif isinstance(stmt, ast.ImportFrom):
                 for name in stmt.names:
                     if name.asname is not None:
@@ -182,8 +200,12 @@ class SSA:
                 if left == None:
                     continue
                 actual_value = parse_val(right)
-                if isinstance(left, ast.Tuple):
-                    continue
+#                if isinstance(left, ast.Tuple):
+#                    continue
+                if not isinstance(left, ast.Name):
+                    print(ast.dump(left))
+                    print(ast.dump(right))
+
                 if left.id in self.numbering:
                     var_no = self.numbering[left.id]+1
                     self.numbering[left.id] = var_no
@@ -194,32 +216,26 @@ class SSA:
                     self.var_values[(left.id,var_no)] = actual_value
                 phi_fun = []
                 right_vars = self.get_identifiers(right)
+                #if left.id == 'e_vals':
                 for var_name in right_vars:
                    # last assignment occur in the same block
                     for tmp_var_no in reversed(list(block.ssa_form.keys())):
                         if var_name == tmp_var_no[0]:
                             phi_fun.append(tmp_var_no)
                             break
-
                 local_block_vars = [tmp[0] for tmp in phi_fun]
                 remaining_vars = [tmp for tmp in right_vars if tmp not in local_block_vars]
-                #  to look for the variable last assignment from incoming blocks
+                # to look for the variable last assignment from incoming blocks
                 phi_fun = []
                 for var_name in remaining_vars:
                     visited = set()
                     phi_fun_incoming = self.backward_query(block, var_name, visited)
-                    phi_fun += phi_fun_incoming
+                    if len(phi_fun_incoming) == 0:
+                        phi_fun += [(var_name, -1)]
+                    else:
+                        phi_fun += phi_fun_incoming
                 block.ssa_form[(left.id, var_no)] = phi_fun
         self.ssa_blocks = all_blocks
-        #for fun_name, fun_cfg in cfg.class_cfgs.items():
-        #    print('----------', fun_name, '-------------')
-        #    self.compute_SSA(fun_cfg)
-        #for fun_name, fun_cfg in cfg.functioncfgs.items():
-        #    print('----------', fun_name, '-------------')
-        #    self.compute_SSA(fun_cfg)
-        # to fix identifiers in the last block!!!!! such as ___author___
-        #for ident_name, numbers in self.numbering.items():
-        #    print(ident_name, numbers)
 
     def is_undefined(self, load_idents):
         ident_phi_fun = {}
@@ -254,8 +270,7 @@ class SSA:
     def test(self, live_ident_table=[]):
         n_scopes = len(live_ident_table)
         for block in self.ssa_blocks:
-            ident_phi_fun = {}
-        
+            ident_phi_fun = {} 
             for k, v in block.ssa_form.items():
                 for item in v:
                     if item[0] not in ident_phi_fun:
@@ -263,12 +278,13 @@ class SSA:
                     else:
                         ident_phi_fun[item[0]] += [item[1]]
             for ident_name, numbers in ident_phi_fun.items():
-                #print(ident_name)
+                if -1 in numbers:
+                    return True
                 for i in range(n_scopes):
                     if ident_name in live_ident_table[-i] and -1 in live_ident_table[-i][ident_name]:
                         #print(ident_name, numbers)
-                        return False
+                        return True
                     elif -1 in numbers and ident_name not in self.global_live_idents and ident_name not in BUILT_IN_FUNCTIONS:
-                        return False
+                        return True
         #print(self.error_paths)
-        return True
+        return False
