@@ -1,0 +1,1067 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# English Language Sequence Generator\n",
+    "## Recurrent Neural Network Project\n",
+    "\n",
+    "Welcome to the Recurrent Neural Network Project in the Artificial Intelligence Nanodegree! In this notebook, some template code has already been provided for you, and you will need to implement additional functionality to successfully complete this project. You will not need to modify the included code beyond what is requested. Sections that begin with **'Implementation'** in the header indicate that the following block of code will require additional functionality which you must provide. Instructions will be provided for each section and the specifics of the implementation are marked in the code block with a 'TODO' statement. Please be sure to read the instructions carefully!\n",
+    "\n",
+    "In addition to implementing code, there will be questions that you must answer which relate to the project and your implementation. Each section where you will answer a question is preceded by a **'Question X'** header. Carefully read each question and provide thorough answers in the following text boxes that begin with **'Answer:'**. Your project submission will be evaluated based on your answers to each of the questions and the implementation you provide.  \n",
+    "\n",
+    ">**Note:** Code and Markdown cells can be executed using the **Shift + Enter** keyboard shortcut. In addition, Markdown cells can be edited by typically double-clicking the cell to enter edit mode."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Problem 1: Create a sequence generator"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 1.1  Getting started\n",
+    "\n",
+    "In this project you will implement a popular Recurrent Neural Network (RNN) architecture to create an English language sequence generator capable of building semi-coherent English sentences from scratch by building them up character-by-character.  This will require a substantial amount amount of parameter tuning on a large training corpus (at least 100,000 characters long).  In particular for this project we will be using a complete version of Sir Arthur Conan Doyle's classic book The Adventures of Sherlock Holmes.\n",
+    "\n",
+    "How can we train a machine learning model to generate text automatically, character-by-character?  *By showing the model many training examples so it can learn a pattern between input and output.*  With this type of text generation each input is a string of valid characters like this one\n",
+    "\n",
+    "*dogs are grea*\n",
+    "\n",
+    "while the corresponding output is the next character in the sentence - which here is 't' (since the complete sentence is 'dogs are great').  We need to show a model many such examples in order for it to make reasonable predictions.\n",
+    "\n",
+    "**Fun note:** For those interested in how text generation is being used check out some of the following fun resources:\n",
+    "\n",
+    "- [Generate wacky sentences](http://www.cs.toronto.edu/~ilya/rnn.html) with this academic RNN text generator\n",
+    "\n",
+    "- Various twitter bots that tweet automatically generated text like [this one](http://tweet-generator-alex.herokuapp.com/).\n",
+    "\n",
+    "- The [NanoGenMo](https://github.com/NaNoGenMo/2016) annual contest to automatically produce a 50,000+ novel automatically\n",
+    "\n",
+    "- [Robot Shakespeare](https://github.com/genekogan/RobotShakespeare) a text generator that automatically produces Shakespear-esk sentences"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 1.2  Preprocessing a text dataset\n",
+    "\n",
+    "Our first task is to get a large text corpus for use in training, and on it we perform a several light pre-processing tasks.  The default corpus we will use is the classic book Sherlock Holmes, but you can use a variety of others as well - so long as they are fairly large (around 100,000 characters or more).  "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 13,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "our original text has 581864 characters\n"
+     ]
+    }
+   ],
+   "source": [
+    "# read in the text, transforming everything to lower case\n",
+    "text = open('datasets/holmes.txt').read().lower()\n",
+    "print('our original text has ' + str(len(text)) + ' characters')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Next, lets examine a bit of the raw text.  Because we are interested in creating sentences of English words automatically by building up each word character-by-character, we only want to train on valid English words.  In other words - we need to remove all of the other characters that are not part of English words."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 14,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "\"\\ufeffproject gutenberg's the adventures of sherlock holmes, by arthur conan doyle\\n\\nthis ebook is for the use of anyone anywhere at no cost and with\\nalmost no restrictions whatsoever.  you may copy it, give it away or\\nre-use it under the terms of the project gutenberg license included\\nwith this ebook or online at www.gutenberg.net\\n\\n\\ntitle: the adventures of sherlock holmes\\n\\nauthor: arthur conan doyle\\n\\nposting date: april 18, 2011 [ebook #1661]\\nfirst posted: november 29, 2002\\n\\nlanguage: english\\n\\n\\n*** start of this project gutenberg ebook the adventures of sherlock holmes ***\\n\\n\\n\\n\\nproduced by an anonymous project gutenberg volunteer and jose menendez\\n\\n\\n\\n\\n\\n\\n\\n\\n\\nthe adventures of sherlock holmes\\n\\nby\\n\\nsir arthur conan doyle\\n\\n\\n\\n   i. a scandal in bohemia\\n  ii. the red-headed league\\n iii. a case of identity\\n  iv. the boscombe valley mystery\\n   v. the five orange pips\\n  vi. the man with the twisted lip\\n vii. the adventure of the blue carbuncle\\nviii. the adventure of the speckled band\\n  ix. the adventure of the engineer's thumb\\n   x. the adventure of the noble bachelor\\n  xi. the adventure of the beryl coronet\\n xii. the adventure of the copper beeches\\n\\n\\n\\n\\nadventure i. a scandal in bohemia\\n\\ni.\\n\\nto sherlock holmes she is always the woman. i have seldom heard\\nhim mention her under any other name. in his eyes she eclipses\\nand predominates the whole of her sex. it was not that he felt\\nany emotion akin to love for irene adler. all emotions, and that\\none particularly, were abhorrent to his cold, precise but\\nadmirably balanced mind. he was, i take it, the most perfect\\nreasoning and observing machine that the world has seen, but as a\\nlover he would have placed himself in a false position. he never\\nspoke of the softer passions, save with a gibe and a sneer. they\\nwere admirable things for the observer--excellent for drawing the\\nveil from men's motives and actions. but for the trained reasoner\\nto admit such intrusions into his own delicate and finely\\nadjusted temperament was to introduce a dist\""
+      ]
+     },
+     "execution_count": 14,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "### print out the first 1000 characters of the raw text to get a sense of what we need to throw out\n",
+    "text[:2000]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Wow - there's a lot of junk here (i.e., weird uncommon character combinations - as this first character chunk contains the title and author page, as well as table of contents)!  To keep things simple, we want to train our RNN on a large chunk of more typical English sentences - we don't want it to start thinking non-english words or strange characters are valid! - so lets clean up the data a bit.\n",
+    "\n",
+    "First, since the dataset is so large and the first few hundred characters contain a lot of junk, lets cut it out.  Lets also find-and-replace those newline tags with empty spaces."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 15,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "### find and replace '\\n' and '\\r' symbols - replacing them \n",
+    "text = text[1302:]\n",
+    "text = text.replace('\\n',' ')    # replacing '\\n' with '' simply removes the sequence\n",
+    "text = text.replace('\\r',' ')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Lets see how the first 1000 characters of our text looks now!"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 16,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "\"is eyes she eclipses and predominates the whole of her sex. it was not that he felt any emotion akin to love for irene adler. all emotions, and that one particularly, were abhorrent to his cold, precise but admirably balanced mind. he was, i take it, the most perfect reasoning and observing machine that the world has seen, but as a lover he would have placed himself in a false position. he never spoke of the softer passions, save with a gibe and a sneer. they were admirable things for the observer--excellent for drawing the veil from men's motives and actions. but for the trained reasoner to admit such intrusions into his own delicate and finely adjusted temperament was to introduce a distracting factor which might throw a doubt upon all his mental results. grit in a sensitive instrument, or a crack in one of his own high-power lenses, would not be more disturbing than a strong emotion in a nature such as his. and yet there was but one woman to him, and that woman was the late irene ad\""
+      ]
+     },
+     "execution_count": 16,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "### print out the first 1000 characters of the raw text to get a sense of what we need to throw out\n",
+    "text[:1000]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<a id='TODO_1'></a>\n",
+    "\n",
+    "#### TODO: finish cleaning the text\n",
+    "\n",
+    "Lets make sure we haven't left any other atypical characters (commas, periods, etc., are ok) lurking around in the depths of the text.  You can do this by enumerating all the text's unique characters, examining them, and then replacing any unwanted characters with empty spaces!  Once we find all of the text's unique characters, we can remove all of the atypical ones in the next cell.  Note: don't remove the punctuation marks given in my_answers.py."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 17,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "### TODO: implement cleaned_text in my_answers.py\n",
+    "from my_answers import cleaned_text\n",
+    "\n",
+    "text = cleaned_text(text)\n",
+    "\n",
+    "# shorten any extra dead space created above\n",
+    "text = text.replace('  ',' ')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "With your chosen characters removed print out the first few hundred lines again just to double check that everything looks good."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 18,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "'is eyes she eclipses and predominates the whole of her sex. it was not that he felt any emotion akin to love for irene adler. all emotions, and that one particularly, were abhorrent to his cold, precise but admirably balanced mind. he was, i take it, the most perfect reasoning and observing machine that the world has seen, but as a lover he would have placed himself in a false position. he never spoke of the softer passions, save with a gibe and a sneer. they were admirable things for the observerexcellent for drawing the veil from mens motives and actions. but for the trained reasoner to admit such intrusions into his own delicate and finely adjusted temperament was to introduce a distracting factor which might throw a doubt upon all his mental results. grit in a sensitive instrument, or a crack in one of his own highpower lenses, would not be more disturbing than a strong emotion in a nature such as his. and yet there was but one woman to him, and that woman was the late irene adler, of dubious and questionable memory. i had seen little of holmes lately. my marriage had drifted us away from each other. my own complete happiness, and the homecentred interests which rise up around the man who first finds himself master of his own establishment, were sufficient to absorb all my attention, while holmes, who loathed every form of society with his whole bohemian soul, remained in our lodgings in baker street, buried among his old books, and alternating from week to week between cocaine and ambition, the drowsiness of the drug, and the fierce energy of his own keen nature. he was still, as ever, deeply attracted by the study of crime, and occupied his immense faculties and extraordinary powers of observation in following out those clues, and clearing up those mysteries which had been abandoned as hopeless by the official police. from time to time i heard some vague account of his doings: of his summons to odessa in the case of the trepoff murder, of his clearing up of th'"
+      ]
+     },
+     "execution_count": 18,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "### print out the first 2000 characters of the raw text to get a sense of what we need to throw out\n",
+    "text[:2000]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Now that we have thrown out a good number of non-English characters/character sequences lets print out some statistics about the dataset - including number of total characters and number of unique characters."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 19,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "this corpus has 569169 total number of characters\n",
+      "this corpus has 33 unique characters\n"
+     ]
+    }
+   ],
+   "source": [
+    "# count the number of unique characters in the text\n",
+    "chars = sorted(list(set(text)))\n",
+    "\n",
+    "# print some of the text, as well as statistics\n",
+    "print (\"this corpus has \" +  str(len(text)) + \" total number of characters\")\n",
+    "print (\"this corpus has \" +  str(len(chars)) + \" unique characters\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 1.3  Cutting data into input/output pairs\n",
+    "\n",
+    "Now that we have our text all cleaned up, how can we use it to train a model to generate sentences automatically?  First we need to train a machine learning model - and in order to do that we need a set of input/output pairs for a model to train on.  How can we create a set of input/output pairs from our text to train on?\n",
+    "\n",
+    "Remember in part 1 of this notebook how we used a sliding window to extract input/output pairs from a time series?  We do the same thing here!  We slide a window of length $T$ along our giant text corpus - everything in the window becomes one input while the character following becomes its corresponding output.  This process of extracting input/output pairs is illustrated in the gif below on a small example text using a window size of T = 5.\n",
+    "\n",
+    "<img src=\"images/text_windowing_training.gif\" width=400 height=400/>\n",
+    "\n",
+    "Notice one aspect of the sliding window in this gif that does not mirror the analogous gif for time series shown in part 1 of the notebook - we do not need to slide the window along one character at a time but can move by a fixed step size $M$ greater than 1 (in the gif indeed $M = 1$).  This is done with large input texts (like ours which has over 500,000 characters!) when sliding the window along one character at a time we would create far too many input/output pairs to be able to reasonably compute with.\n",
+    "\n",
+    "More formally lets denote our text corpus - which is one long string of characters - as follows\n",
+    "\n",
+    "$$s_{0},s_{1},s_{2},...,s_{P}$$\n",
+    "\n",
+    "where $P$ is the length of the text (again for our text $P \\approx 500,000!$).  Sliding a window of size T = 5 with a step length of M = 1 (these are the parameters shown in the gif above) over this sequence produces the following list of input/output pairs\n",
+    "\n",
+    "\n",
+    "$$\\begin{array}{c|c}\n",
+    "\\text{Input} & \\text{Output}\\\\\n",
+    "\\hline \\color{CornflowerBlue} {\\langle s_{1},s_{2},s_{3},s_{4},s_{5}\\rangle} & \\color{Goldenrod}{ s_{6}} \\\\\n",
+    "\\ \\color{CornflowerBlue} {\\langle s_{2},s_{3},s_{4},s_{5},s_{6} \\rangle } & \\color{Goldenrod} {s_{7} } \\\\\n",
+    "\\color{CornflowerBlue}  {\\vdots} & \\color{Goldenrod} {\\vdots}\\\\\n",
+    "\\color{CornflowerBlue} { \\langle s_{P-5},s_{P-4},s_{P-3},s_{P-2},s_{P-1} \\rangle } & \\color{Goldenrod} {s_{P}}\n",
+    "\\end{array}$$\n",
+    "\n",
+    "Notice here that each input is a sequence (or vector) of 5 characters (and in general has length equal to the window size T) while each corresponding output is a single character.  We created around P total number of input/output pairs  (for general step size M we create around ceil(P/M) pairs)."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<a id='TODO_2'></a>\n",
+    "\n",
+    "Now its time for you to window the input time series as described above! \n",
+    "\n",
+    "**TODO:** Create a function that runs a sliding window along the input text and creates associated input/output pairs.  A skeleton function has been provided for you.  Note that this function should input a) the text  b) the window size and c) the step size, and return the input/output sequences.  Note: the return items should be *lists* - not numpy arrays.\n",
+    "\n",
+    "(remember to copy your completed function into the script *my_answers.py* function titled *window_transform_text* before submitting your project)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 20,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "### TODO: implement window_transform_series in my_answers.py\n",
+    "from my_answers import window_transform_series"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "With our function complete we can now use it to produce input/output pairs!  We employ the function in the next cell, where the window_size = 50 and step_size = 5."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 21,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "# run your text window-ing function \n",
+    "window_size = 100\n",
+    "step_size = 5\n",
+    "inputs, outputs = window_transform_text(text,window_size,step_size)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Lets print out a few input/output pairs to verify that we have made the right sort of stuff!"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 22,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "input = e eclipses and predominates the whole of her sex. it was not that he felt any emotion akin to love f\n",
+      "output = o\n",
+      "--------------\n",
+      "input = erexcellent for drawing the veil from mens motives and actions. but for the trained reasoner to admi\n",
+      "output = t\n"
+     ]
+    }
+   ],
+   "source": [
+    "# print out a few of the input/output pairs to verify that we've made the right kind of stuff to learn from\n",
+    "print('input = ' + inputs[2])\n",
+    "print('output = ' + outputs[2])\n",
+    "print('--------------')\n",
+    "print('input = ' + inputs[100])\n",
+    "print('output = ' + outputs[100])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Looks good!"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 1.4  Wait, what kind of problem is text generation again?\n",
+    "\n",
+    "In part 1 of this notebook we used the same pre-processing technique - the sliding window - to produce a set of training input/output pairs to tackle the problem of time series prediction *by treating the problem as one of regression*.  So what sort of problem do we have here now, with text generation?  Well, the time series prediction was a regression problem because the output (one value of the time series) was a continuous value.  Here - for character-by-character text generation - each output is a *single character*.  This isn't a continuous value - but a distinct class - therefore **character-by-character text generation is a classification problem**.  \n",
+    "\n",
+    "How many classes are there in the data?  Well, the number of classes is equal to the number of unique characters we have to predict!  How many of those were there in our dataset again?  Lets print out the value again."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 23,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "this corpus has 33 unique characters\n",
+      "and these characters are \n",
+      "[' ', '!', ',', '.', ':', ';', '?', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']\n"
+     ]
+    }
+   ],
+   "source": [
+    "# print out the number of unique characters in the dataset\n",
+    "chars = sorted(list(set(text)))\n",
+    "print (\"this corpus has \" +  str(len(chars)) + \" unique characters\")\n",
+    "print ('and these characters are ')\n",
+    "print (chars)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Rockin' - so we have a multiclass classification problem on our hands!"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 1.5  One-hot encoding characters\n",
+    "\n",
+    "The last issue we have to deal with is representing our text data as numerical data so that we can use it as an input to a neural network. One of the conceptually simplest ways of doing this is via a 'one-hot encoding' scheme.  Here's how it works.\n",
+    "\n",
+    "We transform each character in our inputs/outputs into a vector with length equal to the number of unique characters in our text.  This vector is all zeros except one location where we place a 1 - and this location is unique to each character type.  e.g., we transform 'a', 'b', and 'c' as follows\n",
+    "\n",
+    "$$a\\longleftarrow\\left[\\begin{array}{c}\n",
+    "1\\\\\n",
+    "0\\\\\n",
+    "0\\\\\n",
+    "\\vdots\\\\\n",
+    "0\\\\\n",
+    "0\n",
+    "\\end{array}\\right]\\,\\,\\,\\,\\,\\,\\,b\\longleftarrow\\left[\\begin{array}{c}\n",
+    "0\\\\\n",
+    "1\\\\\n",
+    "0\\\\\n",
+    "\\vdots\\\\\n",
+    "0\\\\\n",
+    "0\n",
+    "\\end{array}\\right]\\,\\,\\,\\,\\,c\\longleftarrow\\left[\\begin{array}{c}\n",
+    "0\\\\\n",
+    "0\\\\\n",
+    "1\\\\\n",
+    "\\vdots\\\\\n",
+    "0\\\\\n",
+    "0 \n",
+    "\\end{array}\\right]\\cdots$$\n",
+    "\n",
+    "where each vector has 32 entries (or in general: number of entries = number of unique characters in text)."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The first practical step towards doing this one-hot encoding is to form a dictionary mapping each unique character to a unique integer, and one dictionary to do the reverse mapping.  We can then use these dictionaries to quickly make our one-hot encodings, as well as re-translate (from integers to characters) the results of our trained RNN classification model."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 24,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "# this dictionary is a function mapping each unique character to a unique integer\n",
+    "chars_to_indices = dict((c, i) for i, c in enumerate(chars))  # map each unique character to unique integer\n",
+    "\n",
+    "# this dictionary is a function mapping each unique integer back to a unique character\n",
+    "indices_to_chars = dict((i, c) for i, c in enumerate(chars))  # map each unique integer back to unique character"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Now we can transform our input/output pairs - consisting of characters - to equivalent input/output pairs made up of one-hot encoded vectors.  In the next cell we provide a function for doing just this: it takes in the raw character input/outputs and returns their numerical versions.  In particular the numerical input is given as $\\bf{X}$, and numerical output is given as the $\\bf{y}$"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 25,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "# transform character-based input/output into equivalent numerical versions\n",
+    "def encode_io_pairs(text,window_size,step_size):\n",
+    "    # number of unique chars\n",
+    "    chars = sorted(list(set(text)))\n",
+    "    num_chars = len(chars)\n",
+    "    \n",
+    "    # cut up text into character input/output pairs\n",
+    "    inputs, outputs = window_transform_text(text,window_size,step_size)\n",
+    "    \n",
+    "    # create empty vessels for one-hot encoded input/output\n",
+    "    X = np.zeros((len(inputs), window_size, num_chars), dtype=np.bool)\n",
+    "    y = np.zeros((len(inputs), num_chars), dtype=np.bool)\n",
+    "    \n",
+    "    # loop over inputs/outputs and transform and store in X/y\n",
+    "    for i, sentence in enumerate(inputs):\n",
+    "        for t, char in enumerate(sentence):\n",
+    "            X[i, t, chars_to_indices[char]] = 1\n",
+    "        y[i, chars_to_indices[outputs[i]]] = 1\n",
+    "        \n",
+    "    return X,y"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Now run the one-hot encoding function by activating the cell below and transform our input/output pairs!"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 26,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "# use your function\n",
+    "window_size = 100\n",
+    "step_size = 5\n",
+    "X,y = encode_io_pairs(text,window_size,step_size)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<a id='TODO_3'></a>\n",
+    "\n",
+    "## 1.6 Setting up our RNN\n",
+    "\n",
+    "With our dataset loaded and the input/output pairs extracted / transformed we can now begin setting up our RNN for training.  Again we will use Keras to quickly build a single hidden layer RNN - where our hidden layer consists of LSTM modules.\n",
+    "\n",
+    "Time to get to work: build a 3 layer RNN model of the following specification\n",
+    "\n",
+    "- layer 1 should be an LSTM module with 200 hidden units --> note this should have input_shape = (window_size,len(chars)) where len(chars) = number of unique characters in your cleaned text\n",
+    "- layer 2 should be a linear module, fully connected, with len(chars) hidden units --> where len(chars) = number of unique characters in your cleaned text\n",
+    "- layer 3 should be a softmax activation ( since we are solving a *multiclass classification*)\n",
+    "- Use the **categorical_crossentropy** loss \n",
+    "\n",
+    "This network can be constructed using just a few lines - as with the RNN network you made in part 1 of this notebook.  See e.g., the [general Keras documentation](https://keras.io/getting-started/sequential-model-guide/) and the [LSTM documentation in particular](https://keras.io/layers/recurrent/) for examples of how to quickly use Keras to build neural network models."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 27,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "### necessary functions from the keras library\n",
+    "from keras.models import Sequential\n",
+    "from keras.layers import Dense, Activation, LSTM\n",
+    "from keras.optimizers import RMSprop\n",
+    "from keras.utils.data_utils import get_file\n",
+    "import keras\n",
+    "import random\n",
+    "\n",
+    "# TODO implement build_part2_RNN in my_answers.py\n",
+    "from my_answers import build_part2_RNN\n",
+    "\n",
+    "model = build_part2_RNN(window_size, len(chars))\n",
+    "\n",
+    "# initialize optimizer\n",
+    "optimizer = keras.optimizers.RMSprop(lr=0.001, rho=0.9, epsilon=1e-08, decay=0.0)\n",
+    "\n",
+    "# compile model --> make sure initialized optimizer and callbacks - as defined above - are used\n",
+    "model.compile(loss='categorical_crossentropy', optimizer=optimizer)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 1.7  Training our RNN model for text generation\n",
+    "\n",
+    "With our RNN setup we can now train it!  Lets begin by trying it out on a small subset of the larger version.  In the next cell we take the first 10,000 input/output pairs from our training database to learn on."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 28,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "# a small subset of our input/output pairs\n",
+    "Xsmall = X[:10000,:,:]\n",
+    "ysmall = y[:10000,:]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Now lets fit our model!"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 29,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Epoch 1/40\n",
+      "10000/10000 [==============================] - 4s - loss: 3.0423     \n",
+      "Epoch 2/40\n",
+      "10000/10000 [==============================] - 4s - loss: 2.8940     \n",
+      "Epoch 3/40\n",
+      "10000/10000 [==============================] - 4s - loss: 2.8726     \n",
+      "Epoch 4/40\n",
+      "10000/10000 [==============================] - 4s - loss: 2.8423     \n",
+      "Epoch 5/40\n",
+      "10000/10000 [==============================] - 4s - loss: 2.7851     \n",
+      "Epoch 6/40\n",
+      "10000/10000 [==============================] - 4s - loss: 2.7138     \n",
+      "Epoch 7/40\n",
+      "10000/10000 [==============================] - 4s - loss: 2.6368     \n",
+      "Epoch 8/40\n",
+      "10000/10000 [==============================] - 4s - loss: 2.5601     \n",
+      "Epoch 9/40\n",
+      "10000/10000 [==============================] - 4s - loss: 2.5041     \n",
+      "Epoch 10/40\n",
+      "10000/10000 [==============================] - 4s - loss: 2.4553     \n",
+      "Epoch 11/40\n",
+      "10000/10000 [==============================] - 4s - loss: 2.4061     \n",
+      "Epoch 12/40\n",
+      "10000/10000 [==============================] - 4s - loss: 2.3682     \n",
+      "Epoch 13/40\n",
+      "10000/10000 [==============================] - 4s - loss: 2.3362     \n",
+      "Epoch 14/40\n",
+      "10000/10000 [==============================] - 4s - loss: 2.3043     \n",
+      "Epoch 15/40\n",
+      "10000/10000 [==============================] - 4s - loss: 2.2733     \n",
+      "Epoch 16/40\n",
+      "10000/10000 [==============================] - 4s - loss: 2.2457     \n",
+      "Epoch 17/40\n",
+      "10000/10000 [==============================] - 4s - loss: 2.2305     \n",
+      "Epoch 18/40\n",
+      "10000/10000 [==============================] - 4s - loss: 2.2000     \n",
+      "Epoch 19/40\n",
+      "10000/10000 [==============================] - 4s - loss: 2.1839     \n",
+      "Epoch 20/40\n",
+      "10000/10000 [==============================] - 4s - loss: 2.1631     \n",
+      "Epoch 21/40\n",
+      "10000/10000 [==============================] - 4s - loss: 2.1411     \n",
+      "Epoch 22/40\n",
+      "10000/10000 [==============================] - 4s - loss: 2.1244     \n",
+      "Epoch 23/40\n",
+      "10000/10000 [==============================] - 4s - loss: 2.1045     \n",
+      "Epoch 24/40\n",
+      "10000/10000 [==============================] - 4s - loss: 2.0875     \n",
+      "Epoch 25/40\n",
+      "10000/10000 [==============================] - 4s - loss: 2.0661     \n",
+      "Epoch 26/40\n",
+      "10000/10000 [==============================] - 4s - loss: 2.0482     \n",
+      "Epoch 27/40\n",
+      "10000/10000 [==============================] - 4s - loss: 2.0283     \n",
+      "Epoch 28/40\n",
+      "10000/10000 [==============================] - 4s - loss: 2.0121     \n",
+      "Epoch 29/40\n",
+      "10000/10000 [==============================] - 4s - loss: 1.9892     \n",
+      "Epoch 30/40\n",
+      "10000/10000 [==============================] - 4s - loss: 1.9705     \n",
+      "Epoch 31/40\n",
+      "10000/10000 [==============================] - 4s - loss: 1.9522     \n",
+      "Epoch 32/40\n",
+      "10000/10000 [==============================] - 4s - loss: 1.9328     \n",
+      "Epoch 33/40\n",
+      "10000/10000 [==============================] - 4s - loss: 1.9138     \n",
+      "Epoch 34/40\n",
+      "10000/10000 [==============================] - 4s - loss: 1.8913     \n",
+      "Epoch 35/40\n",
+      "10000/10000 [==============================] - 4s - loss: 1.8683     \n",
+      "Epoch 36/40\n",
+      "10000/10000 [==============================] - 4s - loss: 1.8453     \n",
+      "Epoch 37/40\n",
+      "10000/10000 [==============================] - 4s - loss: 1.8253     \n",
+      "Epoch 38/40\n",
+      "10000/10000 [==============================] - 4s - loss: 1.7985     \n",
+      "Epoch 39/40\n",
+      "10000/10000 [==============================] - 4s - loss: 1.7768     \n",
+      "Epoch 40/40\n",
+      "10000/10000 [==============================] - 4s - loss: 1.7519     \n"
+     ]
+    }
+   ],
+   "source": [
+    "# train the model\n",
+    "model.fit(Xsmall, ysmall, batch_size=500, epochs=40,verbose = 1)\n",
+    "\n",
+    "# save weights\n",
+    "model.save_weights('model_weights/best_RNN_small_textdata_weights.hdf5')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "How do we make a given number of predictions (characters) based on this fitted model?   \n",
+    "\n",
+    "First we predict the next character after following any chunk of characters in the text of length equal to our chosen window size.  Then we remove the first character in our input sequence and tack our prediction onto the end.  This gives us a slightly changed sequence of inputs that still has length equal to the size of our window.  We then feed in this updated input sequence into the model to predict the another character.  Together then we have two predicted characters following our original input sequence.  Repeating this process N times gives us N predicted characters.\n",
+    "\n",
+    "In the next Python cell we provide you with a completed function that does just this - it makes predictions when given a) a trained RNN model, b) a subset of (window_size) characters from the text, and c) a number of characters to predict (to follow our input subset)."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 30,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "# function that uses trained model to predict a desired number of future characters\n",
+    "def predict_next_chars(model,input_chars,num_to_predict):     \n",
+    "    # create output\n",
+    "    predicted_chars = ''\n",
+    "    for i in range(num_to_predict):\n",
+    "        # convert this round's predicted characters to numerical input    \n",
+    "        x_test = np.zeros((1, window_size, len(chars)))\n",
+    "        for t, char in enumerate(input_chars):\n",
+    "            x_test[0, t, chars_to_indices[char]] = 1.\n",
+    "\n",
+    "        # make this round's prediction\n",
+    "        test_predict = model.predict(x_test,verbose = 0)[0]\n",
+    "\n",
+    "        # translate numerical prediction back to characters\n",
+    "        r = np.argmax(test_predict)                           # predict class of each test input\n",
+    "        d = indices_to_chars[r] \n",
+    "\n",
+    "        # update predicted_chars and input\n",
+    "        predicted_chars+=d\n",
+    "        input_chars+=d\n",
+    "        input_chars = input_chars[1:]\n",
+    "    return predicted_chars"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<a id='TODO_4'></a>\n",
+    "\n",
+    "With your trained model try a few subsets of the complete text as input - note the length of each must be exactly equal to the window size.  For each subset use the function above to predict the next 100 characters that follow each input."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 31,
+   "metadata": {
+    "scrolled": true
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "------------------\n",
+      "input chars = \n",
+      "d predominates the whole of her sex. it was not that he felt any emotion akin to love for irene adle\"\n",
+      "\n",
+      "predicted chars = \n",
+      "nt wish ou has mantery and it the could the was ho mere then and he wand hould the lades and and her\"\n",
+      "\n",
+      "------------------\n",
+      "input chars = \n",
+      "the man who first finds himself master of his own establishment, were sufficient to absorb all my at\"\n",
+      "\n",
+      "predicted chars = \n",
+      " bere and the calles to the soule sof the chathe sare and he manted in the camere and the coule on t\"\n",
+      "\n",
+      "------------------\n",
+      "input chars = \n",
+      "indicated a spirit case and a gasogene in the corner. then he stood before the fire and looked me ov\"\n",
+      "\n",
+      "predicted chars = \n",
+      "e she ledith was and he then in the sallly se pronged ha lack be me the that in the same har and he \"\n",
+      "\n",
+      "------------------\n",
+      "input chars = \n",
+      ", you see, my double deduction that you had been out in vile weather, and that you had a particularl\"\n",
+      "\n",
+      "predicted chars = \n",
+      "e and at the loule sout to his the that in the lamen on the camere and the thend he was hall he pare\"\n",
+      "\n",
+      "------------------\n",
+      "input chars = \n",
+      "is room. frequently. how often? well, some hundreds of times. then how many are there? how many? i d\"\n",
+      "\n",
+      "predicted chars = \n",
+      "ase and he manter and at in the mant intore the camer and he pace and he mand her and her and here a\"\n",
+      "\n"
+     ]
+    }
+   ],
+   "source": [
+    "# TODO: choose an input sequence and use the prediction function in the previous Python cell to predict 100 characters following it\n",
+    "# get an appropriately sized chunk of characters from the text\n",
+    "start_inds = [23, 1200, 3500, 4900, 6000]\n",
+    "\n",
+    "# load in weights\n",
+    "model.load_weights('model_weights/best_RNN_small_textdata_weights.hdf5')\n",
+    "for s in start_inds:\n",
+    "    start_index = s\n",
+    "    input_chars = text[start_index: start_index + window_size]\n",
+    "\n",
+    "    # use the prediction function\n",
+    "    predict_input = predict_next_chars(model,input_chars,num_to_predict = 100)\n",
+    "\n",
+    "    # print out input characters\n",
+    "    print('------------------')\n",
+    "    input_line = 'input chars = ' + '\\n' +  input_chars + '\"' + '\\n'\n",
+    "    print(input_line)\n",
+    "\n",
+    "    # print out predicted characters\n",
+    "    line = 'predicted chars = ' + '\\n' +  predict_input + '\"' + '\\n'\n",
+    "    print(line)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "This looks ok, but not great.  Now lets try the same experiment with a larger chunk of the data - with the first 100,000 input/output pairs.  \n",
+    "\n",
+    "Tuning RNNs for a typical character dataset like the one we will use here is a computationally intensive endeavour and thus timely on a typical CPU.  Using a reasonably sized cloud-based GPU can speed up training by a factor of 10.  Also because of the long training time it is highly recommended that you carefully write the output of each step of your process to file.  This is so that all of your results are saved even if you close the web browser you're working out of, as the processes will continue processing in the background but variables/output in the notebook system will not update when you open it again.\n",
+    "\n",
+    "In the next cell we show you how to create a text file in Python and record data to it.  This sort of setup can be used to record your final predictions."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 32,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "'this is only a test \\nthe value of x is 2\\n'"
+      ]
+     },
+     "execution_count": 32,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "### A simple way to write output to file\n",
+    "f = open('my_test_output.txt', 'w')              # create an output file to write too\n",
+    "f.write('this is only a test ' + '\\n')           # print some output text\n",
+    "x = 2\n",
+    "f.write('the value of x is ' + str(x) + '\\n')    # record a variable value\n",
+    "f.close()     \n",
+    "\n",
+    "# print out the contents of my_test_output.txt\n",
+    "f = open('my_test_output.txt', 'r')              # create an output file to write too\n",
+    "f.read()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "With this recording devices we can now more safely perform experiments on larger portions of the text.  In the next cell we will use the first 100,000 input/output pairs to train our RNN model."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "First we fit our model to the dataset, then generate text using the trained model in precisely the same generation method applied before on the small dataset.\n",
+    "\n",
+    "**Note:** your generated words should be - by and large - more realistic than with the small dataset, but you won't be able to generate perfect English sentences even with this amount of data.  A rule of thumb: your model is working well if you generate sentences that largely contain real English words."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 33,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Epoch 1/30\n",
+      "100000/100000 [==============================] - 43s - loss: 2.0298    \n",
+      "Epoch 2/30\n",
+      "100000/100000 [==============================] - 43s - loss: 1.9373    \n",
+      "Epoch 3/30\n",
+      "100000/100000 [==============================] - 43s - loss: 1.8721    \n",
+      "Epoch 4/30\n",
+      "100000/100000 [==============================] - 43s - loss: 1.8179    \n",
+      "Epoch 5/30\n",
+      "100000/100000 [==============================] - 43s - loss: 1.7703    \n",
+      "Epoch 6/30\n",
+      "100000/100000 [==============================] - 43s - loss: 1.7272    \n",
+      "Epoch 7/30\n",
+      "100000/100000 [==============================] - 43s - loss: 1.6868    \n",
+      "Epoch 8/30\n",
+      "100000/100000 [==============================] - 43s - loss: 1.6498    \n",
+      "Epoch 9/30\n",
+      "100000/100000 [==============================] - 43s - loss: 1.6139    \n",
+      "Epoch 10/30\n",
+      "100000/100000 [==============================] - 43s - loss: 1.5802    \n",
+      "Epoch 11/30\n",
+      "100000/100000 [==============================] - 43s - loss: 1.5479    \n",
+      "Epoch 12/30\n",
+      "100000/100000 [==============================] - 43s - loss: 1.5157    \n",
+      "Epoch 13/30\n",
+      "100000/100000 [==============================] - 43s - loss: 1.4861    \n",
+      "Epoch 14/30\n",
+      "100000/100000 [==============================] - 43s - loss: 1.4557    \n",
+      "Epoch 15/30\n",
+      "100000/100000 [==============================] - 43s - loss: 1.4255    \n",
+      "Epoch 16/30\n",
+      "100000/100000 [==============================] - 43s - loss: 1.3975    \n",
+      "Epoch 17/30\n",
+      "100000/100000 [==============================] - 43s - loss: 1.3686    \n",
+      "Epoch 18/30\n",
+      "100000/100000 [==============================] - 43s - loss: 1.3411    \n",
+      "Epoch 19/30\n",
+      "100000/100000 [==============================] - 43s - loss: 1.3117    \n",
+      "Epoch 20/30\n",
+      "100000/100000 [==============================] - 43s - loss: 1.2831    \n",
+      "Epoch 21/30\n",
+      "100000/100000 [==============================] - 43s - loss: 1.2554    \n",
+      "Epoch 22/30\n",
+      "100000/100000 [==============================] - 43s - loss: 1.2267    \n",
+      "Epoch 23/30\n",
+      "100000/100000 [==============================] - 43s - loss: 1.1985    \n",
+      "Epoch 24/30\n",
+      "100000/100000 [==============================] - 43s - loss: 1.1711    \n",
+      "Epoch 25/30\n",
+      "100000/100000 [==============================] - 43s - loss: 1.1436    \n",
+      "Epoch 26/30\n",
+      "100000/100000 [==============================] - 43s - loss: 1.1164    \n",
+      "Epoch 27/30\n",
+      "100000/100000 [==============================] - 43s - loss: 1.0898    \n",
+      "Epoch 28/30\n",
+      "100000/100000 [==============================] - 43s - loss: 1.0639    \n",
+      "Epoch 29/30\n",
+      "100000/100000 [==============================] - 43s - loss: 1.0388    \n",
+      "Epoch 30/30\n",
+      "100000/100000 [==============================] - 43s - loss: 1.0122    \n"
+     ]
+    }
+   ],
+   "source": [
+    "# a small subset of our input/output pairs\n",
+    "Xlarge = X[:100000,:,:]\n",
+    "ylarge = y[:100000,:]\n",
+    "\n",
+    "# TODO: fit to our larger dataset\n",
+    "model.fit(Xlarge, ylarge, batch_size=500, epochs=30, verbose=1)\n",
+    "\n",
+    "# save weights\n",
+    "model.save_weights('model_weights/best_RNN_large_textdata_weights.hdf5')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 34,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "-------------------\n",
+      "\n",
+      "input chars = \n",
+      "d predominates the whole of her sex. it was not that he felt any emotion akin to love for irene adle\"\n",
+      "\n",
+      "predicted chars = \n",
+      "t. it is a cand of the matter round. i have been missude to the thing with his from in when he was a\"\n",
+      "\n",
+      "-------------------\n",
+      "\n",
+      "input chars = \n",
+      "the man who first finds himself master of his own establishment, were sufficient to absorb all my at\"\n",
+      "\n",
+      "predicted chars = \n",
+      "tere. i was a sure and the chull room drewanded and a mont some had not to lef loods which he packed\"\n",
+      "\n",
+      "-------------------\n",
+      "\n",
+      "input chars = \n",
+      "indicated a spirit case and a gasogene in the corner. then he stood before the fire and looked me ov\"\n",
+      "\n",
+      "predicted chars = \n",
+      "er the odder tongolaten coulless which the recommers on the office. and lay the ress spopt in the pr\"\n",
+      "\n",
+      "-------------------\n",
+      "\n",
+      "input chars = \n",
+      ", you see, my double deduction that you had been out in vile weather, and that you had a particularl\"\n",
+      "\n",
+      "predicted chars = \n",
+      "y and that the struet. i was already thar we and count the wills for a place of lowd, said holmes la\"\n",
+      "\n",
+      "-------------------\n",
+      "\n",
+      "input chars = \n",
+      "is room. frequently. how often? well, some hundreds of times. then how many are there? how many? i d\"\n",
+      "\n",
+      "predicted chars = \n",
+      "o not be a formed the court this has no dount that the starr and sand a little brecest of my miss sa\"\n",
+      "\n"
+     ]
+    }
+   ],
+   "source": [
+    "# TODO: choose an input sequence and use the prediction function in the previous Python cell to predict 100 characters following it\n",
+    "# get an appropriately sized chunk of characters from the text\n",
+    "start_inds = [23, 1200, 3500, 4900, 6000]\n",
+    "\n",
+    "# save output\n",
+    "f = open('text_gen_output/RNN_large_textdata_output.txt', 'w')  # create an output file to write too\n",
+    "\n",
+    "# load weights\n",
+    "model.load_weights('model_weights/best_RNN_large_textdata_weights.hdf5')\n",
+    "for s in start_inds:\n",
+    "    start_index = s\n",
+    "    input_chars = text[start_index: start_index + window_size]\n",
+    "\n",
+    "    # use the prediction function\n",
+    "    predict_input = predict_next_chars(model,input_chars,num_to_predict = 100)\n",
+    "\n",
+    "    # print out input characters\n",
+    "    line = '-------------------' + '\\n'\n",
+    "    print(line)\n",
+    "    f.write(line)\n",
+    "\n",
+    "    input_line = 'input chars = ' + '\\n' +  input_chars + '\"' + '\\n'\n",
+    "    print(input_line)\n",
+    "    f.write(input_line)\n",
+    "\n",
+    "    # print out predicted characters\n",
+    "    predict_line = 'predicted chars = ' + '\\n' +  predict_input + '\"' + '\\n'\n",
+    "    print(predict_line)\n",
+    "    f.write(predict_line)\n",
+    "f.close()"
+   ]
+  }
+ ],
+ "metadata": {
+  "anaconda-cloud": {},
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.6.0"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 1
+}

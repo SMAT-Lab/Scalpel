@@ -1,0 +1,473 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "#Tim Grose - timothy.h.grose@gmail.com\n",
+    "#instructions for running\n",
+    "#download as a .py.  save as main.py into lq_app folder.\n",
+    "#open command prompt in folder containing lq_app folder and type \"bokeh serve lq_app --show\""
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "#import packages\n",
+    "import bokeh, pandas as pd"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 45,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "#import necessary portions of bokeh\n",
+    "from bokeh.plotting import *\n",
+    "from bokeh.models import HoverTool, ColumnDataSource, Axis, Span, NumeralTickFormatter, Label, LabelSet\n",
+    "from bokeh.layouts import row, widgetbox, column\n",
+    "from bokeh.models.widgets import Select, Div\n",
+    "from bokeh.io import curdoc, show\n",
+    "from bokeh.palettes import Inferno256\n",
+    "from os.path import dirname, join"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "metadata": {},
+   "outputs": [
+    {
+     "ename": "NameError",
+     "evalue": "name '__file__' is not defined",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[1;31m---------------------------------------------------------------------------\u001b[0m",
+      "\u001b[1;31mNameError\u001b[0m                                 Traceback (most recent call last)",
+      "\u001b[1;32m<ipython-input-4-a87f4c47225e>\u001b[0m in \u001b[0;36m<module>\u001b[1;34m()\u001b[0m\n\u001b[0;32m      1\u001b[0m \u001b[1;31m#read processed lq data file\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[0;32m      2\u001b[0m \u001b[1;31m#for main.py\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[1;32m----> 3\u001b[1;33m \u001b[0mlqdf\u001b[0m\u001b[1;33m=\u001b[0m\u001b[0mpd\u001b[0m\u001b[1;33m.\u001b[0m\u001b[0mread_csv\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0mjoin\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0mdirname\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0m__file__\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m,\u001b[0m\u001b[1;34m'data'\u001b[0m\u001b[1;33m,\u001b[0m\u001b[1;34m'Trimmed_MSA_LQs_2017-08-06.csv'\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[0m",
+      "\u001b[1;31mNameError\u001b[0m: name '__file__' is not defined"
+     ]
+    }
+   ],
+   "source": [
+    "#read processed lq data file\n",
+    "#for main.py\n",
+    "lqdf=pd.read_csv(join(dirname(__file__),'data','Trimmed_MSA_LQs_2017-08-06.csv'))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "#read processed lq data file\n",
+    "#for ipynb\n",
+    "#lqdf=pd.read_csv(\"data/Trimmed_MSA_LQs_2017-08-06.csv\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 87,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "lqdf_agg=lqdf[(lqdf['agglvl_title']=='Supersector')&(lqdf['area_title']=='New York-Newark-Jersey City, NY-NJ-PA MSA')]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 88,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "x=lqdf_agg['msa_lq']\n",
+    "y=lqdf_agg['annual_avg_emplvl']\n",
+    "desc=lqdf_agg['industry_title']"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 89,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "#set source data\n",
+    "#may need to add columns used in Select\n",
+    "source=ColumnDataSource(data=dict(\n",
+    "    x=x,\n",
+    "    y=y,\n",
+    "    desc=desc,\n",
+    "))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 109,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "#set up contents  of hover tool with source data\n",
+    "hover = HoverTool(\n",
+    "    tooltips=\"\"\"    \n",
+    "    <div style=\"background:white;\">\n",
+    "            <div>\n",
+    "                <span style=\"font-size: 12px; color: blue;\">Industry:</span>\n",
+    "                <span style=\"font-size: 12px; color: black;\">@desc</span>\n",
+    "\n",
+    "            </div>\n",
+    "            <div>\n",
+    "                <span style=\"font-size: 12px; color: blue;\">MSA Location Quotient</span>\n",
+    "                <span style=\"font-size: 12px; color: black;\">@x</span>\n",
+    "                \n",
+    "            </div>\n",
+    "            <div>\n",
+    "                <span style=\"font-size: 12px; color: blue;\">Employment:</span>\n",
+    "                <span style=\"font-size: 12px; color: black;\">@y</span>\n",
+    "            </div>\n",
+    "        </div>\n",
+    "        \"\"\"\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 110,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#set up figure with titles and hover\n",
+    "p1=Figure(x_axis_label='MSA Employment Location Quotient versus all MSAs',\n",
+    "          y_axis_label='MSA Employment',\n",
+    "          tools=[hover],\n",
+    "          logo=None,\n",
+    "          plot_width=600, \n",
+    "          plot_height=600,\n",
+    "          )"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 111,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "p1.yaxis[0].formatter=NumeralTickFormatter(format=\"0,0\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 112,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "p1.xaxis[0].formatter=NumeralTickFormatter(format=\"0,0.00\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 113,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div style=\"display: table;\"><div style=\"display: table-row;\"><div style=\"display: table-cell;\"><b title=\"bokeh.models.renderers.GlyphRenderer\">GlyphRenderer</b>(</div><div style=\"display: table-cell;\">id&nbsp;=&nbsp;'30b198fc-c5ca-4145-96d4-71b80f6f7b0f', <span id=\"26c98d60-bf37-47e4-9afb-bd6378d0e069\" style=\"cursor: pointer;\">&hellip;)</span></div></div><div class=\"11845b27-b63a-4ddb-8ef8-645164892e11\" style=\"display: none;\"><div style=\"display: table-cell;\"></div><div style=\"display: table-cell;\">data_source&nbsp;=&nbsp;ColumnDataSource(id='6d613348-0e4d-4932-9fdf-a83e43d0f883', ...),</div></div><div class=\"11845b27-b63a-4ddb-8ef8-645164892e11\" style=\"display: none;\"><div style=\"display: table-cell;\"></div><div style=\"display: table-cell;\">glyph&nbsp;=&nbsp;Circle(id='2140057a-814d-4d32-81fd-94373e64e61a', ...),</div></div><div class=\"11845b27-b63a-4ddb-8ef8-645164892e11\" style=\"display: none;\"><div style=\"display: table-cell;\"></div><div style=\"display: table-cell;\">hover_glyph&nbsp;=&nbsp;None,</div></div><div class=\"11845b27-b63a-4ddb-8ef8-645164892e11\" style=\"display: none;\"><div style=\"display: table-cell;\"></div><div style=\"display: table-cell;\">js_event_callbacks&nbsp;=&nbsp;{},</div></div><div class=\"11845b27-b63a-4ddb-8ef8-645164892e11\" style=\"display: none;\"><div style=\"display: table-cell;\"></div><div style=\"display: table-cell;\">js_property_callbacks&nbsp;=&nbsp;{},</div></div><div class=\"11845b27-b63a-4ddb-8ef8-645164892e11\" style=\"display: none;\"><div style=\"display: table-cell;\"></div><div style=\"display: table-cell;\">level&nbsp;=&nbsp;'glyph',</div></div><div class=\"11845b27-b63a-4ddb-8ef8-645164892e11\" style=\"display: none;\"><div style=\"display: table-cell;\"></div><div style=\"display: table-cell;\">muted&nbsp;=&nbsp;False,</div></div><div class=\"11845b27-b63a-4ddb-8ef8-645164892e11\" style=\"display: none;\"><div style=\"display: table-cell;\"></div><div style=\"display: table-cell;\">muted_glyph&nbsp;=&nbsp;None,</div></div><div class=\"11845b27-b63a-4ddb-8ef8-645164892e11\" style=\"display: none;\"><div style=\"display: table-cell;\"></div><div style=\"display: table-cell;\">name&nbsp;=&nbsp;None,</div></div><div class=\"11845b27-b63a-4ddb-8ef8-645164892e11\" style=\"display: none;\"><div style=\"display: table-cell;\"></div><div style=\"display: table-cell;\">nonselection_glyph&nbsp;=&nbsp;Circle(id='6e6c50d2-1ee7-4176-936a-a8a66d26068e', ...),</div></div><div class=\"11845b27-b63a-4ddb-8ef8-645164892e11\" style=\"display: none;\"><div style=\"display: table-cell;\"></div><div style=\"display: table-cell;\">selection_glyph&nbsp;=&nbsp;None,</div></div><div class=\"11845b27-b63a-4ddb-8ef8-645164892e11\" style=\"display: none;\"><div style=\"display: table-cell;\"></div><div style=\"display: table-cell;\">subscribed_events&nbsp;=&nbsp;[],</div></div><div class=\"11845b27-b63a-4ddb-8ef8-645164892e11\" style=\"display: none;\"><div style=\"display: table-cell;\"></div><div style=\"display: table-cell;\">tags&nbsp;=&nbsp;[],</div></div><div class=\"11845b27-b63a-4ddb-8ef8-645164892e11\" style=\"display: none;\"><div style=\"display: table-cell;\"></div><div style=\"display: table-cell;\">visible&nbsp;=&nbsp;True,</div></div><div class=\"11845b27-b63a-4ddb-8ef8-645164892e11\" style=\"display: none;\"><div style=\"display: table-cell;\"></div><div style=\"display: table-cell;\">x_range_name&nbsp;=&nbsp;'default',</div></div><div class=\"11845b27-b63a-4ddb-8ef8-645164892e11\" style=\"display: none;\"><div style=\"display: table-cell;\"></div><div style=\"display: table-cell;\">y_range_name&nbsp;=&nbsp;'default')</div></div></div>\n",
+       "<script>\n",
+       "(function() {\n",
+       "  var expanded = false;\n",
+       "  var ellipsis = document.getElementById(\"26c98d60-bf37-47e4-9afb-bd6378d0e069\");\n",
+       "  ellipsis.addEventListener(\"click\", function() {\n",
+       "    var rows = document.getElementsByClassName(\"11845b27-b63a-4ddb-8ef8-645164892e11\");\n",
+       "    for (var i = 0; i < rows.length; i++) {\n",
+       "      var el = rows[i];\n",
+       "      el.style.display = expanded ? \"none\" : \"table-row\";\n",
+       "    }\n",
+       "    ellipsis.innerHTML = expanded ? \"&hellip;)\" : \"&lsaquo;&lsaquo;&lsaquo;\";\n",
+       "    expanded = !expanded;\n",
+       "  });\n",
+       "})();\n",
+       "</script>\n"
+      ],
+      "text/plain": [
+       "GlyphRenderer(id='30b198fc-c5ca-4145-96d4-71b80f6f7b0f', ...)"
+      ]
+     },
+     "execution_count": 113,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "#circle plot on p1 figure\n",
+    "p1.circle('x','y',size=9,fill_color='#ff9000',line_color='firebrick',alpha=.9,source=source)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 114,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "vline=Span(location=1,dimension='height',line_color='yellow',line_width=1)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 115,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "p1.renderers.extend([vline])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 116,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "#get unique agg levels\n",
+    "agglvl=lqdf['agglvl_title'].unique()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 117,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "#set up select agg level widget\n",
+    "agglvl_select=Select(\n",
+    "    title=\"Industry Aggregation Level:\",\n",
+    "    value=agglvl[0],\n",
+    "    options=agglvl.tolist()\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 118,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "#get unique MSAs\n",
+    "geo=lqdf['area_title'].unique()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 119,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "#set up select geo widget\n",
+    "geo_select=Select(\n",
+    "    title=\"Geography:\",\n",
+    "    value='New York-Newark-Jersey City, NY-NJ-PA MSA',\n",
+    "    options=geo.tolist()\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 120,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "def update(attrname,old,new):\n",
+    "    lqdf_agg=lqdf[(lqdf['agglvl_title']==agglvl_select.value)&(lqdf['area_title']==geo_select.value)]\n",
+    "    source.data=dict(\n",
+    "        x=lqdf_agg['msa_lq'],\n",
+    "        y=lqdf_agg['annual_avg_emplvl'],\n",
+    "        desc=lqdf_agg['industry_title'],\n",
+    "        )"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 121,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "for menu in [agglvl_select,geo_select]:\n",
+    "    menu.on_change('value', update)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 122,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "#put controls in widget box\n",
+    "controls = widgetbox([agglvl_select,geo_select],width=420)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 123,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "#add explanatory text\n",
+    "desc=Div(text=\"\"\"\n",
+    "    <h1>\n",
+    "    How is Your City's Economy Unique?\n",
+    "    </h1>\n",
+    "    <p>\n",
+    "    Location Quotients (LQs) compare the proportion of a particular region's employment in a particular industry\n",
+    "    to the proportion of a larger reference area's employment in that same industry. An LQ of greater than 1 indicates\n",
+    "    that an industry has a higher concentration of employment in that region than in the overall reference area.  An LQ of\n",
+    "    less than 1 indicates that an industry has a lower concentration of employment in that region than in the overall\n",
+    "    reference area.\n",
+    "    <br>\n",
+    "    <br>\n",
+    "    This chart shows 2016 LQs for each Metropolitan Statistical Area (MSA) in the U.S. with a reference area of\n",
+    "    all MSAs in the U.S.  It conveys how concentrations in employment vary from city to city.  These LQs are recalcualted\n",
+    "    from overall LQs provided by the Bureau of Labor Statistics (BLS) Quarterly Census of Employment and Wages. \n",
+    "    <br>\n",
+    "    <br>\n",
+    "    Use the filters below to view LQs for different MSAs and different industry aggregation levels, ranging from\n",
+    "    supersector (larger groupings) down to NAICS 4-digit sector (smaller groupings). (NAICS: North American Industry \n",
+    "    Classification System)\n",
+    "    </p>\n",
+    "    \"\"\",width=400)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 124,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "cit=Div(text=\"\"\"\n",
+    "    <br>\n",
+    "    <i>\n",
+    "    <font-size:9px;font-style:italic>\n",
+    "    These MSA LQs are recalculated from overall LQs provided by the Bureau of Labor Statistics (BLS) \n",
+    "    Quarterly Census of Employment and Wages. Government LQs are incorporated into the displayed industry \n",
+    "    aggregation levels too; these do not appear directly in the BLS data. \n",
+    "    <br>\n",
+    "    <br>\n",
+    "    U.S. Bureau of Labor Statistics, 'Quarterly Census of Employment and Wages,' \n",
+    "    26 June 2017. www.bls.gov/cew/datatoc.htm.\n",
+    "    </i>\n",
+    "    \"\"\",width=1000)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 125,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "#make layout with controls and figure p1\n",
+    "layout = column(row(column(desc,controls),p1),cit)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 126,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "#for inline viewing\n",
+    "show(layout)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "curdoc().add_root(layout)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "curdoc().title=\"LQ\""
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.6.0"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
