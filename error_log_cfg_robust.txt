@@ -1,0 +1,429 @@
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\conf\locale\__init__.py 'gbk' codec can't decode byte 0xac in position 1474: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\conf\locale\ar\formats.py 'gbk' codec can't decode byte 0x8f in position 356: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\conf\locale\fa\formats.py 'gbk' codec can't decode byte 0x8f in position 412: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\conf\locale\ja\formats.py 'gbk' codec can't decode byte 0xa5 in position 236: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\conf\locale\km\formats.py 'gbk' codec can't decode byte 0x86 in position 250: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\conf\locale\ko\formats.py 'gbk' codec can't decode byte 0x84 in position 228: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\conf\locale\th\formats.py 'gbk' codec can't decode byte 0x95 in position 670: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\conf\locale\zh_Hans\formats.py 'gbk' codec can't decode byte 0xa5 in position 236: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\conf\locale\zh_Hant\formats.py 'gbk' codec can't decode byte 0xa5 in position 236: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\admin\models.py 'gbk' codec can't decode byte 0x9c in position 2443: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\admin\options.py 'gbk' codec can't decode byte 0x9d in position 12330: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\flatpages\forms.py 'gbk' codec can't decode byte 0x9c in position 416: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\flatpages\models.py 'gbk' codec can't decode byte 0x9d in position 735: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\flatpages\migrations\0001_initial.py 'gbk' codec can't decode byte 0x9d in position 897: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\gis\db\models\fields.py 'gbk' codec can't decode byte 0x94 in position 7756: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\postgres\fields\hstore.py 'gbk' codec can't decode byte 0x9c in position 594: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\redirects\models.py 'gbk' codec can't decode byte 0x9c in position 447: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\redirects\migrations\0001_initial.py 'gbk' codec can't decode byte 0x9c in position 746: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\redirects\migrations\0002_alter_redirect_new_path_help_text.py 'gbk' codec can't decode byte 0x9d in position 522: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\core\paginator.py 'gbk' codec can't decode byte 0xa6 in position 604: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\core\validators.py 'gbk' codec can't decode byte 0x9d in position 10210: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\core\cache\backends\memcached.py 'gbk' codec can't decode byte 0xa5 in position 6841: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\core\management\commands\compilemessages.py 'gbk' codec can't decode byte 0x9c in position 5013: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\db\models\fields\__init__.py 'gbk' codec can't decode byte 0x9c in position 38277: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\forms\models.py 'gbk' codec can't decode byte 0x9c in position 55750: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\template\defaultfilters.py 'gbk' codec can't decode byte 0xa6 in position 9259: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\test\client.py invalid syntax (<unknown>, line 550)
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\test\testcases.py invalid syntax (<unknown>, line 1618)
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\urls\resolvers.py 'gbk' codec can't decode byte 0xa6 in position 8466: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\utils\dateparse.py invalid syntax (<unknown>, line 78)
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\utils\encoding.py 'gbk' codec can't decode byte 0xa5 in position 3437: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\utils\formats.py 'gbk' codec can't decode byte 0x92 in position 9006: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\utils\html.py 'gbk' codec can't decode byte 0xa6 in position 8469: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\utils\text.py 'gbk' codec can't decode byte 0xa6 in position 2542: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\utils\translation\trans_real.py invalid syntax (<unknown>, line 485)
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\views\csrf.py 'gbk' codec can't decode byte 0x9d in position 4285: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\views\debug.py 'gbk' codec can't decode byte 0xa6 in position 12149: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\views\static.py 'gbk' codec can't decode byte 0x9c in position 1575: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\views\generic\dates.py 'gbk' codec can't decode byte 0x9c in position 22498: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\views\generic\list.py 'gbk' codec can't decode byte 0x9d in position 2483: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\admin_changelist\tests.py 'gbk' codec can't decode byte 0x9c in position 63066: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\admin_scripts\tests.py 'gbk' codec can't decode byte 0xab in position 26850: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\admin_utils\test_logentry.py 'gbk' codec can't decode byte 0x9d in position 6552: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\admin_views\tests.py 'gbk' codec can't decode byte 0x9d in position 11364: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\admin_views\test_history_view.py 'gbk' codec can't decode byte 0x9c in position 1704: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\admin_widgets\tests.py 'gbk' codec can't decode byte 0x9d in position 8349: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\auth_tests\test_basic.py 'gbk' codec can't decode byte 0xa6 in position 1957: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\auth_tests\test_forms.py 'gbk' codec can't decode byte 0x9d in position 4503: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\auth_tests\test_models.py 'gbk' codec can't decode byte 0xa6 in position 8130: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\auth_tests\test_validators.py 'gbk' codec can't decode byte 0xae in position 10574: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\auth_tests\test_views.py 'gbk' codec can't decode byte 0x9d in position 37275: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\cache\tests.py 'gbk' codec can't decode byte 0x85 in position 27526: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\db_functions\text\test_pad.py 'gbk' codec can't decode byte 0xa0 in position 1888: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\db_functions\text\test_strindex.py 'gbk' codec can't decode byte 0xbc in position 2017: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\file_uploads\tests.py 'gbk' codec can't decode byte 0xad in position 696: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\flatpages_tests\test_forms.py 'gbk' codec can't decode byte 0x9c in position 2722: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\forms_tests\field_tests\test_filefield.py 'gbk' codec can't decode byte 0xa2 in position 1967: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\forms_tests\field_tests\test_imagefield.py 'gbk' codec can't decode byte 0x9d in position 2475: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\forms_tests\field_tests\test_integerfield.py 'gbk' codec can't decode byte 0xa6 in position 5396: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\forms_tests\field_tests\test_jsonfield.py 'gbk' codec can't decode byte 0x8c in position 1101: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\forms_tests\field_tests\test_slugfield.py 'gbk' codec can't decode byte 0xa0 in position 585: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\forms_tests\field_tests\test_urlfield.py 'gbk' codec can't decode byte 0xac in position 6538: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\forms_tests\tests\tests.py 'gbk' codec can't decode byte 0xa2 in position 6901: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\forms_tests\tests\test_error_messages.py 'gbk' codec can't decode byte 0x9c in position 11730: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\forms_tests\tests\test_forms.py 'gbk' codec can't decode byte 0xa2 in position 121957: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\forms_tests\tests\test_validators.py 'gbk' codec can't decode byte 0xa0 in position 2771: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\httpwrappers\tests.py 'gbk' codec can't decode byte 0xac in position 9269: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\humanize_tests\tests.py 'gbk' codec can't decode byte 0xa6 in position 14500: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\i18n\tests.py 'gbk' codec can't decode byte 0x9a in position 21939: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\i18n\test_compilation.py 'gbk' codec can't decode byte 0x9d in position 2443: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\invalid_models_tests\test_relative_fields.py 'gbk' codec can't decode byte 0x8c in position 27218: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\mail\tests.py 'gbk' codec can't decode byte 0xac in position 37750: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\migrations\models.py 'gbk' codec can't decode byte 0x9d in position 338: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\migrations\test_autodetector.py 'gbk' codec can't decode byte 0x9d in position 69759: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\migrations\test_commands.py 'gbk' codec can't decode byte 0xa6 in position 21199: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\model_fields\test_decimalfield.py 'gbk' codec can't decode byte 0x9c in position 978: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\model_fields\test_durationfield.py 'gbk' codec can't decode byte 0x9d in position 2652: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\model_fields\test_uuid.py 'gbk' codec can't decode byte 0x9c in position 9343: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\model_forms\tests.py 'gbk' codec can't decode byte 0x9d in position 55528: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\model_forms\test_uuid.py 'gbk' codec can't decode byte 0x9d in position 1110: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\postgres_tests\test_hstore.py 'gbk' codec can't decode byte 0x9d in position 9915: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\serializers\test_data.py <class '_ast.Subscript'>
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\staticfiles_tests\cases.py 'gbk' codec can't decode byte 0x97 in position 4318: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\str\tests.py 'gbk' codec can't decode byte 0xac in position 326: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\template_tests\filter_tests\test_force_escape.py 'gbk' codec can't decode byte 0xac in position 2823: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\template_tests\filter_tests\test_truncatechars.py 'gbk' codec can't decode byte 0xa6 in position 346: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\template_tests\filter_tests\test_truncatechars_html.py 'gbk' codec can't decode byte 0xa6 in position 289: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\template_tests\filter_tests\test_truncatewords.py 'gbk' codec can't decode byte 0xa6 in position 597: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\template_tests\filter_tests\test_truncatewords_html.py 'gbk' codec can't decode byte 0xa6 in position 480: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\template_tests\filter_tests\test_urlize.py 'gbk' codec can't decode byte 0x80 in position 6013: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\template_tests\filter_tests\test_urlizetrunc.py 'gbk' codec can't decode byte 0xa6 in position 785: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\template_tests\syntax_tests\test_filter_syntax.py 'gbk' codec can't decode byte 0xa6 in position 6827: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\test_client_regress\tests.py 'gbk' codec can't decode byte 0x8d in position 5712: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\test_runner_apps\tagged\tests_syntax_error.py invalid syntax (<unknown>, line 11)
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\transactions\tests.py 'gbk' codec can't decode byte 0xa6 in position 20333: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\urlpatterns\tests.py 'gbk' codec can't decode byte 0xa6 in position 7076: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\utils_tests\test_encoding.py 'gbk' codec can't decode byte 0xa5 in position 4899: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\utils_tests\test_jslex.py 'gbk' codec can't decode byte 0x82 in position 1467: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\utils_tests\test_numberformat.py 'gbk' codec can't decode byte 0xac in position 6639: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\utils_tests\test_text.py 'gbk' codec can't decode byte 0xa6 in position 2743: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\validation\test_error_messages.py 'gbk' codec can't decode byte 0x9d in position 550: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\validators\tests.py 'gbk' codec can't decode byte 0xaa in position 2065: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\view_tests\generic_urls.py 'gbk' codec can't decode byte 0xad in position 904: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\view_tests\tests\test_csrf.py 'gbk' codec can't decode byte 0x9d in position 1877: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\tests\view_tests\tests\test_debug.py 'gbk' codec can't decode byte 0x80 in position 35421: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\flask\tests\test_cli.py 'gbk' codec can't decode byte 0xab in position 14915: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\httpie\httpie\client.py 'gbk' codec can't decode byte 0x9d in position 6227: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pandas\pandas\core\frame.py 'gbk' codec can't decode byte 0xa6 in position 213554: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pandas\pandas\core\generic.py 'gbk' codec can't decode byte 0x99 in position 96729: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pandas\pandas\core\series.py 'gbk' codec can't decode byte 0xa6 in position 90828: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pandas\pandas\core\computation\parsing.py 'gbk' codec can't decode byte 0xac in position 1652: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pandas\pandas\core\indexes\datetimes.py 'gbk' codec can't decode byte 0x99 in position 5604: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pandas\pandas\core\reshape\merge.py 'gbk' codec can't decode byte 0x99 in position 76355: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pandas\pandas\core\strings\accessor.py 'gbk' codec can't decode byte 0x95 in position 97062: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pandas\pandas\io\sql.py 'gbk' codec can't decode byte 0x99 in position 12717: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pandas\pandas\io\stata.py 'gbk' codec can't decode byte 0xac in position 129489: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pandas\pandas\io\formats\format.py 'gbk' codec can't decode byte 0x9d in position 33109: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pandas\pandas\io\formats\style.py 'gbk' codec can't decode byte 0x99 in position 92835: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pandas\pandas\io\formats\style_render.py <class '_ast.Subscript'>
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pandas\pandas\tests\arrays\categorical\test_repr.py 'gbk' codec can't decode byte 0x84 in position 2330: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pandas\pandas\tests\frame\test_query_eval.py 'gbk' codec can't decode byte 0xac in position 43991: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pandas\pandas\tests\frame\methods\test_filter.py 'gbk' codec can't decode byte 0x82 in position 3834: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pandas\pandas\tests\frame\methods\test_replace.py 'gbk' codec can't decode byte 0xad in position 53506: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pandas\pandas\tests\indexes\base_class\test_formats.py 'gbk' codec can't decode byte 0x82 in position 1297: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pandas\pandas\tests\indexes\categorical\test_formats.py 'gbk' codec can't decode byte 0x82 in position 2018: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pandas\pandas\tests\indexes\object\test_astype.py 'gbk' codec can't decode byte 0x82 in position 172: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pandas\pandas\tests\io\test_clipboard.py 'gbk' codec can't decode byte 0xb4 in position 920: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pandas\pandas\tests\io\test_common.py 'gbk' codec can't decode byte 0x95 in position 6082: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pandas\pandas\tests\io\test_stata.py 'gbk' codec can't decode byte 0x80 in position 67609: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pandas\pandas\tests\io\excel\test_readers.py 'gbk' codec can't decode byte 0x95 in position 26944: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pandas\pandas\tests\io\formats\test_format.py 'gbk' codec can't decode byte 0x82 in position 20897: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pandas\pandas\tests\io\formats\test_printing.py 'gbk' codec can't decode byte 0x82 in position 1172: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pandas\pandas\tests\io\formats\test_to_csv.py 'gbk' codec can't decode byte 0x9e in position 1294: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pandas\pandas\tests\io\json\test_json_table_schema.py 'gbk' codec can't decode byte 0xa4 in position 9051: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pandas\pandas\tests\io\json\test_pandas.py 'gbk' codec can't decode byte 0x9d in position 46795: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pandas\pandas\tests\io\json\test_readlines.py 'gbk' codec can't decode byte 0x9d in position 787: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pandas\pandas\tests\io\parser\test_encoding.py 'gbk' codec can't decode byte 0xa8 in position 5966: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pandas\pandas\tests\io\parser\common\test_common_basic.py 'gbk' codec can't decode byte 0xad in position 17563: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pandas\pandas\tests\io\parser\usecols\test_strings.py 'gbk' codec can't decode byte 0x82 in position 2041: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pandas\pandas\tests\io\xml\test_to_xml.py 'gbk' codec can't decode byte 0x95 in position 5379: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pandas\pandas\tests\scalar\test_nat.py <class '_ast.Subscript'>
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pandas\pandas\tests\series\test_cumulative.py <class '_ast.Subscript'>
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pandas\pandas\tests\series\methods\test_astype.py 'gbk' codec can't decode byte 0x80 in position 11808: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pandas\pandas\tests\series\methods\test_to_csv.py 'gbk' codec can't decode byte 0xad in position 4201: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pandas\pandas\tests\strings\test_strings.py 'gbk' codec can't decode byte 0x85 in position 10334: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pytorch\caffe2\python\layers_test.py <class '_ast.Subscript'>
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pytorch\test\test_fx_experimental.py <class '_ast.Subscript'>
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pytorch\test\test_jit.py <class '_ast.Subscript'>
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pytorch\test\test_jit_fuser.py 'gbk' codec can't decode byte 0xad in position 2706: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pytorch\test\test_jit_fuser_te.py <class '_ast.Subscript'>
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pytorch\test\test_linalg.py 'gbk' codec can't decode byte 0x92 in position 108108: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pytorch\test\test_nn.py <class '_ast.Subscript'>
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pytorch\test\test_torch.py 'gbk' codec can't decode byte 0xad in position 90728: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pytorch\test\test_type_promotion.py <class '_ast.Subscript'>
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pytorch\test\jit\test_python_builtins.py <class '_ast.Subscript'>
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pytorch\test\package\test_directory_reader.py 'gbk' codec can't decode byte 0x80 in position 3543: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pytorch\test\package\test_misc.py 'gbk' codec can't decode byte 0x80 in position 934: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pytorch\test\package\test_resources.py 'gbk' codec can't decode byte 0x80 in position 877: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pytorch\test\package\test_torchscript.py <class '_ast.Subscript'>
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pytorch\test\quantization\core\test_quantized_module.py <class '_ast.Subscript'>
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pytorch\test\quantization\jit\test_quantize_jit.py <class '_ast.Subscript'>
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pytorch\tools\actions_local_runner.py 'gbk' codec can't decode byte 0x93 in position 2245: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pytorch\torch\_torch_docs.py 'gbk' codec can't decode byte 0x9d in position 58879: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pytorch\torch\distributed\elastic\rendezvous\etcd_rendezvous.py 'gbk' codec can't decode byte 0x9d in position 5315: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pytorch\torch\distributed\pipeline\sync\pipeline.py 'gbk' codec can't decode byte 0x80 in position 5792: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pytorch\torch\distributed\pipeline\sync\skip\portal.py 'gbk' codec can't decode byte 0xa2 in position 598: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pytorch\torch\distributed\pipeline\sync\skip\skippable.py 'gbk' codec can't decode byte 0x80 in position 11961: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pytorch\torch\distributed\pipeline\sync\_balance\blockpartition.py 'gbk' codec can't decode byte 0x88 in position 1764: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pytorch\torch\linalg\__init__.py 'gbk' codec can't decode byte 0xb4 in position 57726: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\pytorch\torch\package\file_structure_representation.py 'gbk' codec can't decode byte 0x80 in position 2415: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\requests\requests\certs.py 'gbk' codec can't decode byte 0x94 in position 175: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\requests\requests\status_codes.py 'gbk' codec can't decode byte 0x93 in position 892: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\requests\tests\test_requests.py 'gbk' codec can't decode byte 0xa9 in position 89214: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\scrapy\docs\conf.py f-string: single '}' is not allowed (<unknown>, line 52)
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\scrapy\scrapy\contracts\__init__.py <class '_ast.Subscript'>
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\scrapy\tests\test_commands.py 'gbk' codec can't decode byte 0xa5 in position 23977: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\scrapy\tests\test_crawler.py 'gbk' codec can't decode byte 0xa5 in position 9336: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\scrapy\tests\test_responsetypes.py 'gbk' codec can't decode byte 0x98 in position 1073: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\scrapy\tests\test_utils_asyncio.py 'gbk' codec can't decode byte 0xa5 in position 670: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\glossary.py 'gbk' codec can't decode byte 0x8a in position 5881: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\language.py 'gbk' codec can't decode byte 0x93 in position 19902: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\scorer.py 'gbk' codec can't decode byte 0x93 in position 32356: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\util.py 'gbk' codec can't decode byte 0x99 in position 41513: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\cli\project\document.py 'gbk' codec can't decode byte 0xaf in position 3201: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\char_classes.py 'gbk' codec can't decode byte 0xac in position 10818: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\lex_attrs.py 'gbk' codec can't decode byte 0x98 in position 2096: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\norm_exceptions.py 'gbk' codec can't decode byte 0xac in position 504: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\punctuation.py 'gbk' codec can't decode byte 0x94 in position 278: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\tokenizer_exceptions.py 'gbk' codec can't decode byte 0xa0 in position 3366: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\am\examples.py 'gbk' codec can't decode byte 0x8d in position 184: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\am\lex_attrs.py 'gbk' codec can't decode byte 0xb5 in position 77: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\am\punctuation.py 'gbk' codec can't decode byte 0xa1 in position 156: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\am\stop_words.py 'gbk' codec can't decode byte 0xba in position 307: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\am\tokenizer_exceptions.py 'gbk' codec can't decode byte 0xb5 in position 87: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\ar\lex_attrs.py 'gbk' codec can't decode byte 0xae in position 263: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\bn\examples.py 'gbk' codec can't decode byte 0xa7 in position 174: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\bn\punctuation.py 'gbk' codec can't decode byte 0xac in position 183: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\bn\stop_words.py 'gbk' codec can't decode byte 0x9a in position 49: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\bn\tokenizer_exceptions.py 'gbk' codec can't decode byte 0xa6 in position 173: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\ca\punctuation.py 'gbk' codec can't decode byte 0x99 in position 266: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\en\stop_words.py 'gbk' codec can't decode byte 0x98 in position 2114: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\es\punctuation.py 'gbk' codec can't decode byte 0x80 in position 388: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\fa\examples.py 'gbk' codec can't decode byte 0xbc in position 349: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\fa\generate_verbs_exc.py 'gbk' codec can't decode byte 0x85 in position 13799: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\fa\lex_attrs.py 'gbk' codec can't decode byte 0x85 in position 67: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\fa\stop_words.py 'gbk' codec can't decode byte 0xaf in position 200: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\fa\tokenizer_exceptions.py 'gbk' codec can't decode byte 0xaa in position 334: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\fr\punctuation.py 'gbk' codec can't decode byte 0x99 in position 283: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\fr\stop_words.py 'gbk' codec can't decode byte 0x99 in position 373: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\fr\tokenizer_exceptions.py 'gbk' codec can't decode byte 0x90 in position 3067: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\fr\_tokenizer_exceptions_list.py 'gbk' codec can't decode byte 0x92 in position 183: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\grc\examples.py 'gbk' codec can't decode byte 0xbd in position 192: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\grc\lex_attrs.py 'gbk' codec can't decode byte 0x82 in position 79: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\grc\stop_words.py 'gbk' codec can't decode byte 0xbd in position 75: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\grc\test_text.py 'gbk' codec can't decode byte 0xbd in position 165: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\grc\tokenizer_exceptions.py 'gbk' codec can't decode byte 0x80 in position 155: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\gu\examples.py 'gbk' codec can't decode byte 0xaa in position 186: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\gu\stop_words.py 'gbk' codec can't decode byte 0xaa in position 32: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\hi\examples.py 'gbk' codec can't decode byte 0xb2 in position 190: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\hi\lex_attrs.py 'gbk' codec can't decode byte 0x8b in position 123: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\hi\stop_words.py 'gbk' codec can't decode byte 0xa4 in position 207: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\hu\punctuation.py 'gbk' codec can't decode byte 0xac in position 312: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\id\punctuation.py 'gbk' codec can't decode byte 0x94 in position 1049: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\it\punctuation.py 'gbk' codec can't decode byte 0x99 in position 256: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\ja\examples.py 'gbk' codec can't decode byte 0xa2 in position 178: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\ja\stop_words.py 'gbk' codec can't decode byte 0xbc in position 131: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\ja\tag_bigram_map.py 'gbk' codec can't decode byte 0xae in position 179: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\ja\tag_map.py 'gbk' codec can't decode byte 0x80 in position 537: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\ja\tag_orth_map.py 'gbk' codec can't decode byte 0x80 in position 153: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\ja\__init__.py 'gbk' codec can't decode byte 0xa6 in position 3678: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\kn\examples.py 'gbk' codec can't decode byte 0xaf in position 204: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\kn\stop_words.py 'gbk' codec can't decode byte 0xae in position 44: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\ko\examples.py 'gbk' codec can't decode byte 0xb4 in position 182: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\ko\lex_attrs.py 'gbk' codec can't decode byte 0x81 in position 58: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\ko\stop_words.py 'gbk' codec can't decode byte 0xb4 in position 30: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\ko\tag_map.py 'gbk' codec can't decode byte 0x80 in position 139: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\ko\__init__.py 'gbk' codec can't decode byte 0x90 in position 1420: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\lb\punctuation.py 'gbk' codec can't decode byte 0x99 in position 105: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\lij\punctuation.py 'gbk' codec can't decode byte 0x99 in position 99: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\lij\tokenizer_exceptions.py 'gbk' codec can't decode byte 0x99 in position 607: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\ml\examples.py 'gbk' codec can't decode byte 0xaf in position 196: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\ml\lex_attrs.py 'gbk' codec can't decode byte 0xaa in position 132: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\ml\stop_words.py 'gbk' codec can't decode byte 0x8d in position 36: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\mr\stop_words.py 'gbk' codec can't decode byte 0xa8 in position 178: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\nb\punctuation.py 'gbk' codec can't decode byte 0x94 in position 565: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\ne\examples.py 'gbk' codec can't decode byte 0x87 in position 196: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\ne\lex_attrs.py 'gbk' codec can't decode byte 0xbe in position 123: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\ne\stop_words.py 'gbk' codec can't decode byte 0xa4 in position 125: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\nl\punctuation.py 'gbk' codec can't decode byte 0x94 in position 1124: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\pl\examples.py 'gbk' codec can't decode byte 0x9d in position 692: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\pl\punctuation.py 'gbk' codec can't decode byte 0x80 in position 881: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\ro\punctuation.py 'gbk' codec can't decode byte 0x94 in position 2261: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\ru\examples.py 'gbk' codec can't decode byte 0x94 in position 753: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\sa\examples.py 'gbk' codec can't decode byte 0xbf in position 202: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\sa\lex_attrs.py 'gbk' codec can't decode byte 0xa4 in position 123: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\sa\stop_words.py 'gbk' codec can't decode byte 0xae in position 117: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\si\examples.py 'gbk' codec can't decode byte 0xba in position 184: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\si\lex_attrs.py 'gbk' codec can't decode byte 0xaf in position 68: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\si\stop_words.py 'gbk' codec can't decode byte 0xbb in position 36: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\sk\examples.py 'gbk' codec can't decode byte 0xac in position 575: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\sl\stop_words.py 'gbk' codec can't decode byte 0x93 in position 98: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\ta\examples.py 'gbk' codec can't decode byte 0xae in position 180: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\ta\lex_attrs.py 'gbk' codec can't decode byte 0xaa in position 59: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\ta\stop_words.py 'gbk' codec can't decode byte 0xae in position 48: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\te\examples.py 'gbk' codec can't decode byte 0x8d in position 248: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\te\lex_attrs.py 'gbk' codec can't decode byte 0xaf in position 95: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\te\stop_words.py 'gbk' codec can't decode byte 0x82 in position 111: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\th\lex_attrs.py 'gbk' codec can't decode byte 0x8c in position 70: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\th\stop_words.py 'gbk' codec can't decode byte 0x89 in position 48: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\th\tokenizer_exceptions.py 'gbk' codec can't decode byte 0xab in position 51: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\ti\examples.py 'gbk' codec can't decode byte 0x8d in position 184: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\ti\lex_attrs.py 'gbk' codec can't decode byte 0xad in position 86: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\ti\punctuation.py 'gbk' codec can't decode byte 0xa1 in position 156: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\ti\stop_words.py 'gbk' codec can't decode byte 0xbb in position 64: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\ti\tokenizer_exceptions.py 'gbk' codec can't decode byte 0xb5 in position 87: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\uk\examples.py 'gbk' codec can't decode byte 0xb8 in position 842: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\vi\lex_attrs.py 'gbk' codec can't decode byte 0xb7 in position 222: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\vi\stop_words.py 'gbk' codec can't decode byte 0xa5 in position 119: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\xx\examples.py 'gbk' codec can't decode byte 0x9d in position 3483: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\yo\examples.py 'gbk' codec can't decode byte 0x8d in position 432: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\yo\lex_attrs.py 'gbk' codec can't decode byte 0x80 in position 111: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\yo\stop_words.py 'gbk' codec can't decode byte 0x80 in position 175: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\zh\examples.py 'gbk' codec can't decode byte 0xaf in position 195: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\zh\lex_attrs.py 'gbk' codec can't decode byte 0x87 in position 78: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\lang\zh\stop_words.py 'gbk' codec can't decode byte 0x80 in position 201: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\tests\test_displacy.py 'gbk' codec can't decode byte 0x93 in position 2589: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\tests\lang\test_attrs.py 'gbk' codec can't decode byte 0xa5 in position 1177: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\tests\lang\am\test_text.py 'gbk' codec can't decode byte 0xab in position 104: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\tests\lang\bn\test_tokenizer.py 'gbk' codec can't decode byte 0xbf in position 85: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\tests\lang\ca\test_text.py 'gbk' codec can't decode byte 0x9d in position 1022: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\tests\lang\de\test_text.py 'gbk' codec can't decode byte 0x9d in position 1347: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\tests\lang\en\test_customized_tokenizer.py 'gbk' codec can't decode byte 0x80 in position 534: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\tests\lang\en\test_text.py 'gbk' codec can't decode byte 0x9d in position 811: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\tests\lang\es\test_text.py 'gbk' codec can't decode byte 0x9d in position 782: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\tests\lang\fr\test_text.py 'gbk' codec can't decode byte 0x94 in position 682: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\tests\lang\grc\test_text.py 'gbk' codec can't decode byte 0xbd in position 165: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\tests\lang\gu\test_text.py 'gbk' codec can't decode byte 0xaa in position 92: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\tests\lang\hi\test_lex_attrs.py 'gbk' codec can't decode byte 0xaf in position 145: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\tests\lang\hu\test_tokenizer.py 'gbk' codec can't decode byte 0x90 in position 3527: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\tests\lang\ja\test_lemmatization.py 'gbk' codec can't decode byte 0x8f in position 80: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\tests\lang\ja\test_tokenizer.py 'gbk' codec can't decode byte 0x88 in position 186: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\tests\lang\ko\test_lemmatization.py 'gbk' codec can't decode byte 0xa1 in position 71: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\tests\lang\ko\test_tokenizer.py 'gbk' codec can't decode byte 0x80 in position 59: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\tests\lang\ky\test_tokenizer.py 'gbk' codec can't decode byte 0x94 in position 382: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\tests\lang\lb\test_text.py 'gbk' codec can't decode byte 0x9d in position 1035: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\tests\lang\ml\test_text.py 'gbk' codec can't decode byte 0xaf in position 109: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\tests\lang\ne\test_text.py 'gbk' codec can't decode byte 0xae in position 92: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\tests\lang\sa\test_text.py 'gbk' codec can't decode byte 0xa5 in position 130: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\tests\lang\th\test_tokenizer.py 'gbk' codec can't decode byte 0xa1 in position 109: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\tests\lang\ti\test_text.py 'gbk' codec can't decode byte 0xad in position 103: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\tests\lang\tt\test_tokenizer.py 'gbk' codec can't decode byte 0x94 in position 307: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\tests\lang\vi\test_tokenizer.py 'gbk' codec can't decode byte 0xa3 in position 186: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\tests\lang\yo\test_text.py 'gbk' codec can't decode byte 0x8d in position 149: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\tests\lang\zh\test_text.py 'gbk' codec can't decode byte 0x80 in position 155: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\tests\lang\zh\test_tokenizer.py 'gbk' codec can't decode byte 0xad in position 152: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\tests\pipeline\test_sentencizer.py 'gbk' codec can't decode byte 0xac in position 5120: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\tests\regression\test_issue1501-2000.py 'gbk' codec can't decode byte 0x94 in position 1125: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\tests\regression\test_issue3001-3500.py 'gbk' codec can't decode byte 0x93 in position 4703: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\tests\regression\test_issue3501-4000.py 'gbk' codec can't decode byte 0xa5 in position 9430: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\tests\serialize\test_serialize_tokenizer.py 'gbk' codec can't decode byte 0x9d in position 1679: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\tests\tokenizer\test_exceptions.py 'gbk' codec can't decode byte 0xa4 in position 1334: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\tests\tokenizer\test_naughty_strings.py 'gbk' codec can't decode byte 0x80 in position 340: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\tests\tokenizer\test_urls.py 'gbk' codec can't decode byte 0xaa in position 1414: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\spaCy\spacy\tests\training\test_augmenters.py 'gbk' codec can't decode byte 0xa6 in position 1341: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\setup.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\shortcuts.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\__init__.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\__main__.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\apps\registry.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\conf\global_settings.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\conf\__init__.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\conf\locale\__init__.py 'gbk' codec can't decode byte 0xac in position 1474: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\conf\locale\ar\formats.py 'gbk' codec can't decode byte 0x8f in position 356: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\conf\locale\fa\formats.py 'gbk' codec can't decode byte 0x8f in position 412: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\conf\locale\ja\formats.py 'gbk' codec can't decode byte 0xa5 in position 236: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\conf\locale\km\formats.py 'gbk' codec can't decode byte 0x86 in position 250: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\conf\locale\ko\formats.py 'gbk' codec can't decode byte 0x84 in position 228: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\conf\locale\th\formats.py 'gbk' codec can't decode byte 0x95 in position 670: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\conf\locale\zh_Hans\formats.py 'gbk' codec can't decode byte 0xa5 in position 236: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\conf\locale\zh_Hant\formats.py 'gbk' codec can't decode byte 0xa5 in position 236: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\conf\urls\i18n.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\admin\actions.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\admin\checks.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\admin\decorators.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\admin\filters.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\admin\helpers.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\admin\models.py 'gbk' codec can't decode byte 0x9c in position 2443: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\admin\options.py 'gbk' codec can't decode byte 0x9d in position 12330: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\admin\sites.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\admin\utils.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\admin\widgets.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\admin\__init__.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\admin\templatetags\admin_list.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\admin\templatetags\admin_modify.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\admin\templatetags\admin_urls.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\admin\templatetags\log.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\admin\views\decorators.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\admindocs\urls.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\admindocs\utils.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\admindocs\views.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\auth\admin.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\auth\backends.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\auth\checks.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\auth\context_processors.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\auth\decorators.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\auth\forms.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\auth\hashers.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\auth\middleware.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\auth\models.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\auth\password_validation.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\auth\signals.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\auth\tokens.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\auth\urls.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\auth\views.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\auth\__init__.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\auth\handlers\modwsgi.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\auth\management\__init__.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\auth\management\commands\changepassword.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\auth\migrations\0011_update_proxy_permissions.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\contenttypes\checks.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\contenttypes\forms.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\contenttypes\views.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\contenttypes\management\__init__.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\contenttypes\migrations\0002_remove_content_type_name.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\flatpages\forms.py 'gbk' codec can't decode byte 0x9c in position 416: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\flatpages\models.py 'gbk' codec can't decode byte 0x9d in position 735: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\flatpages\urls.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\flatpages\views.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\flatpages\migrations\0001_initial.py 'gbk' codec can't decode byte 0x9d in position 897: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\flatpages\templatetags\flatpages.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\gis\geometry.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\gis\shortcuts.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\gis\views.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\gis\admin\widgets.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\gis\db\backends\mysql\schema.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\gis\db\backends\postgis\pgraster.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\gis\db\models\fields.py 'gbk' codec can't decode byte 0x94 in position 7756: illegal multibyte sequence
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\gis\db\models\lookups.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\gis\forms\widgets.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\gis\gdal\field.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\gis\gdal\libgdal.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\gis\gdal\prototypes\ds.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\gis\gdal\prototypes\errcheck.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\gis\gdal\prototypes\generation.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\gis\gdal\prototypes\geom.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\gis\gdal\prototypes\raster.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\gis\gdal\prototypes\srs.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\gis\geoip2\base.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\gis\geos\factory.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\gis\geos\libgeos.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\gis\geos\prototypes\coordseq.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\gis\geos\prototypes\errcheck.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\gis\geos\prototypes\geom.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\gis\geos\prototypes\io.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\gis\geos\prototypes\misc.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\gis\geos\prototypes\predicates.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\gis\geos\prototypes\prepared.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\gis\geos\prototypes\threadsafe.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\gis\geos\prototypes\topology.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\gis\sitemaps\views.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\gis\utils\ogrinfo.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\gis\utils\ogrinspect.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\gis\utils\srs.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\humanize\templatetags\humanize.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\messages\api.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\messages\storage\base.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\postgres\apps.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\postgres\search.py unsupported operand type(s) for +: 'dict' and 'str'
+File: C:\Users\Bill Quan\Desktop\fit3171\fit4003\other\os_python_projects\django\django\contrib\postgres\signals.py unsupported operand type(s) for +: 'dict' and 'str'
