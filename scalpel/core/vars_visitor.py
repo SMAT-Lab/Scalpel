@@ -91,7 +91,7 @@ class VarsVisitor(ast.NodeVisitor):
             self.visit(c)
 
     def visit_Call(self, node):
-        #self.visit(node.func)
+        self.visit(node.func)
         for arg in node.args:
             self.visit(arg)
         for keyword in node.keywords:
@@ -105,6 +105,7 @@ class VarsVisitor(ast.NodeVisitor):
         var_info = {"name": full_name, "lineno": node.lineno, "col_offset":
                 node.col_offset}
         self.result.append(var_info)
+        self.visit(node.value)
 
     def get_attr_name (self, node):
         if isinstance(node, ast.Call):
