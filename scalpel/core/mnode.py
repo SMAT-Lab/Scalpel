@@ -76,7 +76,7 @@ class MNode:
 
     def parse_vars(self, scope = ""):
         """
-        Return a list of variable records ranking by their line numbers
+        Returns a list of variable records ranking by their line numbers
         Args:
             scope: a dotted string to provide name space. For instance, A.fun
             means to retreive the function named fun in the class A
@@ -94,7 +94,7 @@ class MNode:
     def parse_func_calls(self, scope = ""):
 
         """
-        Return a list of function calls ranking by their line numbers
+        Returns a list of function calls ranking by their line numbers
         Args:
             scope: a dotted string to provide name space. For instance, A.fun
             means to retreive the function named fun in the class A
@@ -110,7 +110,10 @@ class MNode:
         """
         Build AST tree for th source 
         """
-        self.ast = ast.parse(self.source)
+        try:
+            self.ast = ast.parse(self.source)
+        except Exception as e:
+            self.ast = None
 
     def _parse_func_defs(self, ast_node_lst, def_records, scope = "mod"):
         """
@@ -216,15 +219,18 @@ class MNode:
                         import_dict[d['name']] = d['name']
                     else:
                         import_dict[d['asname']] = d['name'] # otherwise , use alias name
-            if isinstance(stmt, ast.ImportFrom) and stmt.module is not None:
-                # for import from statements
-                # module names are the head of a API name
+            if isinstance(stmt, ast.ImportFrom):
+                m_name = stmt.module
+                if m_name is None and stmt.level== 1:
+                    m_name = '.'
+                if m_name is None and stmt.level== 2:
+                    m_name = '..' 
                 items = [nn.__dict__ for nn in stmt.names]
                 for d in items:
                     if d['asname'] is None: # alias name not found
-                        import_dict[d['name']] = stmt.module+'.'+d['name']
+                        import_dict[d['name']] = m_name +'.'+d['name']
                     else:
-                        import_dict[d['asname']] = stmt.module+'.'+d['name']
+                        import_dict[d['asname']] = m_name +'.'+d['name']
         return import_dict
 
     def retrieve_meta(self, node):
