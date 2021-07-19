@@ -203,6 +203,9 @@ class CFG(object):
         self.functioncfgs = {}
         self.class_cfgs = {}
 
+        self.function_args = {}
+        self.class_args = {}
+
     def __str__(self):
         return "CFG for {}".format(self.name)
 
@@ -239,10 +242,10 @@ class CFG(object):
 
         # Build the subgraphs for the function definitions in the CFG and add
         # them to the graph.
-        for subcfg in self.functioncfgs:
-            subgraph = self.functioncfgs[subcfg]._build_visual(format=format,
-                                                               calls=calls)
-            graph.subgraph(subgraph)
+        #for subcfg in self.functioncfgs:
+        #    subgraph = self.functioncfgs[subcfg]._build_visual(format=format,
+        #                                                       calls=calls)
+        #    graph.subgraph(subgraph)
 
         return graph
 

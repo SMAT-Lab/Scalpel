@@ -231,6 +231,14 @@ class CFGBuilder(ast.NodeVisitor):
                                                               func_body,
                                                               asynchr,
                                                               self.current_id)
+        def get_arg_names(argument_node):
+            arg_names = []
+            for node in ast.walk(argument_node):
+                if isinstance(node, ast.arg):
+                    arg_names.append( node.arg)
+            return arg_names
+
+        self.cfg.function_args[node.name] = get_arg_names(node.args)
         self.current_id = func_builder.current_id + 1
 
     def new_ClassCFG(self, node, asynchr=False):

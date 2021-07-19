@@ -10,7 +10,7 @@ from ..core.mnode import MNode
 from ..core.vars_visitor  import get_vars
 
 BUILT_IN_FUNCTIONS = set([ "abs","delattr",
-        "hash","memoryview","set", "range", "self" "all","dict","help","min","setattr","any","dir","=hex","next","slice", "self",
+        "hash","memoryview","set", "range", "self" "all","dict","help","min","setattr","any","dir","hex","next","slice", "self",
         "ascii","divmod","enumerate","id","object","sorted","bin","enumerate","input",
         "staticmethod","bool", "eval" "int", "len", "self", "open" "str" "breakpoint" "exec" "isinstance" "ord",
         "sum", "bytearray", "filter", "issubclass", "pow", "super", "bytes", "float", "iter", "print"
@@ -55,6 +55,7 @@ class SSA:
         def_records = self.m_node.parse_func_defs()
         def_idents = [r['name'] for r in def_records if r['scope'] == 'mod']
         self.global_live_idents = def_idents + list(import_dict.keys())
+
     def flatten_tuple(ast_tuple):
         """
         input: ast tuple object
@@ -91,7 +92,7 @@ class SSA:
                     assign_stmts.append((stmt.target, stmt.value))
             elif isinstance(stmt, ast.Expr) and isinstance(stmt.value, ast.Call):
                 if isinstance(stmt.value.func, ast.Attribute):
-                    assign_stmts.append((None, stmt.value.func  ))
+                    assign_stmts.append((None, stmt.value  ))
             elif isinstance(stmt, ast.Expr) and isinstance(stmt.value,
                     ast.Attribute):
                 assign_stmts.append((None,  stmt))
@@ -117,6 +118,8 @@ class SSA:
                         assign_stmts.append((ast.Name(name.asname, ast.Store()),  None))
                     else:
                         assign_stmts.append((ast.Name(name.name, ast.Store()),  None))
+            elif isinstance(stmt, ast.Return):
+                    assign_stmts.append((None,  stmt.value))
         return assign_stmts
 
     def get_attribute_stmts(self, stmts):
@@ -131,7 +134,6 @@ class SSA:
         Args:
             ast_node: AST node.
         """
-        print(ast.dump(ast_node))
         res = get_vars(ast_node)
         idents = [r['name'] for r in res if  r['name'] is not None and "." not in r['name']]
         return idents
@@ -192,7 +194,7 @@ class SSA:
             assign_records = self.get_assign_raw(block.statements)
             #call_stmts = self.get_attribute_stmts(block.statements)
             for ar in assign_records:
-                left, right = ar
+                left, right = ar 
                 actual_value = parse_val(right)
 #                if isinstance(left, ast.Tuple):
 #                    continue
@@ -210,11 +212,8 @@ class SSA:
                     var_no = 1
                     self.numbering[left_name] = var_no
                     self.var_values[(left_name,var_no)] = actual_value
-                phi_fun = []
-                
+                phi_fun = [] 
                 right_vars = self.get_identifiers(right)
-                print(ast.dump(right))
-                print(right_vars)
                 for var_name in right_vars:
                    # last assignment occur in the same block
                     for tmp_var_no in reversed(list(block.ssa_form.keys())):
@@ -265,6 +264,20 @@ class SSA:
                 #    print(ident_name, set(nums))
         return def_reach
 
+    def find_this_ident_name(self, ident_name, live_ident_table):
+
+        n_scopes = len(live_ident_table)
+        for i in range(n_scopes):
+            if ident_name in live_ident_table[-i]:
+                if (-1 in live_ident_table[-i][ident_name]):
+                    return False
+                else:
+                    return True
+
+        if  ident_name not in self.global_live_idents and (ident_name not in BUILT_IN_FUNCTIONS):
+            return False
+        return True
+
     def test(self, live_ident_table=[]):
         n_scopes = len(live_ident_table)
         undefined_idents = []
@@ -277,15 +290,8 @@ class SSA:
                     else:
                         ident_phi_fun[item[0]] += [item[1]]
             for ident_name, numbers in ident_phi_fun.items():
-                if -1 in numbers and ident_name not in self.global_live_idents \
-                and ident_name not in BUILT_IN_FUNCTIONS and ident_name not in live_ident_table:
+                if -1 not in numbers:
+                    continue
+                if not self.find_this_ident_name(ident_name, live_ident_table):
                     undefined_idents.append(ident_name)
-                for i in range(n_scopes):
-                    if ident_name in live_ident_table[-i] and -1 in live_ident_table[-i][ident_name]:
-                        #print(ident_name, numbers)
-                        #return True
-                        undefined_idents.append(ident_name)
-                    elif -1 in numbers and ident_name not in self.global_live_idents and ident_name not in BUILT_IN_FUNCTIONS:
-                        undefined_idents.append(ident_name)
-        #print(self.error_paths)
         return undefined_idents
