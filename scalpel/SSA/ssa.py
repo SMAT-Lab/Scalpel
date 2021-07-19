@@ -7,11 +7,12 @@ from ..core.vars_visitor import get_vars
 from ..cfg.builder import CFGBuilder
 from ..cfg.builder import Block
 from ..core.mnode import MNode
+from ..core.vars_visitor  import get_vars
 
 BUILT_IN_FUNCTIONS = set([ "abs","delattr",
-        "hash","memoryview","set","all","dict","help","min","setattr","any","dir","=hex","next","slice",
+        "hash","memoryview","set", "range", "self" "all","dict","help","min","setattr","any","dir","=hex","next","slice", "self",
         "ascii","divmod","enumerate","id","object","sorted","bin","enumerate","input",
-        "staticmethod","bool", "eval" "int" "open" "str" "breakpoint" "exec" "isinstance" "ord",
+        "staticmethod","bool", "eval" "int", "len", "self", "open" "str" "breakpoint" "exec" "isinstance" "ord",
         "sum", "bytearray", "filter", "issubclass", "pow", "super", "bytes", "float", "iter", "print"
         "tuple", "callable", "format", "len", "property", "type", "chr","frozenset", "list", "range", "vars", 
         "classmethod", "getattr", "locals", "repr", "repr", "zip", "compile", "globals", "map", "reversed",  "__import__", "complex", "hasattr", "max", "round"]
@@ -130,14 +131,9 @@ class SSA:
         Args:
             ast_node: AST node.
         """
-        idents = []
-        if ast_node is None:
-            return idents
-        if isinstance(ast_node, (ast.ListComp, ast.SetComp)):
-            ast_node = ast_node.generators[0].iter
-        for tmp_node in ast.walk(ast_node):
-            if isinstance(tmp_node, ast.Name):
-                idents.append(tmp_node.id)
+        print(ast.dump(ast_node))
+        res = get_vars(ast_node)
+        idents = [r['name'] for r in res if  r['name'] is not None and "." not in r['name']]
         return idents
 
     def backward_query(self, block, ident_name, visited, path = []):
@@ -197,26 +193,28 @@ class SSA:
             #call_stmts = self.get_attribute_stmts(block.statements)
             for ar in assign_records:
                 left, right = ar
-                if left == None:
-                    continue
                 actual_value = parse_val(right)
 #                if isinstance(left, ast.Tuple):
 #                    continue
-                if not isinstance(left, ast.Name):
-                    print(ast.dump(left))
-                    print(ast.dump(right))
+                left_name = "<holder>"
+                if left is not None:
+                    left_name = left.id
+                if right is None:
+                    continue
 
-                if left.id in self.numbering:
-                    var_no = self.numbering[left.id]+1
-                    self.numbering[left.id] = var_no
-                    self.var_values[(left.id,var_no)] = actual_value
+                if left_name in self.numbering:
+                    var_no = self.numbering[left_name]+1
+                    self.numbering[left_name] = var_no
+                    self.var_values[(left_name,var_no)] = actual_value
                 else:
                     var_no = 1
-                    self.numbering[left.id] = var_no
-                    self.var_values[(left.id,var_no)] = actual_value
+                    self.numbering[left_name] = var_no
+                    self.var_values[(left_name,var_no)] = actual_value
                 phi_fun = []
+                
                 right_vars = self.get_identifiers(right)
-                #if left.id == 'e_vals':
+                print(ast.dump(right))
+                print(right_vars)
                 for var_name in right_vars:
                    # last assignment occur in the same block
                     for tmp_var_no in reversed(list(block.ssa_form.keys())):
@@ -234,7 +232,7 @@ class SSA:
                         phi_fun += [(var_name, -1)]
                     else:
                         phi_fun += phi_fun_incoming
-                block.ssa_form[(left.id, var_no)] = phi_fun
+                block.ssa_form[(left_name, var_no)] = phi_fun
         self.ssa_blocks = all_blocks
 
     def is_undefined(self, load_idents):
@@ -269,6 +267,7 @@ class SSA:
 
     def test(self, live_ident_table=[]):
         n_scopes = len(live_ident_table)
+        undefined_idents = []
         for block in self.ssa_blocks:
             ident_phi_fun = {} 
             for k, v in block.ssa_form.items():
@@ -278,13 +277,15 @@ class SSA:
                     else:
                         ident_phi_fun[item[0]] += [item[1]]
             for ident_name, numbers in ident_phi_fun.items():
-                if -1 in numbers:
-                    return True
+                if -1 in numbers and ident_name not in self.global_live_idents \
+                and ident_name not in BUILT_IN_FUNCTIONS and ident_name not in live_ident_table:
+                    undefined_idents.append(ident_name)
                 for i in range(n_scopes):
                     if ident_name in live_ident_table[-i] and -1 in live_ident_table[-i][ident_name]:
                         #print(ident_name, numbers)
-                        return True
+                        #return True
+                        undefined_idents.append(ident_name)
                     elif -1 in numbers and ident_name not in self.global_live_idents and ident_name not in BUILT_IN_FUNCTIONS:
-                        return True
+                        undefined_idents.append(ident_name)
         #print(self.error_paths)
-        return False
+        return undefined_idents

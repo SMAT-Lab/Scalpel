@@ -114,20 +114,15 @@ class VarsVisitor(ast.NodeVisitor):
         if isinstance(node, ast.Name):
             return node.id
         elif isinstance(node, ast.Attribute):
-            return self.get_attr_name(node.value)+"."+node.attr
+            attr_name = self.get_attr_name(node.value)
+            if attr_name is None:
+                return None
+            return attr_name +"."+node.attr
         elif isinstance(node, ast.Subscript):
             return self.get_attr_name(node.value)
-        #pass
-        #
-        #
-        #self.visit(node.value)
-        #if not isinstance(node.value, ast.Name):
-        #    self.visit(node.value)
-        #else:
-        #    if isinstance(node.value.ctx, ast.Load):
-        #        self.result.append((node.value.id, 'load'))
-        #    else:
-        #        self.result.append((node.value.id, 'store'))
+        else:
+            # such as (a**2).sum()
+            return None
 
     def slicev(self, node):
         if isinstance(node, ast.Slice):

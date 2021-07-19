@@ -45,6 +45,12 @@ def test_get_vars():
     assert ("ada" in var_names)
     assert ("X_std" in var_names)
     assert ("y" in var_names)
+    
+    code_str = "(errors**2).sum() / 2.0"
+    ast_node = ast.parse(code_str)
+    var_results = get_vars(ast_node)
+    var_names = [r['name'] for r in var_results if r['name'] is not None]
+    assert len(var_names) == 1 and "errors" in var_names
 
 def main():
     test_function_calls()
