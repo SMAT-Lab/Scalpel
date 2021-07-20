@@ -129,8 +129,9 @@ class Block(object):
             block.
         """
         txt = ""
-        for func_name in self.func_calls:
-            txt += func_name + '\n'
+        for func_call_entry in self.func_calls:
+            
+            txt += func_call_entry['name'] + '\n'
         return txt
 
 
