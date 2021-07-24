@@ -166,7 +166,7 @@ def main():
         #print(filename)
         #filename = "/mnt/fit-Knowledgezoo/Github_repos_download/data/diyclassics@mapping-experiments/book-map-ner-htef.ipynb"
         filename = os.path.basename(filename)
-        notebook_path = os.path.join("name-error-notebooks", repo_name+'-'+ filename)
+        notebook_path = os.path.join("test-cases/name-error-notebooks", repo_name+'-'+ filename)
         s = do_single_notebook(notebook_path)
         f = open('nameerror-tests/'+repo_name+ '.py', 'w')
         f.write(s)
