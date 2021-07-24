@@ -34,7 +34,6 @@ def test_ssa():
     call_records = mnode.parse_func_calls(scope="LocalStack.__call__")
     assert len(var_records)  > 0
     assert len(call_records) > 0
-
     ast_node = mnode.ast
     m_ssa = SSA(source)
     m_ssa.gen()
@@ -62,6 +61,7 @@ def test_SSA():
         fun_ssa = SSA(source)
         fun_ssa.compute_SSA(fun_cfg) 
         fun_ssa.test()
+
     for class_name, class_cfg in cfg.class_cfgs.items():
         # class body ssa compute 
         c_ssa = SSA(source)
@@ -72,13 +72,14 @@ def test_SSA():
         for inside_fun_name, inside_fun_cfg in class_cfg.functioncfgs.items():
             #if inside_fun_name == 'status_printer':
             #    inside_fun_cfg.build_visual('cfg', 'pdf')
-            live_ident_table = [m_final_idents, c_final_idents]
+            live_ident_table.append(c_final_idents]
             fun_ssa = SSA(source)
             fun_ssa.compute_SSA(inside_fun_cfg) 
             fun_ssa.test(live_ident_table=live_ident_table)
             #print(class_name, inside_fun_name)
             #inside_fun_cfg.build_visual('cfg', 'pdf')
             #break
+        live_ident_table.pop()
 
 if __name__ == '__main__':
     test_SSA()

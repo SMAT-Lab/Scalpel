@@ -6,8 +6,6 @@ from scalpel.core.module_graph import MNode, ModuleGraph, UnitWalker
 from scalpel.rewriter import Rewriter
 from scalpel.SSA.ssa import SSA
 
-# we need to define cretieras for variables
-
 def listcomp2loop(comp_node, target_name):
     iter = comp_node.generators[0].iter
     ifs  = comp_node.generators[0].ifs
@@ -32,8 +30,7 @@ def listcomp2loop(comp_node, target_name):
     return [new_lst_def, ast.For(target, iter, body_stmts, orelse)]
 
 def rewrite(node):
-    if isinstance(node, ast.Assign):
-        
+    if isinstance(node, ast.Assign): 
         if len(node.targets) ==1 and isinstance(node.value, ast.Subscript):
             if isinstance(node.value.value, ast.ListComp):
                 loop_stmts = listcomp2loop(node.value.value, node.targets[0].id)
@@ -143,9 +140,8 @@ def test_syntax_desugar():
     for unit in Walker:
         new_stmts = rewrite(unit.node)
         unit.insert_stmts_before(new_stmts)
-        pass  
+        pass
         #unit.insert_before()
-
     #rewriter = Rewriter(source)
     #new_ast = rewriter.rewrite()
     new_ast = ast.fix_missing_locations(module_node)
