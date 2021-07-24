@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+# coding: utf-8
+# In[262]:
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
@@ -87,6 +90,7 @@ class Model(dict):
         
         
         
+# In[263]:
 text = """<html>
     <head>
     </head>
@@ -103,7 +107,9 @@ text = """<html>
 </html>"""
 xml = etree.fromstring(text)
 model = Model.fromlxml(xml)
+# In[264]:
 model.search('hello')
+# In[249]:
 text = """<html>
     <head>
     </head>
@@ -120,7 +126,9 @@ text = """<html>
 </html>"""
 xml = etree.fromstring(text)
 model = Model(xml)
+# In[251]:
 model.search('hello')
+# In[169]:
 def peel(markup):
     """
     Remove the outmost markup tags
@@ -128,8 +136,13 @@ def peel(markup):
     tagpair =r'(?s)^\s*<(\w+)( .*)?>(.*)</\1>\s*$'
     content = re.sub(tagpair, r'\3', markup)
     return content.strip()
+# In[152]:
 re.findall(tagpair, text)
+# In[153]:
 re.match(tagpair, text.strip())
+# In[154]:
 peel(text)
+# In[157]:
 bt = b'abc'
+# In[160]:
 bt.decode()

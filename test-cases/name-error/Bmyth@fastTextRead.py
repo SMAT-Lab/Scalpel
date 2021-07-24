@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# coding: utf-8
+# In[5]:
 import tensorflow as tf
 import pickle
 import os
@@ -16,6 +19,7 @@ def load(filename):
 taxonomyList = load('PocData/taxonomyList_r.pkl')
 docs = load('PocData/docs.pkl')
 print(len(docs))
+# In[6]:
 from nltk.tokenize import RegexpTokenizer
 from tensorflow.contrib import learn
 import numpy as np
@@ -38,17 +42,13 @@ def docs2x(docs):
     return x
 x = docs2x(docs)
 print((x[0]))
-# vocabulary restore and transform
-tokenizer = RegexpTokenizer(r'\w+')
-_vocab_processor = learn.preprocessing.VocabularyProcessor.restore('data/vocabulary.vocab')
-print(len(_vocab_processor.vocabulary_))
-doc = tokenizer.tokenize(docs[0]['x'].lower())
-_x = list(_vocab_processor.transform(doc))
+# In[7]:
 # deal with y in docs
 y = []
 for doc in docs:
     y.append(doc['y'])
 y = np.array(y)
+# In[8]:
 # data shuffle
 n_sample = len(y)
 np.random.seed(10)
@@ -56,12 +56,14 @@ shuffle_indices = np.random.permutation(np.arange(n_sample))
 x_shuffled = x[shuffle_indices]
 y_shuffled = y[shuffle_indices]
 print(len(y_shuffled))
+# In[9]:
 # 训练样本/测试样本 split
 sample_rate = .1
 dev_sample_index = -1 * int(sample_rate * float(n_sample))
 x_train, x_dev = x_shuffled[:dev_sample_index], x_shuffled[dev_sample_index:]
 y_train, y_dev = y_shuffled[:dev_sample_index], y_shuffled[dev_sample_index:]
 print("train/test split: {:d}/{:d}".format(len(y_train), len(y_dev)))
+# In[10]:
 # fasttext
 def FastText(input_x, dropout_keep_prob, sequence_length, num_classes, vocab_size, embedding_size):
     # Embedding layer
@@ -74,6 +76,7 @@ def FastText(input_x, dropout_keep_prob, sequence_length, num_classes, vocab_siz
         b = tf.Variable(tf.constant(0.1, shape=[num_classes]), name="b")
         logits = tf.nn.xw_plus_b(h, W, b, name="logits")
         return logits
+# In[11]:
 # batch method
 def batch_iter(data, batch_size, num_epochs, shuffle=True):
     """
@@ -93,6 +96,7 @@ def batch_iter(data, batch_size, num_epochs, shuffle=True):
             start_index = batch_num * batch_size
             end_index = min((batch_num + 1) * batch_size, data_size)
             yield shuffled_data[start_index:end_index]
+# In[15]:
 # hyper parameters
 embedding_dim = 100
 dropout_keep_prob = 0.6
@@ -157,6 +161,7 @@ with train_graph.as_default():
             [cost, accuracy],
             feed_dict)
         print("loss {:g}, acc {:g}".format(_loss, _accuracy))
+# In[16]:
 # train    
 batches = batch_iter(list(zip(x_train, y_train)), batch_size, num_epochs)
 with tf.Session(graph=train_graph) as sess:
@@ -180,9 +185,12 @@ with tf.Session(graph=train_graph) as sess:
     path = saver.save(sess, save_model_path)
     print("Saved model checkpoint to {}\n".format(path))
         
+# In[17]:
+get_ipython().run_line_magic('matplotlib', 'inline')
 import matplotlib.pyplot as plt
 plt.plot(acc_result, label='accuracy')
 plt.legend()
+# In[18]:
 try:
     if batch_size:
         pass

@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# coding: utf-8
+# In[8]:
 import numpy as np
 from Bio import SeqIO
 import random
@@ -8,6 +11,7 @@ from sklearn.metrics import roc_curve, auc
 from itertools import cycle
 from optparse import OptionParser
 from itertools import cycle
+# In[9]:
 def read_file(file):
     seqs = []
     with open(file,'r') as f:
@@ -59,6 +63,7 @@ def dna_to_vec(sequences):
     X = np.array(Xt)
     return X
         
+# In[10]:
 class neuralnet(object):
     
     def __init__(self,inputLayerSize,hiddenLayerSize,outputLayerSize):
@@ -210,11 +215,13 @@ class neuralnet(object):
         bar.finish()
         print('Score:')
         return self.forward(X)
+# In[11]:
 #Reading in data
 posfile='rap1-lieb-positives.txt'
 negfile='yeast-upstream-1k-negative.fa'
 pos_seqs, cut_neg = read_files(posfile, negfile)
 pos_vec, neg_vec = dna_to_vec(pos_seqs),dna_to_vec(cut_neg)
+# In[45]:
 #Creating datasets for cross-validation by shuffling positive datasets
 avgC = int(round(pos_vec.shape[0]/5))
 np.random.shuffle(pos_vec)
@@ -247,6 +254,7 @@ yhat_c = np.zeros((neg_c.shape[0],1))
 yhat_d = np.zeros((neg_d.shape[0],1))
 yhat_e = np.zeros((neg_e.shape[0],1))
 yhat_list = [yhat_a,yhat_b,yhat_c,yhat_d,yhat_e]
+# In[58]:
 nn = neuralnet(68,200,1)
 pos = np.concatenate(pos_list)
 neg = np.concatenate(neg_list)
@@ -279,6 +287,7 @@ with open("yhat_test_snow.txt", "w") as f:
         f.write("\t")
         f.write(str(yhat_test[i]))
         f.write("\t")
+# In[59]:
 for i in range(0,5):
     print("Training dataset {}".format(i+1))
     nn.__init__(68,200,1) # Reinitialize the neural network class so that each withheld dataset gets a fresh neural net.

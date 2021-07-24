@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# coding: utf-8
+# In[36]:
 import requests
 import json
 r = requests.get('http://3d-kenya.chordsrt.com/instruments/1.geojson?start=2016-09-01T00:00&end=2016-11-01T00:00')
@@ -5,10 +8,7 @@ if r.status_code == 200:
     d = r.json()['Data']
 else:
     print("Please verify that the URL for the weather station is correct. You may just have to try again with a different/smaller date range or different dates.")
-d
-for o in d:
-    if o['variable_shortname'] == 'msl1':
-        print(o['time'], o['value'], o['units'])
+# In[25]:
 davad_tuple = (
     'f1',
     'f2',
@@ -40,7 +40,7 @@ def make_data_set(d):
                 data_list.append('{}'.format(' '.join(davad_tuple)))
     #print('//AA\n{}\n//ZZ'.format('\n'.join(data_list)))
     return data_list
-make_data_set(d)
+# In[10]:
 def email_data(data_list):
     import os
     
@@ -58,4 +58,5 @@ def email_data(data_list):
             subject='DATA'
     )
     print(response)
+# In[37]:
 email_data(make_data_set(d))

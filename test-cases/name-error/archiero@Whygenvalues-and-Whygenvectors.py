@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# coding: utf-8
+# In[13]:
 import pandas as pd
 import numpy as np
 from numpy import linalg
@@ -10,9 +13,7 @@ from bokeh.palettes import RdYlGn
 from bokeh.models.widgets import DataTable, DateFormatter, TableColumn
 output_notebook()
 #output_file('example')
-x0,y0 = 0,1
-a,b,c,d = 1,1,2,0
-steps = 101
+# In[48]:
 #Define function here:
 def matrixhit(a,b,c,d,x0,y0,steps):
     xvals = [0]
@@ -116,9 +117,12 @@ def update(ind=0):
 #    p1.title.text='Eigenvalues and Eigenvectors'
     push_notebook()
 interact(update, ind=(0,steps-1,1))
+# In[39]:
 a,b,c,d,x0,y0 = 1,1,2,0,0,1
 steps = 51
+# In[29]:
 a,b,c,d,x0,y0 = 3,2,1,0,-1,-2
 steps = 51
+# In[31]:
 a,b,c,d,x0,y0 = 1,1,-1,1,3,2
 steps = 51

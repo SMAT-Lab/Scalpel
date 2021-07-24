@@ -1,13 +1,11 @@
-import time
-import pylab
-import sqlite3
-import seaborn as sns
-from datetime import datetime
-from matplotlib import pyplot as plt
+#!/usr/bin/env python
+# coding: utf-8
+# In[1]:
 # Connect to SQLite DB
 conn = sqlite3.connect("data/content_digest.db")
 # Initialize DB cursor
 cur = conn.cursor()
+# In[2]:
 def query_db(query):
     '''
     Query database and return query as list of lists
@@ -16,7 +14,7 @@ def query_db(query):
     cur.execute(query)
     end = time.time()
     
-    print ("Query Duration: ",(end-start)/60.0, "Minutes")
+    print "Query Duration: ",(end-start)/60.0, "Minutes"
     return cur.fetchall()
 def plot_clicks_overall(rows, interval):
     '''
@@ -42,15 +40,19 @@ def plot_clicks_bygroup(rows, interval):
         plt.xticks(dates[::interval], [x.strftime("%m-%d-%Y") for x in dates[::interval]], rotation=45)
     plt.tick_params(axis="x", labelsize=20)
     plt.tick_params(axis="y", labelsize=24)
+# In[3]:
 # Return Total Number of Links Sent to Users
 n = query_db("""SELECT COUNT(*) FROM email_content;""")[0][0]
-print ("Number of Links: ", n)
+print "Number of Links: ", n
+# In[4]:
 # Return Total Number of Successful Clicks
 n = query_db("""SELECT COUNT(*) FROM clicks WHERE status_code=200;""")[0][0]
-print ("Number of Clicks: ", n)
+print "Number of Clicks: ", n
+# In[5]:
 # Return Total Number of UNIQUE Succesful Clicks (e.g. Page Views)
 n = query_db("""SELECT COUNT(*) FROM (SELECT DISTINCT user_id, article_id FROM clicks WHERE status_code=200);""")[0][0]
-print ("Number of Unique Clicks: ", n)
+print "Number of Unique Clicks: ", n
+# In[7]:
 rows_overall = query_db('''
                         SELECT
                             DATE(email_content.send_time) AS send_date,
@@ -75,7 +77,8 @@ rows_overall = query_db('''
                         ;
                         ''')
 for row in rows_overall[:5]:
-    print( row)
+    print row
+# In[11]:
 plt.figure(figsize=(20,10))
 plt.subplot(1,2,1)
 plot_clicks_overall(rows_overall, interval=10)
@@ -90,6 +93,7 @@ plt.ylabel("Click Rate (%)", fontsize=24)
 plt.title("(B)", fontsize=24)
 pylab.ylim([15,20])
 plt.savefig("graphics/click-rate-overall.png")
+# In[9]:
 rows_by_tod = query_db('''
                         SELECT
                             DATE(email_content.send_time) AS send_date,
@@ -118,6 +122,7 @@ rows_by_tod = query_db('''
                         ORDER BY send_date, send_time_of_day
                         ;
                         ''')
+# In[12]:
 rows_by_dow = query_db('''
                         SELECT
                             DATE(email_content.send_time) AS send_date,
@@ -151,6 +156,7 @@ rows_by_dow = query_db('''
                         ORDER BY send_date, send_day_of_wk
                         ;
                         ''')
+# In[13]:
 plt.figure(figsize=(20,10))
 plt.subplot(1,2,1)
 plot_clicks_bygroup(rows_by_dow, interval=2)
@@ -167,6 +173,7 @@ plt.title("By Time of Day", fontsize=24)
 plt.legend(loc="best", fontsize=20)
 pylab.ylim([0,50])
 plt.savefig("graphics/click-rate-by-time.png")
+# In[14]:
 rows = query_db('''
                 SELECT
                     topics.name AS topic_name,
@@ -183,7 +190,8 @@ rows = query_db('''
 most_common_topics = []
 for each in sorted(rows, key=lambda x: x[1], reverse=True)[:8]:
     most_common_topics.append(each[0].encode("ascii"))
-print (most_common_topics)
+print most_common_topics
+# In[15]:
 rows = query_db('''
                 SELECT
                     types.name AS type_name,
@@ -199,7 +207,8 @@ rows = query_db('''
 most_common_types = []
 for each in sorted(rows, key=lambda x: x[1], reverse=True)[:8]:
     most_common_types.append(each[0].encode("ascii"))
-print (most_common_types)
+print most_common_types
+# In[16]:
 rows_by_topic = query_db('''
                          SELECT
                             DATE(email_content.send_time) AS send_date,
@@ -233,6 +242,7 @@ rows_by_topic = query_db('''
                         ORDER BY send_date, topic_name
                         ;
                         ''')
+# In[17]:
 rows_by_type = query_db('''
                         SELECT
                             DATE(email_content.send_time) AS send_date,
@@ -266,6 +276,7 @@ rows_by_type = query_db('''
                         ORDER BY send_date, type_name
                         ;
                         ''')
+# In[18]:
 rows_by_common_topic = [x for x in rows_by_topic if x[1] in most_common_topics]
 rows_by_common_type =  [x for x in rows_by_type if x[1] in most_common_types ]
 plt.figure(figsize=(20,10))
@@ -284,5 +295,6 @@ plt.title("By Content Type (8 Most Common)", fontsize=24)
 plt.legend(loc="best", fontsize=18)
 pylab.ylim([0,50])
 plt.savefig("graphics/clicks-by-content.png")
+# In[19]:
 # Close DB connection
 conn.close()

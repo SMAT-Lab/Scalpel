@@ -1,8 +1,13 @@
+#!/usr/bin/env python
+# coding: utf-8
+# In[1]:
 import os
 import numpy as np
 import sys, unicodedata
+# In[2]:
 tbl = dict.fromkeys(i for i in range(sys.maxunicode)
                     if unicodedata.category(chr(i)).startswith('P'))
+# In[4]:
 for root,dirs, files in os.walk('tsv_files/'):
     tsv_list = [file for file in files if file[-3:]=="tsv"]
 whole_class_info=[[],[],[]]
@@ -17,4 +22,5 @@ with open(root+"assess_pregnancy.tsv") as cur_tsv:
     for idx, item in enumerate(whole_class_info):
         with open("preg"+os.sep+str(idx)+".txt","w+") as write_f:
             write_f.write("\n".join(item))
+# In[5]:
 whole_class_info[2][1]

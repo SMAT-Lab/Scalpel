@@ -1,12 +1,6 @@
-import random
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
-import seaborn as sns
-from matplotlib.patches import Arc
-from matplotlib import collections  as mc
-import time
-from IPython import display
+#!/usr/bin/env python
+# coding: utf-8
+# In[2]:
 #initial set up of the community
 def initNRandConn(n, a, b,):
     Data=pd.DataFrame({"person":list(range(n))}) #use a Pandas dataframe to easily store and quickly access status of each person.
@@ -122,6 +116,7 @@ def criticalPop(m):
     Data['Critical']=0
     Data.loc[critical,'Critical']=1
     return Data
+# In[6]:
 Data, n , subset=initNRandConn(300,4,10)
 DataSaved1=Data.copy(deep=True)
 Data=Vac(.5)
@@ -131,6 +126,7 @@ DataSaved3=Data.copy(deep=True)
 Data=initSick(3)
 DataSaved4=Data.copy(deep=True)
 plotIt2()
+# In[7]:
 for i in range(5):
     #plt.gca().cla();
     plt.gcf()

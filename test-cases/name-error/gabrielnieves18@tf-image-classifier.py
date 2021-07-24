@@ -1,25 +1,10 @@
-# call %matplotlib only in a Jupiter notebook
-# Common import
-import hashlib
-import matplotlib.pyplot as plt
-import numpy as np
-import os
-import pandas as pd
-import tarfile
-from pandas.plotting import scatter_matrix
-from six.moves import urllib
-from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error
-from sklearn.model_selection import train_test_split, StratifiedShuffleSplit, cross_val_score
-from sklearn.pipeline import Pipeline, FeatureUnion
-from sklearn.preprocessing import Imputer, LabelBinarizer, LabelEncoder
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
-from sklearn.tree import DecisionTreeRegressor
+#!/usr/bin/env python
+# coding: utf-8
+# In[131]:
 DOWNLOAD_ROOT = "https://raw.githubusercontent.com/ageron/handson-ml/master/"
 HOUSING_PATH = os.path.join("datasets", "housing")
 HOUSING_URL = DOWNLOAD_ROOT + "datasets/housing/housing.tgz"
+# In[132]:
 def fetch_housing_data(housing_url=HOUSING_URL, 
                         housing_path=HOUSING_PATH):
     
@@ -32,19 +17,23 @@ def fetch_housing_data(housing_url=HOUSING_URL,
         housing_tgz = tarfile.open(tgz_path)
         housing_tgz.extractall(path=housing_path)
         housing_tgz.close()
+# In[133]:
 def load_housing_data(housing_path=HOUSING_PATH):
     
     csv_path = os.path.join(housing_path, "housing.csv")
     return( pd.read_csv(csv_path) )
+# In[134]:
 def split_train_test(data, test_ratio):
     shuffled_indices = np.random.permutation(len(data))
     test_set_size = int(len(data) * test_ratio)
     test_indices = shuffled_indices[:test_set_size]
     train_indices = shuffled_indices[test_set_size:]
     return( data.iloc[train_indices], data.iloc[test_indices] )
+# In[135]:
 def test_set_check(identifier, test_ratio, hash):
     hashed_id = hash(np.int64(identifier))
     return( hashed_id.digest()[-1] < (256 * test_ratio) )
+# In[136]:
 def split_train_test_by_id(data, 
                            test_ratio, 
                            id_column, 
@@ -54,10 +43,12 @@ def split_train_test_by_id(data,
                                                        test_ratio, 
                                                        hash))
     return( data.loc[~in_test_set], data.loc[in_test_set] )
+# In[278]:
 def display_scores(scores):
     print("Scores:", scores)
     print("Mean:", scores.mean())
     print("Standard deviation:", scores.std())
+# In[137]:
 # Although Scikit-Learn provides many useful transformers, 
 # you will need to write your own for tasks such as custom 
 # cleanup operations or combining specific attributes. 
@@ -88,6 +79,7 @@ class CombinedAttributesAdder(BaseEstimator, TransformerMixin):
             return np.c_[X, rooms_per_household, population_per_household]
 attr_adder = CombinedAttributesAdder(add_bedrooms_per_room=False)
 housing_extra_attribs = attr_adder.transform(housing.values)
+# In[138]:
 # Now it would be nice if we could feed a Pandas DataFrame containing 
 # non-numerical columns directly into our pipeline, instead of having 
 # to first manually extract the numerical columns into a NumPy array. 
@@ -102,6 +94,7 @@ class DataFrameSelector(BaseEstimator, TransformerMixin):
         return self
     def transform(self, X):
         return X[self.attribute_names].values
+# In[266]:
 # 
 # Disclaimer this is NOT the actual code from the book or
 # the CategoricalEncoder definition.
@@ -117,6 +110,7 @@ class MyCategoricalEncoder(BaseEstimator, TransformerMixin):
         return encoder.transform(X.reshape(-1,1))
     def fit_transform(self, X, y=None):
         return encoder.fit_transform(X.reshape(-1,1))
+# In[250]:
 # Definition of the CategoricalEncoder class, copied from PR #9151.
 # Just run this cell, or copy it to your code, do not try to understand it (yet).
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -284,14 +278,20 @@ class CategoricalEncoder(BaseEstimator, TransformerMixin):
             return out.toarray()
         else:
             return out
+# In[140]:
 fetch_housing_data()
 housing_data = load_housing_data()
 housing_data.head()
+# In[141]:
 housing_data.info()
+# In[142]:
 housing_data['ocean_proximity'].value_counts()
+# In[143]:
 housing_data.describe()
+# In[144]:
 housing_data.hist(bins=50, figsize=(20, 15))
 plt.show()
+# In[145]:
 housing_data["income_cat"] = np.ceil(housing_data["median_income"] / 1.5)
 # Add a values of 5.0 to the fields that return False to the
 # condition. Otherwise, leave the current value in place
@@ -300,6 +300,7 @@ housing_data["income_cat"].where(housing_data["income_cat"] < 5,
                                   5.0, 
                                   inplace=True)
 housing_data.head()
+# In[146]:
 # create your training and testing set
 # Alternative 1
 # housing_with_id = housing_data.reset_index()
@@ -317,13 +318,17 @@ train_set, test_set = train_test_split(housing_data,
                                        random_state=42)
 print( "{} train + {} test".format(len(train_set), 
                                    len(test_set)) )
+# In[147]:
 housing_data["median_income"].hist(bins=50, figsize=(15, 10))
 plt.show()
+# In[148]:
 housing_data["income_cat"].hist(bins=50, figsize=(10, 5))
 plt.show()
+# In[149]:
 overall = housing_data["income_cat"].value_counts(sort=False) / len(housing_data)
 random_train = train_set["income_cat"].value_counts(sort=False) / len(train_set)
 random_test = test_set["income_cat"].value_counts(sort=False) / len(test_set)
+# In[150]:
 split = StratifiedShuffleSplit(n_splits=1,
                                test_size=0.2,
                                random_state=42)
@@ -334,6 +339,7 @@ for train_index, test_index in split.split(housing_data,
     
 strat_train = (strat_train_set["income_cat"].value_counts(sort=False) / len(train_set) )
 strat_test = (strat_test_set["income_cat"].value_counts(sort=False) / len(test_set) )
+# In[151]:
 # Lets test the homogeneity of out train and test sets
 # in relation to the overall data set
 hg_test = pd.DataFrame()
@@ -346,28 +352,35 @@ hg_test['Rand. Train %error'] = ((overall - random_train) / overall * 100).value
 hg_test['Strat Train %error'] = ((overall - strat_train) / overall * 100).values
 hg_test['Rand. Test %error'] = (( overall - random_test) / overall * 100).values
 hg_test['Strat Test %error'] = ((overall - strat_test) / overall * 100).values
+# In[152]:
 # Here we can see that the stratified sample is a better
 # data set do to how much more homogeneous it is.
 hg_test.iloc[::-1]
+# In[153]:
 # Now we should remove the "income_cat" field so the data is back
 # to its original state:
 for set_ in (strat_train_set, strat_test_set):
     set_.drop("income_cat", axis=1, inplace=True)
+# In[154]:
 strat_test_set.head()
+# In[155]:
 # Copy the training set to avoid loosing it
 housing = strat_train_set.copy()
+# In[156]:
 # Visualizing Geographical Data
 housing.plot(kind="scatter", x="longitude", y="latitude", alpha=0.4,
             s=housing["population"]/100, label="population", figsize=(10,7),
             c="median_house_value", cmap=plt.get_cmap("jet"), colorbar=True)
 # plt.legend()
 plt.show()
+# In[157]:
 # Another way to look for correlations between attributes 
 # is to use Pandas scatter_matrix function.
 attributes = ["median_house_value", "median_income", "total_rooms",
               "housing_median_age"]
 scatter_matrix(housing[attributes], figsize=(12, 8))
 plt.show()
+# In[158]:
 # Now lets look for correlations
 '''
 See how the median income has 68% correlation with the 
@@ -382,15 +395,18 @@ We can corroborate all this information on the scatter graph above.
 '''
 corr_mattrix = housing.corr()
 corr_mattrix["median_house_value"].sort_values(ascending=False)
+# In[159]:
 # median_house_value and median_income look promissing
 # Lets take a closer look
 housing.plot(kind="scatter", x="median_income", 
              y="median_house_value", alpha=0.4)
 plt.show()
+# In[160]:
 # Copy the training set to avoid loosing it
 # Create the labels set aka. the "Y" vector
 housing = strat_train_set.drop("median_house_value", axis=1)
 housing_labels = strat_train_set["median_house_value"].copy()
+# In[161]:
 # Most Machine Learning algorithms cannot work with missing features, 
 # let's use sklearn to populte these empty vaues with the respective 
 # median value of each feature
@@ -401,12 +417,14 @@ housing_num = housing.drop(labels="ocean_proximity", axis=1)
 X = imputer.fit_transform(housing_num)
 housing_tr = pd.DataFrame(X, columns=housing_num.columns)
 imputer.statistics_
+# In[162]:
 # Lets make sure that we have transform our data properly
 # The pandas DataFrame.describe() method should be good for this.
 # describe() will not count those values that are missing
 housing_tr.describe()
 # Eureka! We can see that all the features have a count of 16,512.
 # That is the same as the lenght of the training set.
+# In[163]:
 # All jokes aside. Now that we removed all missing values from our
 # training set feat. we can move to fixing those pesky text fields.
 # Earlier we left out the categorical atribute ocean_proximity because
@@ -420,6 +438,7 @@ encoder = LabelEncoder()
 housing_cat = housing["ocean_proximity"]
 housing_cat_encoded = encoder.fit_transform(housing_cat)
 housing_cat_encoded
+# In[164]:
 # Awesome, now we have a numerical representaton of those text labels.
 # The thing is, these numerical representations are not the best way 
 # to deal with this kind of issue. Why you may ask?
@@ -440,12 +459,15 @@ housing_cat_encoded
 # equal to 1 (hot), while all others will be cero (cold).
 # 
 print(encoder.classes_)
+# In[165]:
 encoder = OneHotEncoder()
 housing_cat_1hot = encoder.fit_transform(housing_cat_encoded.reshape(-1,1))
 housing_cat_1hot
+# In[166]:
 # Im a bit sleepy right now, I have nothing witty to say
 # See page 64 of the book for more info.
 housing_cat_1hot.toarray()
+# In[267]:
 num_attribs = list(housing_num)
 cat_attribs = ["ocean_proximity"]
 num_pipeline = Pipeline([
@@ -468,10 +490,13 @@ full_pipeline = FeatureUnion(transformer_list=[
 # Return a numpy array
 housing_prepared = full_pipeline.fit_transform(housing)
 housing_prepared
+# In[268]:
 housing_prepared.shape
+# In[269]:
 # Lest Train a Linear Regresion Model 
 lin_reg = LinearRegression()
 lin_reg.fit(housing_prepared, housing_labels)
+# In[275]:
 some_data = housing.iloc[:5]
 some_labels = housing_labels.iloc[:5]
 some_data_prepared = full_pipeline.transform(some_data)
@@ -483,6 +508,7 @@ print("Labels: {}".format(list(some_labels)))
 print("Root Mean Squared Error (RMSE): {}".format(lin_rmse))
 # We have an error margin of 68,628; Not too good.
 # Let's try a NonLinearModel Model; Let's try DecisionTreeRegresor
+# In[287]:
 tree_reg = DecisionTreeRegressor()
 tree_reg.fit(housing_prepared, housing_labels)
 housing_predictions = tree_reg.predict(housing_prepared)
@@ -494,17 +520,21 @@ print("Root Mean Squared Error (RMSE): {}".format(tree_rmse))
       
 # OMG we have 0% error! We have created a perfect model.
 # AKA. we have overfitted our data! #ZadBoyz
+# In[294]:
 scores = cross_val_score(tree_reg, housing_prepared, housing_labels,
                          scoring="neg_mean_squared_error", cv=10)
 tree_rmse_scores = np.sqrt(-scores)
 display_scores(tree_rmse_scores)
+# In[295]:
 lin_scores = cross_val_score(lin_reg, housing_prepared, housing_labels,
                              scoring="neg_mean_squared_error", cv=10)
 lin_rmse_scores = np.sqrt(-lin_scores)
 display_scores(lin_rmse_scores)
+# In[299]:
 forest_reg = RandomForestRegressor()
 forest_scores = cross_val_score(forest_reg, housing_prepared, housing_labels,
                                 scoring="neg_mean_squared_error", cv=10)
 forest_rmse_scores = np.sqrt(-forest_scores)
 display_scores(forest_rmse_scores)
+# In[300]:
 # To-Do

@@ -1,8 +1,13 @@
+#!/usr/bin/env python
+# coding: utf-8
+# In[144]:
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.integrate import odeint
 import sympy 
 #%matplotlib notebook
+get_ipython().run_line_magic('matplotlib', 'inline')
+# In[145]:
 y, x = np.ogrid[-1:2:100j, -1:1:100j]
 plt.contour(x.ravel(), 
             y.ravel(), 
@@ -11,6 +16,7 @@ plt.contour(x.ravel(),
             colors='red',)
 plt.axis('equal')
 plt.show()  
+# In[155]:
 def fun(s,t):
     R = s[0]
     J = s[1]
@@ -37,6 +43,7 @@ plt.quiver(xx, yy, a*xx+b*yy, c*xx + d*yy)
 plt.xlabel('R(t)')
 plt.ylabel('J(t)')   
 plt.savefig("fig1-a.png")  
+# In[157]:
 def fun(s,t):
     P = s[0]
     C = s[1]
@@ -62,6 +69,7 @@ plt.streamplot(xx, yy, a*xx+b*yy, c*xx + d*yy, density=1,color='r')
 plt.xlabel('R(t)')
 plt.ylabel('J(t)')   
 plt.savefig("fig1-b,.png") 
+# In[158]:
 def fun(s,t):
     R = s[0]
     J = s[1]
@@ -88,6 +96,7 @@ plt.streamplot(xx, yy, a*xx+b*yy, c*xx + d*yy, density=1,color='r')
 plt.xlabel('R(t)')
 plt.ylabel('J(t)')   
 plt.savefig("fig1-c.png")
+# In[77]:
 def fun(s,t):
     R = s[0]
     J = s[1]
@@ -105,6 +114,7 @@ sol1 = odeint(fun, init1, t)
 #sol2 = odeint(fun, init2, t) 
 plt.plot(sol1[:,0], sol1[:,1], color='g')   
 #plt.plot(sol2[:,0], sol2[:,1])    
+# In[159]:
 def fun(s,t):
     R = s[0]
     J= s[1]
@@ -138,6 +148,7 @@ plt.ylabel("Evolving of " r'$\mathbf{J}$' "'s love for " r'$\mathbf{R}$' " over 
 ax.annotate("P loves but C do not, i.e.  $a = -d$ ", xy=(-2, 3), xytext=(-1.8, 5))
 ax.annotate('No matter what, the relation will not hit the intersection.', xy=(-2, 3), xytext=(-1.8, 4.)) 
 plt.savefig("fig2-a.png") 
+# In[161]:
 def fun(s,t):
     R = s[0]
     J = s[1]
@@ -165,6 +176,7 @@ plt.xlabel("Evolving of " r'$\mathbf{R }$' "'s love for " r'$\mathbf{J}$' " over
 plt.ylabel("Evolving of " r'$\mathbf{J}$' "'s love for " r'$\mathbf{R}$' " over time") 
 #plt.quiver(xx, yy, a*xx+b*yy, c*xx + d*yy) 
 plt.savefig("fig2-b.png") 
+# In[121]:
 def fun(s,t):
     P = s[0]
     C = s[1]
@@ -188,6 +200,7 @@ xx,yy = np.meshgrid(x,y)
 plt.subplot(122)
 plt.streamplot(xx, yy, a*xx+b*yy, c*xx + d*yy, density=1,color='r')      
 #plt.quiver(xx, yy, a*xx+b*yy, c*xx + d*yy) 
+# In[37]:
 X, Y = np.meshgrid(np.arange(0, 2 * np.pi, .2), np.arange(0, 2 * np.pi, .2))
 U = np.cos(X)
 V = np.sin(Y)

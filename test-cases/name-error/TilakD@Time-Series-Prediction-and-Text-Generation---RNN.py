@@ -1,15 +1,26 @@
+#!/usr/bin/env python
+# coding: utf-8
+# In[1]:
 ### Load in necessary libraries for data input and normalization
+get_ipython().run_line_magic('matplotlib', 'inline')
 import numpy as np
 import matplotlib.pyplot as plt
+get_ipython().run_line_magic('load_ext', 'autoreload')
+get_ipython().run_line_magic('autoreload', '2')
 from my_answers import *
+get_ipython().run_line_magic('load_ext', 'autoreload')
+get_ipython().run_line_magic('autoreload', '2')
 from my_answers import *
 ### load in and normalize the dataset
 dataset = np.loadtxt('datasets/normalized_apple_prices.csv')
+# In[2]:
 # lets take a look at our time series
 plt.plot(dataset)
 plt.xlabel('time period')
 plt.ylabel('normalized series value')
+# In[4]:
 odd_nums = np.array([1,3,5,7,9,11,13])
+# In[5]:
 # run a window of size 2 over the odd number sequence and display the results
 window_size = 2
 X = []
@@ -31,12 +42,15 @@ print ('--- the input X will look like ----')
 print (X)
 print ('--- the associated output y will look like ----')
 print (y)
+# In[6]:
 ### TODO: implement the function window_transform_series in the file my_answers.py
 from my_answers import window_transform_series
 print(window_transform_series(odd_nums,2))
+# In[7]:
 # window the data using your windowing function
 window_size = 7
 X,y = window_transform_series(series = dataset,window_size = window_size)
+# In[8]:
 # split our dataset into training / testing sets
 train_test_split = int(np.ceil(2*len(y)/float(3)))   # set the split point
 # partition the training set
@@ -48,6 +62,7 @@ y_test = y[train_test_split:]
 # NOTE: to use keras's RNN LSTM module our input must be reshaped to [samples, window size, stepsize] 
 X_train = np.asarray(np.reshape(X_train, (X_train.shape[0], window_size, 1)))
 X_test = np.asarray(np.reshape(X_test, (X_test.shape[0], window_size, 1)))
+# In[10]:
 ### TODO: create required RNN model
 # import keras network libraries
 from keras.models import Sequential
@@ -63,18 +78,23 @@ model = build_part1_RNN(window_size)
 optimizer = keras.optimizers.RMSprop(lr=0.001, rho=0.9, epsilon=1e-08, decay=0.0)
 # compile the model
 model.compile(loss='mean_squared_error', optimizer=optimizer)
+# In[11]:
 # run your model!
 model.fit(X_train, y_train, epochs=1000, batch_size=50, verbose=0)
+# In[12]:
 # generate predictions for training
 train_predict = model.predict(X_train)
 test_predict = model.predict(X_test)
+# In[13]:
 # print out training and testing errors
 training_error = model.evaluate(X_train, y_train, verbose=0)
 print('training error = ' + str(training_error))
 testing_error = model.evaluate(X_test, y_test, verbose=0)
 print('testing error = ' + str(testing_error))
+# In[14]:
 ### Plot everything - the original series as well as predictions on training and testing sets
 import matplotlib.pyplot as plt
+get_ipython().run_line_magic('matplotlib', 'inline')
 # plot original series
 plt.plot(dataset,color = 'k')
 # plot training set prediction
@@ -87,50 +107,63 @@ plt.xlabel('day')
 plt.ylabel('(normalized) price of Apple stock')
 plt.legend(['original series','training fit','testing fit'],loc='center left', bbox_to_anchor=(1, 0.5))
 plt.show()
+# In[15]:
 # read in the text, transforming everything to lower case
 text = open('datasets/holmes.txt').read().lower()
 print('our original text has ' + str(len(text)) + ' characters')
+# In[16]:
 ### print out the first 1000 characters of the raw text to get a sense of what we need to throw out
 text[:2000]
+# In[17]:
 ### find and replace '\n' and '\r' symbols - replacing them 
 text = text[1302:]
 text = text.replace('\n',' ')    # replacing '\n' with '' simply removes the sequence
 text = text.replace('\r',' ')
+# In[18]:
 ### print out the first 1000 characters of the raw text to get a sense of what we need to throw out
 text[:1000]
+# In[19]:
 ### TODO: implement cleaned_text in my_answers.py
 from my_answers import cleaned_text
 text = cleaned_text(text)
 # shorten any extra dead space created above
 text = text.replace('  ',' ')
+# In[20]:
 ### print out the first 2000 characters of the raw text to get a sense of what we need to throw out
 text[:2000]
+# In[21]:
 # count the number of unique characters in the text
 chars = sorted(list(set(text)))
 # print some of the text, as well as statistics
 print ("this corpus has " +  str(len(text)) + " total number of characters")
 print ("this corpus has " +  str(len(chars)) + " unique characters")
+# In[25]:
 ### TODO: implement window_transform_series in my_answers.py
 from my_answers import window_transform_series
+# In[26]:
 # run your text window-ing function 
 window_size = 100
 step_size = 5
 inputs, outputs = window_transform_text(text,window_size,step_size)
+# In[27]:
 # print out a few of the input/output pairs to verify that we've made the right kind of stuff to learn from
 print('input = ' + inputs[2])
 print('output = ' + outputs[2])
 print('--------------')
 print('input = ' + inputs[100])
 print('output = ' + outputs[100])
+# In[28]:
 # print out the number of unique characters in the dataset
 chars = sorted(list(set(text)))
 print ("this corpus has " +  str(len(chars)) + " unique characters")
 print ('and these characters are ')
 print (chars)
+# In[29]:
 # this dictionary is a function mapping each unique character to a unique integer
 chars_to_indices = dict((c, i) for i, c in enumerate(chars))  # map each unique character to unique integer
 # this dictionary is a function mapping each unique integer back to a unique character
 indices_to_chars = dict((i, c) for i, c in enumerate(chars))  # map each unique integer back to unique character
+# In[30]:
 # transform character-based input/output into equivalent numerical versions
 def encode_io_pairs(text,window_size,step_size):
     # number of unique chars
@@ -151,10 +184,12 @@ def encode_io_pairs(text,window_size,step_size):
         y[i, chars_to_indices[outputs[i]]] = 1
         
     return X,y
+# In[31]:
 # use your function
 window_size = 100
 step_size = 5
 X,y = encode_io_pairs(text,window_size,step_size)
+# In[34]:
 ### necessary functions from the keras library
 from keras.models import Sequential
 from keras.layers import Dense, Activation, LSTM
@@ -169,13 +204,16 @@ model = build_part2_RNN(window_size, len(chars))
 optimizer = keras.optimizers.RMSprop(lr=0.001, rho=0.9, epsilon=1e-08, decay=0.0)
 # compile model --> make sure initialized optimizer and callbacks - as defined above - are used
 model.compile(loss='categorical_crossentropy', optimizer=optimizer)
+# In[35]:
 # a small subset of our input/output pairs
 Xsmall = X[:10000,:,:]
 ysmall = y[:10000,:]
+# In[36]:
 # train the model
 model.fit(Xsmall, ysmall, batch_size=500, epochs=40,verbose = 1)
 # save weights
 model.save_weights('model_weights/best_RNN_small_textdata_weights.hdf5')
+# In[37]:
 # function that uses trained model to predict a desired number of future characters
 def predict_next_chars(model,input_chars,num_to_predict):     
     # create output
@@ -195,6 +233,7 @@ def predict_next_chars(model,input_chars,num_to_predict):
         input_chars+=d
         input_chars = input_chars[1:]
     return predicted_chars
+# In[42]:
 # TODO: choose an input sequence and use the prediction function in the previous Python cell to predict 100 characters following it
 # get an appropriately sized chunk of characters from the text
 start_inds = [10, 20, 30, 40]
@@ -212,6 +251,7 @@ for s in start_inds:
     # print out predicted characters
     line = 'predicted chars = ' + '\n' +  predict_input + '"' + '\n'
     print(line)
+# In[43]:
 ### A simple way to write output to file
 f = open('my_test_output.txt', 'w')              # create an output file to write too
 f.write('this is only a test ' + '\n')           # print some output text
@@ -221,6 +261,7 @@ f.close()
 # print out the contents of my_test_output.txt
 f = open('my_test_output.txt', 'r')              # create an output file to write too
 f.read()
+# In[44]:
 # a small subset of our input/output pairs
 Xlarge = X[:100000,:,:]
 ylarge = y[:100000,:]
@@ -228,6 +269,7 @@ ylarge = y[:100000,:]
 model.fit(Xlarge, ylarge, batch_size=500, epochs=30, verbose=1)
 # save weights
 model.save_weights('model_weights/best_RNN_large_textdata_weights.hdf5')
+# In[45]:
 # TODO: choose an input sequence and use the prediction function in the previous Python cell to predict 100 characters following it
 # get an appropriately sized chunk of characters from the text
 start_inds = [100, 200, 300, 400]

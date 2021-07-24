@@ -1,5 +1,9 @@
+#!/usr/bin/env python
+# coding: utf-8
+# In[1]:
 import nbformat
 import io
+# In[27]:
 import re
 import os 
 import requests
@@ -65,98 +69,16 @@ def read_nb(nb_src, ext=True):
 nburl = 'https://raw.githubusercontent.com/kingsgeocomp/geocomputation/master/Practical-01-Code%20Camp%20Recap.ipynb'
 t = read_nb(nburl)
 print(t)
+# In[16]:
 r = requests.get(nburl).text
 #r.text.split("\n")
 f = io.StringIO(r)
 print(f.readline())
 print(f.readline())
 print(f.readline())
-#?nbformat.read
-def write_nb(nb, fn):
-    """
-    Write a notebook to the path specified.
-    
-    Parameters
-    ==========
-    nb: nbformat.notebooknode.NotebookNode
-        A notebook object to write to disk.
-    fn: String
-        Path to which you want the notebook written. _Note:_ 
-        for simplicity's sake this will automatically append 
-        '.ipynb' to the filename; however we recommend that 
-        you not get lazy and rely on this feature since it may
-        go away in the future.
-    
-    Returns
-    =======
-    Void.
-    """
-    
-    m = re.search('^(.+geopyter)', os.getcwd(), re.IGNORECASE)
-    if m:
-        self.base_dir = m.group(0)
-    else:
-        self.base_dir = '.'
-    path = ''
-    loc = urlparse(ipynb)
-    if loc.scheme in ('http','ftp','https'):
-        print("Haven't implemented remote files yet")
-        #path = requests.get(loc)
-    elif loc.path is not None:
-        if os.path.exists(ipynb):
-            path = ipynb
-        elif os.path.exists(os.path.join(self.base_dir,"atoms",ipynb)):
-            path = os.path.join(self.base_dir,"atoms",ipynb)
-        else:
-            print("Doesn't look like there's a file at: " + ipynb)
-    else:
-        print("Don't know what to do with this type of path info: " + ipynb)
-    
-    # Append file extension
-    if not fn.endswith('.ipynb'):
-        fn += '.ipynb'
-    
-    # Write raw notebook content
-    with io.open(fn, 'w', encoding='utf8') as f:
-        nbformat.write(nb, f, nbformat.NO_CONVERT)
-from collections import defaultdict
-def get_nb_structure(nb):
-    cell_types = defaultdict(list)
-    for i, cell in enumerate(nb['cells']):
-        cell_types[cell.cell_type].append(i)
-    return cell_types
-def dump_nb(nb, cells=5, lines=5):
-    """
-    Dump content of a notebook to STDOUT to aid in debugging.
-    
-    Parameters
-    ==========
-    nb: nbformat.notebooknode.NotebookNode
-        A notebook object from which to dump content.
-    cells: int
-        Select an arbitrary number of cells to output. Defaults to 5.
-    lines: int
-        Select an arbitrary number of lines from each cell to output. Defaults to 5.
-    
-    Returns
-    =======
-    Void.
-    """
-    
-    # For the cell-range specified
-    for c in xrange(0, cells):
-        
-        # Check we still have cells to read
-        if c < len(nb.cells):
-            
-            # And dump the contents to STDOUT
-            print("====== " + nb.cells[c]['cell_type'] + " ======")
-            src = nb.cells[c]['source'].splitlines()
-            if len(src) > lines:
-                print('\n'.join(src[0:lines]))
-                print("...")
-            else:
-                print(nb.cells[c]['source'])
+# In[11]:
+get_ipython().run_line_magic('pinfo', 'nbformat.read')
+# In[265]:
 from git import Repo
 def gitter(path='.'):
     """
@@ -188,7 +110,9 @@ def gitter(path='.'):
     rp['sha'] = hc.hexsha
     
     return rp
+# In[266]:
 print(gitter())
+# In[267]:
 import re
 import importlib
 def find_libraries(nb):
@@ -247,56 +171,12 @@ def find_libraries(nb):
                 pass
         vlibs[l] = ver
     return vlibs
+# In[268]:
 #source_nb = 'atoms/foundations/Dictionaries.ipynb'
 source_nb = 'atoms/visualization/choropleth_classification.ipynb'
 inb = read_nb(source_nb)
 print(find_libraries(inb))
-def write_metadata(nb, nm, val, namespace=unicode('geopyter')):
-    """
-    Add or append metadata values to the geopyter parameter.
-    
-    Parameters
-    ==========
-    nb: nbformat.notebooknode.NotebookNode
-        A notebook object to which to add Geopyter metadata.
-    nm: String
-        The name of the key within the Geopyter dictionary that we want to update.
-    val: String, List, Dictionary
-        The value to associate with the key.
-    
-    Returns
-    =======
-    Void.
-    """
-    
-    # Check for the namespace in the notebook metadata
-    if not namespace in nb.metadata:
-        nb.metadata[namespace] = {}
-    
-    # And write it
-    nb.metadata[namespace][nm] = val
-def get_metadata(nb, nm, namespace=unicode('geopyter')):
-    """
-    Retrieve metadata values from the geopyter parameter.
-    
-    Parameters
-    ==========
-    nb: nbformat.notebooknode.NotebookNode
-        A notebook object to which to add Geopyter metadata.
-    nm: String
-        The name of the key within the Geopyter dictionary that we want to retrieve.
-    
-    Returns
-    =======
-    Void.
-    """
-    
-    # Check for the namespace in the notebook metadata
-    if not nb.metadata.has_key(namespace):
-        nb.metadata[namespace] = {}
-    
-    # And write it
-    nb.metadata[namespace][nm] = val
+# In[315]:
 def read_user_metadata(nb):
     src = nb.cells[0]['source']
     #print(src)
@@ -314,23 +194,37 @@ def read_user_metadata(nb):
                 val = val[0]
             meta[m.group(1)] = val
     return meta
+# In[313]:
 #source_nb = 'atoms/foundations/Dictionaries.ipynb'
 source_nb = 'atoms/visualization/choropleth_classification.ipynb'
 inb = read_nb(source_nb)
+# In[317]:
 for (key, val) in read_user_metadata(inb).iteritems():
     write_metadata(inb, key, val)
+# In[319]:
 write_metadata(inb, unicode('libraries'), find_libraries(inb))
 write_metadata(inb, unicode('git'), gitter())
+# In[5]:
 inb.keys()
+# In[320]:
 inb.metadata
+# In[67]:
 write_nb(inb, 'test-metadata.ipynb')
+# In[166]:
 dump_nb(inb, cells=2)
+# In[18]:
 c0 = snb.cells[0]
+# In[19]:
 type(c0)
+# In[20]:
 c0.keys()
+# In[21]:
 c0['cell_type']
+# In[22]:
 c0['source']
+# In[23]:
 c0['metadata']
+# In[24]:
 from collections import defaultdict
 def get_structure(cells):
     cell_types = defaultdict(list)
@@ -338,16 +232,24 @@ def get_structure(cells):
         cell_types[cell.cell_type].append(i)
     return cell_types
             
+# In[25]:
 cell_types = get_structure(snb.cells)
+# In[26]:
 cell_types.keys()
+# In[27]:
 for ct, cells in cell_types.items():
     print('Cell Type: %s\t %d cells'% (ct, len(cells)))
+# In[28]:
 code_cell_idx = cell_types['code'][0]
 code_cell_idx
+# In[29]:
 snb.cells[code_cell_idx]
+# In[30]:
 mkd_cell_idx = cell_types['markdown'][0]
 mkd_cell_idx
+# In[31]:
 snb.cells[mkd_cell_idx]
+# In[32]:
 def remove_outputs(nb):
     """Set output attribute of all code cells to be empty"""
     for cell in nb.cells:
@@ -363,8 +265,10 @@ def clear_notebook(old_ipynb, new_ipynb):
 source_nb = 'atoms/visualization/choropleth_classification.ipynb'
 new_nb = 'nout.ipynb'
 clear_notebook(source_nb, new_nb)
+# In[174]:
 source_nb = 'atoms/foundations/Dictionaries-Test.ipynb'
 nb = read_nb(source_nb)
+# In[225]:
 source_nb = 'atoms/foundations/Dictionaries-Test.ipynb'
 nb = read_nb(source_nb)
 import re
@@ -391,6 +295,7 @@ for c in cell_types['markdown']:
     
     h3 = soup.findAll('h3')
     print( ", ".join([x.contents[0] for x in h3]))
+# In[34]:
 import re
 rh1 = re.compile('^# ')
 rh2 = re.compile('^## ')
@@ -422,18 +327,27 @@ class NoteBook(object):
         
         
     
+# In[35]:
 nb = NoteBook(source_nb)
+# In[36]:
 cid = nb.get_cells_by_id()
+# In[37]:
 cid
+# In[38]:
 cid = nb.get_cells_by_id([7, 10, 2])
+# In[39]:
 cid
+# In[40]:
 nb.get_header_cells()
+# In[41]:
 hdict = defaultdict(list)
 for idx, cell in nb.get_header_cells():
     level = cell['source'].count("#")
     hdict[level].append(idx)
     
+# In[42]:
 hdict
+# In[43]:
 # find the start and end cells for each H? block
 keys = list(hdict.keys())
 keys.sort(reverse=True)
@@ -453,15 +367,21 @@ while keys:
                     stop = larger[0]
         start_end.append([element, stop])
         
+# In[59]:
 start_end # for each H? cell report the start and end cells
+# In[51]:
 hdict
+# In[60]:
 len(start_end)
+# In[61]:
 len(nb.get_header_cells())
+# In[68]:
 # second h2 section with all children
 se2 = [ v for v in start_end if v[0]==3][0]
 block = nb.get_cells_by_id(range(*se2))
 for cell in block:
     print(cell['source'])
+# In[69]:
 # first h3 section in second h2 section with all children
 se3 = [ v for v in start_end if v[0]==9][0]
 block = nb.get_cells_by_id(range(*se3))

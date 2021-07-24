@@ -1,8 +1,12 @@
+#!/usr/bin/env python
+# coding: utf-8
+# In[1]:
 import gym
 import numpy as np
 from collections import defaultdict
 import functools
 from tqdm import tqdm_notebook
+# In[2]:
 def generate_zeros(n):
     return [0] * n
 class TabularQAgent(object):
@@ -50,9 +54,11 @@ class TabularQAgent(object):
             if done:
                 break
             obs = obs2
+# In[5]:
 def train(tabular_q_agent, env):
     for episode in tqdm_notebook(range(200000)):
         all_reward, step_count = tabular_q_agent.learn(env)
+# In[6]:
 # 构建 Environment
 env = gym.make('FrozenLake-v0')
 env.seed(0)  # 确保结果具有可重现性
