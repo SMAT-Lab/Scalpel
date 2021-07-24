@@ -39,6 +39,8 @@ def test_ssa():
     m_ssa = SSA(source)
     m_ssa.gen()
     m_ssa.test()
+def detect_name_error(cfg):
+    pass
 
 def test_SSA():
 
@@ -50,10 +52,12 @@ def test_SSA():
     ast_node = mnode.ast
     cfg = mnode.gen_cfg()
     m_ssa = SSA(source)
-    m_ssa.compute_SSA(cfg)
-    m_final_idents = m_ssa.compute_final_idents()
-    #print(m_final_idents)
-    #cfg.build_visual('cfg', 'pdf')
+    m_ssa.compute_SSA(cfg) 
+    m_final_idents = m_ssa.compute_final_idents() #print(m_final_idents)
+    viz_graph = cfg.build_visual("pdf")
+    viz_graph.attr("node", nodesep= "0.5")
+    viz_graph.render('cfg.pdf', view=True)
+
     for fun_name, fun_cfg in cfg.functioncfgs.items():
         fun_ssa = SSA(source)
         fun_ssa.compute_SSA(fun_cfg) 

@@ -2,7 +2,7 @@ from X import A
 from X import B
 from X.C import C2
 from Y import D as d
-from . import Test
+from .. import Test
 
 def main(a, b):
 #def main(a, b, x=10, y=10, z = 10):

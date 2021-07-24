@@ -37,10 +37,9 @@ def do_single_notebook(filename):
             #source_all = "\n".join(source_cells)
             # get func_call and parameter type
             # how to deal with variable func def
-            #source_all_lines = source_all.split('\n')
-            
+            #source_all_lines = source_all.split('\n') 
             source_all_lines = body.split('\n')
-            
+
             # remove magic functions and linux commands
             source_all_lines = filter(lambda x:filter_line(x), source_all_lines)
             source_all = "\n".join(source_all_lines)
@@ -131,8 +130,8 @@ def test_SSA_single():
     #fn = "chrisjcc@DataInsight.py" # R script syntax
     #fn = "independent_example.py"
 
-    #src_path = os.path.join('test-cases', 'name-error', fn)
-    src_path = os.path.join('nameerror-tests', fn)
+    src_path = os.path.join('test-cases', 'name-error', fn)
+    #src_path = os.path.join('nameerror-tests', fn)
     exec_log_path = os.path.join("sniffer-dog-exp-data/base/exec_log/", fn.split('.py')[0])
     msg = open(exec_log_path).read()
     name = get_name_from_msg(msg)

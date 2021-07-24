@@ -9,7 +9,8 @@ from ..cfg.builder import Block
 from ..core.mnode import MNode
 from ..core.vars_visitor  import get_vars
 
-BUILT_IN_FUNCTIONS = set([ "abs","delattr",
+BUILT_IN_FUNCTIONS = set([ "abs","delattr", "print", "str", "bin", "int",
+    "float", "open",
         "hash","memoryview","set", "range", "self" "all","dict","help","min","setattr","any","dir","hex","next","slice", "self",
         "ascii","divmod","enumerate","id","object","sorted","bin","enumerate","input",
         "staticmethod","bool", "eval" "int", "len", "self", "open" "str" "breakpoint" "exec" "isinstance" "ord",
@@ -51,10 +52,11 @@ class SSA:
         self.error_paths = []
 
     def get_global_live_vars(self):
-        import_dict = self.m_node.parse_import_stmts()
-        def_records = self.m_node.parse_func_defs()
-        def_idents = [r['name'] for r in def_records if r['scope'] == 'mod']
-        self.global_live_idents = def_idents + list(import_dict.keys())
+        #import_dict = self.m_node.parse_import_stmts()
+        #def_records = self.m_node.parse_func_defs()
+        #def_idents = [r['name'] for r in def_records if r['scope'] == 'mod']
+        #self.global_live_idents = def_idents + list(import_dict.keys())
+        self.global_live_idents = []
 
     def flatten_tuple(ast_tuple):
         """
@@ -93,6 +95,8 @@ class SSA:
             elif isinstance(stmt, ast.Expr) and isinstance(stmt.value, ast.Call):
                 if isinstance(stmt.value.func, ast.Attribute):
                     assign_stmts.append((None, stmt.value  ))
+                else:
+                    assign_stmts.append((None, stmt.value  ))
             elif isinstance(stmt, ast.Expr) and isinstance(stmt.value,
                     ast.Attribute):
                 assign_stmts.append((None,  stmt))
@@ -120,6 +124,7 @@ class SSA:
                         assign_stmts.append((ast.Name(name.name, ast.Store()),  None))
             elif isinstance(stmt, ast.Return):
                     assign_stmts.append((None,  stmt.value))
+
         return assign_stmts
 
     def get_attribute_stmts(self, stmts):
@@ -264,7 +269,7 @@ class SSA:
                 #    print(ident_name, set(nums))
         return def_reach
 
-    def find_this_ident_name(self, ident_name, live_ident_table):
+    def find_this_ident_name(self, ident_name, live_ident_table, def_names):
 
         n_scopes = len(live_ident_table)
         for i in range(n_scopes):
@@ -274,11 +279,14 @@ class SSA:
                 else:
                     return True
 
-        if  ident_name not in self.global_live_idents and (ident_name not in BUILT_IN_FUNCTIONS):
+        if ident_name in BUILT_IN_FUNCTIONS:
+            return True
+
+        if ident_name not in def_names:
             return False
         return True
 
-    def test(self, live_ident_table=[]):
+    def test(self, live_ident_table=[], def_names = []):
         n_scopes = len(live_ident_table)
         undefined_idents = []
         for block in self.ssa_blocks:
@@ -292,6 +300,7 @@ class SSA:
             for ident_name, numbers in ident_phi_fun.items():
                 if -1 not in numbers:
                     continue
-                if not self.find_this_ident_name(ident_name, live_ident_table):
+                is_found = self.find_this_ident_name(ident_name, live_ident_table, def_names)
+                if not is_found:
                     undefined_idents.append(ident_name)
         return undefined_idents
