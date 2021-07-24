@@ -4,24 +4,45 @@ import sys
 import ast
 import astor
 import nbformat
+from nbconvert import PythonExporter
 from scalpel.core.mnode import MNode
 from scalpel.SSA.ssa import SSA
 
+
 # we need to define cretieras for variables
+def filter_line(line):
+    if len(line)==0:
+        return False
+
+    if line[0] in ['%', '!', '?']:
+        return False
+
+    if line.split(' ')[0]  in ["cat", "ls", "mkdir", "less", "sudo", "cd"]:
+        return False
+    return True
+
 def do_single_notebook(filename):
+
     try:
         with open(filename) as f:
             nb = nbformat.read(f, as_version=4)
             cells = list(filter(lambda x:x['cell_type'] == 'code' and
                 x['execution_count'] is not None, nb.cells))
             nb.cells = cells # assign new cells
-            source_cells = [c['source'] for c in nb.cells]
-            source_all = "\n".join(source_cells)
+            exporter = PythonExporter()
+            (body, resources) = exporter.from_notebook_node(nb)
+            #print(resources)
+
+            #source_cells = [c['source'] for c in nb.cells]
+            #source_all = "\n".join(source_cells)
             # get func_call and parameter type
             # how to deal with variable func def
-            source_all_lines = source_all.split('\n')
+            #source_all_lines = source_all.split('\n')
+            
+            source_all_lines = body.split('\n')
+            
             # remove magic functions and linux commands
-            source_all_lines = filter(lambda x:len(x)>0 and x[0]!='%' and x[0]!='!', source_all_lines)
+            source_all_lines = filter(lambda x:filter_line(x), source_all_lines)
             source_all = "\n".join(source_all_lines)
             return source_all
             #print(source_all)
@@ -102,21 +123,16 @@ def test_SSA(source, target_ident):
 def test_SSA_single():
     #fn = "TilakD@Time-Series-Prediction-and-Text-Generation---RNN.py" # case
     #passed
-    #fn = "whugue@clickstream-analysis.py"  # syntax error
     #fn = "howl-anderson@q_learning_demo.py"  # lib issues
-    #fn = "TermiNutZ@pills_online.py"
-    #fn = "jlewi@kubeflow-rl.py"
-    fn = "arm61@isistrainingcourse_mar2018.py"  # syntax
+    fn = "TermiNutZ@pills_online.py"
     #fn = "tamanyan@ml-baseball.py"  # wrong !!
-    #fn = "bigspider@arclimb.py"   # order
     #fn = "pysal@geopyter.py" # syntax
     #fn = "KirstieJane@BrainsForPublication.py" # syntax
-    #fn = "Devjiu@diploma.py" # syntax
-    #fn = "Neurita@nipype-lessons.py" # syntax
     #fn = "chrisjcc@DataInsight.py" # R script syntax
     #fn = "independent_example.py"
 
-    src_path = os.path.join('test-cases', 'name-error', fn)
+    #src_path = os.path.join('test-cases', 'name-error', fn)
+    src_path = os.path.join('nameerror-tests', fn)
     exec_log_path = os.path.join("sniffer-dog-exp-data/base/exec_log/", fn.split('.py')[0])
     msg = open(exec_log_path).read()
     name = get_name_from_msg(msg)
@@ -125,6 +141,7 @@ def test_SSA_single():
     try:
         tree = ast.parse(src)
     except Exception as e:
+        print(e)
         os.system('2to3 '+ src_path + ' -n -W  --output-dir=tmp/')
         src = open('tmp/'+fn).read()
     res = test_SSA(src, name)
@@ -166,7 +183,7 @@ def main():
         #print(filename)
         #filename = "/mnt/fit-Knowledgezoo/Github_repos_download/data/diyclassics@mapping-experiments/book-map-ner-htef.ipynb"
         filename = os.path.basename(filename)
-        notebook_path = os.path.join("name-error-notebooks", repo_name+'-'+ filename)
+        notebook_path = os.path.join("test-cases/name-error-notebooks", repo_name+'-'+ filename)
         s = do_single_notebook(notebook_path)
         f = open('nameerror-tests/'+repo_name+ '.py', 'w')
         f.write(s)
@@ -175,6 +192,6 @@ def main():
         #break
     return 0
 if __name__ == '__main__':
-    main()
+    #main()
     #test_SSA_batch()
-    #test_SSA_single()
+    test_SSA_single()
