@@ -16,7 +16,9 @@ BUILT_IN_FUNCTIONS = set([ "abs","delattr", "print", "str", "bin", "int",
         "staticmethod","bool", "eval" "int", "len", "self", "open" "str" "breakpoint" "exec" "isinstance" "ord",
         "sum", "bytearray", "filter", "issubclass", "pow", "super", "bytes", "float", "iter", "print"
         "tuple", "callable", "format", "len", "property", "type", "chr","frozenset", "list", "range", "vars", 
-        "classmethod", "getattr", "locals", "repr", "repr", "zip", "compile", "globals", "map", "reversed",  "__import__", "complex", "hasattr", "max", "round"]
+        "classmethod", "getattr", "locals", "repr", "repr", "zip", "compile",
+        "globals", "map", "reversed",  "__import__", "complex", "hasattr",
+        "max", "round", "get_ipython"]
         )
 
 def parse_val(node):

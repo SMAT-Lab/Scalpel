@@ -191,6 +191,7 @@ def main():
         #break
     return 0
 if __name__ == '__main__':
-    #main()
+    main()
     #test_SSA_batch()
-    test_SSA_single()
+    #test_SSA_single()
+    #fn = "Devjiu@diploma.py" # syntax
