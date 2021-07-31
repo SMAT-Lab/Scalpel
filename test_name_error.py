@@ -60,7 +60,7 @@ def get_name_from_msg(msg):
         return groups[-1]
     return None
 
-def test_SSA(source, target_ident):
+def test_SSA(source):
 
     mnode = MNode("local")
     mnode.source = source
@@ -69,7 +69,6 @@ def test_SSA(source, target_ident):
     if ast_node is None: 
         print('syntax')
         return False
-
     cfg = mnode.gen_cfg()
     m_ssa = SSA(source)
     m_ssa.compute_SSA(cfg)
@@ -77,12 +76,18 @@ def test_SSA(source, target_ident):
     live_ident_table = [m_final_idents]
     undefined_idents = m_ssa.test()
     graph_viz = cfg.build_visual('pdf')
-    #graph_viz.render("cfg.pdf", view=True)
+    graph_viz.render("cfg1", view=False)
     def_names = []
+    #key_path = m_ssa.error_paths[undefined_idents[0]][0]
+    #key_path = list(reversed(key_path))
+    #m_ssa.retrieve_key_stmts(key_path)
+    return undefined_idents
+
 
     for fun_name, fun_cfg in cfg.functioncfgs.items():
         args = cfg.function_args[fun_name]
         arg_idents = {arg_name:[2] for arg_name in args}
+        print(fun_name, arg_idents)
         live_ident_table.append(arg_idents)
         fun_ssa = SSA(source)
         fun_ssa.compute_SSA(fun_cfg)
@@ -110,31 +115,38 @@ def test_SSA(source, target_ident):
 
         live_ident_table.pop()
 
-    print('--------------------------')
-    print(target_ident)
-    print(undefined_idents)
-    print('--------------------------')
-
-    if target_ident in undefined_idents:
-        return True
-    return False
+    #print('--------------------------')
+    #print(target_ident)
+    #print(undefined_idents)
+    #print('--------------------------')
+    return undefined_idents
+    #if target_ident is None:
+    #    return len(undefined_idents)==0
+    #
+    #if target_ident in undefined_idents:
+    #    return True
+    #return False
 
 def test_SSA_single():
     #fn = "TilakD@Time-Series-Prediction-and-Text-Generation---RNN.py" # case
     #passed
     #fn = "howl-anderson@q_learning_demo.py"  # lib issues
-    fn = "TermiNutZ@pills_online.py"
+    #fn = "TermiNutZ@pills_online.py"
     #fn = "tamanyan@ml-baseball.py"  # wrong !!
     #fn = "pysal@geopyter.py" # syntax
     #fn = "KirstieJane@BrainsForPublication.py" # syntax
     #fn = "chrisjcc@DataInsight.py" # R script syntax
     #fn = "independent_example.py"
+    # new cases
 
-    src_path = os.path.join('test-cases', 'name-error', fn)
+    fn = "chingwenhsu@cme161.py"
+
+    #src_path = os.path.join('test-cases', 'name-error', fn)
+    src_path = os.path.join('exec_scripts', fn)
     #src_path = os.path.join('nameerror-tests', fn)
-    exec_log_path = os.path.join("sniffer-dog-exp-data/base/exec_log/", fn.split('.py')[0])
-    msg = open(exec_log_path).read()
-    name = get_name_from_msg(msg)
+    #exec_log_path = os.path.join("sniffer-dog-exp-data/base/exec_log/", fn.split('.py')[0])
+    #msg = open(exec_log_path).read()
+    #name = get_name_from_msg(msg)
     #name = "Activation"
     src = open(src_path).read()
     try:
@@ -143,34 +155,44 @@ def test_SSA_single():
         print(e)
         os.system('2to3 '+ src_path + ' -n -W  --output-dir=tmp/')
         src = open('tmp/'+fn).read()
-    res = test_SSA(src, name)
+    res = test_SSA(src)
     print(res)
 
 def test_SSA_batch():
     #filename = sys.argv[1]
     #source = open(filename).read()
-    all_fns = os.listdir('name-error-cases')
+    #all_fns = os.listdir('name-error-cases')
+    all_fns = os.listdir('exec_scripts')
     for fn in all_fns:
         #if fn!='djahng@sentiment-rnn.py':
         #    continue
-        src_path = os.path.join('name-error-cases', fn) 
-        exec_log_path = os.path.join("sniffer-dog-exp-data/base/exec_log/", fn.split('.py')[0])
-        msg = open(exec_log_path).read()
-        name = get_name_from_msg(msg)
+        #src_path = os.path.join('name-error-cases', fn) 
+        src_path = os.path.join('exec_scripts', fn) 
+        #exec_log_path = os.path.join("sniffer-dog-exp-data/base/exec_log/", fn.split('.py')[0])
+        #msg = open(exec_log_path).read()
+        #name = get_name_from_msg(msg)
         #src_path ='tmp.py'
+        #print(src_path)
         src = open(src_path).read()
-        res = test_SSA(src, name)
-        if  res:
-           # print('Yes')
-            pass
-        else:
+        name = None
+        undefined_idents = test_SSA(src)
+        if len(undefined_idents) > 0:
+            #print('---------------------')
             print(fn)
+            #print(undefined_idents)
+            #print('---------------------')
+        #if  res:
+        #    #print('Yes')
+        #    pass
+        #else:
+        #    print(fn)
            # print("No")
         #break
 
 def main():
     #all_rows = open("all.row").readlines()
-    all_rows = open("nameerror.row").readlines()
+    #all_rows = open("nameerror.row").readlines()
+    all_rows = open("req3.subject.row").readlines()
     for row in all_rows:
         line_parts = row.strip().split('|')
         filename = line_parts[-1]
@@ -182,9 +204,11 @@ def main():
         #print(filename)
         #filename = "/mnt/fit-Knowledgezoo/Github_repos_download/data/diyclassics@mapping-experiments/book-map-ner-htef.ipynb"
         filename = os.path.basename(filename)
-        notebook_path = os.path.join("test-cases/name-error-notebooks", repo_name+'-'+ filename)
+        #notebook_path = os.path.join("test-cases/name-error-notebooks", repo_name+'-'+ filename)
+        notebook_path = os.path.join("exec_notebooks/", repo_name+'-'+ filename)
         s = do_single_notebook(notebook_path)
-        f = open('nameerror-tests/'+repo_name+ '.py', 'w')
+        #f = open('nameerror-tests/'+repo_name+ '.py', 'w')
+        f = open('exec_scripts/'+repo_name+ '.py', 'w')
         f.write(s)
         f.close() 
         #break
@@ -192,5 +216,5 @@ def main():
     return 0
 if __name__ == '__main__':
     #main()
-    #test_SSA_batch()
-    test_SSA_single()
+    test_SSA_batch()
+    #test_SSA_single()

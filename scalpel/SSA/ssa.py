@@ -3,6 +3,8 @@ In this module, the single static assignment forms are  implemented to allow
 futher anaysis. The module contain a single class named SSA.
 """
 import ast
+from functools import reduce
+from collections import OrderedDict
 from ..core.vars_visitor import get_vars
 from ..cfg.builder import CFGBuilder
 from ..cfg.builder import Block
@@ -10,13 +12,13 @@ from ..core.mnode import MNode
 from ..core.vars_visitor  import get_vars
 
 BUILT_IN_FUNCTIONS = set([ "abs","delattr", "print", "str", "bin", "int",
-    "float", "open",
+        "float", "open",
         "hash","memoryview","set", "range", "self" "all","dict","help","min","setattr","any","dir","hex","next","slice", "self",
         "ascii","divmod","enumerate","id","object","sorted","bin","enumerate","input",
         "staticmethod","bool", "eval" "int", "len", "self", "open" "str" "breakpoint" "exec" "isinstance" "ord",
         "sum", "bytearray", "filter", "issubclass", "pow", "super", "bytes", "float", "iter", "print"
         "tuple", "callable", "format", "len", "property", "type", "chr","frozenset", "list", "range", "vars", 
-        "classmethod", "getattr", "locals", "repr", "repr", "zip", "compile", "globals", "map", "reversed",  "__import__", "complex", "hasattr", "max", "round"]
+        "classmethod", "getattr", "locals", "repr", "repr", "zip", "compile", "globals", "map", "reversed",  "__import__", "complex", "hasattr", "max", "round", "get_ipython"]
         )
 
 def parse_val(node):
@@ -49,7 +51,8 @@ class SSA:
         self.m_node.gen_ast() 
         self.global_live_idents = []
         self.ssa_blocks = []
-        self.error_paths = []
+        self.error_paths = {}
+        self.dom = {}
 
     def get_global_live_vars(self):
         #import_dict = self.m_node.parse_import_stmts()
@@ -124,6 +127,10 @@ class SSA:
                         assign_stmts.append((ast.Name(name.name, ast.Store()),  None))
             elif isinstance(stmt, ast.Return):
                     assign_stmts.append((None,  stmt.value))
+            elif isinstance(stmt, ast.FunctionDef):
+                    assign_stmts.append((ast.Name(stmt.name, ast.Store()),  None))
+            elif isinstance(stmt, ast.ClassDef):
+                    assign_stmts.append((ast.Name(stmt.name, ast.Store()),  None))
 
         return assign_stmts
 
@@ -139,26 +146,62 @@ class SSA:
         Args:
             ast_node: AST node.
         """
+        if ast_node is None:
+            return []
         res = get_vars(ast_node)
         idents = [r['name'] for r in res if  r['name'] is not None and "." not in r['name']]
         return idents
+
+    def is_loop_header(block): 
+        pass
+    def compute_dominator():
+        dominators = {}
+        for block in self.ssa_blocks:
+            dominaotrs[block.id] = [block.id]
+
+        for block in self.ssa_blocks:
+            dominaotrs[block.id] = [block.id]
+            if len(block.predecessors)>=2:
+                for p_link in block.predecessors:
+                    p_block = p_link.source
+                    #runner = p_block
+    def is_dominator(self, b1, b2):
+        # if b1 idom b2, all path has to go to b1 before accessing b2
+        # then the in-degree of b2 must be one  and there exists an edge between b1-b2
+        pass
 
     def backward_query(self, block, ident_name, visited, path = []):
         phi_fun = []
         visited.add(block.id)
         path.append(block.id)
         # all the incoming path
-        for suc_link in block.predecessors:
-            is_this_path_done = False
+
+        for suc_link in block.predecessors: 
+            is_this_path_done = False 
             parent_block = suc_link.source
-            # this is a back edge, discard it 
-            #if parent_block.id > block.id:
+            target_block = suc_link.target
+            # deal with cycles, this is back edge
+            if parent_block is None:
+                continue
+            if parent_block.id in visited or parent_block.id == block.id:
+                continue
+
+            # if the block dominates the parent block, then give it up
+            if block.id in self.dom[parent_block.id]:
+                continue
+
+            #grand_parent_blocks = [link.source for link in parent_block.predecessors]
+            #grand_parent_block_ids = [b.id for b in grand_parent_blocks]
+            #if block.id in grand_parent_block_ids:
             #    continue
-            target_ssa_left = reversed(list(parent_block.ssa_form.keys()))
+            #if ident_name == 'condition':
+                #print('testing')
+                #self.print_block(parent_block)
+            target_ssa_left = reversed(list(parent_block.ssa_form.keys())) 
             block_phi_fun = []
             for tmp_var_no in target_ssa_left:
                 if tmp_var_no[0] == ident_name:
-                    block_phi_fun.append(tmp_var_no)
+                    block_phi_fun.append(tmp_var_no) 
                     is_this_path_done = True
                     break
             # this is one block 
@@ -176,10 +219,19 @@ class SSA:
             #    phi_fun += block_phi_fun
             if len(block_phi_fun) == 0:
                 phi_fun += [(ident_name, -1)]
-                self.error_paths.append(path.copy())
+                if ident_name in self.error_paths:
+                    self.error_paths[ident_name].append(path.copy())
+                else:
+                    self.error_paths[ident_name] = [path.copy()]
+
             else:
                 phi_fun += block_phi_fun
         path.pop()
+        #if ident_name == 'wakeup_time':
+        #    print('----------------1>')
+        #    print(phi_fun)
+        #    self.print_block(block)
+        #    print('<----------------2')
         return phi_fun
 
     def compute_SSA(self, cfg, live_ident_table={}, is_final=False):
@@ -193,6 +245,7 @@ class SSA:
         # visit all blocks in bfs order 
         #cfg = CFGBuilder(self.module_ast)
         all_blocks = cfg.bfs()
+        self.compute_dom(all_blocks)
         for block in all_blocks:
             #parse_vars from the right
             # single line function to be added 
@@ -206,8 +259,6 @@ class SSA:
                 left_name = "<holder>"
                 if left is not None:
                     left_name = left.id
-                if right is None:
-                    continue
 
                 if left_name in self.numbering:
                     var_no = self.numbering[left_name]+1
@@ -217,10 +268,11 @@ class SSA:
                     var_no = 1
                     self.numbering[left_name] = var_no
                     self.var_values[(left_name,var_no)] = actual_value
-                phi_fun = [] 
+                phi_fun = []
                 right_vars = self.get_identifiers(right)
                 for var_name in right_vars:
                    # last assignment occur in the same block
+                    #print(block.ssa_form.keys())
                     for tmp_var_no in reversed(list(block.ssa_form.keys())):
                         if var_name == tmp_var_no[0]:
                             phi_fun.append(tmp_var_no)
@@ -236,7 +288,10 @@ class SSA:
                         phi_fun += [(var_name, -1)]
                     else:
                         phi_fun += phi_fun_incoming
+
                 block.ssa_form[(left_name, var_no)] = phi_fun
+
+
         self.ssa_blocks = all_blocks
 
     def is_undefined(self, load_idents):
@@ -281,14 +336,90 @@ class SSA:
 
         if ident_name in BUILT_IN_FUNCTIONS:
             return True
-
         if ident_name not in def_names:
             return False
         return True
 
+    def retrieve_key_stmts(self, block_id_lst):
+        import astor
+        id2blocks = {b.id:b for b in self.ssa_blocks}
+        for b_id in block_id_lst:
+            tmp_block = id2blocks[b_id]
+            key_stmt = tmp_block.statements[-1]
+            #print(astor.to_source(key_stmt))
+
+    def print_block(self, block):
+        #for stmt in block.statements:
+        print(block.get_source())
+
+    # compute the dominators 
+    def compute_dom(self, ssa_blocks):
+        entry_block = ssa_blocks[0]
+        id2blocks = {b.id:b for b in ssa_blocks}
+        block_ids = list(id2blocks.keys())
+        entry_id = entry_block.id
+        N_blocks = len(ssa_blocks)
+        dom = {}
+        # for all other nodes, set all nodes as the dominators
+        for b_id in block_ids:
+            if b_id == entry_id:
+                dom[b_id] = set([entry_id])
+            else:
+                dom[b_id] = set(block_ids)
+
+        # Iteratively eliminate nodes that are not dominators
+        #Dom(n) = {n} union with intersection over Dom(p) for all p in pred(n)
+        changed = True
+        counter = 0
+        while changed:
+            changed = False
+            for b_id in block_ids:
+                if b_id == entry_id:
+                    continue
+                pre_block_ids = [pre_link.source.id for pre_link in id2blocks[b_id].predecessors ]
+                pre_dom_set = [dom[pre_b_id] for pre_b_id in pre_block_ids]
+                new_dom_set = set([b_id])
+
+                if len(pre_dom_set) != 0:
+                    new_dom_tmp = reduce(set.intersection, pre_dom_set) 
+                    new_dom_set = new_dom_set.union(new_dom_tmp)
+                old_dom_set = dom[b_id]
+
+                if new_dom_set != old_dom_set:
+                    changed = True
+                    dom[b_id] = new_dom_set
+        self.dom = dom
+        return dom
+
+        # compute idom: immediately dominator
+        idom = {}
+        for block in ssa_blocks:
+            idom[b.id] = set()
+            pred_links = block.predecessors
+            pred_nodes =  [pl.source for pl in pred_links]
+            if len(pred_nodes)!=1:
+                continue
+            #if dom 
+
+        # then compute the dominace frontiers
+        dominance_frontier = {b.id:set() for b in ssa_blocks}
+        for block in ssa_blocks:
+            pred_links = block.predecessors
+            pred_nodes =  [pl.source for pl in pred_links]
+            if len(pred_nodes)<2:
+                continue
+            for pn in pred_nodes:
+                runner = pn.id
+                while runner != idom[b.id]:
+                    dominance_frontier[runner].add(b.id)
+                    runner = idom[runner]
+
+        return dom
+
     def test(self, live_ident_table=[], def_names = []):
         n_scopes = len(live_ident_table)
         undefined_idents = []
+        self.compute_dom(self.ssa_blocks)
         for block in self.ssa_blocks:
             ident_phi_fun = {} 
             for k, v in block.ssa_form.items():
@@ -296,11 +427,15 @@ class SSA:
                     if item[0] not in ident_phi_fun:
                         ident_phi_fun[item[0]] = [item[1]]
                     else:
-                        ident_phi_fun[item[0]] += [item[1]]
+                        ident_phi_fun[item[0]] += [item[1]] 
+
             for ident_name, numbers in ident_phi_fun.items():
                 if -1 not in numbers:
                     continue
                 is_found = self.find_this_ident_name(ident_name, live_ident_table, def_names)
                 if not is_found:
-                    undefined_idents.append(ident_name)
+                    undefined_idents.append(ident_name) 
+                    #self.print_block(block)
+                    #print(ident_name, numbers)
+
         return undefined_idents
