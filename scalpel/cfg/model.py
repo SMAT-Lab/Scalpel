@@ -105,7 +105,7 @@ class Block(object):
         """
         src = ""
         for statement in self.statements:
-            if type(statement) in [ast.If, ast.For, ast.While]:
+            if type(statement) in [ast.If, ast.For, ast.While, ast.With]:
                 src += (astor.to_source(statement)).split('\n')[0] + "\n"
             elif type(statement) == ast.Try:
                 src += (astor.to_source(statement)).split('\n')[0] + "\n"

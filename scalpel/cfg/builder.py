@@ -548,3 +548,33 @@ class CFGBuilder(ast.NodeVisitor):
         afteryield_block = self.new_block()
         self.add_exit(self.current_block, afteryield_block)
         self.current_block = afteryield_block
+
+    def visit_With(self, node):
+        #self.cfg.asynchr = True
+        #self.add_statement(self.current_block, node)
+        #afterwith_block = self.new_block()
+        #self.add_exit(self.current_block, afterwith_block)
+        #self.current_block = afterwith_block
+
+        #
+        self.add_statement(self.current_block, node)
+        # New block for the body of the with.
+        with_block = self.new_block()
+        self.add_exit(self.current_block, with_block)
+
+        # Block of code after the with loop.
+        afterwith_block = self.new_block()
+        # no branch here
+        self.add_exit(with_block, afterwith_block)
+        self.current_block = with_block
+
+        # Populate the body of the with loop.
+        for child in node.body:
+            self.visit(child)
+
+        if not self.current_block.exits:
+            self.add_exit(self.current_block, afterwith_block)
+
+        # Continue building the CFG in the after-with block.
+        self.current_block = afterwith_block
+

@@ -60,6 +60,18 @@ def get_name_from_msg(msg):
         return groups[-1]
     return None
 
+
+def code_syntax_check(src_path):
+    src = open(src_path).read()
+    fn = os.path.basename(src_path)
+    try:
+        tree = ast.parse(src)
+    except Exception as e:
+        #print(e)
+        os.system('2to3 '+ src_path + ' -n -W  --output-dir=tmp/')
+        src = open('./tmp/'+fn).read()
+    return src
+
 def test_SSA(source):
 
     mnode = MNode("local")
@@ -67,27 +79,28 @@ def test_SSA(source):
     mnode.gen_ast()
     ast_node = mnode.ast
     if ast_node is None: 
-        print('syntax')
-        return False
+        #print('syntax')
+        return []
     cfg = mnode.gen_cfg()
+    graph_viz = cfg.build_visual('pdf')
+    graph_viz.render("cfg1", view=False)
     m_ssa = SSA(source)
     m_ssa.compute_SSA(cfg)
     m_final_idents = m_ssa.compute_final_idents()
     live_ident_table = [m_final_idents]
     undefined_idents = m_ssa.test()
-    graph_viz = cfg.build_visual('pdf')
-    graph_viz.render("cfg1", view=False)
     def_names = []
     #key_path = m_ssa.error_paths[undefined_idents[0]][0]
     #key_path = list(reversed(key_path))
     #m_ssa.retrieve_key_stmts(key_path)
     return undefined_idents
 
-
     for fun_name, fun_cfg in cfg.functioncfgs.items():
+        #graph_viz = fun_cfg.build_visual('pdf')
+        #graph_viz.render("cfg1", view=False)
         args = cfg.function_args[fun_name]
         arg_idents = {arg_name:[2] for arg_name in args}
-        print(fun_name, arg_idents)
+    #    print(fun_name, arg_idents)
         live_ident_table.append(arg_idents)
         fun_ssa = SSA(source)
         fun_ssa.compute_SSA(fun_cfg)
@@ -95,6 +108,7 @@ def test_SSA(source):
         live_ident_table.pop()
         def_names += [fun_name]
 
+    #return undefined_idents
     cfg.class_cfgs = {}
     for class_name, class_cfg in cfg.class_cfgs.items():
         # class body ssa compute
@@ -139,10 +153,13 @@ def test_SSA_single():
     #fn = "independent_example.py"
     # new cases
 
-    fn = "chingwenhsu@cme161.py"
+    #fn = "chingwenhsu@cme161.py"
+    fn_path = sys.argv[1]
+    fn = os.path.basename(fn_path)
+    src_path = fn_path
 
     #src_path = os.path.join('test-cases', 'name-error', fn)
-    src_path = os.path.join('exec_scripts', fn)
+    #src_path = os.path.join('exec_scripts', fn)
     #src_path = os.path.join('nameerror-tests', fn)
     #exec_log_path = os.path.join("sniffer-dog-exp-data/base/exec_log/", fn.split('.py')[0])
     #msg = open(exec_log_path).read()
@@ -152,33 +169,33 @@ def test_SSA_single():
     try:
         tree = ast.parse(src)
     except Exception as e:
-        print(e)
-        os.system('2to3 '+ src_path + ' -n -W  --output-dir=tmp/')
-        src = open('tmp/'+fn).read()
+        os.system('2to3 '+ src_path + ' -n -W  --output-dir=tmp/ > /dev/null')
+        src = open('./tmp/'+fn).read()
     res = test_SSA(src)
     print(res)
 
 def test_SSA_batch():
     #filename = sys.argv[1]
     #source = open(filename).read()
-    #all_fns = os.listdir('name-error-cases')
-    all_fns = os.listdir('exec_scripts')
+    all_fns = os.listdir(os.path.join('test-cases', 'name-error'))
+    #all_fns = os.listdir('exec_scripts')
     for fn in all_fns:
-        #if fn!='djahng@sentiment-rnn.py':
-        #    continue
-        #src_path = os.path.join('name-error-cases', fn) 
-        src_path = os.path.join('exec_scripts', fn) 
-        #exec_log_path = os.path.join("sniffer-dog-exp-data/base/exec_log/", fn.split('.py')[0])
-        #msg = open(exec_log_path).read()
-        #name = get_name_from_msg(msg)
+        src_path = os.path.join('test-cases', 'name-error', fn) 
+        #src_path = os.path.join('exec_scripts', fn) 
+        exec_log_path = os.path.join("sniffer-dog-exp-data/base/exec_log/", fn.split('.py')[0])
+        msg = open(exec_log_path).read()
+        name = get_name_from_msg(msg)
         #src_path ='tmp.py'
         #print(src_path)
-        src = open(src_path).read()
-        name = None
+        src = code_syntax_check(src_path)
+        #src = open(src_path).read()
+        #name = None
         undefined_idents = test_SSA(src)
-        if len(undefined_idents) > 0:
+        if name not in undefined_idents:
+            print(fn, name, "not-found")
+        #if len(undefined_idents) > 0:
             #print('---------------------')
-            print(fn)
+        #    print(fn)
             #print(undefined_idents)
             #print('---------------------')
         #if  res:
@@ -216,5 +233,5 @@ def main():
     return 0
 if __name__ == '__main__':
     #main()
-    test_SSA_batch()
-    #test_SSA_single()
+    #test_SSA_batch()
+    test_SSA_single()
