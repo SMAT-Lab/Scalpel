@@ -131,6 +131,10 @@ class SSA:
                     assign_stmts.append((ast.Name(stmt.name, ast.Store()),  None))
             elif isinstance(stmt, ast.ClassDef):
                     assign_stmts.append((ast.Name(stmt.name, ast.Store()),  None))
+            elif isinstance(stmt, ast.With):
+                    for item in stmt.items:
+                        # left: optional_vars  right: context_expr
+                        assign_stmts.append((item.optional_vars, item.context_expr))
 
         return assign_stmts
 
@@ -187,7 +191,7 @@ class SSA:
                 continue
 
             # if the block dominates the parent block, then give it up
-            if block.id in self.dom[parent_block.id]:
+            if parent_block.id in self.dom and  block.id in self.dom[parent_block.id]:
                 continue
 
             #grand_parent_blocks = [link.source for link in parent_block.predecessors]
@@ -245,6 +249,7 @@ class SSA:
         # visit all blocks in bfs order 
         #cfg = CFGBuilder(self.module_ast)
         all_blocks = cfg.bfs()
+        #print(len(all_blocks))
         self.compute_dom(all_blocks)
         for block in all_blocks:
             #parse_vars from the right
@@ -377,7 +382,7 @@ class SSA:
                 if b_id == entry_id:
                     continue
                 pre_block_ids = [pre_link.source.id for pre_link in id2blocks[b_id].predecessors ]
-                pre_dom_set = [dom[pre_b_id] for pre_b_id in pre_block_ids]
+                pre_dom_set = [dom[pre_b_id] for pre_b_id in pre_block_ids if pre_b_id in dom]
                 new_dom_set = set([b_id])
 
                 if len(pre_dom_set) != 0:
@@ -390,7 +395,6 @@ class SSA:
                     dom[b_id] = new_dom_set
         self.dom = dom
         return dom
-
         # compute idom: immediately dominator
         idom = {}
         for block in ssa_blocks:
@@ -400,7 +404,6 @@ class SSA:
             if len(pred_nodes)!=1:
                 continue
             #if dom 
-
         # then compute the dominace frontiers
         dominance_frontier = {b.id:set() for b in ssa_blocks}
         for block in ssa_blocks:
