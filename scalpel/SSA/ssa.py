@@ -227,7 +227,6 @@ class SSA:
                     self.error_paths[ident_name].append(path.copy())
                 else:
                     self.error_paths[ident_name] = [path.copy()]
-
             else:
                 phi_fun += block_phi_fun
         path.pop()
@@ -238,6 +237,36 @@ class SSA:
         #    print('<----------------2')
         return phi_fun
 
+    def get_stmt_idents_ctx(self, statements):
+        ident_records = []
+        for stmt in statements:
+            # if this is a definition of class/function, ignore
+            if isinstance(stmt, (ast.FunctionDef, ast.ClassDef)):
+                continue
+            stored_idents = []
+            loaded_idents = []
+            idents = get_vars(stmt)
+            if isinstance(stmt, (ast.Import, ast.ImportFrom)):
+                for alias in stmt.names:
+                    if alias.asname is  None:
+                        stored_idents += [alias.name]
+                    else:
+                        stored_idents += [alias.asname]
+                ident_records.append((stored_idents, loaded_idents))
+                continue 
+
+            ident_info = get_vars(stmt)
+            for r in ident_info:
+                if r['name'] is None or "." in r['name']:
+                    continue
+                if r['usage'] == 'store':
+                    stored_idents.append(r['name'])
+                else:
+                    loaded_idents.append(r['name'])
+            ident_records.append((stored_idents, loaded_idents))
+        return ident_records
+
+
     def compute_SSA(self, cfg, live_ident_table={}, is_final=False):
         """
         generate an SSA graph.
@@ -247,44 +276,21 @@ class SSA:
         self.get_global_live_vars()
         #self.numbering = {}
         # visit all blocks in bfs order 
-        #cfg = CFGBuilder(self.module_ast)
         all_blocks = cfg.bfs()
-        #print(len(all_blocks))
         self.compute_dom(all_blocks)
         for block in all_blocks:
-            #parse_vars from the right
-            # single line function to be added 
-            assign_records = self.get_assign_raw(block.statements)
-            #call_stmts = self.get_attribute_stmts(block.statements)
-            for ar in assign_records:
-                left, right = ar 
-                actual_value = parse_val(right)
-#                if isinstance(left, ast.Tuple):
-#                    continue
-                left_name = "<holder>"
-                if left is not None:
-                    left_name = left.id
-
-                if left_name in self.numbering:
-                    var_no = self.numbering[left_name]+1
-                    self.numbering[left_name] = var_no
-                    self.var_values[(left_name,var_no)] = actual_value
-                else:
-                    var_no = 1
-                    self.numbering[left_name] = var_no
-                    self.var_values[(left_name,var_no)] = actual_value
+            #assign_records = self.get_assign_raw(block.statements)
+            ident_records = self.get_stmt_idents_ctx(block.statements)
+            for stored_idents, loaded_idents in ident_records:
                 phi_fun = []
-                right_vars = self.get_identifiers(right)
-                for var_name in right_vars:
+                for var_name in loaded_idents:
                    # last assignment occur in the same block
-                    #print(block.ssa_form.keys())
                     for tmp_var_no in reversed(list(block.ssa_form.keys())):
                         if var_name == tmp_var_no[0]:
                             phi_fun.append(tmp_var_no)
                             break
                 local_block_vars = [tmp[0] for tmp in phi_fun]
-                remaining_vars = [tmp for tmp in right_vars if tmp not in local_block_vars]
-                # to look for the variable last assignment from incoming blocks
+                remaining_vars = [tmp for tmp in loaded_idents if tmp not in local_block_vars and (tmp not in stored_idents)]
                 phi_fun = []
                 for var_name in remaining_vars:
                     visited = set()
@@ -293,10 +299,63 @@ class SSA:
                         phi_fun += [(var_name, -1)]
                     else:
                         phi_fun += phi_fun_incoming
+                if len(stored_idents) == 0:
+                    stored_idents += ["<holder>"]
+                    #block.ssa_form[("<holder>", 1)] = phi_fun
+                    #continue
 
-                block.ssa_form[(left_name, var_no)] = phi_fun
+                for ident_name in stored_idents:
+                    if ident_name in self.numbering:
+                        var_no = self.numbering[ident_name]+1
+                        self.numbering[ident_name] = var_no
+                    #    self.var_values[(left_name,var_no)] = actual_value
+                        block.ssa_form[(ident_name, var_no)] = phi_fun
+                    else:
+                        var_no = 1
+                        self.numbering[ident_name] = var_no
+                        block.ssa_form[(ident_name, var_no)] = phi_fun
+                        #    self.var_values[(left_name,var_no)] = actual_value
 
+            #call_stmts = self.get_attribute_stmts(block.statements)
+            #for ar in assign_records:
+            #    left, right = ar 
+            #    actual_value = parse_val(right)
+#                if isinstance(left, ast.Tuple):
+#                    continue
+            #    left_name = "<holder>"
+            #    if left is not None:
+            #        left_name = left.id
+            #
+            #    if left_name in self.numbering:
+            #        var_no = self.numbering[left_name]+1
+            #        self.numbering[left_name] = var_no
+            #        self.var_values[(left_name,var_no)] = actual_value
+            #    else:
+            #        var_no = 1
+            #        self.numbering[left_name] = var_no
+            #        self.var_values[(left_name,var_no)] = actual_value
+            #    phi_fun = []
+            #    right_vars = self.get_identifiers(right)
+            #    for var_name in right_vars:
+            #       # last assignment occur in the same block
+            #        #print(block.ssa_form.keys())
+            #        for tmp_var_no in reversed(list(block.ssa_form.keys())):
+            #            if var_name == tmp_var_no[0]:
+            #                phi_fun.append(tmp_var_no)
+            #                break
+            #    local_block_vars = [tmp[0] for tmp in phi_fun]
+            #    remaining_vars = [tmp for tmp in right_vars if tmp not in local_block_vars]
+            #    # to look for the variable last assignment from incoming blocks
+            #    phi_fun = []
+            #    for var_name in remaining_vars:
+            #        visited = set()
+            #        phi_fun_incoming = self.backward_query(block, var_name, visited)
+            #        if len(phi_fun_incoming) == 0:
+            #            phi_fun += [(var_name, -1)]
+            #        else:
+            #            phi_fun += phi_fun_incoming
 
+            #    block.ssa_form[(left_name, var_no)] = phi_fun
         self.ssa_blocks = all_blocks
 
     def is_undefined(self, load_idents):
@@ -330,7 +389,6 @@ class SSA:
         return def_reach
 
     def find_this_ident_name(self, ident_name, live_ident_table, def_names):
-
         n_scopes = len(live_ident_table)
         for i in range(n_scopes):
             if ident_name in live_ident_table[-i]:
@@ -338,7 +396,6 @@ class SSA:
                     return False
                 else:
                     return True
-
         if ident_name in BUILT_IN_FUNCTIONS:
             return True
         if ident_name not in def_names:
@@ -416,29 +473,23 @@ class SSA:
                 while runner != idom[b.id]:
                     dominance_frontier[runner].add(b.id)
                     runner = idom[runner]
-
         return dom
 
     def test(self, live_ident_table=[], def_names = []):
         n_scopes = len(live_ident_table)
         undefined_idents = []
-        self.compute_dom(self.ssa_blocks)
         for block in self.ssa_blocks:
-            ident_phi_fun = {} 
+            ident_phi_fun = {}
             for k, v in block.ssa_form.items():
                 for item in v:
                     if item[0] not in ident_phi_fun:
                         ident_phi_fun[item[0]] = [item[1]]
                     else:
                         ident_phi_fun[item[0]] += [item[1]] 
-
             for ident_name, numbers in ident_phi_fun.items():
                 if -1 not in numbers:
                     continue
                 is_found = self.find_this_ident_name(ident_name, live_ident_table, def_names)
                 if not is_found:
                     undefined_idents.append(ident_name) 
-                    #self.print_block(block)
-                    #print(ident_name, numbers)
-
         return undefined_idents
