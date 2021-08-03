@@ -1,0 +1,9 @@
+rule infer
+  command = /usr/bin/python3 -m pytype.single --imports_info $imports --module-name $module -V 3.8 -o $out --no-report-errors --nofail --quick $in
+  description = infer $module
+rule check
+  command = /usr/bin/python3 -m pytype.single --imports_info $imports --module-name $module -V 3.8 -o $out --analyze-annotated --nofail --quick $in
+  description = check $module
+build /home/jwan0248/Documents/Scalpel/test-cases/.pytype/pyi/toy_module.pyi: check /home/jwan0248/Documents/Scalpel/test-cases/toy_module.py
+  imports = /home/jwan0248/Documents/Scalpel/test-cases/.pytype/imports/toy_module.imports
+  module = toy_module
