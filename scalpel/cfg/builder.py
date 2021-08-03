@@ -555,7 +555,6 @@ class CFGBuilder(ast.NodeVisitor):
         #afterwith_block = self.new_block()
         #self.add_exit(self.current_block, afterwith_block)
         #self.current_block = afterwith_block
-
         #
         self.add_statement(self.current_block, node)
         # New block for the body of the with.
