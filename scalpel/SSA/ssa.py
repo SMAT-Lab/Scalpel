@@ -5,15 +5,16 @@ futher anaysis. The module contain a single class named SSA.
 import ast
 from functools import reduce
 from collections import OrderedDict
+import networkx as nx
 from ..core.vars_visitor import get_vars
 from ..cfg.builder import CFGBuilder
 from ..cfg.builder import Block
 from ..core.mnode import MNode
 from ..core.vars_visitor  import get_vars
 
-BUILT_IN_FUNCTIONS = set([ "abs","delattr", "print", "str", "bin", "int",
+BUILT_IN_FUNCTIONS = set([ "abs","delattr", "print", "str", "bin", "int", "xrange", "eval",
         "float", "open",
-        "hash","memoryview","set", "range", "self" "all","dict","help","min","setattr","any","dir","hex","next","slice", "self",
+        "hash","memoryview","set", "tuple", "range", "self" "all","dict","help","min","setattr","any","dir","hex","next","slice", "self",
         "ascii","divmod","enumerate","id","object","sorted","bin","enumerate","input",
         "staticmethod","bool", "eval" "int", "len", "self", "open" "str" "breakpoint" "exec" "isinstance" "ord",
         "sum", "bytearray", "filter", "issubclass", "pow", "super", "bytes", "float", "iter", "print"
@@ -156,23 +157,6 @@ class SSA:
         idents = [r['name'] for r in res if  r['name'] is not None and "." not in r['name']]
         return idents
 
-    def is_loop_header(block): 
-        pass
-    def compute_dominator():
-        dominators = {}
-        for block in self.ssa_blocks:
-            dominaotrs[block.id] = [block.id]
-
-        for block in self.ssa_blocks:
-            dominaotrs[block.id] = [block.id]
-            if len(block.predecessors)>=2:
-                for p_link in block.predecessors:
-                    p_block = p_link.source
-                    #runner = p_block
-    def is_dominator(self, b1, b2):
-        # if b1 idom b2, all path has to go to b1 before accessing b2
-        # then the in-degree of b2 must be one  and there exists an edge between b1-b2
-        pass
 
     def backward_query(self, block, ident_name, visited, path = []):
         phi_fun = []
@@ -230,11 +214,6 @@ class SSA:
             else:
                 phi_fun += block_phi_fun
         path.pop()
-        #if ident_name == 'wakeup_time':
-        #    print('----------------1>')
-        #    print(phi_fun)
-        #    self.print_block(block)
-        #    print('<----------------2')
         return phi_fun
 
     def get_stmt_idents_ctx(self, statements):
@@ -243,6 +222,15 @@ class SSA:
             # if this is a definition of class/function, ignore
             if isinstance(stmt, (ast.FunctionDef, ast.ClassDef)):
                 continue
+
+            # if this is control flow statements, we should not visit its body to avoid duplicates
+            # as they are already in the next blocks
+            if isinstance(stmt, (ast.Try)):
+                continue
+
+            if isinstance(stmt,(ast.If)):
+                stmt.body = []
+
             stored_idents = []
             loaded_idents = []
             idents = get_vars(stmt)
@@ -254,7 +242,6 @@ class SSA:
                         stored_idents += [alias.asname]
                 ident_records.append((stored_idents, loaded_idents))
                 continue 
-
             ident_info = get_vars(stmt)
             for r in ident_info:
                 if r['name'] is None or "." in r['name']:
@@ -276,7 +263,7 @@ class SSA:
         self.get_global_live_vars()
         #self.numbering = {}
         # visit all blocks in bfs order 
-        all_blocks = cfg.bfs()
+        all_blocks = cfg.get_all_blocks()
         self.compute_dom(all_blocks)
         for block in all_blocks:
             #assign_records = self.get_assign_raw(block.statements)
@@ -416,6 +403,22 @@ class SSA:
 
     # compute the dominators 
     def compute_dom(self, ssa_blocks):
+        # construct the Graph
+        #
+        entry_block = ssa_blocks[0]
+        G = nx.DiGraph()
+
+        for block in ssa_blocks: 
+            G.add_node(block.id)
+            exits = block.exits
+            preds =  block.predecessors
+            for link in preds+exits:
+                G.add_edge(link.source.id, link.target.id)
+
+        DF =  nx.dominance_frontiers(G, entry_block.id).items():
+
+
+    def compute_dom_old(self, ssa_blocks):
         entry_block = ssa_blocks[0]
         id2blocks = {b.id:b for b in ssa_blocks}
         block_ids = list(id2blocks.keys())
@@ -451,6 +454,24 @@ class SSA:
                     changed = True
                     dom[b_id] = new_dom_set
         self.dom = dom
+        search_tree = {}
+        visited = set()
+        def gen_dfs_tree(node):
+            if node.id in visited:
+                return
+            visited.add(node.id)
+            if node.id not in search_tree:
+                search_tree[node.id] = []
+            for link in node.exits:
+                child_node = link.target
+                if child_node.id in visited:
+                    continue
+                search_tree[node.id].append(child_node.id)
+                gen_dfs_tree(child_node)
+        gen_dfs_tree(entry_block)
+        print(dom)
+        print(search_tree)
+
         return dom
         # compute idom: immediately dominator
         idom = {}
@@ -478,6 +499,7 @@ class SSA:
     def test(self, live_ident_table=[], def_names = []):
         n_scopes = len(live_ident_table)
         undefined_idents = []
+        def_use = {}
         for block in self.ssa_blocks:
             ident_phi_fun = {}
             for k, v in block.ssa_form.items():
@@ -492,4 +514,10 @@ class SSA:
                 is_found = self.find_this_ident_name(ident_name, live_ident_table, def_names)
                 if not is_found:
                     undefined_idents.append(ident_name) 
+                else: 
+                    pass
+                   #
+                   # if ident_name == 'np':
+                   #     print(live_ident_table)
+                   #     self.print_block(block)
         return undefined_idents
