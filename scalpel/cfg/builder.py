@@ -573,7 +573,6 @@ class CFGBuilder(ast.NodeVisitor):
 
         if not self.current_block.exits:
             self.add_exit(self.current_block, afterwith_block)
-
         # Continue building the CFG in the after-with block.
         self.current_block = afterwith_block
 

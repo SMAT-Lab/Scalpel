@@ -103,7 +103,7 @@ class Block(object):
         Returns:
             A string containing the source code of the statements.
         """
-        src = ""
+        src = "#" + str(self.id)+'\n'
         for statement in self.statements:
             if type(statement) in [ast.If, ast.For, ast.While, ast.With]:
                 src += (astor.to_source(statement)).split('\n')[0] + "\n"
@@ -130,7 +130,6 @@ class Block(object):
         """
         txt = ""
         for func_call_entry in self.func_calls:
-            
             txt += func_call_entry['name'] + '\n'
         return txt
 
@@ -264,8 +263,8 @@ class CFG(object):
                     if args[0].id == value.id:
                         return ifstmt.test
         return None
-
-    def bfs(self):
+    def get_all_blocks(self):
+        all_blocks = []
         import queue
         all_blocks = []
         visited = set()
@@ -283,6 +282,9 @@ class CFG(object):
                 if suc_link.target.id not in visited:
                     working_queue.put(suc_link.target)
         return all_blocks
+        #def dfs(start_block):
+        #    # non-recurisve implementation of DFS search
+
 
     def backward(self, block, value, is_visited, visit_link):
         # if not found in the current block, get all lookup results of the predecessors block 
