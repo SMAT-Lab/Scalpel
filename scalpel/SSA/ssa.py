@@ -415,8 +415,7 @@ class SSA:
             for link in preds+exits:
                 G.add_edge(link.source.id, link.target.id)
 
-        DF =  nx.dominance_frontiers(G, entry_block.id).items():
-
+        DF =  nx.dominance_frontiers(G, entry_block.id)
 
     def compute_dom_old(self, ssa_blocks):
         entry_block = ssa_blocks[0]
