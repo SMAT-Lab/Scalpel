@@ -163,12 +163,20 @@ class VarsVisitor(ast.NodeVisitor):
         #return node
 
     def visit_Assign(self, node):
+        for target in node.targets:
+            #if isinstance(target, ast.Subscript):
+            #    target.value.ctx = ast.Store()
+            self.visit(target)
         if not isinstance(node.value, ast.Lambda):
             self.visit(node.value)
-            for target in node.targets:
-                if isinstance(target, ast.Subscript):
-                    target.value.ctx = ast.Store()
-                self.visit(target)
+
+            #for target in node.targets:
+            #    if isinstance(target, ast.Subscript):
+            #        target.value.ctx = ast.Store()
+            #    self.visit(target)
+        #else:
+        #    self.visit(target)
+
 
 def get_vars(node):
     visitor = VarsVisitor()
