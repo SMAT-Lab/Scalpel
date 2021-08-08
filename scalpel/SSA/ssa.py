@@ -7,12 +7,11 @@ from functools import reduce
 from collections import OrderedDict
 import networkx as nx
 from ..core.vars_visitor import get_vars
-from ..cfg.builder import CFGBuilder
-from ..cfg.builder import Block
+from ..cfg.builder import CFGBuilder, Block
 from ..core.mnode import MNode
 from ..core.vars_visitor  import get_vars
 
-BUILT_IN_FUNCTIONS = set([ "abs","delattr", "print", "str", "bin", "int", "xrange", "eval",
+BUILT_IN_FUNCTIONS = set([ "abs","delattr", "print", "str", "bin", "int", "xrange", "eval", "all", "__name__",
         "float", "open",
         "hash","memoryview","set", "tuple", "range", "self" "all","dict","help","min","setattr","any","dir","hex","next","slice", "self",
         "ascii","divmod","enumerate","id","object","sorted","bin","enumerate","input",
@@ -54,6 +53,12 @@ class SSA:
         self.ssa_blocks = []
         self.error_paths = {}
         self.dom = {}
+
+        self.block_ident_gen = {}
+        self.block_ident_use = {}
+        self.reachable_table = {}
+        id2block = {}
+        self.unreachable_names = {}
 
     def get_global_live_vars(self):
         #import_dict = self.m_node.parse_import_stmts()
@@ -163,7 +168,6 @@ class SSA:
         visited.add(block.id)
         path.append(block.id)
         # all the incoming path
-
         for suc_link in block.predecessors: 
             is_this_path_done = False 
             parent_block = suc_link.source
@@ -216,43 +220,155 @@ class SSA:
         path.pop()
         return phi_fun
 
-    def get_stmt_idents_ctx(self, statements):
-        ident_records = []
-        for stmt in statements:
-            # if this is a definition of class/function, ignore
-            if isinstance(stmt, (ast.FunctionDef, ast.ClassDef)):
-                continue
+    def get_stmt_idents_ctx(self, stmt):
+        # if this is a definition of class/function, ignore
+        stored_idents = []
+        loaded_idents = []
+        if isinstance(stmt, (ast.FunctionDef, ast.ClassDef)):
+            # todo, values to named params
+            stored_idents.append(stmt.name)
+            return stored_idents, loaded_idents
 
-            # if this is control flow statements, we should not visit its body to avoid duplicates
-            # as they are already in the next blocks
-            if isinstance(stmt, (ast.Try)):
-                continue
+        # if this is control flow statements, we should not visit its body to avoid duplicates
+        # as they are already in the next blocks
 
-            if isinstance(stmt,(ast.If)):
-                stmt.body = []
-
-            stored_idents = []
-            loaded_idents = []
-            idents = get_vars(stmt)
-            if isinstance(stmt, (ast.Import, ast.ImportFrom)):
-                for alias in stmt.names:
-                    if alias.asname is  None:
-                        stored_idents += [alias.name]
-                    else:
-                        stored_idents += [alias.asname]
-                ident_records.append((stored_idents, loaded_idents))
-                continue 
-            ident_info = get_vars(stmt)
-            for r in ident_info:
-                if r['name'] is None or "." in r['name']:
-                    continue
-                if r['usage'] == 'store':
-                    stored_idents.append(r['name'])
+        if isinstance(stmt, (ast.Import, ast.ImportFrom)):
+            for alias in stmt.names:
+                if alias.asname is None:
+                    stored_idents += [alias.name]
                 else:
-                    loaded_idents.append(r['name'])
-            ident_records.append((stored_idents, loaded_idents))
-        return ident_records
+                    stored_idents += [alias.asname]
+            return stored_idents, loaded_idents
 
+        if isinstance(stmt, (ast.Try)):
+            for handler in stmt.handlers:
+                if handler.name is not None:
+                    stored_idents.append(handler.name)
+            return stored_idents, loaded_idents
+
+        visit_node = stmt
+        if isinstance(visit_node,(ast.If, ast.IfExp)):
+            visit_node.body = []
+            visit_node.orlse=[]
+        if isinstance(visit_node,(ast.With)):
+            visit_node.body = []
+            visit_node.orlse=[]
+
+        ident_info = get_vars(visit_node)
+        for r in ident_info:
+            if r['name'] is None or "." in r['name']:
+                continue
+            if r['usage'] == 'store':
+                stored_idents.append(r['name'])
+            else:
+                loaded_idents.append(r['name'])
+        return stored_idents, loaded_idents
+
+    def compute_undefined_names(self, cfg, scope="mod"):
+        """
+        generate undefined names from given cfg
+        """
+        all_blocks = cfg.get_all_blocks()
+        reachable_table = {}
+        id2block = {}
+
+        block_ident_gen = {}
+        block_ident_use = {}
+
+        dom = self.compute_dom_old(all_blocks) 
+        for block in all_blocks:
+            #assign_records = self.get_assign_raw(block.statements)
+            id2block[block.id] = block
+            block_ident_gen[block.id] = []
+            block_ident_use[block.id] = []
+            ident_to_be_traced = []
+            for stmt in block.statements:
+                stored_idents, loaded_idents = self.get_stmt_idents_ctx(stmt) 
+                for ident in loaded_idents:
+                    # cannot find in previous statements or current statements
+                    if ident not in stored_idents and ident not in block_ident_gen[block.id]:
+                        ident_to_be_traced.append(ident)
+                block_ident_gen[block.id] += stored_idents
+            block_ident_use[block.id]  = ident_to_be_traced
+
+        subscope_undefined_names = []
+        undefined_names = [] 
+        for block in all_blocks:
+            # number of stmts parsed
+            for stmt in block.statements:
+                if isinstance(stmt, ast.FunctionDef):
+                    fun_undefined_names = self.compute_undefined_names(cfg.functioncfgs[stmt.name])  
+                    fun_args = cfg.function_args[stmt.name]
+                    # exclude arguments 
+                    fun_undefined_names = [name for name in fun_undefined_names if name not in fun_args]
+                    subscope_undefined_names += fun_undefined_names
+                if isinstance(stmt, ast.ClassDef):
+                    class_cfg = cfg.class_cfgs[stmt.name]
+                    for inside_fun_name, inside_fun_cfg in class_cfg.functioncfgs.items():
+                        fun_args = class_cfg.function_args[inside_fun_name]
+                        fun_undefined_names = self.compute_undefined_names(inside_fun_cfg) 
+                        fun_undefined_names = [name for name in fun_undefined_names if name not in fun_args]
+                        subscope_undefined_names += fun_undefined_names
+            subscope_undefined_names = [name for name in subscope_undefined_names if name not in block_ident_gen[block.id]]
+            # process this block
+            block_id = block.id 
+            all_used_idents = block_ident_use[block_id]+ list(set(subscope_undefined_names))
+            idents_non_local = [ident for ident in all_used_idents if ident not in BUILT_IN_FUNCTIONS]
+            idents_non_local = list(set(idents_non_local))
+
+            idents_left = []
+
+            dominators = dom[block_id]
+
+            for ident in idents_non_local:
+                is_found = False
+                # look for this var in it dominatores
+                for d_b_id in dominators:
+                    if d_b_id == block_id:
+                        continue
+                    if ident in block_ident_gen[d_b_id]:
+                        is_found = True
+                        break
+                if is_found == False:
+                    idents_left.append(ident)
+                # for those vars that cannot be found in its domiators, backtrace to 
+                # test if there is a path along wich the var is not defined. 
+            for ident in idents_left:
+                visited = set()
+                is_found = self.backward_query_new(block, ident, visited, dom={}, block_ident_gen=block_ident_gen) 
+                if not is_found:
+                    undefined_names += [ident]
+                    if  ident == "HBox":
+                        print(block.id)
+                        #self.print_block(block)
+        return list(set(undefined_names))
+
+
+    def backward_query_new(self, block, ident_name, visited, path = [], dom={}, block_ident_gen={}):
+        phi_fun = []
+        visited.add(block.id)
+        path.append(block.id)
+        # all the incoming path
+        for suc_link in block.predecessors: 
+            is_this_path_done = False 
+            parent_block = suc_link.source
+            target_block = suc_link.target
+            # deal with cycles, this is back edge
+            if parent_block is None:
+                continue
+            if parent_block.id in visited or parent_block.id == block.id:
+                continue
+            # if the block dominates the parent block, then give it up
+            if parent_block.id in dom and  block.id in dom[parent_block.id]:
+                continue
+            ##############
+            if parent_block.id not in block_ident_gen:
+                continue
+            if ident_name in block_ident_gen[parent_block.id]:
+                return True
+            return self.backward_query_new(parent_block, ident_name, visited, dom=dom, block_ident_gen=block_ident_gen)
+
+        return False
 
     def compute_SSA(self, cfg, live_ident_table={}, is_final=False):
         """
@@ -407,15 +523,34 @@ class SSA:
         #
         entry_block = ssa_blocks[0]
         G = nx.DiGraph()
-
         for block in ssa_blocks: 
             G.add_node(block.id)
             exits = block.exits
             preds =  block.predecessors
             for link in preds+exits:
                 G.add_edge(link.source.id, link.target.id)
+        DF = nx.dominance_frontiers(G, entry_block.id)
+        return DF 
 
-        DF =  nx.dominance_frontiers(G, entry_block.id)
+    def RD(self, cfg_blocks):
+        # worklist 
+        entry_block = cfg_blocks[0]
+        Out[entry_block.id]  = set()
+        # init the iterative algorithm
+        for block in cfg_blocks:
+            if block.id != entry_block.id:
+                out[block.id] = set()
+        changed = True
+        while changed:
+            for block in cfg_blocks:
+                # 
+                pre_links = block.predecessors
+                pre_blocks = [pl.source for pl in pre_links]
+                pre_outs = [out[pb.id] for pb in pre_blocks]
+                In[block.id] =  reduce(set.intersection, pre_outs) 
+                Out[block.id] = gen(B) (In[block.id]-kill[block.id])
+        # boundry
+        return 0
 
     def compute_dom_old(self, ssa_blocks):
         entry_block = ssa_blocks[0]
@@ -452,71 +587,30 @@ class SSA:
                 if new_dom_set != old_dom_set:
                     changed = True
                     dom[b_id] = new_dom_set
-        self.dom = dom
-        search_tree = {}
-        visited = set()
-        def gen_dfs_tree(node):
-            if node.id in visited:
-                return
-            visited.add(node.id)
-            if node.id not in search_tree:
-                search_tree[node.id] = []
-            for link in node.exits:
-                child_node = link.target
-                if child_node.id in visited:
-                    continue
-                search_tree[node.id].append(child_node.id)
-                gen_dfs_tree(child_node)
-        gen_dfs_tree(entry_block)
-        print(dom)
-        print(search_tree)
-
-        return dom
-        # compute idom: immediately dominator
-        idom = {}
-        for block in ssa_blocks:
-            idom[b.id] = set()
-            pred_links = block.predecessors
-            pred_nodes =  [pl.source for pl in pred_links]
-            if len(pred_nodes)!=1:
-                continue
-            #if dom 
-        # then compute the dominace frontiers
-        dominance_frontier = {b.id:set() for b in ssa_blocks}
-        for block in ssa_blocks:
-            pred_links = block.predecessors
-            pred_nodes =  [pl.source for pl in pred_links]
-            if len(pred_nodes)<2:
-                continue
-            for pn in pred_nodes:
-                runner = pn.id
-                while runner != idom[b.id]:
-                    dominance_frontier[runner].add(b.id)
-                    runner = idom[runner]
         return dom
 
-    def test(self, live_ident_table=[], def_names = []):
-        n_scopes = len(live_ident_table)
-        undefined_idents = []
-        def_use = {}
-        for block in self.ssa_blocks:
-            ident_phi_fun = {}
-            for k, v in block.ssa_form.items():
-                for item in v:
-                    if item[0] not in ident_phi_fun:
-                        ident_phi_fun[item[0]] = [item[1]]
-                    else:
-                        ident_phi_fun[item[0]] += [item[1]] 
-            for ident_name, numbers in ident_phi_fun.items():
-                if -1 not in numbers:
-                    continue
-                is_found = self.find_this_ident_name(ident_name, live_ident_table, def_names)
-                if not is_found:
-                    undefined_idents.append(ident_name) 
-                else: 
-                    pass
+    #def test(self, live_ident_table=[], def_names = []):
+    #    n_scopes = len(live_ident_table)
+    #    undefined_idents = []
+    #    def_use = {}
+    #    for block in self.ssa_blocks:
+    #        ident_phi_fun = {}
+    #        for k, v in block.ssa_form.items():
+    #            for item in v:
+    #                if item[0] not in ident_phi_fun:
+    #                    ident_phi_fun[item[0]] = [item[1]]
+    #                else:
+    #                    ident_phi_fun[item[0]] += [item[1]] 
+    #        for ident_name, numbers in ident_phi_fun.items():
+    #            if -1 not in numbers:
+    #                continue
+    #            is_found = self.find_this_ident_name(ident_name, live_ident_table, def_names)
+    #            if not is_found:
+    #                undefined_idents.append(ident_name) 
+    #            else: 
+    #                pass
                    #
                    # if ident_name == 'np':
                    #     print(live_ident_table)
                    #     self.print_block(block)
-        return undefined_idents
+    #    return undefined_idents
