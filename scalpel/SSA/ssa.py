@@ -14,11 +14,17 @@ from ..core.vars_visitor  import get_vars
 BUILT_IN_FUNCTIONS = set([ "abs","delattr", "print", "str", "bin", "int", "xrange", "eval", "all", "__name__",
         "float", "open",
         "hash","memoryview","set", "tuple", "range", "self" "all","dict","help","min","setattr","any","dir","hex","next","slice", "self",
-        "ascii","divmod","enumerate","id","object","sorted","bin","enumerate","input",
+        "ascii","divmod","enumerate","id", "isinstance", "object","sorted","bin","enumerate","input",
         "staticmethod","bool", "eval" "int", "len", "self", "open" "str" "breakpoint" "exec" "isinstance" "ord",
         "sum", "bytearray", "filter", "issubclass", "pow", "super", "bytes", "float", "iter", "print"
         "tuple", "callable", "format", "len", "property", "type", "chr","frozenset", "list", "range", "vars", 
-        "classmethod", "getattr", "locals", "repr", "repr", "zip", "compile", "globals", "map", "reversed",  "__import__", "complex", "hasattr", "max", "round", "get_ipython"]
+        "classmethod", "getattr", "locals", "repr", "repr", "zip", "compile", "globals", "map", "reversed",  "__import__", "complex", "hasattr", "max", "round", "get_ipython",
+        
+        "ImportError", "KeyError", "ModuleNotFoundError", "TypeError",
+        "ValueError",
+        "Exception", "DeprecationWarning",
+        "display" # notebook functions 
+        ]
         )
 
 def parse_val(node):
@@ -126,7 +132,9 @@ class SSA:
                     else:
                         assign_stmts.append((ast.Name(name.name, ast.Store()),  None))
             elif isinstance(stmt, ast.ImportFrom):
+                print(ast.dump(stmt))
                 for name in stmt.names:
+
                     if name.asname is not None:
                         assign_stmts.append((ast.Name(name.asname, ast.Store()),  None))
                     else:
@@ -235,9 +243,9 @@ class SSA:
         if isinstance(stmt, (ast.Import, ast.ImportFrom)):
             for alias in stmt.names:
                 if alias.asname is None:
-                    stored_idents += [alias.name]
+                    stored_idents += [alias.name.split('.')[0]]
                 else:
-                    stored_idents += [alias.asname]
+                    stored_idents += [alias.asname.split('.')[0]]
             return stored_idents, loaded_idents
 
         if isinstance(stmt, (ast.Try)):
@@ -253,6 +261,9 @@ class SSA:
         if isinstance(visit_node,(ast.With)):
             visit_node.body = []
             visit_node.orlse=[]
+
+        if isinstance(visit_node,(ast.While)):
+            visit_node.body = []
 
         ident_info = get_vars(visit_node)
         for r in ident_info:
@@ -338,9 +349,6 @@ class SSA:
                 is_found = self.backward_query_new(block, ident, visited, dom={}, block_ident_gen=block_ident_gen) 
                 if not is_found:
                     undefined_names += [ident]
-                    if  ident == "HBox":
-                        print(block.id)
-                        #self.print_block(block)
         return list(set(undefined_names))
 
 
