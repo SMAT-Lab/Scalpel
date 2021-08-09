@@ -19,11 +19,20 @@ BUILT_IN_FUNCTIONS = set([ "abs","delattr", "print", "str", "bin", "int", "xrang
         "sum", "bytearray", "filter", "issubclass", "pow", "super", "bytes", "float", "iter", "print"
         "tuple", "callable", "format", "len", "property", "type", "chr","frozenset", "list", "range", "vars", 
         "classmethod", "getattr", "locals", "repr", "repr", "zip", "compile", "globals", "map", "reversed",  "__import__", "complex", "hasattr", "max", "round", "get_ipython",
-        
-        "ImportError", "KeyError", "ModuleNotFoundError", "TypeError",
-        "ValueError",
-        "Exception", "DeprecationWarning",
-        "display" # notebook functions 
+        ###  built-in exceptions
+        "BaseException", "SystemExit", "KeyboardInterrupt", "GeneratorExit", "Exception",
+        "StopIteration", "StopAsyncIteration","ArithmeticError", "FloatingPointError", "OverflowError",
+        "ZeroDivisionError","AssertionError", "AttributeError", "BufferError", "EOFError",
+        "ImportError", "ModuleNotFoundError", "LookupError", "IndexError" , "KeyError", "MemoryError", "NameError",
+        "UnboundLocalError" "OSError", "BlockingIOError", "ChildProcessError", "ConnectionError",
+        "BrokenPipeError", "ConnectionAbortedError", "ConnectionRefusedError","ConnectionResetError",
+        "FileExistsError", "FileNotFoundError", "InterruptedError","IsADirectoryError", "NotADirectoryError",
+        "PermissionError","ProcessLookupError", "TimeoutError", "ReferenceError", "RuntimeError",
+        "NotImplementedError","RecursionError", "SyntaxError", "IndentationError", "TabError",
+        "SystemError", "TypeError", "ValueError","UnicodeError","UnicodeDecodeError","UnicodeEncodeError","UnicodeTranslateError",
+        # built-in warnings
+        "Warning","DeprecationWarning","PendingDeprecationWarning","RuntimeWarning","SyntaxWarning",
+        "UserWarning", "FutureWarning","ImportWarning","UnicodeWarning","BytesWarning","ResourceWarning" 
         ]
         )
 
