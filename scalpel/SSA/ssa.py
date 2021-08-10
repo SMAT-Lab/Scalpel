@@ -24,7 +24,7 @@ BUILT_IN_FUNCTIONS = set([ "abs","delattr", "print", "str", "bin", "int", "xrang
         "StopIteration", "StopAsyncIteration","ArithmeticError", "FloatingPointError", "OverflowError",
         "ZeroDivisionError","AssertionError", "AttributeError", "BufferError", "EOFError",
         "ImportError", "ModuleNotFoundError", "LookupError", "IndexError" , "KeyError", "MemoryError", "NameError",
-        "UnboundLocalError" "OSError", "BlockingIOError", "ChildProcessError", "ConnectionError",
+        "UnboundLocalError", "OSError", "IOError", "BlockingIOError", "ChildProcessError", "ConnectionError",
         "BrokenPipeError", "ConnectionAbortedError", "ConnectionRefusedError","ConnectionResetError",
         "FileExistsError", "FileNotFoundError", "InterruptedError","IsADirectoryError", "NotADirectoryError",
         "PermissionError","ProcessLookupError", "TimeoutError", "ReferenceError", "RuntimeError",
@@ -32,7 +32,9 @@ BUILT_IN_FUNCTIONS = set([ "abs","delattr", "print", "str", "bin", "int", "xrang
         "SystemError", "TypeError", "ValueError","UnicodeError","UnicodeDecodeError","UnicodeEncodeError","UnicodeTranslateError",
         # built-in warnings
         "Warning","DeprecationWarning","PendingDeprecationWarning","RuntimeWarning","SyntaxWarning",
-        "UserWarning", "FutureWarning","ImportWarning","UnicodeWarning","BytesWarning","ResourceWarning" 
+        "UserWarning", "FutureWarning","ImportWarning","UnicodeWarning","BytesWarning","ResourceWarning",
+        # Others
+        "NotImplemented", "__main__", "__file__", "__name__"
         ]
         )
 
@@ -143,7 +145,6 @@ class SSA:
             elif isinstance(stmt, ast.ImportFrom):
                 print(ast.dump(stmt))
                 for name in stmt.names:
-
                     if name.asname is not None:
                         assign_stmts.append((ast.Name(name.asname, ast.Store()),  None))
                     else:
@@ -265,13 +266,17 @@ class SSA:
 
         visit_node = stmt
         if isinstance(visit_node,(ast.If, ast.IfExp)):
-            visit_node.body = []
-            visit_node.orlse=[]
+            #visit_node.body = []
+            #visit_node.orlse=[]
+            visit_node = stmt.test
+
         if isinstance(visit_node,(ast.With)):
             visit_node.body = []
             visit_node.orlse=[]
 
         if isinstance(visit_node,(ast.While)):
+            visit_node.body = []
+        if isinstance(visit_node,(ast.For)):
             visit_node.body = []
 
         ident_info = get_vars(visit_node)
@@ -358,6 +363,9 @@ class SSA:
                 is_found = self.backward_query_new(block, ident, visited, dom={}, block_ident_gen=block_ident_gen) 
                 if not is_found:
                     undefined_names += [ident]
+        #            if ident=='keyfunc':
+        #                self.print_block(block)
+        #                print(block.id)
         return list(set(undefined_names))
 
 
