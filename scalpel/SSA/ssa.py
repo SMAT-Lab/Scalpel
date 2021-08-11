@@ -3,11 +3,12 @@ In this module, the single static assignment forms are  implemented to allow
 futher anaysis. The module contain a single class named SSA.
 """
 import ast
+import astor
 from functools import reduce
 from collections import OrderedDict
 import networkx as nx
 from ..core.vars_visitor import get_vars
-from ..cfg.builder import CFGBuilder, Block
+from ..cfg.builder import CFGBuilder, Block, invert
 from ..core.mnode import MNode
 from ..core.vars_visitor  import get_vars
 
@@ -358,24 +359,34 @@ class SSA:
                     idents_left.append(ident)
                 # for those vars that cannot be found in its domiators, backtrace to 
                 # test if there is a path along wich the var is not defined. 
+            path_constraint = None
+            if len(block.predecessors) ==1:
+                path_constraint = block.predecessors[0].exitcase
             for ident in idents_left:
                 visited = set()
-                is_found = self.backward_query_new(block, ident, visited, dom={}, block_ident_gen=block_ident_gen) 
+                is_found = self.backward_query_new(block, ident, visited, dom={}, block_ident_gen=block_ident_gen, condition_cons=path_constraint) 
                 if not is_found:
                     undefined_names += [ident]
-        #            if ident=='keyfunc':
-        #                self.print_block(block)
-        #                print(block.id)
+            #        if ident== 'tables':
+            #            self.print_block(block)
         return list(set(undefined_names))
 
+ 
 
-    def backward_query_new(self, block, ident_name, visited, path = [], dom={}, block_ident_gen={}):
+    def backward_query_new(self, block, ident_name, visited, path = [], dom={}, block_ident_gen={}, condition_cons=None):
+        # condition constraints:
         phi_fun = []
         visited.add(block.id)
         path.append(block.id)
         # all the incoming path
         for suc_link in block.predecessors: 
-            is_this_path_done = False 
+            if condition_cons is not None: 
+                this_condition = invert(condition_cons) 
+                this_txt = astor.to_source(this_condition) 
+                this_edge_txt = astor.to_source(suc_link.exitcase)
+                if this_txt.strip()==this_edge_txt.strip():
+                    return True
+
             parent_block = suc_link.source
             target_block = suc_link.target
             # deal with cycles, this is back edge
@@ -391,7 +402,7 @@ class SSA:
                 continue
             if ident_name in block_ident_gen[parent_block.id]:
                 return True
-            return self.backward_query_new(parent_block, ident_name, visited, dom=dom, block_ident_gen=block_ident_gen)
+            return self.backward_query_new(parent_block, ident_name, visited, dom=dom, block_ident_gen=block_ident_gen, condition_cons=condition_cons)
 
         return False
 
@@ -444,46 +455,6 @@ class SSA:
                         block.ssa_form[(ident_name, var_no)] = phi_fun
                         #    self.var_values[(left_name,var_no)] = actual_value
 
-            #call_stmts = self.get_attribute_stmts(block.statements)
-            #for ar in assign_records:
-            #    left, right = ar 
-            #    actual_value = parse_val(right)
-#                if isinstance(left, ast.Tuple):
-#                    continue
-            #    left_name = "<holder>"
-            #    if left is not None:
-            #        left_name = left.id
-            #
-            #    if left_name in self.numbering:
-            #        var_no = self.numbering[left_name]+1
-            #        self.numbering[left_name] = var_no
-            #        self.var_values[(left_name,var_no)] = actual_value
-            #    else:
-            #        var_no = 1
-            #        self.numbering[left_name] = var_no
-            #        self.var_values[(left_name,var_no)] = actual_value
-            #    phi_fun = []
-            #    right_vars = self.get_identifiers(right)
-            #    for var_name in right_vars:
-            #       # last assignment occur in the same block
-            #        #print(block.ssa_form.keys())
-            #        for tmp_var_no in reversed(list(block.ssa_form.keys())):
-            #            if var_name == tmp_var_no[0]:
-            #                phi_fun.append(tmp_var_no)
-            #                break
-            #    local_block_vars = [tmp[0] for tmp in phi_fun]
-            #    remaining_vars = [tmp for tmp in right_vars if tmp not in local_block_vars]
-            #    # to look for the variable last assignment from incoming blocks
-            #    phi_fun = []
-            #    for var_name in remaining_vars:
-            #        visited = set()
-            #        phi_fun_incoming = self.backward_query(block, var_name, visited)
-            #        if len(phi_fun_incoming) == 0:
-            #            phi_fun += [(var_name, -1)]
-            #        else:
-            #            phi_fun += phi_fun_incoming
-
-            #    block.ssa_form[(left_name, var_no)] = phi_fun
         self.ssa_blocks = all_blocks
 
     def is_undefined(self, load_idents):
