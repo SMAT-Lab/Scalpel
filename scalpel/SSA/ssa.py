@@ -12,7 +12,10 @@ from ..cfg.builder import CFGBuilder, Block, invert
 from ..core.mnode import MNode
 from ..core.vars_visitor  import get_vars
 
-BUILT_IN_FUNCTIONS = set([ "abs","delattr", "print", "str", "bin", "int", "xrange", "eval", "all", "__name__",
+BUILT_IN_FUNCTIONS = set([ 
+
+         ### built-in functions
+        "abs","delattr", "print", "str", "bin", "int", "xrange", "eval", "all", "__name__",
         "float", "open",
         "hash","memoryview","set", "tuple", "range", "self" "all","dict","help","min","setattr","any","dir","hex","next","slice", "self",
         "ascii","divmod","enumerate","id", "isinstance", "object","sorted","bin","enumerate","input",
@@ -20,7 +23,10 @@ BUILT_IN_FUNCTIONS = set([ "abs","delattr", "print", "str", "bin", "int", "xrang
         "sum", "bytearray", "filter", "issubclass", "pow", "super", "bytes", "float", "iter", "print"
         "tuple", "callable", "format", "len", "property", "type", "chr","frozenset", "list", "range", "vars", 
         "classmethod", "getattr", "locals", "repr", "repr", "zip", "compile", "globals", "map", "reversed",  "__import__", "complex", "hasattr", "max", "round", "get_ipython",
+        
+        "ord",
         ###  built-in exceptions
+
         "BaseException", "SystemExit", "KeyboardInterrupt", "GeneratorExit", "Exception",
         "StopIteration", "StopAsyncIteration","ArithmeticError", "FloatingPointError", "OverflowError",
         "ZeroDivisionError","AssertionError", "AttributeError", "BufferError", "EOFError",
@@ -316,6 +322,7 @@ class SSA:
                         ident_to_be_traced.append(ident)
                 block_ident_gen[block.id] += stored_idents
             block_ident_use[block.id]  = ident_to_be_traced
+        
 
         subscope_undefined_names = []
         undefined_names = [] 
@@ -323,21 +330,24 @@ class SSA:
             # number of stmts parsed
             for stmt in block.statements:
                 if isinstance(stmt, ast.FunctionDef):
-                    fun_undefined_names = self.compute_undefined_names(cfg.functioncfgs[stmt.name])  
-                    fun_args = cfg.function_args[stmt.name]
+                    fun_undefined_names = self.compute_undefined_names(cfg.functioncfgs[(block.id, stmt.name)])  
+                    fun_args = cfg.function_args[(block.id, stmt.name)]
                     # exclude arguments 
                     fun_undefined_names = [name for name in fun_undefined_names if name not in fun_args]
                     subscope_undefined_names += fun_undefined_names
                 if isinstance(stmt, ast.ClassDef):
                     class_cfg = cfg.class_cfgs[stmt.name]
-                    for inside_fun_name, inside_fun_cfg in class_cfg.functioncfgs.items():
-                        fun_args = class_cfg.function_args[inside_fun_name]
+                    for inside_fun_key, inside_fun_cfg in class_cfg.functioncfgs.items():
+                        fun_args = class_cfg.function_args[inside_fun_key]
                         fun_undefined_names = self.compute_undefined_names(inside_fun_cfg) 
                         fun_undefined_names = [name for name in fun_undefined_names if name not in fun_args]
                         subscope_undefined_names += fun_undefined_names
             subscope_undefined_names = [name for name in subscope_undefined_names if name not in block_ident_gen[block.id]]
             # process this block
             block_id = block.id 
+            if block_id == 5:
+                print(subscope_undefined_names)
+            
             all_used_idents = block_ident_use[block_id]+ list(set(subscope_undefined_names))
             idents_non_local = [ident for ident in all_used_idents if ident not in BUILT_IN_FUNCTIONS]
             idents_non_local = list(set(idents_non_local))
@@ -367,8 +377,7 @@ class SSA:
                 is_found = self.backward_query_new(block, ident, visited, dom={}, block_ident_gen=block_ident_gen, condition_cons=path_constraint) 
                 if not is_found:
                     undefined_names += [ident]
-            #        if ident== 'tables':
-            #            self.print_block(block)
+                
         return list(set(undefined_names))
 
  
@@ -585,28 +594,3 @@ class SSA:
                     dom[b_id] = new_dom_set
         return dom
 
-    #def test(self, live_ident_table=[], def_names = []):
-    #    n_scopes = len(live_ident_table)
-    #    undefined_idents = []
-    #    def_use = {}
-    #    for block in self.ssa_blocks:
-    #        ident_phi_fun = {}
-    #        for k, v in block.ssa_form.items():
-    #            for item in v:
-    #                if item[0] not in ident_phi_fun:
-    #                    ident_phi_fun[item[0]] = [item[1]]
-    #                else:
-    #                    ident_phi_fun[item[0]] += [item[1]] 
-    #        for ident_name, numbers in ident_phi_fun.items():
-    #            if -1 not in numbers:
-    #                continue
-    #            is_found = self.find_this_ident_name(ident_name, live_ident_table, def_names)
-    #            if not is_found:
-    #                undefined_idents.append(ident_name) 
-    #            else: 
-    #                pass
-                   #
-                   # if ident_name == 'np':
-                   #     print(live_ident_table)
-                   #     self.print_block(block)
-    #    return undefined_idents

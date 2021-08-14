@@ -25,16 +25,15 @@ NAMECONSTANT_TYPE = ast.Constant if is_py38_or_higher() else ast.NameConstant
 # Continue
 # Try
 # ExceptHandler
+# finally
 # with
 # withitem
 
 def invert(node):
     """
     Invert the operation in an ast node object (get its negation).
-
     Args:
         node: An ast node object.
-
     Returns:
         An ast node object containing the inverse (negation) of the input node.
     """
@@ -60,7 +59,6 @@ def invert(node):
         inverse_node = NAMECONSTANT_TYPE(value=not node.value)
     else:
         inverse_node = ast.UnaryOp(op=ast.Not(), operand=node)
-
     return inverse_node
 
 
@@ -212,7 +210,7 @@ class CFGBuilder(ast.NodeVisitor):
             self.add_exit(self.current_block, loopguard)
         return loopguard
 
-    def new_functionCFG(self, node, asynchr=False):
+    def new_functionCFG(self, node, asynchr=False, enclosing_block_id=-1):
         """
         Create a new sub-CFG for a function definition and add it to the
         function CFGs of the CFG being built.
@@ -227,7 +225,7 @@ class CFGBuilder(ast.NodeVisitor):
         # added to the function CFGs of the current CFG.
         func_body = ast.Module(body=node.body)
         func_builder = CFGBuilder()
-        self.cfg.functioncfgs[node.name] = func_builder.build(node.name,
+        self.cfg.functioncfgs[(enclosing_block_id,node.name)] = func_builder.build(node.name,
                                                               func_body,
                                                               asynchr,
                                                               self.current_id)
@@ -238,7 +236,7 @@ class CFGBuilder(ast.NodeVisitor):
                     arg_names.append( node.arg)
             return arg_names
 
-        self.cfg.function_args[node.name] = get_arg_names(node.args)
+        self.cfg.function_args[(enclosing_block_id, node.name)] = get_arg_names(node.args)
         self.current_id = func_builder.current_id + 1
 
     def new_ClassCFG(self, node, asynchr=False):
@@ -519,11 +517,11 @@ class CFGBuilder(ast.NodeVisitor):
 
     def visit_FunctionDef(self, node):
         self.add_statement(self.current_block, node)
-        self.new_functionCFG(node, asynchr=False)
+        self.new_functionCFG(node, asynchr=False, enclosing_block_id=self.current_block.id)
 
     def visit_AsyncFunctionDef(self, node):
         self.add_statement(self.current_block, node)
-        self.new_functionCFG(node, asynchr=True)
+        self.new_functionCFG(node, asynchr=True,enclosing_block_id=self.current_block.id)
 
     def visit_ClassDef(self, node):
         self.add_statement(self.current_block, node)
