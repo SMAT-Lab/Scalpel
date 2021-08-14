@@ -380,7 +380,7 @@ class SSA:
         path.append(block.id)
         # all the incoming path
         for suc_link in block.predecessors: 
-            if condition_cons is not None: 
+            if condition_cons is not None and suc_link.exitcase is not None: 
                 this_condition = invert(condition_cons) 
                 this_txt = astor.to_source(this_condition) 
                 this_edge_txt = astor.to_source(suc_link.exitcase)
