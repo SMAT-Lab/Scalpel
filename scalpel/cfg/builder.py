@@ -1,9 +1,6 @@
 """
-Control flow graph builder.
+This implementation is partly adapted from  the static cfg project
 """
-# Aurelien Coet, 2018.
-# Modified by Andrei Nacu, 2020
-
 
 import ast
 from .model import Block, Link, CFG
@@ -157,7 +154,6 @@ class CFGBuilder(ast.NodeVisitor):
     def new_block(self):
         """
         Create a new block with a new id.
-
         Returns:
             A Block object with a new unique id.
         """
@@ -167,7 +163,6 @@ class CFGBuilder(ast.NodeVisitor):
     def add_statement(self, block, statement):
         """
         Add a statement to a block.
-
         Args:
             block: A Block object to which a statement must be added.
             statement: An AST node representing the statement that must be
@@ -179,7 +174,6 @@ class CFGBuilder(ast.NodeVisitor):
     def add_exit(self, block, nextblock, exitcase=None):
         """
         Add a new exit to a block.
-
         Args:
             block: A block to which an exit must be added.
             nextblock: The block to which control jumps from the new exit.
@@ -301,7 +295,6 @@ class CFGBuilder(ast.NodeVisitor):
             for exit in block.exits[:]:
                 self.clean_cfg(exit.target, visited)
 
-    # ---------- AST Node visitor methods ---------- #
     def goto_new_block(self, node):
         if self.separate_node_blocks:
             newblock = self.new_block()
@@ -309,6 +302,7 @@ class CFGBuilder(ast.NodeVisitor):
             self.current_block = newblock
         self.generic_visit(node)
 
+    # start visting all statements in AST tree
     def visit_Expr(self, node):
         self.add_statement(self.current_block, node)
         self.goto_new_block(node)
@@ -345,7 +339,9 @@ class CFGBuilder(ast.NodeVisitor):
         self.goto_new_block(node)
 
     def visit_Raise(self, node):
-        # TODO
+        self.add_statement(self.current_block, node)
+        self.cfg.finalblocks.append(self.current_block)
+        self.current_block = self.new_block()
         pass
 
     def visit_Assert(self, node):

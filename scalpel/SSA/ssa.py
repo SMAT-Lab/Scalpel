@@ -345,8 +345,6 @@ class SSA:
             subscope_undefined_names = [name for name in subscope_undefined_names if name not in block_ident_gen[block.id]]
             # process this block
             block_id = block.id 
-            if block_id == 5:
-                print(subscope_undefined_names)
             
             all_used_idents = block_ident_use[block_id]+ list(set(subscope_undefined_names))
             idents_non_local = [ident for ident in all_used_idents if ident not in BUILT_IN_FUNCTIONS]
@@ -377,6 +375,8 @@ class SSA:
                 is_found = self.backward_query_new(block, ident, visited, dom={}, block_ident_gen=block_ident_gen, condition_cons=path_constraint) 
                 if not is_found:
                     undefined_names += [ident]
+                    if ident == "new_dtype":
+                        self.print_block(block)
                 
         return list(set(undefined_names))
 
