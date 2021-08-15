@@ -1,8 +1,11 @@
- __pycache__/
- *.pyc
- *.swp
- *.pyc
- **/*.pyc
+__pycache__/
+*.pyc
+*.swp
+*.pyc
+**/*.pyc
 *.pdf
 test-cases/
 dev/
+venv/
+.idea/
+Scalpel.egg-info/
