@@ -1,5 +1,6 @@
 """
-This implementation is partly adapted from  the static cfg project
+This implementation is partly adapted from the static cfg project
+https://github.com/coetaur0/staticfg
 """
 
 import ast
@@ -366,7 +367,7 @@ class CFGBuilder(ast.NodeVisitor):
         try_block = self.new_block()
         self.add_exit(self.current_block, try_block, ast.Constant(True))
 
-        # Create a block for the code after the if-else.
+        # Create blocks for handlers
         n_handlers = len(node.handlers)
         handler_blocks = []
         for i in range(n_handlers):
@@ -544,21 +545,21 @@ class CFGBuilder(ast.NodeVisitor):
         self.current_block = afteryield_block
 
     def visit_With(self, node):
-        #self.cfg.asynchr = True
-        #self.add_statement(self.current_block, node)
-        #afterwith_block = self.new_block()
-        #self.add_exit(self.current_block, afterwith_block)
-        #self.current_block = afterwith_block
-        #
+        # add with statement to the current block
         self.add_statement(self.current_block, node)
         # New block for the body of the with.
         with_block = self.new_block()
+        # link current block to with block
         self.add_exit(self.current_block, with_block)
 
-        # Block of code after the with loop.
+
+        # Block of code after the with.
         afterwith_block = self.new_block()
         # no branch here
-        self.add_exit(with_block, afterwith_block)
+        # link with block and body of with
+        #print(with_block, afterwith_block)
+        #self.add_exit(with_block, afterwith_block)
+        # go to with block and create more 
         self.current_block = with_block
 
         # Populate the body of the with loop.
