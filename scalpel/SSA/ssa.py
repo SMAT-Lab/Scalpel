@@ -16,7 +16,7 @@ BUILT_IN_FUNCTIONS = set([
 
          ### built-in functions
         "abs","delattr", "print", "str", "bin", "int", "xrange", "eval", "all", "__name__",
-        "float", "open",
+        "float", "open", "unicode",
         "hash","memoryview","set", "tuple", "range", "self" "all","dict","help","min","setattr","any","dir","hex","next","slice", "self",
         "ascii","divmod","enumerate","id", "isinstance", "object","sorted","bin","enumerate","input",
         "staticmethod","bool", "eval" "int", "len", "self", "open" "str" "breakpoint" "exec" "isinstance" "ord",
@@ -41,7 +41,7 @@ BUILT_IN_FUNCTIONS = set([
         "Warning","DeprecationWarning","PendingDeprecationWarning","RuntimeWarning","SyntaxWarning",
         "UserWarning", "FutureWarning","ImportWarning","UnicodeWarning","BytesWarning","ResourceWarning",
         # Others
-        "NotImplemented", "__main__", "__file__", "__name__"
+        "NotImplemented", "__main__", "__file__", "__name__", "__debug__"
         ]
         )
 
@@ -303,7 +303,6 @@ class SSA:
         all_blocks = cfg.get_all_blocks()
         reachable_table = {}
         id2block = {}
-
         block_ident_gen = {}
         block_ident_use = {}
 
@@ -321,8 +320,7 @@ class SSA:
                     if ident not in stored_idents and ident not in block_ident_gen[block.id]:
                         ident_to_be_traced.append(ident)
                 block_ident_gen[block.id] += stored_idents
-            block_ident_use[block.id]  = ident_to_be_traced
-        
+            block_ident_use[block.id]  = ident_to_be_traced 
 
         subscope_undefined_names = []
         undefined_names = [] 
@@ -333,23 +331,30 @@ class SSA:
                     fun_undefined_names = self.compute_undefined_names(cfg.functioncfgs[(block.id, stmt.name)])  
                     fun_args = cfg.function_args[(block.id, stmt.name)]
                     # exclude arguments 
-                    fun_undefined_names = [name for name in fun_undefined_names if name not in fun_args]
+                    fun_undefined_names = [name for name in fun_undefined_names if name not in fun_args and name != stmt.name]
+                    fun_idx = block_ident_gen[block.id].index(stmt.name)
+                    part_ident_gen = block_ident_gen[block.id][0:fun_idx]
+                    fun_undefined_names = [name for name in fun_undefined_names if name not in part_ident_gen]
                     subscope_undefined_names += fun_undefined_names
-                if isinstance(stmt, ast.ClassDef):
+
+                elif isinstance(stmt, ast.ClassDef):
                     class_cfg = cfg.class_cfgs[stmt.name]
-                    for inside_fun_key, inside_fun_cfg in class_cfg.functioncfgs.items():
-                        fun_args = class_cfg.function_args[inside_fun_key]
-                        fun_undefined_names = self.compute_undefined_names(inside_fun_cfg) 
-                        fun_undefined_names = [name for name in fun_undefined_names if name not in fun_args]
-                        subscope_undefined_names += fun_undefined_names
-            subscope_undefined_names = [name for name in subscope_undefined_names if name not in block_ident_gen[block.id]]
+                    cls_body_undefined_names = self.compute_undefined_names(class_cfg)
+                    cls_idx = block_ident_gen[block.id].index(stmt.name)
+                    part_ident_gen = block_ident_gen[block.id][0:cls_idx]
+                    cls_body_undefined_names = [name for name in cls_body_undefined_names if name not in part_ident_gen and name != stmt.name]
+                    subscope_undefined_names += cls_body_undefined_names
+                    #for inside_fun_key, inside_fun_cfg in class_cfg.functioncfgs.items():
+                    #    fun_args = class_cfg.function_args[inside_fun_key]
+                    #    fun_undefined_names = self.compute_undefined_names(inside_fun_cfg) 
+                    #    fun_undefined_names = [name for name in fun_undefined_names if name not in fun_args]
+                    #    subscope_undefined_names += fun_undefined_names
+            #subscope_undefined_names = [name for name in subscope_undefined_names if name not in block_ident_gen[block.id]]
             # process this block
-            block_id = block.id 
-            
+            block_id = block.id  
             all_used_idents = block_ident_use[block_id]+ list(set(subscope_undefined_names))
             idents_non_local = [ident for ident in all_used_idents if ident not in BUILT_IN_FUNCTIONS]
             idents_non_local = list(set(idents_non_local))
-
             idents_left = []
 
             dominators = dom[block_id]
@@ -359,6 +364,7 @@ class SSA:
                 # look for this var in it dominatores
                 for d_b_id in dominators:
                     if d_b_id == block_id:
+                        # do not consider itself
                         continue
                     if ident in block_ident_gen[d_b_id]:
                         is_found = True
@@ -372,30 +378,32 @@ class SSA:
                 path_constraint = block.predecessors[0].exitcase
             for ident in idents_left:
                 visited = set()
-                is_found = self.backward_query_new(block, ident, visited, dom={}, block_ident_gen=block_ident_gen, condition_cons=path_constraint) 
-                if not is_found:
+                is_found = self.backward_query_new(block, ident, visited, dom={}, block_ident_gen=block_ident_gen, condition_cons=path_constraint, entry_id=cfg.entryblock.id) 
+                #if ident=='cv2':
+                #    print(is_found, block.id)
+                if is_found:
                     undefined_names += [ident]
-                    if ident == "new_dtype":
-                        self.print_block(block)
-                
-        return list(set(undefined_names))
-
- 
-
-    def backward_query_new(self, block, ident_name, visited, path = [], dom={}, block_ident_gen={}, condition_cons=None):
+                    #if ident == "hash_utf8":
+                    #    self.print_block(block) 
+        return list(set(undefined_names)) 
+    # if there exists one path that ident_name is not reachable 
+    def backward_query_new(self, block, ident_name, visited, path = [], dom={}, block_ident_gen={}, condition_cons=None, entry_id=1):
         # condition constraints:
         phi_fun = []
         visited.add(block.id)
         path.append(block.id)
         # all the incoming path
+        # if this is the entry block and ident not in the gen set then return True
+        if block.id == entry_id:
+            return True
         for suc_link in block.predecessors: 
             if condition_cons is not None and suc_link.exitcase is not None: 
                 this_condition = invert(condition_cons) 
                 this_txt = astor.to_source(this_condition) 
                 this_edge_txt = astor.to_source(suc_link.exitcase)
+                # this path contracdict the constraints
                 if this_txt.strip()==this_edge_txt.strip():
-                    return True
-
+                    continue
             parent_block = suc_link.source
             target_block = suc_link.target
             # deal with cycles, this is back edge
@@ -409,10 +417,16 @@ class SSA:
             ##############
             if parent_block.id not in block_ident_gen:
                 continue
+            # if the name id found in this gen set. then stop visiting this path
             if ident_name in block_ident_gen[parent_block.id]:
+                continue
+            # if the name id is not found in the parent block and the parent is entry  return True
+            if parent_block.id == entry_id:
                 return True
-            return self.backward_query_new(parent_block, ident_name, visited, dom=dom, block_ident_gen=block_ident_gen, condition_cons=condition_cons)
-
+            # if continue to search
+            # not in its parent gen set  then search from this path
+            return self.backward_query_new(parent_block, ident_name, visited, dom=dom, block_ident_gen=block_ident_gen, condition_cons=condition_cons, entry_id=entry_id)
+        
         return False
 
     def compute_SSA(self, cfg, live_ident_table={}, is_final=False):
