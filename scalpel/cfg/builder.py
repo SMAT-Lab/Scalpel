@@ -387,7 +387,10 @@ class CFGBuilder(ast.NodeVisitor):
             self.add_exit(self.current_block, handler_blocks[i], handler.type)
             self.current_block = handler_blocks[i]
             self.visit(handler)
-            self.add_exit(self.current_block, after_try_block)
+            # If encountered a break, exit will have already been added
+            if not self.current_block.exits:
+                self.add_exit(self.current_block, afterif_block)
+            #self.add_exit(self.current_block, after_try_block)
 
         #if not self.current_block.exits:
         #    self.add_exit(self.current_block, after_try_block)
@@ -456,7 +459,6 @@ class CFGBuilder(ast.NodeVisitor):
         if not (isinstance(inverted_test, NAMECONSTANT_TYPE) and
                 inverted_test.value is False):
             self.add_exit(self.current_block, afterwhile_block, inverted_test)
-
         # Populate the while block.
         self.current_block = while_block
         for child in node.body:
@@ -551,7 +553,6 @@ class CFGBuilder(ast.NodeVisitor):
         with_block = self.new_block()
         # link current block to with block
         self.add_exit(self.current_block, with_block)
-
 
         # Block of code after the with.
         afterwith_block = self.new_block()
