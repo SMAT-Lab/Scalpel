@@ -347,6 +347,10 @@ class CFGBuilder(ast.NodeVisitor):
         self.add_statement(self.current_block, node)
         self.goto_new_block(node)
 
+    def visit_Pass(self, node):
+        self.add_statement(self.current_block, node)
+        self.goto_new_block(node)
+
     def visit_Raise(self, node):
         self.add_statement(self.current_block, node)
         self.cfg.finalblocks.append(self.current_block)
