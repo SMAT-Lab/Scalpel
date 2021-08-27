@@ -511,7 +511,37 @@ class CFGBuilder(ast.NodeVisitor):
         # Popping the current after loop stack,taking care of errors in case of nested for loops
         self.after_loop_block_stack.pop()
         self.curr_loop_guard_stack.pop()
+    # Async for loops and async with context managers. 
+    # They have the same fields as For and With, respectively. 
+    # Only valid in the body of an AsyncFunctionDef.
+    # https://docs.python.org/3/library/ast.html
+    def visit_AsyncFor(self, node):
+        loop_guard = self.new_loopguard()
+        self.current_block = loop_guard
+        self.add_statement(self.current_block, node)
+        self.curr_loop_guard_stack.append(loop_guard)
+        # New block for the body of the for-loop.
+        for_block = self.new_block()
+        self.add_exit(self.current_block, for_block, node.iter)
 
+        # Block of code after the for loop.
+        afterfor_block = self.new_block()
+        self.add_exit(self.current_block, afterfor_block)
+        self.after_loop_block_stack.append(afterfor_block)
+        self.current_block = for_block
+
+        # Populate the body of the for loop.
+        for child in node.body:
+            self.visit(child)
+        if not self.current_block.exits:
+            # Did not encounter a break
+            self.add_exit(self.current_block, loop_guard)
+
+        # Continue building the CFG in the after-for block.
+        self.current_block = afterfor_block
+        # Popping the current after loop stack,taking care of errors in case of nested for loops
+        self.after_loop_block_stack.pop()
+        self.curr_loop_guard_stack.pop()
     def visit_Break(self, node):
         assert len(self.after_loop_block_stack), "Found break not inside loop"
         self.add_exit(self.current_block, self.after_loop_block_stack[-1])
@@ -559,6 +589,36 @@ class CFGBuilder(ast.NodeVisitor):
         self.current_block = afteryield_block
 
     def visit_With(self, node):
+        # add with statement to the current block
+        self.add_statement(self.current_block, node)
+        # New block for the body of the with.
+        with_block = self.new_block()
+        # link current block to with block
+        self.add_exit(self.current_block, with_block)
+
+        # Block of code after the with.
+        afterwith_block = self.new_block()
+        # no branch here
+        # link with block and body of with
+        #print(with_block, afterwith_block)
+        #self.add_exit(with_block, afterwith_block)
+        # go to with block and create more 
+        self.current_block = with_block
+
+        # Populate the body of the with loop.
+        for child in node.body:
+            self.visit(child)
+
+        if not self.current_block.exits:
+            self.add_exit(self.current_block, afterwith_block)
+        # Continue building the CFG in the after-with block.
+        self.current_block = afterwith_block
+
+    # Async for loops and async with context managers. 
+    # They have the same fields as For and With, respectively. 
+    # Only valid in the body of an AsyncFunctionDef.
+    # https://docs.python.org/3/library/ast.html
+    def visit_AsyncWith(self, node):
         # add with statement to the current block
         self.add_statement(self.current_block, node)
         # New block for the body of the with.
