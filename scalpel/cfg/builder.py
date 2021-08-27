@@ -339,6 +339,14 @@ class CFGBuilder(ast.NodeVisitor):
         self.add_statement(self.current_block, node)
         self.goto_new_block(node)
 
+    def visit_Global(self, node):
+        self.add_statement(self.current_block, node)
+        self.goto_new_block(node)
+
+    def visit_Nonlocal(self, node):
+        self.add_statement(self.current_block, node)
+        self.goto_new_block(node)
+
     def visit_Raise(self, node):
         self.add_statement(self.current_block, node)
         self.cfg.finalblocks.append(self.current_block)
@@ -389,7 +397,7 @@ class CFGBuilder(ast.NodeVisitor):
             self.visit(handler)
             # If encountered a break, exit will have already been added
             if not self.current_block.exits:
-                self.add_exit(self.current_block, afterif_block)
+                self.add_exit(self.current_block, after_try_block)
             #self.add_exit(self.current_block, after_try_block)
 
         #if not self.current_block.exits:
