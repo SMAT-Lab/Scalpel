@@ -102,74 +102,6 @@ class SSA:
         second = ast_tuple[1]  
 
 
-    def get_assign_raw(self, stmts):
-        """
-        Retrieve the assignment statements 
-        Args:
-            stmts: A list of statements from the block node in the CFG.
-        """
-        assign_stmts = []
-        for stmt in stmts:
-            if isinstance(stmt,ast.Assign):
-                if isinstance(stmt.targets, list):
-                    for target in stmt.targets:
-                        if hasattr(target, "id"):
-                            assign_stmts.append((target, stmt.value))
-                        elif isinstance(target, ast.Tuple):
-                            for elt in target.elts:
-                                if hasattr(elt, "id"):
-                                    assign_stmts.append((elt, stmt.value))
-
-            elif isinstance(stmt,ast.AnnAssign):
-                if hasattr(stmt.target, "id"):
-                    assign_stmts.append((stmt.target, stmt.value))
-            elif isinstance(stmt, ast.AugAssign):
-                if hasattr(stmt.target, "id"):
-                    assign_stmts.append((stmt.target, stmt.value))
-            elif isinstance(stmt, ast.Expr) and isinstance(stmt.value, ast.Call):
-                if isinstance(stmt.value.func, ast.Attribute):
-                    assign_stmts.append((None, stmt.value  ))
-                else:
-                    assign_stmts.append((None, stmt.value  ))
-            elif isinstance(stmt, ast.Expr) and isinstance(stmt.value,
-                    ast.Attribute):
-                assign_stmts.append((None,  stmt))
-            elif isinstance(stmt, ast.For):
-                if isinstance(stmt.target, ast.Name):
-                    assign_stmts.append((stmt.target,  stmt.iter))
-                elif isinstance(stmt.target, ast.Tuple):
-                    for item in stmt.target.elts:
-                        if isinstance(item, ast.Tuple):
-                            for elt in item.elts:
-                                assign_stmts.append((elt,  stmt.iter))
-                        else:
-                            assign_stmts.append((item,  stmt.iter))
-            elif isinstance(stmt, ast.Import):
-                for name in stmt.names:
-                    if name.asname is not None:
-                        assign_stmts.append((ast.Name(name.asname, ast.Store()),  None))
-                    else:
-                        assign_stmts.append((ast.Name(name.name, ast.Store()),  None))
-            elif isinstance(stmt, ast.ImportFrom):
-                print(ast.dump(stmt))
-                for name in stmt.names:
-                    if name.asname is not None:
-                        assign_stmts.append((ast.Name(name.asname, ast.Store()),  None))
-                    else:
-                        assign_stmts.append((ast.Name(name.name, ast.Store()),  None))
-            elif isinstance(stmt, ast.Return):
-                    assign_stmts.append((None,  stmt.value))
-            elif isinstance(stmt, ast.FunctionDef):
-                    assign_stmts.append((ast.Name(stmt.name, ast.Store()),  None))
-            elif isinstance(stmt, ast.ClassDef):
-                    assign_stmts.append((ast.Name(stmt.name, ast.Store()),  None))
-            elif isinstance(stmt, ast.With):
-                    for item in stmt.items:
-                        # left: optional_vars  right: context_expr
-                        assign_stmts.append((item.optional_vars, item.context_expr))
-
-        return assign_stmts
-
     def get_attribute_stmts(self, stmts):
         call_stmts = []
         for stmt in stmts:
@@ -187,6 +119,7 @@ class SSA:
         res = get_vars(ast_node)
         idents = [r['name'] for r in res if  r['name'] is not None and "." not in r['name']]
         return idents
+
     def get_stmt_idents_ctx(self, stmt):
         # if this is a definition of class/function, ignore
         stored_idents = []
@@ -261,8 +194,8 @@ class SSA:
 
         dom = self.compute_dom_old(all_blocks) 
         #idom = self.compute_idom(all_blocks) 
-
         for block in all_blocks:
+            print(block.id)
             #assign_records = self.get_assign_raw(block.statements)
             id2block[block.id] = block
             block_ident_gen[block.id] = []
