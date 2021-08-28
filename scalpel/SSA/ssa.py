@@ -12,7 +12,7 @@ from ..cfg.builder import CFGBuilder, Block, invert
 from ..core.mnode import MNode
 from ..core.vars_visitor  import get_vars
 
-BUILT_IN_FUNCTIONS = set([ 
+BUILT_IN_FUNCTIONS = { 
          ### built-in functions
         "abs","delattr", "print", "str", "bin", "int", "xrange", "eval", "all", "__name__",
         "float", "open", "unicode", "exec",
@@ -39,9 +39,8 @@ BUILT_IN_FUNCTIONS = set([
         "Warning","DeprecationWarning","PendingDeprecationWarning","RuntimeWarning","SyntaxWarning",
         "UserWarning", "FutureWarning","ImportWarning","UnicodeWarning","BytesWarning","ResourceWarning",
         # Others
-        "NotImplemented", "__main__", "__file__", "__name__", "__debug__"
-        ]
-        )
+        "NotImplemented", "__main__", "__file__", "__name__", "__debug__" 
+        }
 
 def parse_val(node):
    # does not return anything
@@ -82,6 +81,9 @@ class SSA:
         id2block = {}
         self.unreachable_names = {}
         self.undefined_names_from = {}
+
+        self.global_names = []
+        
 
     def get_global_live_vars(self):
         #import_dict = self.m_node.parse_import_stmts()
@@ -185,65 +187,6 @@ class SSA:
         res = get_vars(ast_node)
         idents = [r['name'] for r in res if  r['name'] is not None and "." not in r['name']]
         return idents
-
-
-    def backward_query(self, block, ident_name, visited, path = []):
-        phi_fun = []
-        visited.add(block.id)
-        path.append(block.id)
-        # all the incoming path
-        for suc_link in block.predecessors: 
-            is_this_path_done = False 
-            parent_block = suc_link.source
-            target_block = suc_link.target
-            # deal with cycles, this is back edge
-            if parent_block is None:
-                continue
-            if parent_block.id in visited or parent_block.id == block.id:
-                continue
-
-            # if the block dominates the parent block, then give it up
-            if parent_block.id in self.dom and  block.id in self.dom[parent_block.id]:
-                continue
-
-            #grand_parent_blocks = [link.source for link in parent_block.predecessors]
-            #grand_parent_block_ids = [b.id for b in grand_parent_blocks]
-            #if block.id in grand_parent_block_ids:
-            #    continue
-            #if ident_name == 'condition':
-                #print('testing')
-                #self.print_block(parent_block)
-            target_ssa_left = reversed(list(parent_block.ssa_form.keys())) 
-            block_phi_fun = []
-            for tmp_var_no in target_ssa_left:
-                if tmp_var_no[0] == ident_name:
-                    block_phi_fun.append(tmp_var_no) 
-                    is_this_path_done = True
-                    break
-            # this is one block 
-            #phi_fun += block_phi_fun
-            if is_this_path_done:
-                phi_fun += block_phi_fun
-                continue
-            if len(block_phi_fun) == 0:
-                # not found in this parent_block
-                if len(parent_block.predecessors)!=0 and parent_block.id not in visited:
-                    block_phi_fun = self.backward_query(parent_block,
-                            ident_name, visited, path = path)
-                    #phi_fun += block_phi_fun
-            #else:
-            #    phi_fun += block_phi_fun
-            if len(block_phi_fun) == 0:
-                phi_fun += [(ident_name, -1)]
-                if ident_name in self.error_paths:
-                    self.error_paths[ident_name].append(path.copy())
-                else:
-                    self.error_paths[ident_name] = [path.copy()]
-            else:
-                phi_fun += block_phi_fun
-        path.pop()
-        return phi_fun
-
     def get_stmt_idents_ctx(self, stmt):
         # if this is a definition of class/function, ignore
         stored_idents = []
@@ -271,6 +214,10 @@ class SSA:
                 if handler.name is not None:
                     stored_idents.append(handler.name)
             return stored_idents, loaded_idents, []
+        if isinstance(stmt, ast.Global):
+            for name in stmt.names:
+                self.global_names.append(name)
+            return stored_idents, loaded_idents, []
 
         visit_node = stmt
         if isinstance(visit_node,(ast.If, ast.IfExp)):
@@ -289,7 +236,7 @@ class SSA:
 
         ident_info = get_vars(visit_node)
         for r in ident_info:
-            if r['name'] is None or "." in r['name']:
+            if r['name'] is None or "." in r['name'] or "_hidden_" in r['name']:
                 continue
             if r['usage'] == 'store':
                 stored_idents.append(r['name'])
@@ -313,8 +260,7 @@ class SSA:
         undefined_names = []
 
         dom = self.compute_dom_old(all_blocks) 
-        idom = self.compute_idom(all_blocks)
-    
+        #idom = self.compute_idom(all_blocks) 
 
         for block in all_blocks:
             #assign_records = self.get_assign_raw(block.statements)
@@ -332,12 +278,6 @@ class SSA:
                     # in the case x = [i+1 for i in range(10)]
                     if ident not in block_ident_gen[block.id] and ident not in stored_idents:
                                 ident_to_be_traced.append((ident, ".".join(scope)))
-                    #if ident not in block_ident_gen[block.id]:
-                    #    if isinstance(stmt, (ast.Assign, ast.AugAssign, ast.AnnAssign)):
-                    #        ident_to_be_traced.append(ident)
-                    #    else:
-                    #        if ident not in stored_idents:
-                    #            ident_to_be_traced.append(ident) 
                 block_ident_gen[block.id] += stored_idents
                 block_ident_unorder[block.id]  += scope_func_names
             block_ident_use[block.id]  = ident_to_be_traced 
@@ -372,7 +312,7 @@ class SSA:
             block_id = block.id
             all_used_idents = block_ident_use[block_id]+ list(set(subscope_undefined_names)) 
             #all_used_idents = []
-            idents_non_local = [ident for ident in all_used_idents if ident[0] not in BUILT_IN_FUNCTIONS]
+            idents_non_local = [ident for ident in all_used_idents if ident[0] not in BUILT_IN_FUNCTIONS and ident[0] not in self.global_names]
             idents_non_local = list(set(idents_non_local))
             idents_left = []
             dominators = dom[block_id]
@@ -394,73 +334,29 @@ class SSA:
             path_constraint = None
             if len(block.predecessors) ==1:
                 path_constraint = block.predecessors[0].exitcase
+
             for ident in idents_left:
                 visited = set()
-                dom_stmt_res = []
-                is_found = self.backward_query_new(block, ident[0], visited, dom={}, block_ident_gen=block_ident_gen, condition_cons=path_constraint, entry_id=cfg.entryblock.id, idom=idom,
-                        dom_stmt_res=dom_stmt_res) 
+                exec_path = []
+                is_found = self.backward_query_new(block, ident[0], visited, dom={}, path=exec_path, block_ident_gen=block_ident_gen, condition_cons=path_constraint, entry_id=cfg.entryblock.id)
                 if is_found:
-                    idom_block_id = idom[block.id]
-                    idom_block = id2block[idom_block_id]
-                    stmt_type = type(idom_block.statements[-1])
-                    dom_stmt_res.append(stmt_type)
-                    print(ident[0], dom_stmt_res)
-
                     undefined_names += [ident]
+                    print(ident, exec_path)
 
         return list(set(undefined_names)) 
-    def backward_query_stmt_type(self, block, ident_name, visited, dom={},idom = {}, dom_stmt_res = [],  block_ident_gen={}, condition_cons=None, entry_id=1):
-        # condition constraints:
-        phi_fun = []
-        visited.add(block.id)
-        path.append(block.id)
-        # all the incoming path
-        # if this is the entry block and ident not in the gen set then return True
-        if block.id == entry_id:
-            return True
-        for suc_link in block.predecessors: 
-            if condition_cons is not None and suc_link.exitcase is not None: 
-                this_condition = invert(condition_cons) 
-                this_txt = astor.to_source(this_condition) 
-                this_edge_txt = astor.to_source(suc_link.exitcase)
-                # this path contracdict the constraints
-                if this_txt.strip()==this_edge_txt.strip():
-                    continue
-            parent_block = suc_link.source
-            target_block = suc_link.target
-            # deal with cycles, this is back edge
-            if parent_block is None:
-                continue
-            if parent_block.id in visited or parent_block.id == block.id:
-                continue
-            # if the block dominates the parent block, then give it up
-            if parent_block.id in dom and  block.id in dom[parent_block.id]:
-                continue
-            ##############
-            if parent_block.id not in block_ident_gen:
-                continue
-            # if the name id found in this gen set. then stop visiting this path
-            if ident_name in block_ident_gen[parent_block.id]:
-                continue
-                return True
-            # if the name id is not found in the parent block and the parent is entry  return True
-            if parent_block.id == entry_id:
-                return False
-            # if continue to search
-            # not in its parent gen set  then search from this path
-            return self.backward_query_new(parent_block, ident_name, visited, dom=dom, block_ident_gen=block_ident_gen, condition_cons=condition_cons, entry_id=entry_id) 
-        return False
+
     # if there exists one path that ident_name is not reachable 
     def backward_query_new(self, block, ident_name, visited, path = [], dom={},idom = {}, dom_stmt_res = [],  block_ident_gen={}, condition_cons=None, entry_id=1):
         # condition constraints:
-        phi_fun = []
         visited.add(block.id)
         path.append(block.id)
+        print(path, )
         # all the incoming path
         # if this is the entry block and ident not in the gen set then return True
         if block.id == entry_id:
             return True
-        for suc_link in block.predecessors: 
+
+        for suc_link in block.predecessors:
             if condition_cons is not None and suc_link.exitcase is not None: 
                 this_condition = invert(condition_cons) 
                 this_txt = astor.to_source(this_condition) 
@@ -490,58 +386,8 @@ class SSA:
             # if continue to search
             # not in its parent gen set  then search from this path
             return self.backward_query_new(parent_block, ident_name, visited, dom=dom, block_ident_gen=block_ident_gen, condition_cons=condition_cons, entry_id=entry_id) 
+        path.pop()
         return False
-
-    def compute_SSA(self, cfg, live_ident_table={}, is_final=False):
-        """
-        generate an SSA graph.
-        """
-        # to consider single line function call / single line attributes/
-        # return statements
-        self.get_global_live_vars()
-        #self.numbering = {}
-        # visit all blocks in bfs order 
-        all_blocks = cfg.get_all_blocks()
-        self.compute_dom(all_blocks)
-        for block in all_blocks:
-            #assign_records = self.get_assign_raw(block.statements)
-            ident_records = self.get_stmt_idents_ctx(block.statements)
-            for stored_idents, loaded_idents in ident_records:
-                phi_fun = []
-                for var_name in loaded_idents:
-                   # last assignment occur in the same block
-                    for tmp_var_no in reversed(list(block.ssa_form.keys())):
-                        if var_name == tmp_var_no[0]:
-                            phi_fun.append(tmp_var_no)
-                            break
-                local_block_vars = [tmp[0] for tmp in phi_fun]
-                remaining_vars = [tmp for tmp in loaded_idents if tmp not in local_block_vars and (tmp not in stored_idents)]
-                phi_fun = []
-                for var_name in remaining_vars:
-                    visited = set()
-                    phi_fun_incoming = self.backward_query(block, var_name, visited)
-                    if len(phi_fun_incoming) == 0:
-                        phi_fun += [(var_name, -1)]
-                    else:
-                        phi_fun += phi_fun_incoming
-                if len(stored_idents) == 0:
-                    stored_idents += ["<holder>"]
-                    #block.ssa_form[("<holder>", 1)] = phi_fun
-                    #continue
-
-                for ident_name in stored_idents:
-                    if ident_name in self.numbering:
-                        var_no = self.numbering[ident_name]+1
-                        self.numbering[ident_name] = var_no
-                    #    self.var_values[(left_name,var_no)] = actual_value
-                        block.ssa_form[(ident_name, var_no)] = phi_fun
-                    else:
-                        var_no = 1
-                        self.numbering[ident_name] = var_no
-                        block.ssa_form[(ident_name, var_no)] = phi_fun
-                        #    self.var_values[(left_name,var_no)] = actual_value
-
-        self.ssa_blocks = all_blocks
 
     def is_undefined(self, load_idents):
         ident_phi_fun = {}
@@ -555,37 +401,6 @@ class SSA:
     def build_viz(self):
         pass
 
-    def compute_final_idents(self):
-        # when there is only one exit block, compute SSA for all the vars in
-        # numbering make a if statement here to see if this is a module
-        final_phi_fun = {}
-        def_reach = {}
-        for block in self.ssa_blocks:
-            if len(block.exits) == 0:
-                #for ident_name, phi_rec in block.ssa_form.items():
-                #    print(ident_name, phi_rec)
-                for ident_name, number in self.numbering.items():
-                    visited = set()
-                    phi_fun_incoming = self.backward_query(block, ident_name, visited)
-                    if ident_name not in def_reach:
-                        def_reach[ident_name] = set([tmp[1] for tmp in phi_fun_incoming])
-                #for ident_name, nums in def_reach.items():
-                #    print(ident_name, set(nums))
-        return def_reach
-
-    def find_this_ident_name(self, ident_name, live_ident_table, def_names):
-        n_scopes = len(live_ident_table)
-        for i in range(n_scopes):
-            if ident_name in live_ident_table[-i]:
-                if (-1 in live_ident_table[-i][ident_name]):
-                    return False
-                else:
-                    return True
-        if ident_name in BUILT_IN_FUNCTIONS:
-            return True
-        if ident_name not in def_names:
-            return False
-        return True
 
     def retrieve_key_stmts(self, block_id_lst):
         import astor
@@ -616,6 +431,8 @@ class SSA:
 
     def RD(self, cfg_blocks):
         # worklist 
+        # this is to express the conventional RD anaysis
+        # By using Out and Kill set to compute the latest assignment to a variable  
         entry_block = cfg_blocks[0]
         Out[entry_block.id]  = set()
         # init the iterative algorithm
@@ -647,7 +464,6 @@ class SSA:
                 dom[b_id] = set([entry_id])
             else:
                 dom[b_id] = set(block_ids)
-
         # Iteratively eliminate nodes that are not dominators
         #Dom(n) = {n} union with intersection over Dom(p) for all p in pred(n)
         changed = True
