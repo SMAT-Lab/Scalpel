@@ -15,7 +15,7 @@ from ..core.vars_visitor  import get_vars
 BUILT_IN_FUNCTIONS = { 
          ### built-in functions
         "abs","delattr", "print", "str", "bin", "int", "xrange", "eval", "all", "__name__",
-        "float", "open", "unicode", "exec",
+        "float", "open", "unicode", "exec", "breakpoint",
         "hash","memoryview","set", "tuple", "range", "self" "all","dict","help","min","setattr","any","dir","hex","next","slice", "self",
         "ascii","divmod","enumerate","id", "isinstance", "object","sorted","bin","enumerate","input",
         "staticmethod","bool", "eval" "int", "len", "self", "open" "str" "breakpoint" "exec" "isinstance" "ord",
@@ -24,7 +24,6 @@ BUILT_IN_FUNCTIONS = {
         "classmethod", "getattr", "locals", "repr", "repr", "zip", "compile", "globals", "map", "reversed",  "__import__", "complex", "hasattr", "max", "round", "get_ipython",
         "ord",
         ###  built-in exceptions
-
         "BaseException", "SystemExit", "KeyboardInterrupt", "GeneratorExit", "Exception",
         "StopIteration", "StopAsyncIteration","ArithmeticError", "FloatingPointError", "OverflowError",
         "ZeroDivisionError","AssertionError", "AttributeError", "BufferError", "EOFError",
@@ -33,13 +32,13 @@ BUILT_IN_FUNCTIONS = {
         "BrokenPipeError", "ConnectionAbortedError", "ConnectionRefusedError","ConnectionResetError",
         "FileExistsError", "FileNotFoundError", "InterruptedError","IsADirectoryError", "NotADirectoryError",
         "PermissionError","ProcessLookupError", "TimeoutError", "ReferenceError", "RuntimeError",
-        "NotImplementedError","RecursionError", "SyntaxError", "IndentationError", "TabError",
+        "NotImplementedError","RecursionError", "SyntaxError", "IndentationError", "TabError", "EnvironmentError",
         "SystemError", "TypeError", "ValueError","UnicodeError","UnicodeDecodeError","UnicodeEncodeError","UnicodeTranslateError",
         # built-in warnings
         "Warning","DeprecationWarning","PendingDeprecationWarning","RuntimeWarning","SyntaxWarning",
         "UserWarning", "FutureWarning","ImportWarning","UnicodeWarning","BytesWarning","ResourceWarning",
         # Others
-        "NotImplemented", "__main__", "__file__", "__name__", "__debug__" 
+        "NotImplemented", "__main__", "__doc__'", "__file__", "__name__", "__debug__" 
         }
 
 def parse_val(node):
@@ -81,9 +80,7 @@ class SSA:
         id2block = {}
         self.unreachable_names = {}
         self.undefined_names_from = {}
-
         self.global_names = []
-        
 
     def get_global_live_vars(self):
         #import_dict = self.m_node.parse_import_stmts()
@@ -99,8 +96,7 @@ class SSA:
         """
         output =[]
         first = ast_tuple[0]
-        second = ast_tuple[1]  
-
+        second = ast_tuple[1]
 
     def get_attribute_stmts(self, stmts):
         call_stmts = []
@@ -195,7 +191,6 @@ class SSA:
         dom = self.compute_dom_old(all_blocks) 
         #idom = self.compute_idom(all_blocks) 
         for block in all_blocks:
-            print(block.id)
             #assign_records = self.get_assign_raw(block.statements)
             id2block[block.id] = block
             block_ident_gen[block.id] = []
@@ -219,7 +214,6 @@ class SSA:
             # number of stmts parsed
             for stmt in block.statements:
                 if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef)):
-
                     fun_undefined_names = self.compute_undefined_names(cfg.functioncfgs[(block.id, stmt.name)], scope = scope+[stmt.name])  
                     fun_args = cfg.function_args[(block.id, stmt.name)]
                     # exclude arguments 
@@ -240,7 +234,6 @@ class SSA:
                     tmp_avail_names = part_ident_gen + [stmt.name] + block_ident_unorder[block.id]
                     cls_body_undefined_names = [name for name in cls_body_undefined_names if name[0] not in tmp_avail_names]
                     subscope_undefined_names += cls_body_undefined_names
-            #subscope_undefined_names = [name for name in subscope_undefined_names if name not in block_ident_gen[block.id]]
             # process this block
             block_id = block.id
             all_used_idents = block_ident_use[block_id]+ list(set(subscope_undefined_names)) 
@@ -254,10 +247,8 @@ class SSA:
                 is_found = False
                 # look for this var in it dominatores
                 for d_b_id in dominators:
-                    if d_b_id == block_id:
+                    if d_b_id != block_id and ident[0] in block_ident_gen[d_b_id]:
                         # do not consider itself
-                        continue
-                    if ident[0] in block_ident_gen[d_b_id]:
                         is_found = True
                         break
                 if is_found == False:
@@ -271,19 +262,18 @@ class SSA:
             for ident in idents_left:
                 visited = set()
                 exec_path = []
-                is_found = self.backward_query_new(block, ident[0], visited, dom={}, path=exec_path, block_ident_gen=block_ident_gen, condition_cons=path_constraint, entry_id=cfg.entryblock.id)
+                is_found = self.backward_query_new(block, ident[0], visited, dom=dom, path=exec_path, block_ident_gen=block_ident_gen, condition_cons=path_constraint, entry_id=cfg.entryblock.id)
                 if is_found:
                     undefined_names += [ident]
-                    print(ident, exec_path)
-
         return list(set(undefined_names)) 
 
     # if there exists one path that ident_name is not reachable 
+    # when the entered block is the entry block, it means the variable has not been found in this path. 
+    #Otherwise, the algorithm terminates at a previous block.
     def backward_query_new(self, block, ident_name, visited, path = [], dom={},idom = {}, dom_stmt_res = [],  block_ident_gen={}, condition_cons=None, entry_id=1):
         # condition constraints:
         visited.add(block.id)
         path.append(block.id)
-        print(path, )
         # all the incoming path
         # if this is the entry block and ident not in the gen set then return True
         if block.id == entry_id:
@@ -319,7 +309,6 @@ class SSA:
             # if continue to search
             # not in its parent gen set  then search from this path
             return self.backward_query_new(parent_block, ident_name, visited, dom=dom, block_ident_gen=block_ident_gen, condition_cons=condition_cons, entry_id=entry_id) 
-        path.pop()
         return False
 
     def is_undefined(self, load_idents):
