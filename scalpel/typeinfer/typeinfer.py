@@ -9,7 +9,6 @@ import ast
 import tokenize
 import typed_ast
 import typeshed_client
-from pprint import pprint
 from dataclasses import dataclass
 from typing import List, Dict, Union
 
