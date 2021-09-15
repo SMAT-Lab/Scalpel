@@ -351,11 +351,13 @@ class CFGBuilder(ast.NodeVisitor):
         self.add_statement(self.current_block, node)
         self.goto_new_block(node)
 
+    def visit_Delete(self, node):
+        self.add_statement(self.current_block, node)
+        self.goto_new_block(node)
     def visit_Raise(self, node):
         self.add_statement(self.current_block, node)
         self.cfg.finalblocks.append(self.current_block)
         self.current_block = self.new_block()
-        pass
 
     def visit_Assert(self, node):
         self.add_statement(self.current_block, node)
@@ -378,6 +380,9 @@ class CFGBuilder(ast.NodeVisitor):
         # Create a new block for the body of try.
         try_block = self.new_block()
         self.add_exit(self.current_block, try_block, ast.Constant(True))
+        n_else_stmts = len(node.orelse)
+        #else_block = self.new_block()
+        #self.add_exit(self.current_block, try_block, ast.Constant(True))
 
         # Create blocks for handlers
         n_handlers = len(node.handlers)
@@ -387,11 +392,23 @@ class CFGBuilder(ast.NodeVisitor):
             handler_blocks += [h_block]
         after_try_block = self.new_block()
         #self.add_exit(self.current_block, after_try_block, ast.Constant(False))
-        current_block = self.current_block
+        # keep the original block
+        current_block = self.current_block 
+        #
         self.current_block = try_block
+
         for child in node.body:
             self.visit(child)
+
+        if n_else_stmts>0:
+            else_block = self.new_block()
+            self.add_exit(self.current_block, else_block)
+            self.current_block = else_block
+            # create else block
+            for child in node.orelse:
+                self.visit(child)
         self.add_exit(self.current_block, after_try_block)
+
 
         for i in range(n_handlers):
             self.current_block = current_block
