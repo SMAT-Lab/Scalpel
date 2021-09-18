@@ -6,7 +6,6 @@ Automated Type Inference
 
 import os
 import re
-import sys
 import ast
 import astunparse
 
@@ -17,7 +16,7 @@ from scalpel.typeinfer.utilities import (
     rename_from_name,
     is_valid_call_link
 )
-from scalpel.typeinfer.ast_factory import (
+from scalpel.typeinfer.archive.ast_factory import (
     SourceSplitVisitor,
     ReturnStmtVisitor,
     ClassSplitVisitor

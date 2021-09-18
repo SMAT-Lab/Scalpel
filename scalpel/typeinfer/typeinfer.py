@@ -1,402 +1,82 @@
 """
 Tomas Bolger 2021
 Python 3.9
-Scalpel Type Inference Module
+Scalpel Type Inference Static Analysis Tools
 """
 
 import os
 import ast
-import tokenize
-import typed_ast
-import typeshed_client
-from dataclasses import dataclass
-from typing import List, Dict, Union
+import astunparse
+from typing import List
 
-from scalpel.cfg import CFGBuilder
-
-import utilities
-
-builtin_types_dict = utilities.get_built_in_types()
-
-
-@dataclass
-class TypeWarning:
-    warning: str  # Stores warning text
-    line: int  # Line number of warning
-    file: str  # Line where the warning was found
-    variable: str  # Name of the variable
-
-    def print_warning(self):
-        print(f"{self.file}:{self.line}: {self.warning}")
-
-
-@dataclass
-class ScalpelVariable:
-    name: str  # The name of the variable
-    function: str  # The name of the function where the variable is defined
-    line: int  # The line number that the variable is defined at
-    type: str = None  # The type of the variable as a string
-    in_conditional: bool = False  # Whether the variable is involved in any conditional statements
-    in_equality: bool = False  # Whether the variable is involved in an equality statement
-    is_callable: bool = False  # Whether the variable has been called as a function
-    called_methods: List[str] = None  # List of methods called from the variable
-    binary_operations: Dict[str, str] = None  # Dictionary indexed by other variable name and the operator used
+from scalpel.typeinfer.visitors import get_call_type
+from scalpel.typeinfer.classes import ProcessedFile
+from scalpel.typeinfer.analysers import (
+    VariableAssignmentMap,
+    SourceSplitVisitor,
+    ClassSplitVisitor,
+    ReturnStmtVisitor,
+    HeuristicParser
+)
+from scalpel.typeinfer.graph import Tree, ImportGraph
+from scalpel.typeinfer.utilities import (
+    generate_ast,
+    parse_module,
+    get_api_ref_id,
+    get_function_comment,
+    is_imported_fun,
+    is_valid_call_link,
+    rename_from_name,
+    is_done,
+    find_class_by_attr,
+)
 
 
-@dataclass
-class ScalpelFunction:
-    """
-    Holds information about a function
-    """
-    name: str  # The name of the function
-    line: int  # The line number that the variable is defined at
-    return_type: str = None  # The return type of the function
+def process_code_with_heuristics(source):
+    def pick_type(type_lst):
+        base_type_names = ["Num", "Set", "List", "Tuple", "Dict", "Str", "NameConstant"]
+        new_type_lst = []
+        type_hint_pair_list = []
+        length = len(type_lst[0])
+        if length == 0:
+            return []
+        type_lst = filter(lambda x: len(x) == length, type_lst)
+        for i in range(length):
+            i_th = [t[i] for t in type_lst]
+            new_type_lst += [None]
+            for tmp in i_th:
+                if tmp in base_type_names:
+                    new_type_lst[-1] = tmp
+                    break
+            for tmp in i_th:
+                if isinstance(tmp, tuple) and tmp[0] == "Call":
+                    if new_type_lst[i] is not None:
+                        type_hint_pair_list += [(tmp[1], new_type_lst[i])]
 
+        return type_hint_pair_list
 
-@dataclass
-class ScalpelClass:
-    """
-    Holds information about a class
-    """
-    name: str  # The name of the class
-    methods: List[ScalpelFunction]  # List of functions defined in the class
-    inherits: List[str] = None  # Name of the class that this class inherits from
-
-
-@dataclass
-class BinaryOperation:
-    """
-    Holds information about a binary operation between two variables
-    """
-    left: str  # The left variable
-    left_ast_type: any  # The AST type of the left variable
-    right: str  # The right variable
-    right_ast_type: any  # The AST type of the right variable
-    operator: any  # The binary operator used between the two variables
-    shared_type: str = None  # Stores shared type between the variables in the operation
-
-
-class BinaryOperatorMap:
-
-    def __init__(self):
-        self.hash: Dict[str, list] = {}
-        self._type_hash: Dict[str, any] = {}
-
-    def append(self, operation: BinaryOperation):
-        # Left variable
-        if self.hash.get(operation.left):
-            self.hash[operation.left].append(operation)
-        else:
-            self.hash[operation.left] = [operation]
-
-        # Right variable
-        if self.hash.get(operation.right):
-            self.hash[operation.right].append(operation)
-        else:
-            self.hash[operation.right] = [operation]
-
-        # Variable hashing
-        self._type_hash[operation.left] = operation.left_ast_type
-        self._type_hash[operation.right] = operation.right_ast_type
-
-    def __getitem__(self, item):
-        if hashed := self.hash.get(item):
-            return hashed
-        return None
-
-    def chain_types(self):
-        """
-        TODO: Chain together types of variables involved in binary operations to determine types
-        """
-        for variable, operation_list in self.hash.items():
-            if isinstance(self._type_hash.get(variable), ast.Constant):
-                pass
-
-
-class _StaticAnalyzer(ast.NodeVisitor):
-    def __init__(self):
-        self.file_name = None
-
-    def check(self, paths):
-        for filepath in paths:
-            self.file_name = filepath
-            tree = ast.parse(_StaticAnalyzer.read_file(self.file_name))
-            self.visit(tree)
-
-    @staticmethod
-    def read_file(file_name: str):
-        """
-        Read a file as tokens
-
-        :param file_name: The name of the file to read
-        :type file_name: str
-        :return: The read file tokens
-        """
-        with tokenize.open(file_name) as file:
-            return file.read()
-
-
-class ImportTypeMap(_StaticAnalyzer):
-    """
-    Class for mapping import types
-    """
-
-    def __init__(self, file_name):
-        super().__init__()
-        self.file_name = file_name
-        self.imports: Dict[str, str] = {}
-        self.typeshed_resolver = typeshed_client.Resolver()
-        self.root = ast.parse(_StaticAnalyzer.read_file(self.file_name))
-
-    def map(self):
-        # TODO: Add check in here to see if import is a local file, if it is
-        #  we may have to recursively instantiate a type inference process on it
-        import_mappings = {}  # Maps imported functions, variables, etc. to their types
-        imports = {}  # Keeps a dictionary of imported libraries
-        for node in ast.iter_child_nodes(self.root):
-            if isinstance(node, ast.Import):
-                module = []
-            elif isinstance(node, ast.ImportFrom):
-                module = node.module.split('.')
+    try:
+        tree = ast.parse(source, mode='exec')
+        visitor = HeuristicParser()
+        visitor.visit(tree)
+        func_arg_db = {}
+        function_arg_types = get_call_type(tree)
+        type_hint_pairs = visitor.type_hint_pairs
+        all_call_names = []
+        for pair in function_arg_types:
+            name, arg_type = pair
+            name_parts = name.split('.')
+            name = ".".join(name_parts)
+            all_call_names += [name]
+            if name in func_arg_db:
+                func_arg_db[name] += [arg_type]
             else:
-                continue
-
-            for names in node.names:
-                for name in names.name.split('.'):
-                    import_name = ".".join(module + [name])
-                    if module:
-                        # Importing from module
-                        import_type = self.get_imported_type(import_name)
-                        import_mappings[name] = import_type
-                    else:
-                        # Importing whole module
-                        imports[import_name] = True
-
-        return import_mappings, imports
-
-    def get_imported_type(self, import_name: str):
-        fully_qualified_name = self.typeshed_resolver.get_fully_qualified_name(import_name)
-        if isinstance(fully_qualified_name, typeshed_client.parser.NameInfo):
-            node = fully_qualified_name.ast
-            if isinstance(node, typed_ast._ast3.FunctionDef):
-                if isinstance(node.returns, typed_ast._ast3.Subscript):
-                    return node.returns.value.id
-                return node.returns.id
-            elif isinstance(node, typed_ast._ast3.AnnAssign):
-                return node.annotation.id
-            elif isinstance(node, typed_ast._ast3.ClassDef):
-                return node.name  # Type is class name
-        return 'any'
-
-
-class ClassDefinitionMap(_StaticAnalyzer):
-    """
-    Class for retrieving class definitions in a file
-    """
-
-    def __init__(self, file_name):
-        super().__init__()
-        self.file_name = file_name
-        self.root = ast.parse(_StaticAnalyzer.read_file(self.file_name))
-
-    def map(self) -> List[ScalpelClass]:
-        class_definitions = []
-        for node in ast.iter_child_nodes(self.root):
-            if isinstance(node, ast.ClassDef):
-                class_name = node.name
-                inheritance = [n.id for n in node.bases]
-                methods = []
-                for n in node.body:
-                    if isinstance(n, ast.FunctionDef):
-                        # We don't pass return type into function def since we will figure it out later
-                        methods.append(ScalpelFunction(
-                            name=n.name,
-                            line=n.lineno
-                        ))
-                class_definitions.append(ScalpelClass(
-                    name=class_name,
-                    methods=methods,
-                    inherits=inheritance
-                ))
-
-        return class_definitions
-
-
-class FunctionDefinitionMap(_StaticAnalyzer):
-    """
-    Class for retrieving functions definitions in a file
-    """
-
-    def __init__(self, file_name):
-        super().__init__()
-        self.file_name = file_name
-        self.root = ast.parse(_StaticAnalyzer.read_file(self.file_name))
-
-    def map(self) -> List[ScalpelFunction]:
-        function_definitions = []
-        for node in ast.iter_child_nodes(self.root):
-            if isinstance(node, ast.FunctionDef):
-                # We don't pass return type into function def since we will figure it out later
-                # Also worth noting that this won't pick up on methods defined in classes
-                function_definitions.append(ScalpelFunction(
-                    name=node.name,
-                    line=node.lineno
-                ))
-
-        return function_definitions
-
-
-class VariableAssignmentMap(_StaticAnalyzer):
-    """
-    Class for retrieving variable assignments
-    """
-
-    def __init__(self, file_name):
-        super().__init__()
-        self.file_name = file_name
-        self.root = ast.parse(_StaticAnalyzer.read_file(self.file_name))
-
-    def map(self) -> List[ScalpelVariable]:
-        # TODO: Ensure coverage of all variable types
-        variables = []
-        for node in ast.walk(self.root):
-            if isinstance(node, ast.Assign) and isinstance(node.targets[0], ast.Name):
-                # TODO: Look for ast.AugAssign node to check types are consistent
-                variable_name = node.targets[0].id
-                assignment_type = any.__name__
-                if isinstance(node.value, ast.Call):
-                    # Assignment is to a callable
-                    called = node.value.func.id  # Name of callable
-
-                elif isinstance(node.value, ast.Constant):
-                    # String, int, float, boolean
-                    assignment_type = type(node.value.value).__name__  # Determine specific type
-                elif isinstance(node.value, ast.Dict):
-                    # Dictionary
-                    key_type = self.__check_consistent_list_types(node.value.keys)
-                    value_type = self.__check_consistent_list_types(node.value.values)
-                    assignment_type = f"Dict[{key_type}, {value_type}]"
-                elif isinstance(node.value, ast.List) or isinstance(node.value, ast.Tuple):
-                    # List or tuple, check to see if types in list are constant
-                    values = node.value.elts
-                    value_type = self.__check_consistent_list_types(values)
-                    assignment_type = f"{type(node.value).__name__}[{value_type}]"
-                elif isinstance(node.value, ast.IfExp) or isinstance(node.value, ast.Compare):
-                    # Boolean, see heuristic 4
-                    assignment_type = bool.__name__
-
-                variables.append(ScalpelVariable(
-                    name=variable_name,
-                    function="",  # TODO: How to determine this easily? Line numbers?
-                    line=node.lineno,
-                    type=assignment_type
-                ))
-
-        return variables
-
-    @staticmethod
-    def __check_consistent_list_types(values) -> str:
-        """
-        Checks a list of values to see if they have a constant type
-        """
-        if len(values) == 0:
-            # Nothing in list yet so return any
-            return any.__name__
-        first_type = type(values[0])
-        assignment_type = any.__name__
-        if not first_type == ast.Constant:
-            builtin_first_type = builtin_types_dict.get(first_type.__name__.lower())
-            # Not an AST constant so we can just compare AST types
-            for n in values[1:len(values)]:
-                # Compare type to first items type
-                if not isinstance(n, first_type):
-                    # No constant type, assign any
-                    assignment_type = any.__name__
-                    break
-                else:
-                    assignment_type = builtin_first_type
-        else:
-            # We have an AST constant so we will need to compare their types
-            first_constant_type = type(values[0].value)
-            assignment_type = first_constant_type.__name__
-            for n in values[1:len(values)]:
-                # Compare type to first items type
-                if not isinstance(n, ast.Constant):
-                    # Not a constant type, assign any
-                    assignment_type = any.__name__
-                    break
-                else:
-                    if not isinstance(n.value, first_constant_type):
-                        assignment_type = any.__name__
-                        break
-        return assignment_type
-
-
-class BinaryOperationMap(_StaticAnalyzer):
-    """
-    Class for retrieving variable assignments
-    """
-
-    def __init__(self, file_name):
-        super().__init__()
-        self.file_name = file_name
-        self.root = ast.parse(_StaticAnalyzer.read_file(self.file_name))
-
-    def map(self) -> BinaryOperatorMap:
-
-        binary_operator_map = BinaryOperatorMap()
-        for node in ast.walk(self.root):
-
-            if isinstance(node, ast.BinOp):
-                # Check to see if we have an easily resolvable variable type since this will allow
-                # us to determine the type of all variables involved in the binary operation
-                if isinstance(node.left, ast.Constant):
-                    assignment_type = type(node.left.value).__name__
-                elif isinstance(node.right, ast.Constant):
-                    assignment_type = type(node.right.value).__name__
-                elif isinstance(node.left, ast.List):
-                    assignment_type = List.__name__
-                elif isinstance(node.right, ast.List):
-                    assignment_type = List.__name__
-                elif isinstance(node.left, ast.Dict):
-                    assignment_type = Dict.__name__
-                elif isinstance(node.right, ast.Dict):
-                    assignment_type = Dict.__name__
-                elif isinstance(node.left, ast.Call):
-                    # TODO: Check imported types and check already resolved functions?
-
-                    assignment_type = None
-                elif isinstance(node.right, ast.Call):
-                    # TODO: Check imported types and check already resolved functions?
-                    assignment_type = None
-                else:
-                    # TODO: Look back at operations we have already looked at for the type? Resolving later for now
-                    assignment_type = None
-
-                # Check whether we are working with another binary operation
-                if isinstance(node.left, ast.BinOp):
-                    # Since we have another binary operation, we will use its right node for hashing
-                    binary_operation = BinaryOperation(
-                        left=resolve_name(node.left.right),
-                        left_ast_type=type(node.left.right),
-                        right=resolve_name(node.right),
-                        right_ast_type=type(node.right),
-                        operator=type(node.op),
-                        shared_type=assignment_type
-                    )
-                else:
-                    # Not between two binary operations
-                    binary_operation = BinaryOperation(
-                        left=resolve_name(node.left),
-                        left_ast_type=type(node.left),
-                        right=resolve_name(node.right),
-                        right_ast_type=type(node.right),
-                        operator=type(node.op),
-                        shared_type=assignment_type
-                    )
-                binary_operator_map.append(binary_operation)
-
-        return binary_operator_map
+                func_arg_db[name] = [arg_type]
+        for func, arg_type in func_arg_db.items():
+            type_hint_pairs += pick_type(arg_type)
+        return type_hint_pairs, visitor.call_links, all_call_names
+    except (SyntaxError, UnicodeDecodeError):
+        return {}, {}, []
 
 
 class TypeInference:
@@ -404,85 +84,339 @@ class TypeInference:
     Infer types from a given AST node
     """
 
-    def __init__(self, files: List[str]):
-        self.files = files
+    def __init__(self, name: str, entry_point: str):
+        self.name = name
+        self.entry_point = entry_point
 
-    def infer_types(self, print_types=True) -> List[Dict]:
+        if self.entry_point.endswith(".py"):
+            # Singular Python file being analysed
+            self.root_node = Tree(os.path.basename(self.entry_point))
+        else:
+            self.root_node = Tree(self.name)
+
+        self.import_graph = None
+        self.leaves = []
+
+        # Build graph of the directory
+        cwd = os.getcwd()
+        working_dir = os.path.dirname(self.entry_point)
+        os.chdir(working_dir)
+        self.import_graph = ImportGraph(self.entry_point, self.root_node)
+        self.import_graph.build_dir_tree(self.root_node)
+        os.chdir(cwd)
+
+        # Get stack of leaves
+        working_queue = [self.root_node]
+        while len(working_queue) > 0:
+            current_node = working_queue.pop(0)
+            if current_node.name.endswith('.py'):
+                self.leaves.append(current_node)
+            working_queue.extend(current_node.children)
+
+    def infer_types(self):
         """
-        Returns dictionary with each variable in each method with what types it might be
+        Infer the types for the modules accessible from the entrypoint
         """
-        # Run type inference process
+
+        # Loop through leaves
+        for node in self.leaves:
+            node_type_dict, node_type_gt, type_stem_links, node_type_comment, static_assignments, line_numbers = self.process_file(
+                node.source)
+            node.node_type_dict = node_type_dict
+            node.node_type_gt = node_type_gt
+            node.call_links = type_stem_links
+            node.static_assignments = static_assignments
+            node.line_numbers = line_numbers
+
+        # Reconcile across all leaves
+        for node in self.leaves:
+            for function_name, (from_where, from_name) in node.call_links.items():
+                # The same module
+                if node.node_type_dict[function_name] is None:
+                    continue
+
+                if from_where in ['self', 'base', 'local']:
+                    from_name = rename_from_name(from_where, from_name, function_name)
+                    if from_name in node.node_type_dict and node.node_type_dict[from_name] is not None:
+                        t_vals_tmp = node.node_type_dict[from_name]
+                        if is_valid_call_link(t_vals_tmp):
+                            node.node_type_dict[function_name] += t_vals_tmp
+
+                # Might be from other modules
+                else:
+                    visit_path = from_where.split('.')
+                    if len(visit_path) == 1 and visit_path[0] == self.import_graph.root.name:
+                        dst_node = self.import_graph.root
+                    else:
+                        dst_node = self.import_graph.go_to_that_node(node, from_where.split('.')[0:-1])
+
+                    if dst_node is not None:
+                        if dst_node.node_type_dict is not None:
+                            if from_name in dst_node.node_type_dict and dst_node.node_type_dict[from_name] is not None:
+                                t_vals_tmp = dst_node.node_type_dict[from_name]
+                                if is_valid_call_link(t_vals_tmp):
+                                    node.node_type_dict[function_name] += t_vals_tmp
+                    else:
+                        # This is a library call 3call be propagated to other affected calls
+                        node.node_type_dict[function_name] += ["3call"]
+
+        # Finalise function return types
+        for node in self.leaves:
+            type_hint_pairs, client_call_link, all_call_names = process_code_with_heuristics(node.source)
+            for pair in type_hint_pairs:
+                if pair is None:
+                    continue
+                function_name, t_val = pair
+                if t_val in ['call', 'input']:
+                    # TODO: Why do this?
+                    continue
+
+                # Type hints are known
+                if function_name in node.node_type_dict and node.node_type_dict[function_name] is not None:
+                    if "input" in node.node_type_dict[function_name]:
+                        node.node_type_dict[function_name] = [t_val]
+                    if "3call" in node.node_type_dict[function_name]:
+                        node.node_type_dict[function_name] = [t_val]
+                    if "unknown" in node.node_type_dict[function_name]:
+                        node.node_type_dict[function_name] = [t_val]
+                    else:
+                        node.node_type_dict[function_name] += [t_val]
+
+                # Call pairs
+                for call_pair in client_call_link:
+                    if call_pair is None:
+                        continue
+                    function1, function2 = call_pair
+                    # Is this the same module
+                    if function1 in node.node_type_dict and function2 in node.node_type_dict:
+                        # They share with each other
+                        function1_t_val = node.node_type_dict[function1]
+                        function2_t_val = node.node_type_dict[function2]
+
+                        if is_done(function1_t_val) and (not is_done(function2_t_val)):
+                            node.node_type_dict[function2] = function1_t_val
+                        if is_done(function2_t_val) and (not is_done(function1_t_val)):
+                            node.node_type_dict[function1] = function2_t_val
+
+                function_access_attribute_records = {}
+                for call_name in all_call_names:
+                    call_name_segments = call_name.split('.')
+                    if len(call_name_segments) < 2:
+                        continue
+
+                    if call_name_segments[0] not in node.node_type_dict:
+                        continue
+
+                    if call_name_segments[0] not in function_access_attribute_records:
+                        function_access_attribute_records[call_name_segments[0]] = [call_name_segments[1]]
+                    else:
+                        function_access_attribute_records[call_name_segments[0]] += [call_name_segments[1]]
+
+                for function_name, access_attrs in function_access_attribute_records.items():
+                    access_attrs = list(set(access_attrs))
+                    class_inferred = find_class_by_attr(list(node.node_type_dict.keys()), access_attrs)
+                    if class_inferred is not None:
+                        node.node_type_dict[function_name] = [class_inferred]
+
+    def get_types(self) -> List[dict]:
+        n_known = 0
         type_list = []
-        for file_name in self.files:
-            # Get some initial details for the file
+        for node in self.leaves:
+            # Function returns
+            for function_name, type_values in node.node_type_dict.items():
+                if type_values is None or len(type_values) == 0:
+                    continue
 
-            # Get imported types
-            imported_types, imports = ImportTypeMap(file_name).map()
+                if type_values == ['unknown']:
+                    type_list.append({
+                        'file': node.name,
+                        'line_number': node.line_numbers.get(function_name),
+                        'function': function_name,
+                        'type': {any.__name__}
+                    })
 
-            # Get class definitions
-            class_definitions = ClassDefinitionMap(file_name).map()
+                if is_done(type_values):
+                    n_known += 1
+                    # TODO: Resolve warning below
+                    type_list.append({
+                        'file': node.name,
+                        'line_number': node.line_numbers.get(function_name),
+                        'function': function_name,
+                        'type': set(type_values)
+                    })
 
-            # Get function definitions
-            function_definitions = FunctionDefinitionMap(file_name).map()
+            # Static assignments
+            for assignment in node.static_assignments:
+                type_list.append({
+                    'file': node.name,
+                    'line_number': assignment.line,
+                    'variable': assignment.name,
+                    'function': assignment.function,
+                    'type': assignment.type
+                })
 
-            # Collect information about each variable assignment
-            variables = VariableAssignmentMap(file_name).map()
-            # For the variables we known the types of, create warnings for them
-            for variable in variables:
-                print(variable.name, variable.type)
+        return type_list
 
-            # Collection information about binary operations between variables
-            binary_operations = BinaryOperationMap(file_name).map()
+    @staticmethod
+    def process_file(source: str):
+        processed_file = ProcessedFile()
+        node_type_dict = {}
+        node_type_comment = {}
+        node_type_gt = {}
+        stem_from_dict = {}
+        type_stem_links = {}
+        line_no_dict = {}
+        class2base = {}
+        static_assignments = []
 
-            # Create CFG
-            cfg_builder = CFGBuilder()
-            cfg = cfg_builder.build_from_file(
-                name='Test',
-                filepath=get_test_files()[0]
-            )
-            reversed_traversal = reversed([node for node in cfg])
-            # for node in reversed_traversal:
-            # print([n.lineno for n in node.statements])
+        # Generate AST from source
+        tree = generate_ast(source)
+        if tree is None:
+            return node_type_dict, node_type_gt, type_stem_links, node_type_comment, static_assignments, line_no_dict
 
-        return [{}]
+        split_visitor = SourceSplitVisitor()
+        return_visitor = ReturnStmtVisitor()
 
-    def __resolve_function_return(self):
-        pass
+        # Extract all function and class nodes
+        split_visitor.visit(tree)
+        assign_records = split_visitor.assign_dict
 
+        return_visitor.import_assign_records(assign_records)
+        all_methods, all_classes, import_nodes = parse_module(tree)  # TODO: This doesn't need to be a function?
+        import_dict = get_api_ref_id(import_nodes)  # TODO: Replace with import map?
 
-def resolve_name(node: any) -> Union[str, None]:
-    """
-    Resolve the string name of an AST node
-    """
-    if isinstance(node, ast.Name):
-        return node.id
-    elif isinstance(node, ast.Attribute):
-        # TODO: Attributes will have to be resolved to their classes, due to classes having same attribute names
-        return node.attr
-    elif isinstance(node, ast.Call):
-        return node.func.id
-    elif isinstance(node, ast.Constant):
-        return node.value
-    else:
-        return None
+        # Loop through function nodes
+        for function_node in all_methods:
+            function_name = function_node.name
+            line_no_dict[function_name] = function_node.lineno
+            function_source = astunparse.unparse(function_node)
 
+            # Get variable assignment types
+            assignments = VariableAssignmentMap(function_node).map()
+            for assignment in assignments:
+                assignment.function = function_name
+            static_assignments.extend(assignments)
 
-def get_test_files():
-    # Get list of test files
-    directory = os.path.join(os.path.dirname(os.path.realpath(__file__)))
-    test_file_dir = os.path.join(directory, 'test_files')
-    test_files = []
-    for f in os.listdir(test_file_dir):
-        full_path = os.path.join(test_file_dir, f)
-        test_files.append(os.path.relpath(full_path))
-    return test_files
+            assignment_dict = {v.name: v for v in static_assignments}
 
+            # Resolve binary operations by looping through them backwards
+            for variable in list(reversed(static_assignments)):
+                if variable.binary_operation is not None:
+                    # Check left
+                    left_name = variable.binary_operation.left.id
+                    if left_variable := assignment_dict.get(left_name):
+                        variable.type = left_variable.type
+                    # Check right
+                    right_name = variable.binary_operation.right.id
+                    if left_variable := assignment_dict.get(right_name):
+                        variable.type = left_variable.type
 
-def test_type_inference():
-    # Run type inference module on them
-    type_inferrer = TypeInference(get_test_files())
-    types = type_inferrer.infer_types()
+            # Get method header comment TODO: is this needed?
+            node_type_comment[function_name] = get_function_comment(function_source)
+
+            return_visitor.clear()
+            return_visitor.visit(function_node)
+            node_type_dict[function_name] = None
+            node_type_gt[function_name] = None
+
+            if return_visitor.n_returns == 0:
+                # This function has no return
+                continue
+
+            # Function has at least one return if we reach here
+            node_type_dict[function_name] = return_visitor.r_types
+            stem_from_dict[function_name] = return_visitor.stem_from
+            node_type_gt[function_name] = function_node.returns
+
+        # Loop through class nodes
+        for class_node in all_classes:
+            class_name = class_node.name
+            class_visitor = ClassSplitVisitor()
+            class_visitor.visit(class_node)
+
+            # Check for base class type
+            if len(class_node.bases) > 0:
+                if isinstance(class_node.bases[0], ast.Name):
+                    class2base[class_name] = class_node.bases[0].id
+
+            class_assign_records = class_visitor.class_assign_records
+            return_visitor.clear_all()
+            return_visitor.import_assign_records(class_assign_records)
+
+            # Loop through class methods
+            for function_node in class_visitor.fun_nodes:
+                function_name = f"{class_name}.{function_node.name}"
+                function_source = astunparse.unparse(function_node)
+                line_no_dict[function_name] = function_node.lineno
+
+                # Get method header comment TODO: Is this needed?
+                node_type_comment[function_name] = get_function_comment(function_source)
+
+                return_visitor.clear_all()
+                return_visitor.import_class_assign_records(class_assign_records)
+                return_visitor.visit(function_node)
+                node_type_dict[function_name] = None
+                node_type_gt[function_name] = None
+
+                if return_visitor.n_returns == 0:
+                    # There are no returns in this method
+                    continue
+
+                node_type_dict[function_name] = return_visitor.r_types
+                stem_from_dict[function_name] = return_visitor.stem_from
+                node_type_gt[function_name] = function_node.returns
+
+        # Loop through return statements that called another function -> see Heuristic 1
+        for function_name, stems in stem_from_dict.items():
+            stems = list(dict.fromkeys(stems))
+            for from_name in stems:
+                # From the same class
+                if from_name.find('self.') == 0:
+                    type_stem_links[function_name] = ('self', from_name)
+                elif from_name.find('super.') == 0:
+                    class_name = function_name.split('.')[0]
+                    if class_name in class2base:
+                        base_name = class2base[class_name]
+                        if base_name in import_dict:
+                            type_stem_links[function_name] = (
+                                import_dict[base_name], base_name + from_name.lstrip('super'))
+                        else:
+                            type_stem_links[function_name] = ('base', base_name + from_name.lstrip('super'))
+                    else:
+                        # TODO: Can be from other libraries too, check for imported classes
+                        pass
+                elif from_name in node_type_dict:
+                    type_stem_links[function_name] = ('local', from_name)
+                else:
+                    import_path = is_imported_fun(from_name, import_dict)
+                    if import_path is not None:
+                        type_stem_links[function_name] = (import_path, from_name)
+
+        return node_type_dict, node_type_gt, type_stem_links, node_type_comment, static_assignments, line_no_dict
+
+    def print_types(self):
+        self.infer_types()
+        inferred_types = self.get_types()
+        for case in inferred_types:
+            case_type = case.get('type')
+            file_name = case.get('file')
+            function = case.get('function')
+            line_no = case.get('line_number')
+            if var_name := case.get('variable'):
+                # We have a variable
+                print(f"{file_name}:{line_no}: Variable {var_name} in function {function} has type {case_type}")
+            else:
+                # We have a function
+                if len(case_type) > 1:
+                    case_type = f"Union[{', '.join(case_type)}]"
+                else:
+                    case_type = case_type.pop()
+                print(f"{file_name}:{line_no}: Function {function} has return type {case_type}")
 
 
 if __name__ == '__main__':
-    test_type_inference()
+    infferer = TypeInference(name='', entry_point='basecase/case5.py')
+    infferer.infer_types()
+    # print(infferer.get_types())
+    print()
+    infferer.print_types()

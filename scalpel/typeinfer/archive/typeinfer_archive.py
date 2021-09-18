@@ -220,7 +220,7 @@ class TypeInference:
 def get_test_files():
     # Get list of test files
     directory = os.path.join(os.path.dirname(os.path.realpath(__file__)))
-    test_file_dir = os.path.join(directory, 'test_files')
+    test_file_dir = os.path.join(directory, '../test_files')
     test_files = []
     for f in os.listdir(test_file_dir):
         full_path = os.path.join(test_file_dir, f)

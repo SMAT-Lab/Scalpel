@@ -3,17 +3,20 @@ Tomas Bolger 2021
 Python 3.9
 Utilities for type inference module
 """
+
 import re
 import ast
 import builtins
-from typing import Dict, Union
+from typing import Dict, Union, List
 
-from scalpel.core.func_call_visitor import get_func_calls
+from scalpel.core.func_call_visitor import get_func_calls_type
 
 
 def get_built_in_types() -> Dict:
     """
-    Returns the builtin types for Python
+    Gets Python built in types
+
+    :return: Python built in types in a dictionary
     """
     builtin_types = [getattr(builtins, d).__name__ for d in dir(builtins) if isinstance(getattr(builtins, d), type)]
     builtin_types_dict = {}
@@ -22,9 +25,15 @@ def get_built_in_types() -> Dict:
     return builtin_types_dict
 
 
-def get_type(node) -> Union[str, None]:
+def get_type(node) -> str:
+    """
+    Get the type of a node
+
+    :param node: The node to get the type of
+    :return: The type of the node
+    """
     if node is None:
-        return None
+        return any.__name__
     elif isinstance(node, str) and node[0:3] == "org":
         return node[4:]
     elif isinstance(node, ast.BoolOp):
@@ -50,6 +59,7 @@ def get_type(node) -> Union[str, None]:
             if isinstance(node.right, (ast.Constant, ast.Num, ast.List, ast.ListComp,
                                        ast.Set, ast.SetComp, ast.Dict, ast.DictComp)):
                 return get_type(node.right)
+
     if isinstance(node, ast.Name):
         if node.id == 'self':
             return "self"
@@ -77,7 +87,7 @@ def get_type(node) -> Union[str, None]:
     elif isinstance(node, ast.JoinedStr):
         return "str"
     elif isinstance(node, ast.NameConstant):
-        return "NC"
+        return any.__name__
     elif isinstance(node, ast.Constant):
         return get_type(node.value)
     elif isinstance(node, ast.Lambda):
@@ -89,7 +99,7 @@ def get_type(node) -> Union[str, None]:
     elif isinstance(node, ast.GeneratorExp):
         return "generator"
     elif isinstance(node, ast.Call):
-        func_name = get_func_calls(node)
+        func_name = get_func_calls_type(node)
         func_name = func_name[0]
         if isinstance(node.func, ast.Name):
             if node.func.id == "dict":
@@ -105,11 +115,11 @@ def get_type(node) -> Union[str, None]:
             elif node.func.id in ["id", "sum", "len", "int", "float", "ceil", "floor", "max", "min"]:
                 return "num"
             elif node.func.id in ["all", "any", "assert", "bool"]:
-                return "NC"
+                return any.__name__
             elif node.func.id in ["iter"]:
                 return "iterator"
             elif node.func.id in ["isinstance"]:
-                return "NC"
+                return any.__name__
             elif node.func.id in ['bytes']:
                 return "bytes"
             elif is_camel_case(func_name):
@@ -131,6 +141,9 @@ def get_type(node) -> Union[str, None]:
 def is_camel_case(s: str) -> bool:
     """
     Determines whether a string is written in camel case
+
+    :param s: The string to check
+    :return: True if the string is camel case, False otherwise
     """
     pattern = '([A-Z][a-z]*)+'
     if re.search(pattern, s):
@@ -139,16 +152,21 @@ def is_camel_case(s: str) -> bool:
 
 
 def parse_module(m_ast):
+    """
+    Get the function, class and import nodes for a module
+
+    :param m_ast: The AST tree to get the nodes for
+    :return: Tuple containing list of function nodes, list of class nodes and list of import nodes
+    """
     fun_nodes = []
     class_nodes = []
     import_nodes = []
 
-    for node in m_ast.body:
+    for node in ast.walk(m_ast):
         if isinstance(node, ast.FunctionDef):
             fun_nodes += [node]
         if isinstance(node, ast.ClassDef):
             class_nodes += [node]
-    for node in ast.walk(m_ast):
         if isinstance(node, ast.Import) or isinstance(node, ast.ImportFrom):
             import_nodes += [node]
 
@@ -177,9 +195,13 @@ def get_api_ref_id(import_nodes):
     return id2fullname
 
 
-def is_imported_fun(func_name, import_dict):
+def is_imported_fun(func_name: str, import_dict: dict) -> Union[str, None]:
     """
     Determines whether a function is imported from another library
+
+    :param func_name: The name of the function to check
+    :param import_dict: Dictionary of import modules
+    :return: The module that the function was import from or None if it was not imported
     """
     name_parts = func_name.split('.')
     if name_parts[0] in import_dict:
@@ -198,3 +220,77 @@ def rename_from_name(from_where, from_name, fun_name):
 
 def is_valid_call_link(t_vals):
     return all(x not in ['ID', 'call', 'unknown'] for x in t_vals)
+
+
+def generate_ast(source: str):
+    try:
+        tree = ast.parse(source, mode='exec', type_comments=True)
+        return tree
+    except Exception as e:
+        print(e)
+        return None
+
+
+def get_function_comment(source: str) -> str:
+    """
+    Get the function comment header for function source code
+
+    :param source: The function source code to check
+    :return: The function header comment
+    """
+    matches = re.findall(r"\'(.+?)\'", source)
+    comment = ""
+    if len(matches) > 0:
+        comment = matches[0]
+    return comment
+
+
+def is_done(t_vals: List[str]) -> bool:
+    """
+    Determines whether a list of type values is in a finished state
+
+    :param t_vals: List of type values to check
+    :return: True if in a finished state, False otherwise
+    """
+    return all(x not in ['ID', 'call', 'unknown', 'input', '3call'] for x in t_vals)
+
+
+def find_class_by_attr(module_records, attrs):
+    if len(attrs) < 5:
+        return None
+    class_names = [item.split('.')[0] for item in module_records if len(item.split('.')) == 2]
+    class_names = list(set(class_names))
+    for c_name in class_names:
+        if all([(c_name + '.' + x) in module_records for x in attrs]):
+            return c_name
+
+    return None
+
+
+def get_attr_name(node):
+    if isinstance(node, ast.Call):
+        return get_attr_name(node.func)
+    if isinstance(node, ast.Name):
+        return node.id
+    elif isinstance(node, ast.Attribute):
+        return get_attr_name(node.value) + "." + node.attr
+    elif isinstance(node, ast.Subscript):
+        return ""
+    return ""
+
+
+def resolve_name(node: any) -> Union[str, None]:
+    """
+    Resolve the string name of an AST node
+    """
+    if isinstance(node, ast.Name):
+        return node.id
+    elif isinstance(node, ast.Attribute):
+        # TODO: Attributes will have to be resolved to their classes, due to classes having same attribute names
+        return node.attr
+    elif isinstance(node, ast.Call):
+        return node.func.id
+    elif isinstance(node, ast.Constant):
+        return node.value
+    else:
+        return None
