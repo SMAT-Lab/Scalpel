@@ -1,12 +1,12 @@
-# Local import
+# Imported data structure
 
 # EXPECTED OUTPUT:
-# case10.py: child_class -> ChildClass
-# case10.py: my_function-> list
+# case10.py: my_default_dict -> defaultdict
+# case10.py: my_function-> defaultdict
 
-from case9 import ChildClass
+from collections import defaultdict
 
 
 def my_function():
-    child_class = ChildClass()
-    return child_class.my_function()
+    my_default_dict = defaultdict()
+    return my_default_dict

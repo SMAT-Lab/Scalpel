@@ -8,7 +8,7 @@ import ast
 import tokenize
 import typed_ast
 import typeshed_client
-from typing import List, Dict, Union
+from typing import List, Dict
 
 from scalpel.cfg import CFGBuilder
 from scalpel.typeinfer.classes import BinaryOperation, ScalpelVariable, ScalpelFunction, ScalpelClass
@@ -93,8 +93,6 @@ class ImportTypeMap(_StaticAnalyzer):
         self.root = root
 
     def map(self):
-        # TODO: Add check in here to see if import is a local file, if it is
-        #  we may have to recursively instantiate a type inference process on it
         import_mappings = {}  # Maps imported functions, variables, etc. to their types
         imports = {}  # Keeps a dictionary of imported libraries
         for node in ast.iter_child_nodes(self.root):
@@ -193,9 +191,12 @@ class VariableAssignmentMap(_StaticAnalyzer):
     Class for retrieving variable assignments
     """
 
-    def __init__(self, root):
+    def __init__(self, root, imports=None):
         super().__init__()
+        if imports is None:
+            imports = {}
         self.root = root
+        self.imports = imports  # Pass in the imported types for a files
 
     def map(self) -> List[ScalpelVariable]:
         # TODO: Ensure coverage of all variable types
@@ -216,6 +217,10 @@ class VariableAssignmentMap(_StaticAnalyzer):
                     # Assignment is to a callable
                     called = node.value.func.id  # Name of callable
 
+                    # Check to see if it is an imported callable
+                    if imported_type := self.imports.get(called):
+                        variable.type = imported_type
+
                 elif isinstance(node.value, ast.Constant):
                     # String, int, float, boolean
                     variable.type = type(node.value.value).__name__  # Determine specific type
@@ -235,7 +240,6 @@ class VariableAssignmentMap(_StaticAnalyzer):
                 elif isinstance(node.value, ast.BinOp):
                     # Assignment to result of binary operation
                     variable.binary_operation = node.value
-
                 variables.append(variable)
 
         return variables
@@ -346,7 +350,8 @@ class BinaryOperationMap(_StaticAnalyzer):
 
 
 class HeuristicParser(ast.NodeVisitor):
-    def __init__(self):
+    def __init__(self, node):
+        self.node = node
         self.assign_nodes = []
         self.import_nodes = []
         self.records = []
@@ -370,7 +375,7 @@ class HeuristicParser(ast.NodeVisitor):
         all_func_names = get_func_calls(node)
         for func_name in all_func_names:
             if func_name in id2call:
-                # this function call is a value of an assignment
+                # This function call is a value of an assignment
                 self.type_hint_pairs += [(id2call[func_name], "callable")]
 
     def visit_FunctionDef(self, node):
@@ -394,6 +399,7 @@ class HeuristicParser(ast.NodeVisitor):
         self.import_nodes.append(node)
         self.generic_visit(node)
 
+    # Heuristic 4
     def visit_While(self, node):
         if isinstance(node.test, ast.Call):
             func_name = get_func_calls(node.test)
@@ -403,6 +409,7 @@ class HeuristicParser(ast.NodeVisitor):
 
         return node
 
+    # Heuristic 5
     def visit_Compare(self, node):
         left = node.left
         right = node.comparators[0]
@@ -420,6 +427,7 @@ class HeuristicParser(ast.NodeVisitor):
         self.generic_visit(node)
         return node
 
+    # Heuristic 5
     def visit_BinOp(self, node):
         left = node.left
         right = node.right
@@ -437,6 +445,7 @@ class HeuristicParser(ast.NodeVisitor):
         self.generic_visit(node)
         return node
 
+    # Heuristic 4
     def visit_IfExp(self, node):
         if isinstance(node.test, ast.Call):
             func_name = get_func_calls(node.test)
@@ -445,6 +454,7 @@ class HeuristicParser(ast.NodeVisitor):
         self.generic_visit(node)
         return node
 
+    # Heuristic 4
     def visit_If(self, node):
         if isinstance(node.test, ast.Call):
             func_name = get_func_calls(node.test)
@@ -470,7 +480,6 @@ class SourceSplitVisitor(ast.NodeVisitor):
             self.assign_dict[left.id] = [right]
         else:
             self.assign_dict[left.id] += [right]
-
         return node
 
     def visit_FunctionDef(self, node):
@@ -514,7 +523,7 @@ class ClassSplitVisitor(ast.NodeVisitor):
 
 class ReturnStmtVisitor(ast.NodeVisitor):
 
-    def __init__(self):
+    def __init__(self, imports=None):
         self.ast_nodes = []
         self.assign_records = {}
         self.local_assign_records = {}
@@ -524,6 +533,7 @@ class ReturnStmtVisitor(ast.NodeVisitor):
         self.n_returns = 0
         self.r_types = []
         self.init_args = []
+        self.imports = imports
 
     def import_assign_records(self, assign_records):
         self.assign_records = assign_records
@@ -591,11 +601,12 @@ class ReturnStmtVisitor(ast.NodeVisitor):
                 self.r_types += ["self"]
                 return
             elif return_value.id in self.inner_fun_names:
+                # TODO: What about outer fun names or class methods
                 self.r_types += ["callable"]
                 return
 
         init_val = cfg.backward(block, return_value, is_visited, None)
-        type_val = get_type(init_val)
+        type_val = get_type(init_val, imports=self.imports)
 
         if init_val is None and isinstance(return_value, ast.Name):
             if return_value.id in self.args:
@@ -644,7 +655,7 @@ class ReturnStmtVisitor(ast.NodeVisitor):
                 if init_val.id in self.args or init_val.id in self.class_assign_records["init_arg_name_lst"]:
                     self.r_types += ['input']
         else:
-            # known type
+            # Known type
             self.r_types += [type_val]
 
     def type_infer_CFG(self, node):
@@ -719,7 +730,7 @@ class ReturnStmtVisitor(ast.NodeVisitor):
             if isinstance(node.value, ast.Name) and node.value.id in self.args:
                 self.r_types += ['input']
         else:
-            # known type
+            # Known type
             self.r_types += [type_val]
 
     def clear(self):

@@ -56,7 +56,7 @@ class BaseCaseTests(unittest.TestCase):
         infferer = TypeInference(name='case5.py', entry_point='basecase/case5.py')
         infferer.infer_types()
         inferred = infferer.get_types()
-        # TODO: Need to implement binary operation heuristic for this test case to work
+        # TODO: Need to implement binary operation heuristic for returns for this test case to work
         self.assertEqual(
             inferred,
             [{'file': 'case5.py', 'line_number': 9, 'function': 'my_function', 'type': {'int'}},
@@ -110,12 +110,11 @@ class BaseCaseTests(unittest.TestCase):
         infferer = TypeInference(name='case10.py', entry_point='basecase/case10.py')
         infferer.infer_types()
         inferred = infferer.get_types()
-        # TODO: Local imports not working
         self.assertEqual(
             inferred,
-            [{'file': 'case10.py', 'line_number': 11, 'variable': 'child_class',
-              'function': 'my_function', 'type': 'ChildClass'},
-             {'file': 'case10.py', 'line_number': 10, 'function': 'my_function', 'type': {'list'}}]
+            [{'file': 'case10.py', 'line_number': 10, 'function': 'my_function', 'type': {'defaultdict'}},
+             {'file': 'case10.py', 'line_number': 11, 'variable': 'my_default_dict', 'function': 'my_function',
+              'type': 'defaultdict'}]
         )
 
 

@@ -25,11 +25,12 @@ def get_built_in_types() -> Dict:
     return builtin_types_dict
 
 
-def get_type(node) -> str:
+def get_type(node, imports=None) -> str:
     """
     Get the type of a node
 
     :param node: The node to get the type of
+    :param imports: Dictionary of known imported types
     :return: The type of the node
     """
     if node is None:
@@ -101,7 +102,10 @@ def get_type(node) -> str:
     elif isinstance(node, ast.Call):
         func_name = get_func_calls_type(node)
         func_name = func_name[0]
-        if isinstance(node.func, ast.Name):
+        # Check to see if it is an imported callable
+        if imported_type := imports.get(func_name):
+            return imported_type
+        elif isinstance(node.func, ast.Name):
             if node.func.id == "dict":
                 return "dict"
             elif node.func.id == "list":

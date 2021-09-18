@@ -3,7 +3,9 @@ Tree and import graph for type inference
 """
 
 import os
-from scalpel.core.source_visitor import *
+import ast
+
+from scalpel.core.source_visitor import SourceVisitor
 
 
 class Tree:

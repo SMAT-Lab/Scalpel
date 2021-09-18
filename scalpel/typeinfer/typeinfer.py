@@ -13,6 +13,7 @@ from scalpel.typeinfer.visitors import get_call_type
 from scalpel.typeinfer.classes import ProcessedFile
 from scalpel.typeinfer.analysers import (
     VariableAssignmentMap,
+    ImportTypeMap,
     SourceSplitVisitor,
     ClassSplitVisitor,
     ReturnStmtVisitor,
@@ -32,7 +33,7 @@ from scalpel.typeinfer.utilities import (
 )
 
 
-def process_code_with_heuristics(source):
+def process_code_with_heuristics(node):
     def pick_type(type_lst):
         base_type_names = ["Num", "Set", "List", "Tuple", "Dict", "Str", "NameConstant"]
         new_type_lst = []
@@ -56,8 +57,8 @@ def process_code_with_heuristics(source):
         return type_hint_pair_list
 
     try:
-        tree = ast.parse(source, mode='exec')
-        visitor = HeuristicParser()
+        tree = ast.parse(node.source, mode='exec')
+        visitor = HeuristicParser(node)
         visitor.visit(tree)
         func_arg_db = {}
         function_arg_types = get_call_type(tree)
@@ -120,13 +121,12 @@ class TypeInference:
 
         # Loop through leaves
         for node in self.leaves:
-            node_type_dict, node_type_gt, type_stem_links, node_type_comment, static_assignments, line_numbers = self.process_file(
-                node.source)
-            node.node_type_dict = node_type_dict
-            node.node_type_gt = node_type_gt
-            node.call_links = type_stem_links
-            node.static_assignments = static_assignments
-            node.line_numbers = line_numbers
+            processed_file = self.process_file(node.source)
+            node.node_type_dict = processed_file.type_dict
+            node.node_type_gt = processed_file.type_gt
+            node.call_links = processed_file.type_stem_links
+            node.static_assignments = processed_file.static_assignments
+            node.line_numbers = processed_file.line_numbers
 
         # Reconcile across all leaves
         for node in self.leaves:
@@ -162,7 +162,7 @@ class TypeInference:
 
         # Finalise function return types
         for node in self.leaves:
-            type_hint_pairs, client_call_link, all_call_names = process_code_with_heuristics(node.source)
+            type_hint_pairs, client_call_link, all_call_names = process_code_with_heuristics(node)
             for pair in type_hint_pairs:
                 if pair is None:
                     continue
@@ -227,13 +227,14 @@ class TypeInference:
                 if type_values is None or len(type_values) == 0:
                     continue
 
-                if type_values == ['unknown']:
-                    type_list.append({
-                        'file': node.name,
-                        'line_number': node.line_numbers.get(function_name),
-                        'function': function_name,
-                        'type': {any.__name__}
-                    })
+                for value in type_values:
+                    if value in ['unknown', '3call']:
+                        type_list.append({
+                            'file': node.name,
+                            'line_number': node.line_numbers.get(function_name),
+                            'function': function_name,
+                            'type': {any.__name__}
+                        })
 
                 if is_done(type_values):
                     n_known += 1
@@ -260,22 +261,20 @@ class TypeInference:
     @staticmethod
     def process_file(source: str):
         processed_file = ProcessedFile()
-        node_type_dict = {}
-        node_type_comment = {}
-        node_type_gt = {}
+
         stem_from_dict = {}
-        type_stem_links = {}
-        line_no_dict = {}
         class2base = {}
-        static_assignments = []
 
         # Generate AST from source
         tree = generate_ast(source)
         if tree is None:
-            return node_type_dict, node_type_gt, type_stem_links, node_type_comment, static_assignments, line_no_dict
+            return processed_file
+
+        # Get imported types
+        import_mappings, imported = ImportTypeMap(tree).map()
 
         split_visitor = SourceSplitVisitor()
-        return_visitor = ReturnStmtVisitor()
+        return_visitor = ReturnStmtVisitor(imports=import_mappings)
 
         # Extract all function and class nodes
         split_visitor.visit(tree)
@@ -288,19 +287,19 @@ class TypeInference:
         # Loop through function nodes
         for function_node in all_methods:
             function_name = function_node.name
-            line_no_dict[function_name] = function_node.lineno
+            processed_file.line_numbers[function_name] = function_node.lineno
             function_source = astunparse.unparse(function_node)
 
             # Get variable assignment types
-            assignments = VariableAssignmentMap(function_node).map()
+            assignments = VariableAssignmentMap(function_node, imports=import_mappings).map()
             for assignment in assignments:
                 assignment.function = function_name
-            static_assignments.extend(assignments)
+            processed_file.static_assignments.extend(assignments)
 
-            assignment_dict = {v.name: v for v in static_assignments}
+            assignment_dict = {v.name: v for v in processed_file.static_assignments}
 
             # Resolve binary operations by looping through them backwards
-            for variable in list(reversed(static_assignments)):
+            for variable in list(reversed(processed_file.static_assignments)):
                 if variable.binary_operation is not None:
                     # Check left
                     left_name = variable.binary_operation.left.id
@@ -312,21 +311,21 @@ class TypeInference:
                         variable.type = left_variable.type
 
             # Get method header comment TODO: is this needed?
-            node_type_comment[function_name] = get_function_comment(function_source)
+            processed_file.node_type_comment[function_name] = get_function_comment(function_source)
 
             return_visitor.clear()
             return_visitor.visit(function_node)
-            node_type_dict[function_name] = None
-            node_type_gt[function_name] = None
+            processed_file.type_dict[function_name] = None
+            processed_file.type_gt[function_name] = None
 
             if return_visitor.n_returns == 0:
                 # This function has no return
                 continue
 
             # Function has at least one return if we reach here
-            node_type_dict[function_name] = return_visitor.r_types
+            processed_file.type_dict[function_name] = return_visitor.r_types
             stem_from_dict[function_name] = return_visitor.stem_from
-            node_type_gt[function_name] = function_node.returns
+            processed_file.type_gt[function_name] = function_node.returns
 
         # Loop through class nodes
         for class_node in all_classes:
@@ -347,24 +346,24 @@ class TypeInference:
             for function_node in class_visitor.fun_nodes:
                 function_name = f"{class_name}.{function_node.name}"
                 function_source = astunparse.unparse(function_node)
-                line_no_dict[function_name] = function_node.lineno
+                processed_file.line_numbers[function_name] = function_node.lineno
 
                 # Get method header comment TODO: Is this needed?
-                node_type_comment[function_name] = get_function_comment(function_source)
+                processed_file.node_type_comment[function_name] = get_function_comment(function_source)
 
                 return_visitor.clear_all()
                 return_visitor.import_class_assign_records(class_assign_records)
                 return_visitor.visit(function_node)
-                node_type_dict[function_name] = None
-                node_type_gt[function_name] = None
+                processed_file.type_dict[function_name] = None
+                processed_file.type_gt[function_name] = None
 
                 if return_visitor.n_returns == 0:
                     # There are no returns in this method
                     continue
 
-                node_type_dict[function_name] = return_visitor.r_types
+                processed_file.type_dict[function_name] = return_visitor.r_types
                 stem_from_dict[function_name] = return_visitor.stem_from
-                node_type_gt[function_name] = function_node.returns
+                processed_file.type_gt[function_name] = function_node.returns
 
         # Loop through return statements that called another function -> see Heuristic 1
         for function_name, stems in stem_from_dict.items():
@@ -372,27 +371,27 @@ class TypeInference:
             for from_name in stems:
                 # From the same class
                 if from_name.find('self.') == 0:
-                    type_stem_links[function_name] = ('self', from_name)
+                    processed_file.type_stem_links[function_name] = ('self', from_name)
                 elif from_name.find('super.') == 0:
                     class_name = function_name.split('.')[0]
                     if class_name in class2base:
                         base_name = class2base[class_name]
                         if base_name in import_dict:
-                            type_stem_links[function_name] = (
+                            processed_file.type_stem_links[function_name] = (
                                 import_dict[base_name], base_name + from_name.lstrip('super'))
                         else:
-                            type_stem_links[function_name] = ('base', base_name + from_name.lstrip('super'))
+                            processed_file.type_stem_links[function_name] = ('base', base_name + from_name.lstrip('super'))
                     else:
                         # TODO: Can be from other libraries too, check for imported classes
                         pass
-                elif from_name in node_type_dict:
-                    type_stem_links[function_name] = ('local', from_name)
+                elif from_name in processed_file.type_dict:
+                    processed_file.type_stem_links[function_name] = ('local', from_name)
                 else:
                     import_path = is_imported_fun(from_name, import_dict)
                     if import_path is not None:
-                        type_stem_links[function_name] = (import_path, from_name)
+                        processed_file.type_stem_links[function_name] = (import_path, from_name)
 
-        return node_type_dict, node_type_gt, type_stem_links, node_type_comment, static_assignments, line_no_dict
+        return processed_file
 
     def print_types(self):
         self.infer_types()
@@ -415,8 +414,8 @@ class TypeInference:
 
 
 if __name__ == '__main__':
-    infferer = TypeInference(name='', entry_point='basecase/case5.py')
+    infferer = TypeInference(name='', entry_point='basecase/case10.py')
     infferer.infer_types()
-    # print(infferer.get_types())
+    print(infferer.get_types())
     print()
     infferer.print_types()
