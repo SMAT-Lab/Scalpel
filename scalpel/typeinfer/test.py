@@ -35,10 +35,10 @@ class BaseCaseTests(unittest.TestCase):
         infferer = TypeInference(name='case3.py', entry_point='basecase/case3.py')
         infferer.infer_types()
         inferred = infferer.get_types()
-        # TODO: Argument 'my_bool' needs to have its type inferred
         self.assertEqual(
             inferred,
             [{'file': 'case3.py', 'line_number': 8, 'function': 'my_function', 'type': {'str', 'int'}},
+             {'file': 'case3.py', 'line_number': 8, 'parameter': 'my_bool', 'function': 'my_function', 'type': 'any'},
              {'file': 'case3.py', 'line_number': 10, 'variable': 'my_int', 'function': 'my_function', 'type': 'int'},
              {'file': 'case3.py', 'line_number': 13, 'variable': 'my_str', 'function': 'my_function', 'type': 'str'}]
         )
@@ -114,6 +114,32 @@ class BaseCaseTests(unittest.TestCase):
             [{'file': 'case10.py', 'line_number': 10, 'function': 'my_function', 'type': {'defaultdict'}},
              {'file': 'case10.py', 'line_number': 11, 'variable': 'my_default_dict', 'function': 'my_function',
               'type': 'defaultdict'}]
+        )
+
+    def test_case_11(self):
+        infferer = TypeInference(name='case11.py', entry_point='basecase/case11.py')
+        infferer.infer_types()
+        inferred = infferer.get_types()
+        self.assertEqual(
+            inferred,
+            [{'file': 'case11.py', 'line_number': 7, 'function': 'my_function', 'type': {'int', 'str'}},
+             {'file': 'case11.py', 'line_number': 7, 'parameter': 'my_bool', 'function': 'my_function', 'type': 'any'},
+             {'file': 'case11.py', 'line_number': 9, 'variable': 'x', 'function': 'my_function', 'type': 'int'},
+             {'file': 'case11.py', 'line_number': 11, 'variable': 'x', 'function': 'my_function', 'type': 'str'}]
+        )
+
+    def test_case_12(self):
+        infferer = TypeInference(name='case12.py', entry_point='basecase/case12.py')
+        infferer.infer_types()
+        inferred = infferer.get_types()
+        self.assertEqual(
+            inferred,
+            [{'file': 'case12.py', 'line_number': 1, 'function': 'my_function', 'type': {'int'}},
+             {'file': 'case12.py', 'line_number': 1, 'parameter': 'my_val', 'function': 'my_function', 'type': 'int'},
+             {'file': 'case12.py', 'line_number': 2, 'variable': 'x', 'function': 'my_function', 'type': 'int'},
+             {'file': 'case12.py', 'line_number': 3, 'variable': 'y', 'function': 'my_function', 'type': 'int'},
+             {'file': 'case12.py', 'line_number': 4, 'variable': 'g', 'function': 'my_function', 'type': 'int'},
+             {'file': 'case12.py', 'line_number': 5, 'variable': 'z', 'function': 'my_function', 'type': 'int'}]
         )
 
 

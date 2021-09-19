@@ -30,7 +30,7 @@ class ScalpelVariable:
     is_callable: bool = False  # Whether the variable has been called as a function
     called_methods: List[str] = None  # List of methods called from the variable
     binary_operation: ast.BinOp = None  # Binary operation assignment
-
+    is_arg: bool = None  # Whether the variable is an argument in a function
 
 @dataclass
 class ScalpelFunction:

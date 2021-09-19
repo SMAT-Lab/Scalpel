@@ -10,7 +10,7 @@ import astunparse
 from typing import List
 
 from scalpel.typeinfer.visitors import get_call_type
-from scalpel.typeinfer.classes import ProcessedFile
+from scalpel.typeinfer.classes import ProcessedFile, ScalpelVariable
 from scalpel.typeinfer.analysers import (
     VariableAssignmentMap,
     ImportTypeMap,
@@ -248,18 +248,26 @@ class TypeInference:
 
             # Static assignments
             for assignment in node.static_assignments:
-                type_list.append({
-                    'file': node.name,
-                    'line_number': assignment.line,
-                    'variable': assignment.name,
-                    'function': assignment.function,
-                    'type': assignment.type
-                })
+                if assignment.is_arg:
+                    type_list.append({
+                        'file': node.name,
+                        'line_number': assignment.line,
+                        'parameter': assignment.name,
+                        'function': assignment.function,
+                        'type': assignment.type
+                    })
+                else:
+                    type_list.append({
+                        'file': node.name,
+                        'line_number': assignment.line,
+                        'variable': assignment.name,
+                        'function': assignment.function,
+                        'type': assignment.type
+                    })
 
         return type_list
 
-    @staticmethod
-    def process_file(source: str):
+    def process_file(self, source: str):
         processed_file = ProcessedFile()
 
         stem_from_dict = {}
@@ -297,13 +305,19 @@ class TypeInference:
                 assignment.function = function_name
             processed_file.static_assignments.extend(assignments)
 
+            param_list = [v for v in assignments if v.is_arg]
             assignment_dict = {v.name: v for v in processed_file.static_assignments}
 
             # Heuristic 5 Resolve binary operations by looping through them backwards
             for variable in list(reversed(processed_file.static_assignments)):
                 if variable.binary_operation is not None:
+                    # Get left and right for the binary operation
                     left_operation = variable.binary_operation.left
                     right_operation = variable.binary_operation.right
+
+                    # Check for involved parameters
+                    involved_params = [i for i in param_list if self.in_bin_op(i, variable.binary_operation)]
+
                     if isinstance(left_operation, ast.BinOp):
                         # Greater than two values in the operation
                         bin_op_types = {}
@@ -317,7 +331,11 @@ class TypeInference:
 
                         # Check type list for types
                         if len(bin_op_types.keys()) == 1:
-                            variable.type = list(bin_op_types.keys()).pop()
+                            type_value = list(bin_op_types.keys()).pop()
+                            variable.type = type_value
+                            # Set involved parameters types
+                            for i in involved_params:
+                                i.type = type_value
                         else:
                             # TODO: Check for compatible types e.g. float and str
                             # TODO: Check for mismatched types and raise error
@@ -332,6 +350,8 @@ class TypeInference:
                         right_name = right_operation.id
                         if right_variable := assignment_dict.get(right_name):
                             variable.type = right_variable.type
+
+            # Heuristic
 
             # Import resolved assignments to the return visitor
             return_visitor.import_assignments(assignments)
@@ -406,7 +426,8 @@ class TypeInference:
                             processed_file.type_stem_links[function_name] = (
                                 import_dict[base_name], base_name + from_name.lstrip('super'))
                         else:
-                            processed_file.type_stem_links[function_name] = ('base', base_name + from_name.lstrip('super'))
+                            processed_file.type_stem_links[function_name] = (
+                            'base', base_name + from_name.lstrip('super'))
                     else:
                         # TODO: Can be from other libraries too, check for imported classes
                         pass
@@ -419,6 +440,29 @@ class TypeInference:
 
         return processed_file
 
+    @staticmethod
+    def in_bin_op(variable: ScalpelVariable, binary_operation: ast.BinOp):
+        """
+        Determines whether a variable is featured in a binary operation
+        :param variable: The variable to check for
+        :param binary_operation: The binary operation to check
+        :return: True if it is within the binary operation, false otherwise
+        """
+        left_operation = binary_operation.left
+        right_operation = binary_operation.right
+        if isinstance(left_operation, ast.BinOp):
+            # Greater than two values in the operation
+            while isinstance(left_operation, ast.BinOp):
+                right_name = left_operation.right.id
+                if right_name == variable.name:
+                    return True
+                # Move to next right operation
+                left_operation = left_operation.left
+        if left_operation.id == variable.name or right_operation.id == variable.name:
+            return True
+        return False
+
+
     def print_types(self):
         self.infer_types()
         inferred_types = self.get_types()
@@ -430,6 +474,9 @@ class TypeInference:
             if var_name := case.get('variable'):
                 # We have a variable
                 print(f"{file_name}:{line_no}: Variable {var_name} in function {function} has type {case_type}")
+            elif param_name := case.get('parameter'):
+                # We have a parameter
+                print(f"{file_name}:{line_no}: Parameter {param_name} of function {function} has type {case_type}")
             else:
                 # We have a function
                 if len(case_type) > 1:
@@ -440,7 +487,7 @@ class TypeInference:
 
 
 if __name__ == '__main__':
-    inferrer = TypeInference(name='', entry_point='basecase/case12.py')
+    inferrer = TypeInference(name='', entry_point='basecase/case4.py')
     inferrer.infer_types()
 
     for t in inferrer.get_types():

@@ -203,7 +203,19 @@ class VariableAssignmentMap(_StaticAnalyzer):
         # TODO: Double variable assignment, e.g. if True: x = 5; else: x = "Hello";
         variables = []
         for node in ast.walk(self.root):
-            if isinstance(node, ast.Assign) and isinstance(node.targets[0], ast.Name):
+            if isinstance(node, ast.FunctionDef):
+                # Function arguments
+                for arg in node.args.args:
+                    if arg.arg != 'self':
+                        variable = ScalpelVariable(
+                            name=arg.arg,
+                            function=node.name,
+                            line=node.lineno,
+                            type=any.__name__,
+                            is_arg=True
+                        )
+                        variables.append(variable)
+            elif isinstance(node, ast.Assign) and isinstance(node.targets[0], ast.Name):
 
                 variable_name = node.targets[0].id
                 assignment_type = any.__name__
@@ -622,10 +634,10 @@ class ReturnStmtVisitor(ast.NodeVisitor):
 
         if isinstance(return_value, ast.Name):
             # Check to see if we have the return in our list of assignments
-            assignment_dict = {v.name: v for v in self.assignments}
-            if variable := assignment_dict.get(return_value.id):
-                self.r_types += [variable.type]
-                return
+            for assignment in self.assignments:
+                if assignment.name == return_value.id:
+                    self.r_types += [assignment.type]
+            return
 
         if type_val in ["ID", "attr"]:
             # TODO: Is block.id correct here?
@@ -669,7 +681,6 @@ class ReturnStmtVisitor(ast.NodeVisitor):
         else:
             # Known type
             self.r_types += [type_val]
-
 
     def type_infer_CFG(self, node):
         new_body = []
