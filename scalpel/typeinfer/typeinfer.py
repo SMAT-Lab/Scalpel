@@ -301,24 +301,27 @@ class TypeInference:
 
             # Heuristic 5 Resolve binary operations by looping through them backwards
             for variable in list(reversed(processed_file.static_assignments)):
-
                 if variable.binary_operation is not None:
                     left_operation = variable.binary_operation.left
                     right_operation = variable.binary_operation.right
-
                     if isinstance(left_operation, ast.BinOp):
                         # Greater than two values in the operation
-                        type_list = []
+                        bin_op_types = {}
                         while isinstance(left_operation, ast.BinOp):
-                            right_name = left_operation.left.id
+                            right_name = left_operation.right.id
                             if right_variable := assignment_dict.get(right_name):
-                                type_list.append(right_variable.type)
+                                bin_op_types[right_variable.type] = True
 
                             # Move to next right operation
                             left_operation = left_operation.left
 
                         # Check type list for types
-                        print(type_list)
+                        if len(bin_op_types.keys()) == 1:
+                            variable.type = list(bin_op_types.keys()).pop()
+                        else:
+                            # TODO: Check for compatible types e.g. float and str
+                            # TODO: Check for mismatched types and raise error
+                            pass
 
                     else:
                         # Check left
@@ -347,7 +350,6 @@ class TypeInference:
 
             # Function has at least one return if we reach here
             processed_file.type_dict[function_name] = return_visitor.r_types
-            print(return_visitor.r_types)
             stem_from_dict[function_name] = return_visitor.stem_from
             processed_file.type_gt[function_name] = function_node.returns
 
@@ -438,7 +440,7 @@ class TypeInference:
 
 
 if __name__ == '__main__':
-    inferrer = TypeInference(name='', entry_point='basecase/case1.py')
+    inferrer = TypeInference(name='', entry_point='basecase/case12.py')
     inferrer.infer_types()
 
     for t in inferrer.get_types():
