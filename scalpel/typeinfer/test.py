@@ -134,12 +134,44 @@ class BaseCaseTests(unittest.TestCase):
         inferred = infferer.get_types()
         self.assertEqual(
             inferred,
-            [{'file': 'case12.py', 'line_number': 1, 'function': 'my_function', 'type': {'int'}},
-             {'file': 'case12.py', 'line_number': 1, 'parameter': 'my_val', 'function': 'my_function', 'type': 'int'},
-             {'file': 'case12.py', 'line_number': 2, 'variable': 'x', 'function': 'my_function', 'type': 'int'},
-             {'file': 'case12.py', 'line_number': 3, 'variable': 'y', 'function': 'my_function', 'type': 'int'},
-             {'file': 'case12.py', 'line_number': 4, 'variable': 'g', 'function': 'my_function', 'type': 'int'},
-             {'file': 'case12.py', 'line_number': 5, 'variable': 'z', 'function': 'my_function', 'type': 'int'}]
+            [{'file': 'case12.py', 'line_number': 12, 'function': 'my_function', 'type': {'int'}},
+             {'file': 'case12.py', 'line_number': 12, 'parameter': 'my_val', 'function': 'my_function', 'type': 'int'},
+             {'file': 'case12.py', 'line_number': 13, 'variable': 'x', 'function': 'my_function', 'type': 'int'},
+             {'file': 'case12.py', 'line_number': 14, 'variable': 'y', 'function': 'my_function', 'type': 'int'},
+             {'file': 'case12.py', 'line_number': 15, 'variable': 'g', 'function': 'my_function', 'type': 'int'},
+             {'file': 'case12.py', 'line_number': 16, 'variable': 'z', 'function': 'my_function', 'type': 'int'}]
+        )
+
+    def test_case_13(self):
+        infferer = TypeInference(name='case13.py', entry_point='basecase/case13.py')
+        infferer.infer_types()
+        inferred = infferer.get_types()
+        self.assertEqual(
+            inferred,
+            [{'file': 'case13.py', 'line_number': 8, 'function': 'first_function', 'type': {'str'}},
+             {'file': 'case13.py', 'line_number': 12, 'function': 'second_function', 'type': {'str'}},
+             {'file': 'case13.py', 'line_number': 16, 'function': 'third_function', 'type': {'str'}}]
+        )
+
+    def test_case_14(self):
+        infferer = TypeInference(name='case14.py', entry_point='basecase/case14.py')
+        infferer.infer_types()
+        inferred = infferer.get_types()
+        self.assertEqual(
+            inferred,
+            [{'file': 'case14.py', 'line_number': 8, 'function': 'my_function', 'type': {'int'}},
+             {'file': 'case14.py', 'line_number': 9, 'variable': 'x', 'function': 'my_function', 'type': 'int'},
+             {'file': 'case14.py', 'line_number': 10, 'variable': 'z', 'function': 'my_function', 'type': 'int'}]
+        )
+
+    def test_case_15(self):
+        infferer = TypeInference(name='case15.py', entry_point='basecase/case15.py')
+        infferer.infer_types()
+        inferred = infferer.get_types()
+        self.assertEqual(
+            inferred,
+            [{'file': 'case15.py', 'line_number': 11, 'function': 'my_function', 'type': {'str'}},
+             {'file': 'case15.py', 'line_number': 12, 'variable': 'x', 'function': 'my_function', 'type': 'str'}]
         )
 
 

@@ -76,3 +76,4 @@ class ProcessedFile:
     node_type_comment: dict = field(default_factory=dict)
     static_assignments: list = field(default_factory=list)
     line_numbers: dict = field(default_factory=dict)
+    imports: dict = field(default_factory=dict)

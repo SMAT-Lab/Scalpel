@@ -639,6 +639,16 @@ class ReturnStmtVisitor(ast.NodeVisitor):
                     self.r_types += [assignment.type]
             return
 
+        if isinstance(return_value, ast.BinOp):
+            heuristics = Heuristics()
+            return_type = heuristics.heuristic_five_return(
+                import_mappings=self.imports,
+                assignments=self.assignments,
+                return_node=return_value
+            )
+            self.r_types += [return_type]
+            return
+
         if type_val in ["ID", "attr"]:
             # TODO: Is block.id correct here?
             lookup_name = block.id if type_val == "ID" else get_attr_name(init_val)
@@ -769,3 +779,131 @@ class ReturnStmtVisitor(ast.NodeVisitor):
     def clear_all(self):
         self.clear()
         self.class_assign_records = {}
+
+
+class Heuristics:
+    def heuristic_five(self, import_mappings, processed_file, function_node):
+        # Perform heuristic five within a function
+        assignments = VariableAssignmentMap(function_node, imports=import_mappings).map()
+
+        for assignment in assignments:
+            assignment.function = function_node.name
+        processed_file.static_assignments.extend(assignments)
+
+        param_list = [v for v in assignments if v.is_arg]
+        assignment_dict = {v.name: v for v in processed_file.static_assignments}
+        for variable in list(reversed(processed_file.static_assignments)):
+            if variable.binary_operation is not None:
+                # Get left and right for the binary operation
+                left_operation = variable.binary_operation.left
+                right_operation = variable.binary_operation.right
+
+                # Check for involved parameters
+                involved_params = [i for i in param_list if self.in_bin_op(i, variable.binary_operation)]
+
+                if isinstance(left_operation, ast.BinOp):
+                    # Greater than two values in the operation
+                    bin_op_types = {}
+                    while isinstance(left_operation, ast.BinOp):
+
+                        if isinstance(right_operation, ast.Name):
+                            # Named variable
+                            right_name = left_operation.right.id
+                            if right_variable := assignment_dict.get(right_name):
+                                bin_op_types[right_variable.type] = True
+                        elif isinstance(right_operation, ast.Constant):
+                            # Constant value, e.g. 25 as an integer of 'Hello World!' as a string
+                            bin_op_types[type(right_operation.value).__name__] = True
+                        # Move to next left operation
+                        left_operation = left_operation.left
+
+                    # Check type list for types
+                    if len(bin_op_types.keys()) == 1:
+                        type_value = list(bin_op_types.keys()).pop()
+                        variable.type = type_value
+                        # Set involved parameters types
+                        for i in involved_params:
+                            i.type = type_value
+                    else:
+                        # TODO: Check for compatible types e.g. float and str
+                        # TODO: Check for mismatched types and raise error
+                        pass
+
+                else:
+                    # Check left
+                    if isinstance(left_operation, ast.Name):
+                        left_name = left_operation.id
+                        if left_variable := assignment_dict.get(left_name):
+                            variable.type = left_variable.type
+                    elif isinstance(left_operation, ast.Constant):
+                        variable.type = type(left_operation.value).__name__
+
+                    # Check right
+                    if isinstance(right_operation, ast.Name):
+                        right_name = right_operation.id
+                        if right_variable := assignment_dict.get(right_name):
+                            variable.type = right_variable.type
+                    elif isinstance(right_operation, ast.Constant):
+                        variable.type = type(right_operation.value).__name__
+
+        return assignments
+
+    def heuristic_five_return(self, import_mappings, assignments, return_node: ast.BinOp):
+        # Perform heuristic five on a returned binary operation
+        involved = self.get_bin_op_involved(return_node)
+
+        # Check involved for known types
+        for i in involved:
+            if isinstance(i, ast.Name):
+                # Named variable, see if it is a known type
+                assignment_dict = {v.name: v for v in assignments}
+                if assignment := assignment_dict.get(i.id):
+                    if assignment.type != 'any':
+                        return assignment.type
+                # TODO: Check for imported type name
+            elif isinstance(i, ast.Constant):
+                # Constant, check its type
+                return type(i.value).__name__
+
+
+    @staticmethod
+    def get_bin_op_involved(binary_operation: ast.BinOp):
+        """
+        Get list of variables/constants/callables involved in a binary operation
+        :param binary_operation: The binary operation to get the names for
+        :return: List of variable/constants/callables
+        """
+        involved = []
+        left_operation = binary_operation.left
+        right_operation = binary_operation.right
+        involved.append(right_operation)
+        if isinstance(left_operation, ast.BinOp):
+            # Greater than two values in the operation
+            while isinstance(left_operation, ast.BinOp):
+                involved.append(left_operation.right)
+                # Move to next left operation
+                left_operation = left_operation.left
+        involved.append(left_operation)
+        return involved
+
+    @staticmethod
+    def in_bin_op(variable: ScalpelVariable, binary_operation: ast.BinOp):
+        """
+        Determines whether a variable is featured in a binary operation
+        :param variable: The variable to check for
+        :param binary_operation: The binary operation to check
+        :return: True if it is within the binary operation, false otherwise
+        """
+        left_operation = binary_operation.left
+        right_operation = binary_operation.right
+        if isinstance(left_operation, ast.BinOp):
+            # Greater than two values in the operation
+            while isinstance(left_operation, ast.BinOp):
+                right_name = left_operation.right.id
+                if right_name == variable.name:
+                    return True
+                # Move to next right operation
+                left_operation = left_operation.left
+        if left_operation.id == variable.name or right_operation.id == variable.name:
+            return True
+        return False
