@@ -7,9 +7,84 @@ Utilities for type inference module
 import re
 import ast
 import builtins
+from copy import deepcopy
+from collections import deque
 from typing import Dict, Union, List
 
-from scalpel.core.func_call_visitor import get_func_calls_type
+
+def get_func_calls_type(tree):
+    node = deepcopy(tree)
+    transformer = TypeInferCallTransformer()
+    transformer.visit(node)
+    return transformer.call_names
+
+
+class TypeInferCallTransformer(ast.NodeTransformer):
+    def __init__(self):
+        self.call_names = []
+
+    # def visit_FunctionDef(self, node):
+    #    node.decorator_list = []
+    #    self.generic_visit(node)
+    #    return node
+
+    def visit_Attribute(self, node):
+        #        self.generic_visit(node.value)
+        return node
+
+    def visit_Call(self, node):
+
+        tmp_fun_node = deepcopy(node)
+        tmp_fun_node.args = []
+        tmp_fun_node.keywords = []
+
+        callvisitor = FuncCallVisitor()
+        callvisitor.visit(tmp_fun_node)
+
+        self.call_names += [callvisitor.name]
+        for arg in node.args:
+            self.generic_visit(arg)
+
+        for kw in node.keywords:
+            self.generic_visit(kw)
+        self.generic_visit(tmp_fun_node)
+
+        return node
+
+
+class FuncCallVisitor(ast.NodeVisitor):
+    def __init__(self):
+        self._name = deque()
+        self.call_names = []
+
+    def clear(self):
+        self._name = deque()
+        self.call_names = []
+
+    @property
+    def name(self):
+        return '.'.join(self._name)
+
+    @name.deleter
+    def name(self):
+        self._name.clear()
+
+    def visit_Name(self, node):
+        self._name.appendleft(node.id)
+
+    def visit_Attribute(self, node):
+
+        try:
+            self._name.appendleft(node.attr)
+            self._name.appendleft(node.value.id)
+        except AttributeError as e:
+            self.generic_visit(node)
+
+    def visit_Call(self, node):
+        node.args = []
+        node.keywords = []
+        self.generic_visit(node)
+        return node
 
 
 def get_built_in_types() -> Dict:
