@@ -200,6 +200,7 @@ class VariableAssignmentMap(_StaticAnalyzer):
 
     def map(self) -> List[ScalpelVariable]:
         # TODO: Ensure coverage of all variable types
+        # TODO: Double variable assignment, e.g. if True: x = 5; else: x = "Hello";
         variables = []
         for node in ast.walk(self.root):
             if isinstance(node, ast.Assign) and isinstance(node.targets[0], ast.Name):

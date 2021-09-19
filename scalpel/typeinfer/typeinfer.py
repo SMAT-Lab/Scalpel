@@ -414,7 +414,7 @@ class TypeInference:
 
 
 if __name__ == '__main__':
-    infferer = TypeInference(name='', entry_point='basecase/case10.py')
+    infferer = TypeInference(name='', entry_point='basecase/case11.py')
     infferer.infer_types()
     print(infferer.get_types())
     print()
