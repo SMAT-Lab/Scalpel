@@ -292,23 +292,28 @@ class TypeInference:
 
             # Get variable assignment types
             assignments = VariableAssignmentMap(function_node, imports=import_mappings).map()
+
             for assignment in assignments:
                 assignment.function = function_name
             processed_file.static_assignments.extend(assignments)
 
             assignment_dict = {v.name: v for v in processed_file.static_assignments}
 
-            # Resolve binary operations by looping through them backwards
+            # Heuristic 5 Resolve binary operations by looping through them backwards
             for variable in list(reversed(processed_file.static_assignments)):
+                print(variable)
+
                 if variable.binary_operation is not None:
+                    # TODO: Add logic for multiple binary operations
+                    print(variable.binary_operation)
                     # Check left
                     left_name = variable.binary_operation.left.id
                     if left_variable := assignment_dict.get(left_name):
                         variable.type = left_variable.type
                     # Check right
                     right_name = variable.binary_operation.right.id
-                    if left_variable := assignment_dict.get(right_name):
-                        variable.type = left_variable.type
+                    if right_variable := assignment_dict.get(right_name):
+                        variable.type = right_variable.type
 
             # Get method header comment TODO: is this needed?
             processed_file.node_type_comment[function_name] = get_function_comment(function_source)
@@ -414,7 +419,7 @@ class TypeInference:
 
 
 if __name__ == '__main__':
-    infferer = TypeInference(name='', entry_point='basecase/case11.py')
+    infferer = TypeInference(name='', entry_point='basecase/case10.py')
     infferer.infer_types()
     print(infferer.get_types())
     print()
