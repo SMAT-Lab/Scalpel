@@ -301,19 +301,37 @@ class TypeInference:
 
             # Heuristic 5 Resolve binary operations by looping through them backwards
             for variable in list(reversed(processed_file.static_assignments)):
-                print(variable)
 
                 if variable.binary_operation is not None:
-                    # TODO: Add logic for multiple binary operations
-                    print(variable.binary_operation)
-                    # Check left
-                    left_name = variable.binary_operation.left.id
-                    if left_variable := assignment_dict.get(left_name):
-                        variable.type = left_variable.type
-                    # Check right
-                    right_name = variable.binary_operation.right.id
-                    if right_variable := assignment_dict.get(right_name):
-                        variable.type = right_variable.type
+                    left_operation = variable.binary_operation.left
+                    right_operation = variable.binary_operation.right
+
+                    if isinstance(left_operation, ast.BinOp):
+                        # Greater than two values in the operation
+                        type_list = []
+                        while isinstance(left_operation, ast.BinOp):
+                            right_name = left_operation.left.id
+                            if right_variable := assignment_dict.get(right_name):
+                                type_list.append(right_variable.type)
+
+                            # Move to next right operation
+                            left_operation = left_operation.left
+
+                        # Check type list for types
+                        print(type_list)
+
+                    else:
+                        # Check left
+                        left_name = left_operation.id
+                        if left_variable := assignment_dict.get(left_name):
+                            variable.type = left_variable.type
+                        # Check right
+                        right_name = right_operation.id
+                        if right_variable := assignment_dict.get(right_name):
+                            variable.type = right_variable.type
+
+            # Import resolved assignments to the return visitor
+            return_visitor.import_assignments(assignments)
 
             # Get method header comment TODO: is this needed?
             processed_file.node_type_comment[function_name] = get_function_comment(function_source)
@@ -329,6 +347,7 @@ class TypeInference:
 
             # Function has at least one return if we reach here
             processed_file.type_dict[function_name] = return_visitor.r_types
+            print(return_visitor.r_types)
             stem_from_dict[function_name] = return_visitor.stem_from
             processed_file.type_gt[function_name] = function_node.returns
 
@@ -419,8 +438,12 @@ class TypeInference:
 
 
 if __name__ == '__main__':
-    infferer = TypeInference(name='', entry_point='basecase/case10.py')
-    infferer.infer_types()
-    print(infferer.get_types())
+    inferrer = TypeInference(name='', entry_point='basecase/case1.py')
+    inferrer.infer_types()
+
+    for t in inferrer.get_types():
+        print(t)
+
     print()
-    infferer.print_types()
+
+    inferrer.print_types()

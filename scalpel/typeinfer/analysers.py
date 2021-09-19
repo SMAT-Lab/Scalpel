@@ -524,7 +524,7 @@ class ClassSplitVisitor(ast.NodeVisitor):
 
 class ReturnStmtVisitor(ast.NodeVisitor):
 
-    def __init__(self, imports=None):
+    def __init__(self, imports=None, assignments=None):
         self.ast_nodes = []
         self.assign_records = {}
         self.local_assign_records = {}
@@ -534,13 +534,17 @@ class ReturnStmtVisitor(ast.NodeVisitor):
         self.n_returns = 0
         self.r_types = []
         self.init_args = []
-        self.imports = imports
+        self.imports = imports  # Dictionary of imported names and their types
+        self.assignments = assignments  # List of variable assignment in a code block
 
     def import_assign_records(self, assign_records):
         self.assign_records = assign_records
 
     def import_class_assign_records(self, assign_records):
         self.class_assign_records = assign_records
+
+    def import_assignments(self, assignments):
+        self.assignments = assignments
 
     def visit_FunctionDef(self, node):
         args = node.args
@@ -616,6 +620,13 @@ class ReturnStmtVisitor(ast.NodeVisitor):
                 self.r_types += ['input']
                 return
 
+        if isinstance(return_value, ast.Name):
+            # Check to see if we have the return in our list of assignments
+            assignment_dict = {v.name: v for v in self.assignments}
+            if variable := assignment_dict.get(return_value.id):
+                self.r_types += [variable.type]
+                return
+
         if type_val in ["ID", "attr"]:
             # TODO: Is block.id correct here?
             lookup_name = block.id if type_val == "ID" else get_attr_name(init_val)
@@ -658,6 +669,7 @@ class ReturnStmtVisitor(ast.NodeVisitor):
         else:
             # Known type
             self.r_types += [type_val]
+
 
     def type_infer_CFG(self, node):
         new_body = []

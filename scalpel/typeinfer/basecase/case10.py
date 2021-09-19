@@ -4,9 +4,9 @@
 # case10.py: my_default_dict -> defaultdict
 # case10.py: my_function-> defaultdict
 
-from os import getcwd
+from collections import defaultdict
 
 
 def my_function():
-    my_default_dict = getcwd()
+    my_default_dict = defaultdict()
     return my_default_dict
