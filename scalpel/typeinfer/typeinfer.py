@@ -17,7 +17,8 @@ from scalpel.typeinfer.analysers import (
     SourceSplitVisitor,
     ClassSplitVisitor,
     ReturnStmtVisitor,
-    HeuristicParser
+    HeuristicParser,
+    Heuristics
 )
 from scalpel.typeinfer.graph import Tree, ImportGraph
 from scalpel.typeinfer.utilities import (
@@ -127,6 +128,7 @@ class TypeInference:
             node.call_links = processed_file.type_stem_links
             node.static_assignments = processed_file.static_assignments
             node.line_numbers = processed_file.line_numbers
+            node.imports = processed_file.imports
 
         # Reconcile across all leaves
         for node in self.leaves:
@@ -267,7 +269,9 @@ class TypeInference:
 
         return type_list
 
-    def process_file(self, source: str):
+    @staticmethod
+    def process_file(source: str):
+        heuristics = Heuristics()
         processed_file = ProcessedFile()
 
         stem_from_dict = {}
@@ -280,6 +284,7 @@ class TypeInference:
 
         # Get imported types
         import_mappings, imported = ImportTypeMap(tree).map()
+        processed_file.imports = import_mappings
 
         split_visitor = SourceSplitVisitor()
         return_visitor = ReturnStmtVisitor(imports=import_mappings)
@@ -298,60 +303,12 @@ class TypeInference:
             processed_file.line_numbers[function_name] = function_node.lineno
             function_source = astunparse.unparse(function_node)
 
-            # Get variable assignment types
-            assignments = VariableAssignmentMap(function_node, imports=import_mappings).map()
-
-            for assignment in assignments:
-                assignment.function = function_name
-            processed_file.static_assignments.extend(assignments)
-
-            param_list = [v for v in assignments if v.is_arg]
-            assignment_dict = {v.name: v for v in processed_file.static_assignments}
-
-            # Heuristic 5 Resolve binary operations by looping through them backwards
-            for variable in list(reversed(processed_file.static_assignments)):
-                if variable.binary_operation is not None:
-                    # Get left and right for the binary operation
-                    left_operation = variable.binary_operation.left
-                    right_operation = variable.binary_operation.right
-
-                    # Check for involved parameters
-                    involved_params = [i for i in param_list if self.in_bin_op(i, variable.binary_operation)]
-
-                    if isinstance(left_operation, ast.BinOp):
-                        # Greater than two values in the operation
-                        bin_op_types = {}
-                        while isinstance(left_operation, ast.BinOp):
-                            right_name = left_operation.right.id
-                            if right_variable := assignment_dict.get(right_name):
-                                bin_op_types[right_variable.type] = True
-
-                            # Move to next right operation
-                            left_operation = left_operation.left
-
-                        # Check type list for types
-                        if len(bin_op_types.keys()) == 1:
-                            type_value = list(bin_op_types.keys()).pop()
-                            variable.type = type_value
-                            # Set involved parameters types
-                            for i in involved_params:
-                                i.type = type_value
-                        else:
-                            # TODO: Check for compatible types e.g. float and str
-                            # TODO: Check for mismatched types and raise error
-                            pass
-
-                    else:
-                        # Check left
-                        left_name = left_operation.id
-                        if left_variable := assignment_dict.get(left_name):
-                            variable.type = left_variable.type
-                        # Check right
-                        right_name = right_operation.id
-                        if right_variable := assignment_dict.get(right_name):
-                            variable.type = right_variable.type
-
-            # Heuristic
+            # Heuristic 5
+            assignments = heuristics.heuristic_five(
+                import_mappings=import_mappings,
+                processed_file=processed_file,
+                function_node=function_node
+            )
 
             # Import resolved assignments to the return visitor
             return_visitor.import_assignments(assignments)
@@ -427,7 +384,7 @@ class TypeInference:
                                 import_dict[base_name], base_name + from_name.lstrip('super'))
                         else:
                             processed_file.type_stem_links[function_name] = (
-                            'base', base_name + from_name.lstrip('super'))
+                                'base', base_name + from_name.lstrip('super'))
                     else:
                         # TODO: Can be from other libraries too, check for imported classes
                         pass
@@ -439,29 +396,6 @@ class TypeInference:
                         processed_file.type_stem_links[function_name] = (import_path, from_name)
 
         return processed_file
-
-    @staticmethod
-    def in_bin_op(variable: ScalpelVariable, binary_operation: ast.BinOp):
-        """
-        Determines whether a variable is featured in a binary operation
-        :param variable: The variable to check for
-        :param binary_operation: The binary operation to check
-        :return: True if it is within the binary operation, false otherwise
-        """
-        left_operation = binary_operation.left
-        right_operation = binary_operation.right
-        if isinstance(left_operation, ast.BinOp):
-            # Greater than two values in the operation
-            while isinstance(left_operation, ast.BinOp):
-                right_name = left_operation.right.id
-                if right_name == variable.name:
-                    return True
-                # Move to next right operation
-                left_operation = left_operation.left
-        if left_operation.id == variable.name or right_operation.id == variable.name:
-            return True
-        return False
-
 
     def print_types(self):
         self.infer_types()
@@ -487,7 +421,7 @@ class TypeInference:
 
 
 if __name__ == '__main__':
-    inferrer = TypeInference(name='', entry_point='basecase/case4.py')
+    inferrer = TypeInference(name='', entry_point='basecase/case15.py')
     inferrer.infer_types()
 
     for t in inferrer.get_types():

@@ -23,6 +23,7 @@ class Tree:
         self.line_numbers = {}
         self.static_assignments = None
         self.call_links = None
+        self.imports = {}
 
     def __str__(self):
         return str(self.name)

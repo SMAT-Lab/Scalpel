@@ -2,7 +2,7 @@
 
 # EXPECTED OUTPUT:
 # case11.py: x -> Union[int, str]
-# case11.py: my_function-> Union[int, str]
+# case11.py: my_function -> Union[int, str]
 
 def my_function(my_bool):
     if my_bool:
