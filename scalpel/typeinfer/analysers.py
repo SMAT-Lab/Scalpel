@@ -109,7 +109,8 @@ class ImportTypeMap(_StaticAnalyzer):
                     if module:
                         # Importing from module
                         import_type = self.get_imported_type(import_name)
-                        import_mappings[name] = import_type
+                        if import_type is not None:
+                            import_mappings[name] = import_type
                     else:
                         # Importing whole module
                         imports[import_name] = True
@@ -128,7 +129,7 @@ class ImportTypeMap(_StaticAnalyzer):
                 return node.annotation.id
             elif isinstance(node, typed_ast._ast3.ClassDef):
                 return node.name  # Type is class name
-        return 'any'
+        return None
 
 
 class ClassDefinitionMap(_StaticAnalyzer):
@@ -624,7 +625,6 @@ class ReturnStmtVisitor(ast.NodeVisitor):
 
         init_val = cfg.backward(block, return_value, is_visited, None)
         type_val = get_type(init_val, imports=self.imports)
-
         if init_val is None and isinstance(return_value, ast.Name):
             if return_value.id in self.args:
                 self.r_types += ['input']
@@ -642,13 +642,11 @@ class ReturnStmtVisitor(ast.NodeVisitor):
         if isinstance(return_value, ast.BinOp):
             heuristics = Heuristics()
             return_type = heuristics.heuristic_five_return(
-                import_mappings=self.imports,
                 assignments=self.assignments,
                 return_node=return_value
             )
             self.r_types += [return_type]
             return
-
         if type_val in ["ID", "attr"]:
             # TODO: Is block.id correct here?
             lookup_name = block.id if type_val == "ID" else get_attr_name(init_val)
@@ -848,7 +846,7 @@ class Heuristics:
 
         return assignments
 
-    def heuristic_five_return(self, import_mappings, assignments, return_node: ast.BinOp):
+    def heuristic_five_return(self, assignments, return_node: ast.BinOp):
         # Perform heuristic five on a returned binary operation
         involved = self.get_bin_op_involved(return_node)
 
@@ -860,11 +858,9 @@ class Heuristics:
                 if assignment := assignment_dict.get(i.id):
                     if assignment.type != 'any':
                         return assignment.type
-                # TODO: Check for imported type name
             elif isinstance(i, ast.Constant):
                 # Constant, check its type
                 return type(i.value).__name__
-
 
     @staticmethod
     def get_bin_op_involved(binary_operation: ast.BinOp):
