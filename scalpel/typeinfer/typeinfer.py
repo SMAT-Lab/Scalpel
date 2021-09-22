@@ -297,6 +297,8 @@ class TypeInference:
         all_methods, all_classes, import_nodes = parse_module(tree)  # TODO: This doesn't need to be a function?
         import_dict = get_api_ref_id(import_nodes)  # TODO: Replace with import map?
 
+
+
         # Loop through function nodes
         for function_node in all_methods:
             function_name = function_node.name
@@ -329,6 +331,19 @@ class TypeInference:
             processed_file.type_dict[function_name] = return_visitor.r_types
             stem_from_dict[function_name] = return_visitor.stem_from
             processed_file.type_gt[function_name] = function_node.returns
+
+        calls = heuristics.heuristic_two(
+            all_methods=all_methods
+        )
+
+        for static_assignment in processed_file.static_assignments:
+            function_name = static_assignment.function
+            parameter_name = static_assignment.name
+            if function_name in calls:
+                for function_param in calls[function_name]:
+                    if function_param["name"] == parameter_name:
+                        arg = function_param["arg"]
+                        static_assignment.type = arg.type_comment.__name__
 
         # Loop through class nodes
         for class_node in all_classes:
@@ -421,7 +436,7 @@ class TypeInference:
 
 
 if __name__ == '__main__':
-    inferrer = TypeInference(name='', entry_point='basecase/case15.py')
+    inferrer = TypeInference(name='', entry_point='basecase/case16.py')
     inferrer.infer_types()
 
     for t in inferrer.get_types():

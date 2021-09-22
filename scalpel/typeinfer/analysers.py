@@ -782,6 +782,47 @@ class ReturnStmtVisitor(ast.NodeVisitor):
 
 
 class Heuristics:
+    @staticmethod
+    def heuristic_two(all_methods):
+        function_calls = {}
+        all_params = {x.name: [{"arg": y, "name": y.arg} for y in x.args.args] for x in all_methods}
+        # Convert the arguments into a dictionary
+        for function in all_methods:
+            all_function_calls = [x for x in function.body if isinstance(x, ast.Expr)]
+
+            # Calculate all calls performed in this function
+            for func_call in all_function_calls:
+                call_to_function_name = func_call.value.func.id
+                if call_to_function_name in function_calls:
+                    function_calls[call_to_function_name].append(func_call)
+                else:
+                    function_calls[call_to_function_name] = {}
+                    function_calls[call_to_function_name] = [func_call]
+
+        for function, calls in function_calls.items():
+            for call in calls:
+                # TODO Might need to extend with multiple parameter checking depending on our scoping
+                if hasattr(call.value.args[0], "value"):
+                    parameter_type = type(call.value.args[0].value)
+                    result = (parameter_type, "value")
+                elif hasattr(call.value.args[0], "func"):
+                    func_name = call.value.args[0].func.id
+                    result = (func_name, "func")
+                else:
+                    result = (None, None)
+                if function in all_params and "possible_type" not in all_params[function][0]:
+                    all_params[function][0]["possible_type"] = [result]
+                else:
+                    all_params[function][0]["possible_type"].append(result)
+
+        for function_name, parameters in all_params.items():
+            for parameter in parameters:
+                types = [x for x in parameter["possible_type"] if x[-1] == "value"]
+                if len(types) == 1:
+                    parameter["arg"].type_comment = types[0][0]
+
+        return all_params
+
     def heuristic_five(self, import_mappings, processed_file, function_node):
         # Perform heuristic five within a function
         assignments = VariableAssignmentMap(function_node, imports=import_mappings).map()
@@ -864,7 +905,6 @@ class Heuristics:
             elif isinstance(i, ast.Constant):
                 # Constant, check its type
                 return type(i.value).__name__
-
 
     @staticmethod
     def get_bin_op_involved(binary_operation: ast.BinOp):

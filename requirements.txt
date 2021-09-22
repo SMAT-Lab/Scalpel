@@ -1,7 +1,10 @@
 astor~=0.8.1
 graphviz~=0.17
 networkx~=2.6.2
-Scalpel~=1.0b0
+#Scalpel~=1.0b0
 astunparse~=1.6.3
 attrs~=21.2.0
 PyYAML~=5.4.1
+typed-ast
+typeshed-client
+mypy
