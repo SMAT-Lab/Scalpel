@@ -806,9 +806,12 @@ class Heuristics:
 
                         if isinstance(right_operation, ast.Name):
                             # Named variable
-                            right_name = left_operation.right.id
-                            if right_variable := assignment_dict.get(right_name):
-                                bin_op_types[right_variable.type] = True
+                            if isinstance(left_operation.right, ast.Name):
+                                right_name = left_operation.right.id
+                                if right_variable := assignment_dict.get(right_name):
+                                    bin_op_types[right_variable.type] = True
+                            elif isinstance(left_operation.right, ast.Constant):
+                                bin_op_types[type(left_operation.right.value).__name__] = True
                         elif isinstance(right_operation, ast.Constant):
                             # Constant value, e.g. 25 as an integer of 'Hello World!' as a string
                             bin_op_types[type(right_operation.value).__name__] = True
@@ -863,6 +866,57 @@ class Heuristics:
                 return type(i.value).__name__
 
     @staticmethod
+    def heuristic_eight(ast_tree, function_name, function_params):
+        """
+        Performs heuristic 8 for a function's inputs. Note that this heuristic
+        attempts to infer/check the types a developer likely intended for function
+        parameters and provide a limited number of types to the actual number that
+        may work
+
+        :param ast_tree: The ast tree for the module the function is in
+        :param function_name: The name of the function being checked
+        :param function_params: The function parameters from a variable assignment map
+        """
+        param_type_map = {p.name: {} for p in function_params}
+        param_map = {p.name: p for p in function_params}
+
+        # Collect parameter input types
+        for node in ast.walk(ast_tree):
+            if isinstance(node, ast.Call):
+                if isinstance(node.func, ast.Name):
+                    if node.func.id == function_name:
+                        inputs = [n.value for n in node.args]
+                        if len(inputs) == len(function_params):
+                            for index, param in enumerate(function_params):
+                                param_type_map[param.name][type(inputs[index]).__name__] = True
+
+        # Assign parameter input types to parameters
+        for param_name, param_types in param_type_map.items():
+            parameter = param_map.get(param_name)
+            type_values = list(param_types.keys())
+            if len(type_values) == 1:
+                # Validate
+                if parameter.type == 'any':
+                    parameter.type = type_values[0]
+                elif not param_types.get(parameter.type):
+                    # Mismatched inferred types
+                    # TODO: Raise a warning here?
+                    pass
+
+            else:
+                # See if we already inferred type from another heuristic, and check against the input type
+                if parameter.type != 'any':
+                    if parameter.type not in type_values:
+                        # Bad input to function
+                        # TODO: Raise a warning here?
+                        pass
+                    # TODO: Raise warning for types that are passed as input incorrectly?
+                elif len(type_values) > 0:
+                    # Couldn't infer type from other heuristic, set as union of passed in types
+                    union_types = f"Union[{', '.join(type_values)}]"
+                    parameter.type = union_types
+
+    @staticmethod
     def get_bin_op_involved(binary_operation: ast.BinOp):
         """
         Get list of variables/constants/callables involved in a binary operation
@@ -895,9 +949,10 @@ class Heuristics:
         if isinstance(left_operation, ast.BinOp):
             # Greater than two values in the operation
             while isinstance(left_operation, ast.BinOp):
-                right_name = left_operation.right.id
-                if right_name == variable.name:
-                    return True
+                if isinstance(left_operation.right, ast.Name):
+                    right_name = left_operation.right.id
+                    if right_name == variable.name:
+                        return True
                 # Move to next right operation
                 left_operation = left_operation.left
         if left_operation.id == variable.name or right_operation.id == variable.name:

@@ -309,6 +309,14 @@ class TypeInference:
                 function_node=function_node
             )
 
+            # Heuristic 8
+            function_params = [a for a in assignments if a.is_arg]
+            heuristics.heuristic_eight(
+                ast_tree=tree,
+                function_name=function_name,
+                function_params=function_params
+            )
+
             # Import resolved assignments to the return visitor
             return_visitor.import_assignments(assignments)
 
@@ -420,8 +428,7 @@ class TypeInference:
 
 
 if __name__ == '__main__':
-    inferrer = TypeInference(name='case16', entry_point='basecase/case16')
+    inferrer = TypeInference(name='case17', entry_point='basecase/case20.py')
     inferrer.infer_types()
-    inferrer.print_types()
-
-
+    for t in inferrer.get_types():
+        print(t)
