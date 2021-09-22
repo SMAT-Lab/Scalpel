@@ -12,7 +12,6 @@ from typing import List
 from scalpel.typeinfer.visitors import get_call_type
 from scalpel.typeinfer.classes import ProcessedFile, ScalpelVariable
 from scalpel.typeinfer.analysers import (
-    VariableAssignmentMap,
     ImportTypeMap,
     SourceSplitVisitor,
     ClassSplitVisitor,
@@ -130,39 +129,6 @@ class TypeInference:
             node.line_numbers = processed_file.line_numbers
             node.imports = processed_file.imports
 
-        # Reconcile across all leaves
-        for node in self.leaves:
-            for function_name, (from_where, from_name) in node.call_links.items():
-                # The same module
-                if node.node_type_dict[function_name] is None:
-                    continue
-
-                if from_where in ['self', 'base', 'local']:
-                    from_name = rename_from_name(from_where, from_name, function_name)
-                    if from_name in node.node_type_dict and node.node_type_dict[from_name] is not None:
-                        t_vals_tmp = node.node_type_dict[from_name]
-                        if is_valid_call_link(t_vals_tmp):
-                            node.node_type_dict[function_name] += t_vals_tmp
-
-                # Might be from other modules
-                else:
-                    visit_path = from_where.split('.')
-                    if len(visit_path) == 1 and visit_path[0] == self.import_graph.root.name:
-                        dst_node = self.import_graph.root
-                    else:
-                        dst_node = self.import_graph.go_to_that_node(node, from_where.split('.')[0:-1])
-
-                    if dst_node is not None:
-                        if dst_node.node_type_dict is not None:
-                            if from_name in dst_node.node_type_dict and dst_node.node_type_dict[from_name] is not None:
-                                t_vals_tmp = dst_node.node_type_dict[from_name]
-                                if is_valid_call_link(t_vals_tmp):
-                                    node.node_type_dict[function_name] += t_vals_tmp
-                    else:
-                        # This is a library call 3call be propagated to other affected calls
-                        node.node_type_dict[function_name] += ["3call"]
-
-        # Finalise function return types
         for node in self.leaves:
             type_hint_pairs, client_call_link, all_call_names = process_code_with_heuristics(node)
             for pair in type_hint_pairs:
@@ -219,6 +185,38 @@ class TypeInference:
                     class_inferred = find_class_by_attr(list(node.node_type_dict.keys()), access_attrs)
                     if class_inferred is not None:
                         node.node_type_dict[function_name] = [class_inferred]
+
+        # Reconcile across all leaves
+        for node in self.leaves:
+            for function_name, (from_where, from_name) in node.call_links.items():
+                # The same module
+                if node.node_type_dict[function_name] is None:
+                    continue
+
+                if from_where in ['self', 'base', 'local']:
+                    from_name = rename_from_name(from_where, from_name, function_name)
+                    if from_name in node.node_type_dict and node.node_type_dict[from_name] is not None:
+                        t_vals_tmp = node.node_type_dict[from_name]
+                        if is_valid_call_link(t_vals_tmp):
+                            node.node_type_dict[function_name] += t_vals_tmp
+
+                # Might be from other modules
+                else:
+                    visit_path = from_where.split('.')
+                    if len(visit_path) == 1 and visit_path[0] == self.import_graph.root.name:
+                        dst_node = self.import_graph.root
+                    else:
+                        dst_node = self.import_graph.go_to_that_node(node, from_where.split('.')[0:-1])
+
+                    if dst_node is not None:
+                        if dst_node.node_type_dict is not None:
+                            if from_name in dst_node.node_type_dict and dst_node.node_type_dict[from_name] is not None:
+                                t_vals_tmp = dst_node.node_type_dict[from_name]
+                                if is_valid_call_link(t_vals_tmp):
+                                    node.node_type_dict[function_name] += t_vals_tmp
+                    else:
+                        # This is a library call 3call be propagated to other affected calls
+                        node.node_type_dict[function_name] += ["3call"]
 
     def get_types(self) -> List[dict]:
         n_known = 0
@@ -295,9 +293,8 @@ class TypeInference:
 
         return_visitor.import_assign_records(assign_records)
         all_methods, all_classes, import_nodes = parse_module(tree)  # TODO: This doesn't need to be a function?
+
         import_dict = get_api_ref_id(import_nodes)  # TODO: Replace with import map?
-
-
 
         # Loop through function nodes
         for function_node in all_methods:
@@ -310,6 +307,14 @@ class TypeInference:
                 import_mappings=import_mappings,
                 processed_file=processed_file,
                 function_node=function_node
+            )
+
+            # Heuristic 8
+            function_params = [a for a in assignments if a.is_arg]
+            heuristics.heuristic_eight(
+                ast_tree=tree,
+                function_name=function_name,
+                function_params=function_params
             )
 
             # Import resolved assignments to the return visitor
@@ -436,12 +441,7 @@ class TypeInference:
 
 
 if __name__ == '__main__':
-    inferrer = TypeInference(name='', entry_point='basecase/case16.py')
+    inferrer = TypeInference(name='case17', entry_point='basecase/case20.py')
     inferrer.infer_types()
-
     for t in inferrer.get_types():
         print(t)
-
-    print()
-
-    inferrer.print_types()

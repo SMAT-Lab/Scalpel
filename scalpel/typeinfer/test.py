@@ -174,6 +174,30 @@ class BaseCaseTests(unittest.TestCase):
              {'file': 'case15.py', 'line_number': 12, 'variable': 'x', 'function': 'my_function', 'type': 'str'}]
         )
 
+    def test_case_16(self):
+        inferrer = TypeInference(name='case16', entry_point='basecase/case16')
+        inferrer.infer_types()
+        inferred = inferrer.get_types()
+        self.assertEqual(
+            inferred,
+            [{'file': 'file2.py', 'line_number': 1, 'function': 'imported_function', 'type': {'Tuple[str]'}},
+             {'file': 'file2.py', 'line_number': 2, 'variable': 'return_value', 'function': 'imported_function',
+              'type': 'Tuple[str]'},
+             {'file': 'file1.py', 'line_number': 7, 'function': 'class_method', 'type': {'Tuple[str]'}},
+             {'file': 'file1.py', 'line_number': 7, 'function': 'MyClass.class_method', 'type': {'Tuple[str]'}}]
+        )
+
+    def test_case_20(self):
+        inferrer = TypeInference(name='case20', entry_point='basecase/case20.py')
+        inferrer.infer_types()
+        inferred = inferrer.get_types()
+        self.assertEqual(
+            inferred,
+            [{'file': 'case20.py', 'line_number': 1, 'function': 'add', 'type': {'Union[str, int]'}},
+             {'file': 'case20.py', 'line_number': 1, 'parameter': 'x', 'function': 'add', 'type': 'Union[str, int]'},
+             {'file': 'case20.py', 'line_number': 1, 'parameter': 'y', 'function': 'add', 'type': 'Union[str, int]'}]
+        )
+
 
 if __name__ == '__main__':
     unittest.main()
