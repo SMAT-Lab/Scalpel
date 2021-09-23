@@ -348,7 +348,8 @@ class TypeInference:
                 for function_param in calls[function_name]:
                     if function_param["name"] == parameter_name:
                         arg = function_param["arg"]
-                        static_assignment.type = arg.type_comment.__name__
+                        if arg.type_comment is not None:
+                            static_assignment.type = arg.type_comment.__name__
 
         # Loop through class nodes
         for class_node in all_classes:

@@ -790,7 +790,22 @@ class Heuristics:
 
             # Calculate all calls performed in this function
             for func_call in all_function_calls:
-                call_to_function_name = func_call.value.func.id
+                temp_func = func_call
+                id = None
+                while id is None:
+                    if hasattr(temp_func, "value"):
+                        if isinstance(temp_func.value, ast.Call):
+                            temp_func = temp_func.value.func
+                        elif isinstance(temp_func.value, ast.Constant):
+                            id = temp_func.value.value
+                    elif hasattr(temp_func, "id"):
+                        id = temp_func.id
+                if id is None:
+                    continue
+                call_to_function_name = id
+
+                if call_to_function_name not in all_params:
+                    continue
                 if call_to_function_name in function_calls:
                     function_calls[call_to_function_name].append(func_call)
                 else:
@@ -799,6 +814,8 @@ class Heuristics:
 
         for function, calls in function_calls.items():
             for call in calls:
+                if not hasattr(call.value, "args") or len(call.value.args) == 0:
+                    continue
                 # TODO Might need to extend with multiple parameter checking depending on our scoping
                 if hasattr(call.value.args[0], "value"):
                     parameter_type = type(call.value.args[0].value)
@@ -815,9 +832,10 @@ class Heuristics:
 
         for function_name, parameters in all_params.items():
             for parameter in parameters:
-                types = [x for x in parameter["possible_type"] if x[-1] == "value"]
-                if len(types) == 1:
-                    parameter["arg"].type_comment = types[0][0]
+                if "possible_type" in parameter:
+                    types = [x for x in parameter["possible_type"] if x[-1] == "value"]
+                    if len(types) == 1:
+                        parameter["arg"].type_comment = types[0][0]
 
         return all_params
 

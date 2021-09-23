@@ -4,7 +4,7 @@
 # case21.py: x -> str
 
 def func_3():
-    func_1(20)
+    func_1("test")
     func_1(func_2())
     return True
 
