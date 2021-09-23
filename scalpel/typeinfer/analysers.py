@@ -926,7 +926,7 @@ class Heuristics:
             if isinstance(node, ast.Call):
                 if isinstance(node.func, ast.Name):
                     if node.func.id == function_name:
-                        inputs = [n.value for n in node.args]
+                        inputs = [n.value for n in node.args if hasattr(n, "value")]
                         if len(inputs) == len(function_params):
                             for index, param in enumerate(function_params):
                                 param_type_map[param.name][type(inputs[index]).__name__] = True
