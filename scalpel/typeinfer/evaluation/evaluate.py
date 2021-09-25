@@ -9,7 +9,9 @@ import os
 import typing
 import tokenize
 import astunparse
+from pprint import pprint
 
+from scalpel.typeinfer.analysers import ClassSplitVisitor
 from scalpel.typeinfer.typeinfer import TypeInference
 
 
@@ -17,34 +19,61 @@ def get_stub_function_returns(stub_file_path):
     with tokenize.open(stub_file_path) as stub_file:
         stub_source = stub_file.read()
         tree = ast.parse(stub_source, mode='exec', type_comments=True)
-        import_code = ""
+
+        # Parse stub file code
         type_dict = {
             'functions': {}
         }
-        for node in ast.walk(tree):
-            if isinstance(node, ast.Import) or isinstance(node, ast.ImportFrom):
-                import_code += astunparse.unparse(node)
-            if isinstance(node, ast.FunctionDef):
-                function_name = node.name
-                unparsed = astunparse.unparse(node)
-                unparsed = import_code + unparsed  # Add imports to function definition
-                unparsed = unparsed.replace('nothing', 'None')  # Replace nothing with None
+        unparsed = stub_source
+        unparsed = unparsed.replace('nothing', 'None')  # Replace nothing with None
+        module = ast.parse(unparsed, mode='exec')
+        code = compile(module, filename=stub_file_path, mode='exec')
+        namespace = {}
+        while True:
+            try:
+                exec(code, namespace)
+                break
+            except NameError as e:
+                # Remove name and reparse code
+                name = str(e).split("'")[1]
+                unparsed = unparsed.replace(f"({name})", '')
                 module = ast.parse(unparsed, mode='exec')
                 code = compile(module, filename=stub_file_path, mode='exec')
-                namespace = {}
-                exec(code, namespace)
-                type_values = typing.get_type_hints(namespace[function_name])
-                type_dict['functions'][function_name] = str(type_values['return']).replace('typing.', '')
+            except Exception as e:
+                raise
+
+        # Get function and method names
+        all_methods, all_classes, import_nodes = get_nodes(tree)
+        function_names = []
+        for class_node in all_classes:
+            class_name = class_node.name
+            class_visitor = ClassSplitVisitor()
+            class_visitor.visit(class_node)
+
+            class_obj = namespace.get(class_name)
+
+            for function_node in class_visitor.fun_nodes:
+                function_name = function_node.name
+                method_name = f"{class_name}.{function_name}"
+                function_names.append(function_name)
+                function_def = class_obj.__dict__[function_name]
+                type_values = typing.get_type_hints(function_def)
+                type_dict['functions'][method_name] = str(type_values['return']).replace('typing.', '')
+
+        for function_node in all_methods:
+            function_name = function_node.name
+            function_names.append(function_node.name)
+            type_values = typing.get_type_hints(namespace[function_name])
+            type_dict['functions'][function_name] = str(type_values['return']).replace('typing.', '')
+
         return type_dict
 
 
 def basecase_scalpel_vs_pytype():
-    get_stub_function_returns('../basecase/basecase_pytype/pyi/case1.pyi')
-    basecase_files = [f for f in os.listdir('../basecase') if f.endswith('.py')]
-    basecase_files = sorted(basecase_files)
     correct, total = 0, 0
-    for i in range(1, 10):
+    for i in range(1, 11):
         file_name = f'case{i}.py'
+        print(file_name)
         pytype_stub_file = f'../basecase/basecase_pytype/pyi/{file_name}i'
 
         # Get PyType inferred types as dict
@@ -61,24 +90,45 @@ def basecase_scalpel_vs_pytype():
             if 'variable' not in f and 'parameter' not in f:
                 scalpel_functions[f['function']] = f
         for function_name, pytype_return in inferred_pytype['functions'].items():
-            if function_name == '__init__':
+            if '__init__' in function_name:
                 continue
-                
-            scalpel_function = scalpel_functions[function_name]
 
-            # Compare types
-            scalpel_return_set = scalpel_function.get('type')
-            pytype_return_set = {pytype_return}
+            scalpel_function = scalpel_functions.get(function_name)
+            if scalpel_function is not None:
+                # TODO: Improve comparison step here
+                # Compare types
+                scalpel_return_set = scalpel_function.get('type')
+                pytype_return_set = {pytype_return}
 
-            # Perform check
-            if scalpel_return_set == pytype_return_set:
-                correct += 1
+                # Perform check
+                if scalpel_return_set == pytype_return_set:
+                    correct += 1
 
-            # Increment total
-            total += 1
+                print(scalpel_return_set, pytype_return_set)
+
+                # Increment total
+                total += 1
 
     return total, correct
 
 
+def get_nodes(tree):
+    fun_nodes = []
+    class_nodes = []
+    import_nodes = []
+
+    for node in tree.body:
+        if isinstance(node, ast.FunctionDef):
+            fun_nodes += [node]
+        if isinstance(node, ast.ClassDef):
+            class_nodes += [node]
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import) or isinstance(node, ast.ImportFrom):
+            import_nodes += [node]
+
+    return fun_nodes, class_nodes, import_nodes
+
+
 if __name__ == '__main__':
-    basecase_scalpel_vs_pytype()
+    total, correct = basecase_scalpel_vs_pytype()
+    print(f"Total: {total}\nCorrect: {correct}")
