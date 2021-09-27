@@ -900,6 +900,35 @@ class Heuristics:
                 return type(i.value).__name__
 
     @staticmethod
+    def heuristic_seven(processed_file, function_node):
+        # Track calls to isinstance()
+        is_instance_type_map = {}
+        for node in ast.walk(function_node):
+            if isinstance(node, ast.Call):
+                if not isinstance(node.func, ast.Attribute):
+                    if node.func.id == 'isinstance':
+                        # Check to see what the value being compared to is
+                        variable, type_compared = node.args[0], node.args[1]
+                        if isinstance(variable, ast.Name) and isinstance(type_compared, ast.Name):
+                            if type_list := is_instance_type_map.get(variable.id):
+                                type_list.append(type_compared.id)
+                            else:
+                                is_instance_type_map[variable.id] = [type_compared.id]
+
+        # Check static assignments for the variables involved in calls to isinstance
+        involved = [s for s in processed_file.static_assignments if s.name in is_instance_type_map]
+
+        for variable in involved:
+            is_instance_types = is_instance_type_map[variable.name]
+
+            # Variable hasn't been resolved by any other heuristics
+            if variable.type == 'any':
+                if len(is_instance_types) > 1:
+                    variable.type = f'Union[{", ".join(is_instance_types)}]'
+                else:
+                    variable.type = is_instance_types[0]
+
+    @staticmethod
     def heuristic_eight(ast_tree, function_name, function_params):
         """
         Performs heuristic 8 for a function's inputs. Note that this heuristic

@@ -317,6 +317,12 @@ class TypeInference:
                 function_params=function_params
             )
 
+            # Heuristic_seven
+            heuristics.heuristic_seven(
+                processed_file=processed_file,
+                function_node=function_node
+            )
+
             # Import resolved assignments to the return visitor
             return_visitor.import_assignments(assignments)
 
@@ -401,6 +407,12 @@ class TypeInference:
                     function_params=function_params
                 )
 
+                # Heuristic_seven
+                heuristics.heuristic_seven(
+                    processed_file=processed_file,
+                    function_node=function_node
+                )
+
                 return_visitor.clear_all()
                 return_visitor.import_class_assign_records(class_assign_records)
                 return_visitor.visit(function_node)
@@ -468,7 +480,7 @@ class TypeInference:
 
 
 if __name__ == '__main__':
-    inferrer = TypeInference(name='', entry_point='basecase/case19.py')
+    inferrer = TypeInference(name='', entry_point='basecase/case23.py')
     inferrer.infer_types()
     for t in inferrer.get_types():
         print(t)
