@@ -317,8 +317,14 @@ class TypeInference:
                 function_params=function_params
             )
 
-            # Heuristic_seven
+            # Heuristic 7
             heuristics.heuristic_seven(
+                processed_file=processed_file,
+                function_node=function_node
+            )
+
+            # Heuristic 6
+            heuristics.heuristic_six(
                 processed_file=processed_file,
                 function_node=function_node
             )
@@ -407,8 +413,14 @@ class TypeInference:
                     function_params=function_params
                 )
 
-                # Heuristic_seven
+                # Heuristic 7
                 heuristics.heuristic_seven(
+                    processed_file=processed_file,
+                    function_node=function_node
+                )
+
+                # Heuristic 6
+                heuristics.heuristic_six(
                     processed_file=processed_file,
                     function_node=function_node
                 )
@@ -480,7 +492,7 @@ class TypeInference:
 
 
 if __name__ == '__main__':
-    inferrer = TypeInference(name='', entry_point='basecase/case23.py')
+    inferrer = TypeInference(name='', entry_point='basecase/case24.py')
     inferrer.infer_types()
     for t in inferrer.get_types():
         print(t)

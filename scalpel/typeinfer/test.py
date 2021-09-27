@@ -237,6 +237,17 @@ class BaseCaseTests(unittest.TestCase):
               'type': 'Union[int, str]'}]
         )
 
+    def test_case_24(self):
+        inferrer = TypeInference(name='case24', entry_point='basecase/case24.py')
+        inferrer.infer_types()
+        inferred = inferrer.get_types()
+        self.assertEqual(
+            inferred,
+            [{'file': 'case24.py', 'line_number': 1, 'function': 'my_function', 'type': {'any'}},
+             {'file': 'case24.py', 'line_number': 1, 'parameter': 'x', 'function': 'my_function', 'type': 'callable'},
+             {'file': 'case24.py', 'line_number': 2, 'variable': 'y', 'function': 'my_function', 'type': 'any'}]
+        )
+
 
 if __name__ == '__main__':
     unittest.main()

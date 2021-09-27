@@ -900,6 +900,20 @@ class Heuristics:
                 return type(i.value).__name__
 
     @staticmethod
+    def heuristic_six(processed_file, function_node):
+        function_calls = []
+        for node in ast.walk(function_node):
+            # Visit ast.Call nodes, checking for variable names
+            if isinstance(node, ast.Call):
+                if not isinstance(node.func, ast.Attribute):
+                    function_calls.append(node.func.id)
+
+        # Get variables that are called
+        involved = [v for v in processed_file.static_assignments if v.name in function_calls]
+        for variable in involved:
+            variable.type = callable.__name__
+
+    @staticmethod
     def heuristic_seven(processed_file, function_node):
         # Track calls to isinstance()
         is_instance_type_map = {}
