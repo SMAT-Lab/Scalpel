@@ -17,7 +17,8 @@ from scalpel.typeinfer.utilities import (
     get_type,
     get_attr_name,
     get_built_in_types,
-    resolve_name
+    resolve_name,
+    check_consistent_list_types
 )
 
 
@@ -240,13 +241,13 @@ class VariableAssignmentMap(_StaticAnalyzer):
                     variable.type = type(node.value.value).__name__  # Determine specific type
                 elif isinstance(node.value, ast.Dict):
                     # Dictionary
-                    key_type = self.__check_consistent_list_types(node.value.keys)
-                    value_type = self.__check_consistent_list_types(node.value.values)
+                    key_type = check_consistent_list_types(node.value.keys)
+                    value_type = check_consistent_list_types(node.value.values)
                     variable.type = f"Dict[{key_type}, {value_type}]"
                 elif isinstance(node.value, ast.List) or isinstance(node.value, ast.Tuple):
                     # List or tuple, check to see if types in list are constant
                     values = node.value.elts
-                    value_type = self.__check_consistent_list_types(values)
+                    value_type = check_consistent_list_types(values)
                     variable.type = f"{type(node.value).__name__}[{value_type}]"
                 elif isinstance(node.value, ast.IfExp) or isinstance(node.value, ast.Compare):
                     # Boolean, see heuristic 4
@@ -257,44 +258,6 @@ class VariableAssignmentMap(_StaticAnalyzer):
                 variables.append(variable)
 
         return variables
-
-    @staticmethod
-    def __check_consistent_list_types(values) -> str:
-        """
-        Checks a list of values to see if they have a constant type
-        """
-        if len(values) == 0:
-            # Nothing in list yet so return any
-            return any.__name__
-        first_type = type(values[0])
-        assignment_type = any.__name__
-        if not first_type == ast.Constant:
-            builtin_types_dict = get_built_in_types()
-            builtin_first_type = builtin_types_dict.get(first_type.__name__.lower())
-            # Not an AST constant so we can just compare AST types
-            for n in values[1:len(values)]:
-                # Compare type to first items type
-                if not isinstance(n, first_type):
-                    # No constant type, assign any
-                    assignment_type = any.__name__
-                    break
-                else:
-                    assignment_type = builtin_first_type
-        else:
-            # We have an AST constant so we will need to compare their types
-            first_constant_type = type(values[0].value)
-            assignment_type = first_constant_type.__name__
-            for n in values[1:len(values)]:
-                # Compare type to first items type
-                if not isinstance(n, ast.Constant):
-                    # Not a constant type, assign any
-                    assignment_type = any.__name__
-                    break
-                else:
-                    if not isinstance(n.value, first_constant_type):
-                        assignment_type = any.__name__
-                        break
-        return assignment_type
 
 
 class BinaryOperationMap(_StaticAnalyzer):
@@ -504,6 +467,7 @@ class ClassSplitVisitor(ast.NodeVisitor):
     def __init__(self):
         self.fun_nodes = []
         self.class_assign_records = {"init_arg_name_lst": []}
+        self.bases = []
 
     def visit_FunctionDef(self, node):
         self.fun_nodes.append(node)
@@ -518,6 +482,7 @@ class ClassSplitVisitor(ast.NodeVisitor):
         return node
 
     def visit_ClassDef(self, node):
+        self.bases = [n.id for n in node.bases]
         for tmp_node in node.body:
             if not isinstance(tmp_node, ast.Assign):
                 continue
@@ -625,6 +590,7 @@ class ReturnStmtVisitor(ast.NodeVisitor):
 
         init_val = cfg.backward(block, return_value, is_visited, None)
         type_val = get_type(init_val, imports=self.imports)
+
         if init_val is None and isinstance(return_value, ast.Name):
             if return_value.id in self.args:
                 self.r_types += ['input']
@@ -647,8 +613,17 @@ class ReturnStmtVisitor(ast.NodeVisitor):
             )
             self.r_types += [return_type]
             return
+
         if type_val in ["ID", "attr"]:
             # TODO: Is block.id correct here?
+            if type_val == 'attr' and isinstance(init_val.value, ast.Call):
+                # Check for super class call
+                if init_val.value.func.id == 'super':
+                    # Check super class attributes
+                    attribute_name = f"super.{init_val.attr}"
+                    if super_assign := self.class_assign_records.get(attribute_name):
+                        type_val = get_type(super_assign[0])
+
             lookup_name = block.id if type_val == "ID" else get_attr_name(init_val)
             if lookup_name in self.local_assign_records:
                 right = self.local_assign_records[lookup_name][-1]

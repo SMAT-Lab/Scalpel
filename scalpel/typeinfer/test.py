@@ -49,7 +49,7 @@ class BaseCaseTests(unittest.TestCase):
         inferred = infferer.get_types()
         self.assertEqual(
             inferred,
-            [{'file': 'case4.py', 'line_number': 12, 'function': 'MyClass.get_hash', 'type': {'dict'}}]
+            [{'file': 'case4.py', 'line_number': 12, 'function': 'MyClass.get_hash', 'type': {'Dict[any, any]'}}]
         )
 
     def test_case_5(self):
@@ -101,8 +101,8 @@ class BaseCaseTests(unittest.TestCase):
         inferred = infferer.get_types()
         self.assertEqual(
             inferred,
-            [{'file': 'case9.py', 'line_number': 13, 'function': 'ParentClass.my_function', 'type': {'list'}},
-             {'file': 'case9.py', 'line_number': 21, 'function': 'ChildClass.my_function', 'type': {'list'}}]
+            [{'file': 'case9.py', 'line_number': 13, 'function': 'ParentClass.my_function', 'type': {'List[int]'}},
+             {'file': 'case9.py', 'line_number': 21, 'function': 'ChildClass.my_function', 'type': {'List[int]'}}]
         )
 
     def test_case_10(self):
@@ -185,6 +185,36 @@ class BaseCaseTests(unittest.TestCase):
               'type': 'Tuple[str]'},
              {'file': 'file1.py', 'line_number': 7, 'function': 'class_method', 'type': {'Tuple[str]'}},
              {'file': 'file1.py', 'line_number': 7, 'function': 'MyClass.class_method', 'type': {'Tuple[str]'}}]
+        )
+
+    def test_case_17(self):
+        inferrer = TypeInference(name='case17', entry_point='basecase/case17.py')
+        inferrer.infer_types()
+        inferred = inferrer.get_types()
+        self.assertEqual(
+            inferred,
+            [{'file': 'case17.py', 'line_number': 5, 'function': 'fun2', 'type': {'float'}},
+             {'file': 'case17.py', 'line_number': 1, 'parameter': 'a', 'function': 'fun1', 'type': 'float'},
+             {'file': 'case17.py', 'line_number': 5, 'parameter': 'a', 'function': 'fun2', 'type': 'float'}]
+        )
+
+    def test_case_18(self):
+        inferrer = TypeInference(name='case18', entry_point='basecase/case18.py')
+        inferrer.infer_types()
+        inferred = inferrer.get_types()
+        self.assertEqual(
+            inferred,
+            [{'file': 'case18.py', 'line_number': 5, 'function': 'MyParentClass.my_function', 'type': {'str'}},
+             {'file': 'case18.py', 'line_number': 11, 'function': 'ChildClass.my_function', 'type': {'List[str]'}}]
+        )
+
+    def test_case_19(self):
+        inferrer = TypeInference(name='case18', entry_point='basecase/case19.py')
+        inferrer.infer_types()
+        inferred = inferrer.get_types()
+        self.assertEqual(
+            inferred,
+            []
         )
 
     def test_case_20(self):

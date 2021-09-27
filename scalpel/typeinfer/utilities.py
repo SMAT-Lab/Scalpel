@@ -108,6 +108,9 @@ def get_type(node, imports=None) -> str:
     :param imports: Dictionary of known imported types
     :return: The type of the node
     """
+
+    # TODO: Implement consistent list types where required
+
     if node is None:
         return any.__name__
     elif isinstance(node, str) and node[0:3] == "org":
@@ -146,14 +149,15 @@ def get_type(node, imports=None) -> str:
         elif isinstance(node.n, float):
             return "float"
         return "num"
-    elif isinstance(node, ast.List):
-        return "list"
+    elif isinstance(node, ast.List) or isinstance(node, ast.Tuple):
+        value_type = check_consistent_list_types(node.elts)
+        return f"{type(node).__name__}[{value_type}]"
     elif isinstance(node, ast.Subscript):
         return "subscript"
-    elif isinstance(node, ast.Tuple):
-        return "tuple"
     elif isinstance(node, ast.Dict):
-        return "dict"
+        key_type = check_consistent_list_types(node.keys)
+        value_type = check_consistent_list_types(node.values)
+        return f"Dict[{key_type}, {value_type}]"
     elif isinstance(node, ast.Set):
         return "set"
     elif isinstance(node, ast.SetComp):
@@ -216,6 +220,45 @@ def get_type(node, imports=None) -> str:
         return "attr"
     else:
         return "unknown"
+
+
+def check_consistent_list_types(values) -> str:
+    """
+    Checks a list of values to see if they have a constant type
+    """
+
+    if len(values) == 0:
+        # Nothing in list yet so return any
+        return any.__name__
+    first_type = type(values[0])
+    assignment_type = any.__name__
+    if not first_type == ast.Constant:
+        builtin_types_dict = get_built_in_types()
+        builtin_first_type = builtin_types_dict.get(first_type.__name__.lower())
+        # Not an AST constant so we can just compare AST types
+        for n in values[1:len(values)]:
+            # Compare type to first items type
+            if not isinstance(n, first_type):
+                # No constant type, assign any
+                assignment_type = any.__name__
+                break
+            else:
+                assignment_type = builtin_first_type
+    else:
+        # We have an AST constant so we will need to compare their types
+        first_constant_type = type(values[0].value)
+        assignment_type = first_constant_type.__name__
+        for n in values[1:len(values)]:
+            # Compare type to first items type
+            if not isinstance(n, ast.Constant):
+                # Not a constant type, assign any
+                assignment_type = any.__name__
+                break
+            else:
+                if not isinstance(n.value, first_constant_type):
+                    assignment_type = any.__name__
+                    break
+    return assignment_type
 
 
 def is_camel_case(s: str) -> bool:

@@ -1,12 +1,12 @@
 class MyParentClass:
     def __init__(self):
-        self.attribute = ["Hello", "World", "!"]
+        self.parent_attribute = ["Hello", "World", "!"]
 
     def my_function(self):
-        return " ".join(self.attribute)
+        return " ".join(self.parent_attribute)
 
 
 class ChildClass(MyParentClass):
 
     def my_function(self):
-        return super().attribute
+        return super().parent_attribute

@@ -352,8 +352,10 @@ class TypeInference:
                             static_assignment.type = arg.type_comment.__name__
 
         # Loop through class nodes
+        class_assign_record_map = {}
         for class_node in all_classes:
             class_name = class_node.name
+
             class_visitor = ClassSplitVisitor()
             class_visitor.visit(class_node)
 
@@ -363,6 +365,15 @@ class TypeInference:
                     class2base[class_name] = class_node.bases[0].id
 
             class_assign_records = class_visitor.class_assign_records
+            class_assign_record_map[class_name] = class_assign_records
+
+            # Extend class assign records with super class assign records
+            for superclass_name in class_visitor.bases:
+                if assign_records := class_assign_record_map.get(superclass_name):
+                    for assignment_name, type_val in assign_records.items():
+                        super_assignment = assignment_name.replace('self', 'super')
+                        class_assign_records[super_assignment] = type_val
+
             return_visitor.clear_all()
             return_visitor.import_assign_records(class_assign_records)
 
@@ -374,6 +385,21 @@ class TypeInference:
 
                 # Get method header comment TODO: Is this needed?
                 processed_file.node_type_comment[function_name] = get_function_comment(function_source)
+
+                # Heuristic 5
+                assignments = heuristics.heuristic_five(
+                    import_mappings=import_mappings,
+                    processed_file=processed_file,
+                    function_node=function_node
+                )
+
+                # Heuristic 8
+                function_params = [a for a in assignments if a.is_arg]
+                heuristics.heuristic_eight(
+                    ast_tree=tree,
+                    function_name=function_name,
+                    function_params=function_params
+                )
 
                 return_visitor.clear_all()
                 return_visitor.import_class_assign_records(class_assign_records)
@@ -442,7 +468,7 @@ class TypeInference:
 
 
 if __name__ == '__main__':
-    inferrer = TypeInference(name='', entry_point='basecase/case21.py')
+    inferrer = TypeInference(name='', entry_point='basecase/case19.py')
     inferrer.infer_types()
     for t in inferrer.get_types():
         print(t)
