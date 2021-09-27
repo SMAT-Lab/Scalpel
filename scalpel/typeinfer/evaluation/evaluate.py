@@ -58,20 +58,26 @@ def get_stub_function_returns(stub_file_path):
                 function_names.append(function_name)
                 function_def = class_obj.__dict__[function_name]
                 type_values = typing.get_type_hints(function_def)
-                type_dict['functions'][method_name] = str(type_values['return']).replace('typing.', '')
+                if 'typing' in str(type_values['return']):
+                    type_dict['functions'][method_name] = str(type_values['return']).replace('typing.', '')
+                else:
+                    type_dict['functions'][method_name] = type_values['return'].__name__
 
         for function_node in all_methods:
             function_name = function_node.name
             function_names.append(function_node.name)
             type_values = typing.get_type_hints(namespace[function_name])
-            type_dict['functions'][function_name] = str(type_values['return']).replace('typing.', '')
+            if 'typing' in str(type_values['return']):
+                type_dict['functions'][function_name] = str(type_values['return']).replace('typing.', '')
+            else:
+                type_dict['functions'][function_name] = type_values['return'].__name__
 
         return type_dict
 
 
 def basecase_scalpel_vs_pytype():
     correct, total = 0, 0
-    for i in range(1, 11):
+    for i in range(1, 13):
         file_name = f'case{i}.py'
         print(file_name)
         pytype_stub_file = f'../basecase/basecase_pytype/pyi/{file_name}i'
@@ -99,13 +105,27 @@ def basecase_scalpel_vs_pytype():
                 # Compare types
                 scalpel_return_set = scalpel_function.get('type')
                 pytype_return_set = {pytype_return}
-
+                print(scalpel_return_set, pytype_return_set)
                 # Perform check
                 if scalpel_return_set == pytype_return_set:
                     correct += 1
-
-                print(scalpel_return_set, pytype_return_set)
-
+                elif len(scalpel_return_set) == len(pytype_return_set):
+                    # Check first element lowercase
+                    scalpel_return = next(iter(scalpel_return_set))
+                    pytype_return = next(iter(pytype_return_set))
+                    if scalpel_return.lower() in pytype_return.lower():
+                        correct += 1
+                elif len(pytype_return_set) == 1:
+                    pytype_return = next(iter(pytype_return_set))
+                    if 'Union' in pytype_return:
+                        scalpel_union = 'Union['
+                        for index, s in enumerate(scalpel_return_set):
+                            if index + 1 != len(scalpel_return_set):
+                                scalpel_union += s + ', '
+                            else:
+                                scalpel_union += s + ']'
+                        if scalpel_union == pytype_return:
+                            correct += 1
                 # Increment total
                 total += 1
 
