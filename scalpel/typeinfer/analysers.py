@@ -5,6 +5,7 @@ Scalpel Type Inference Static Analysis Tools
 """
 
 import ast
+import regex
 import tokenize
 import typed_ast
 import typeshed_client
@@ -1008,7 +1009,7 @@ class Heuristics:
         for variable in list(reversed(processed_file.static_assignments)):
             involved_params = [i for i in param_list if variable == i]
 
-    count = 0
+        regex = r'\b^(.{0,12}_{0,1}(count|counter|sum)_{0,1}.{0,12}|(int|num|sum|count|counter))$\b'
 
     @staticmethod
     def get_bin_op_involved(binary_operation: ast.BinOp):
