@@ -814,8 +814,7 @@ class Heuristics:
 
         return all_params
 
-    @staticmethod
-    def heuristic_five(import_mappings, processed_file, function_node):
+    def heuristic_five(self, import_mappings, processed_file, function_node):
         # Perform heuristic five within a function
         assignments = VariableAssignmentMap(function_node, imports=import_mappings).map()
 
@@ -832,7 +831,7 @@ class Heuristics:
                 right_operation = variable.binary_operation.right
 
                 # Check for involved parameters
-                involved_params = [i for i in param_list if Heuristics.in_bin_op(i, variable.binary_operation)]
+                involved_params = [i for i in param_list if self.in_bin_op(i, variable.binary_operation)]
 
                 if isinstance(left_operation, ast.BinOp):
                     # Greater than two values in the operation
