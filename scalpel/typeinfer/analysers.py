@@ -771,7 +771,6 @@ class Heuristics:
                     } for x in func_args
                 ]
 
-                print(node)
             elif hasattr(node, "value") and isinstance(node.value, ast.Call):
                 func_name = node.value.func.id
                 args = node.value.args
