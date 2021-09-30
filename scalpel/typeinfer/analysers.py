@@ -976,8 +976,8 @@ class Heuristics:
                     union_types = f"Union[{', '.join(type_values)}]"
                     parameter.type = union_types
 
-    def heuristic_nine(self, import_mappings, processed_file, function_node):
-        # Perform heuristic five within a function
+    @staticmethod
+    def heuristic_nine(import_mappings, processed_file, function_node):
         assignments = VariableAssignmentMap(function_node, imports=import_mappings).map()
 
         for assignment in assignments:
@@ -985,20 +985,11 @@ class Heuristics:
         processed_file.static_assignments.extend(assignments)
 
         # work through params
-        involved = processed_file.static_assignments
         for variable in [v for v in processed_file.static_assignments if v.type == 'any']:
-            regex = re.search(r'\b^(.{0,12}_{0,1}(count|counter|sum)_{0,1}.{0,12}|(int|num|sum|count|counter))$\b',variable.name)
+            regex_query = r'\b^(.{0,12}_{0,1}(count|counter|sum)_{0,1}.{0,12}|(int|num|sum|count|counter))$\b'
+            regex = re.search(regex_query, variable.name)
             if regex:
                 variable.type = 'int'
-
-        # regex = r'\b^(.{0,12}_{0,1}(count|counter|sum)_{0,1}.{0,12}|(int|num|sum|count|counter))$\b'
-
-        """
-        # Get variables that are called
-        involved = [v for v in processed_file.static_assignments if v.name in function_calls]
-        for variable in involved:
-            variable.type = callable.__name__
-        """
 
     @staticmethod
     def get_bin_op_involved(binary_operation: ast.BinOp):
