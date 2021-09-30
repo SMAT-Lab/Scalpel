@@ -757,63 +757,45 @@ class ReturnStmtVisitor(ast.NodeVisitor):
 
 class Heuristics:
     @staticmethod
-    def heuristic_two(all_methods):
-        function_calls = {}
-        all_params = {x.name: [{"arg": y, "name": y.arg} for y in x.args.args] for x in all_methods}
-        # Convert the arguments into a dictionary
-        for function in all_methods:
-            all_function_calls = [x for x in function.body if isinstance(x, ast.Expr)]
+    def heuristic_two(ast_tree, processed_file):
+        function_param_types = {}
+        for node in ast.walk(ast_tree):
+            if isinstance(node, ast.FunctionDef):
+                func_args = node.args.args
+                func_name = node.name
+                function_param_types[func_name] = [{
+                        "possible_arg_types": [],
+                        "funcs": [],
+                        "type": "",
+                        "param_name": x.arg
+                    } for x in func_args
+                ]
 
-            # Calculate all calls performed in this function
-            for func_call in all_function_calls:
-                temp_func = func_call
-                id = None
-                while id is None:
-                    if hasattr(temp_func, "value"):
-                        if isinstance(temp_func.value, ast.Call):
-                            temp_func = temp_func.value.func
-                        elif isinstance(temp_func.value, ast.Constant):
-                            id = temp_func.value.value
-                    elif hasattr(temp_func, "id"):
-                        id = temp_func.id
-                if id is None:
-                    continue
-                call_to_function_name = id
+            elif hasattr(node, "value") and isinstance(node.value, ast.Call):
+                func_name = node.value.func.id
+                args = node.value.args
+                for i in range(len(args)):
+                    arg = args[i]
+                    if isinstance(arg, ast.Call):
+                        function_param_types[func_name][i]["funcs"].append(arg.func.id)
+                    else:
+                        function_param_types[func_name][i]["possible_arg_types"].append(type(arg.value).__name__)
 
-                if call_to_function_name not in all_params:
-                    continue
-                if call_to_function_name in function_calls:
-                    function_calls[call_to_function_name].append(func_call)
-                else:
-                    function_calls[call_to_function_name] = {}
-                    function_calls[call_to_function_name] = [func_call]
+        for function in function_param_types.values():
+            for arg in function:
+                param_name = arg["param_name"]
+                possible_types = list(set(arg["possible_arg_types"]))
+                if len(possible_types) == 1:
+                    arg["type"] = possible_types[0]
 
-        for function, calls in function_calls.items():
-            for call in calls:
-                if not hasattr(call.value, "args") or len(call.value.args) == 0:
-                    continue
-                # TODO Might need to extend with multiple parameter checking depending on our scoping
-                if hasattr(call.value.args[0], "value"):
-                    parameter_type = type(call.value.args[0].value)
-                    result = (parameter_type, "value")
-                elif hasattr(call.value.args[0], "func"):
-                    func_name = call.value.args[0].func.id
-                    result = (func_name, "func")
-                else:
-                    result = (None, None)
-                if function in all_params and "possible_type" not in all_params[function][0]:
-                    all_params[function][0]["possible_type"] = [result]
-                else:
-                    all_params[function][0]["possible_type"].append(result)
-
-        for function_name, parameters in all_params.items():
-            for parameter in parameters:
-                if "possible_type" in parameter:
-                    types = [x for x in parameter["possible_type"] if x[-1] == "value"]
-                    if len(types) == 1:
-                        parameter["arg"].type_comment = types[0][0]
-
-        return all_params
+        for static_assignment in processed_file.static_assignments:
+            function_name = static_assignment.function
+            parameter_name = static_assignment.name
+            if function_name in function_param_types:
+                for arg in function_param_types[function_name]:
+                    if arg["param_name"] == parameter_name:
+                        if arg["type"] is not None or arg["type"] != "":
+                            static_assignment.type = arg["type"]
 
     def heuristic_five(self, import_mappings, processed_file, function_node):
         # Perform heuristic five within a function
@@ -994,7 +976,7 @@ class Heuristics:
                     union_types = f"Union[{', '.join(type_values)}]"
                     parameter.type = union_types
 
-    def heuristic_nine(self,  import_mappings, processed_file, function_node):
+    def heuristic_nine(self, import_mappings, processed_file, function_node):
         # Perform heuristic five within a function
         assignments = VariableAssignmentMap(function_node, imports=import_mappings).map()
 

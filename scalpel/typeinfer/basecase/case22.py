@@ -3,6 +3,10 @@ class test_obj:
         self.func_2 = func_2
 
 
+def func_3():
+    func_1().func_2()
+
+
 def func_2():
     return "test"
 
@@ -12,5 +16,3 @@ def func_1():
     return my_obj
 
 
-def func_3():
-    func_1().func_2()

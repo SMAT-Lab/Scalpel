@@ -336,6 +336,16 @@ class TypeInference:
                 function_node=function_node
             )
 
+            # Heuristic 2
+            heuristics.heuristic_two(
+                ast_tree=tree,
+                processed_file=processed_file
+            )
+
+            # heuristics.heuristic_three(
+            #     processed_file=processed_file,
+            #     function_node=function_node
+            # )
             # Import resolved assignments to the return visitor
             return_visitor.import_assignments(assignments)
 
@@ -355,20 +365,6 @@ class TypeInference:
             processed_file.type_dict[function_name] = return_visitor.r_types
             stem_from_dict[function_name] = return_visitor.stem_from
             processed_file.type_gt[function_name] = function_node.returns
-
-        calls = heuristics.heuristic_two(
-            all_methods=all_methods
-        )
-
-        for static_assignment in processed_file.static_assignments:
-            function_name = static_assignment.function
-            parameter_name = static_assignment.name
-            if function_name in calls:
-                for function_param in calls[function_name]:
-                    if function_param["name"] == parameter_name:
-                        arg = function_param["arg"]
-                        if arg.type_comment is not None:
-                            static_assignment.type = arg.type_comment.__name__
 
         # Loop through class nodes
         class_assign_record_map = {}
@@ -499,7 +495,7 @@ class TypeInference:
 
 
 if __name__ == '__main__':
-    inferrer = TypeInference(name='', entry_point='basecase/case25.py')
+    inferrer = TypeInference(name='', entry_point='basecase/case21.py')
     inferrer.infer_types()
     for t in inferrer.get_types():
         print(t)
