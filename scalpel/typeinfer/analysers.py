@@ -5,7 +5,7 @@ Scalpel Type Inference Static Analysis Tools
 """
 
 import ast
-import regex
+import re
 import tokenize
 import typed_ast
 import typeshed_client
@@ -1002,14 +1002,21 @@ class Heuristics:
             assignment.function = function_node.name
         processed_file.static_assignments.extend(assignments)
 
-        param_list = [v for v in assignments if v.is_arg]
-        assignment_dict = {v.name: v for v in processed_file.static_assignments}
-
         # work through params
-        for variable in list(reversed(processed_file.static_assignments)):
-            involved_params = [i for i in param_list if variable == i]
+        involved = processed_file.static_assignments
+        for variable in [v for v in processed_file.static_assignments if v.type == 'any']:
+            regex = re.search(r'\b^(.{0,12}_{0,1}(count|counter|sum)_{0,1}.{0,12}|(int|num|sum|count|counter))$\b',variable.name)
+            if regex:
+                variable.type = 'int'
 
-        regex = r'\b^(.{0,12}_{0,1}(count|counter|sum)_{0,1}.{0,12}|(int|num|sum|count|counter))$\b'
+        # regex = r'\b^(.{0,12}_{0,1}(count|counter|sum)_{0,1}.{0,12}|(int|num|sum|count|counter))$\b'
+
+        """
+        # Get variables that are called
+        involved = [v for v in processed_file.static_assignments if v.name in function_calls]
+        for variable in involved:
+            variable.type = callable.__name__
+        """
 
     @staticmethod
     def get_bin_op_involved(binary_operation: ast.BinOp):

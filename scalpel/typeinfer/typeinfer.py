@@ -329,12 +329,12 @@ class TypeInference:
                 function_node=function_node
             )
 
-            # # Heuristic 9
-            # heuristics.heuristic_nine(
-            #     import_mappings=import_mappings,
-            #     processed_file=processed_file,
-            #     function_node=function_node
-            # )
+            # Heuristic 9
+            heuristics.heuristic_nine(
+                import_mappings=import_mappings,
+                processed_file=processed_file,
+                function_node=function_node
+            )
 
             # Import resolved assignments to the return visitor
             return_visitor.import_assignments(assignments)
