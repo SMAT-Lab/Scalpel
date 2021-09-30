@@ -994,23 +994,6 @@ class Heuristics:
                     union_types = f"Union[{', '.join(type_values)}]"
                     parameter.type = union_types
 
-    def heuristic_nine(self,  import_mappings, processed_file, function_node):
-        # Perform heuristic five within a function
-        assignments = VariableAssignmentMap(function_node, imports=import_mappings).map()
-
-        for assignment in assignments:
-            assignment.function = function_node.name
-        processed_file.static_assignments.extend(assignments)
-
-        param_list = [v for v in assignments if v.is_arg]
-        assignment_dict = {v.name: v for v in processed_file.static_assignments}
-
-        # work through params
-        for variable in list(reversed(processed_file.static_assignments)):
-            involved_params = [i for i in param_list if variable == i]
-
-    count = 0
-
     @staticmethod
     def get_bin_op_involved(binary_operation: ast.BinOp):
         """
