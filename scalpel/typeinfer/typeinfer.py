@@ -336,11 +336,11 @@ class TypeInference:
                 function_node=function_node
             )
 
-            # Heuristic 2
-            heuristics.heuristic_two(
-                ast_tree=tree,
-                processed_file=processed_file
-            )
+            # # Heuristic 2
+            # heuristics.heuristic_two(
+            #     ast_tree=tree,
+            #     processed_file=processed_file
+            # )
 
             # heuristics.heuristic_three(
             #     processed_file=processed_file,

@@ -1,5 +1,12 @@
+"""
+For some reason, we give User() explicitly to my_func_lower but it is not picked up?
+"""
+
+
 def my_func_main():
-    my_func_lower(User(), User())
+    x = User()
+    y = User()
+    my_func_lower(x, y)
 
 
 def my_func_lower(user_1, user_2):
