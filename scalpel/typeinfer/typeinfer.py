@@ -329,12 +329,12 @@ class TypeInference:
                 function_node=function_node
             )
 
-            # Heuristic 9
-            heuristics.heuristic_nine(
-                import_mappings=import_mappings,
-                processed_file=processed_file,
-                function_node=function_node
-            )
+            # # Heuristic 9
+            # heuristics.heuristic_nine(
+            #     import_mappings=import_mappings,
+            #     processed_file=processed_file,
+            #     function_node=function_node
+            # )
 
             # Heuristic 2
             heuristics.heuristic_two(

@@ -12,7 +12,7 @@
 | 6      | Yes         |  a = fun1(); a()                     | fun1's return type is a function
 | 7      | Yes         |  if isinstance(fun1(),typename)      | fun1’s returns type could be typename
 | 8      | Yes         |  def fun1(x); y= "hello"; fun1(y);   | fun1’s argument x is the same type as y
-| 9      | No          |  var_sum, var_count, person_id       | variables contain 'sum', 'count', and 'id', suggesting that they are int's
+| 9      | No          |  var_sum, var_count, int, num, i, n  | variables contain 'sum', 'count', and 'id', suggesting that they are int's
 | 10     | No          |  class User; def fun(user)           | function parameter 'user' is same name as class 'User'. If user calls same methods as User, suggests user is type of User
 
 To deduce types using these heuristics we need the ability to:
