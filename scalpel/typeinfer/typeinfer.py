@@ -337,10 +337,11 @@ class TypeInference:
             )
 
             # # Heuristic 2
-            # heuristics.heuristic_two(
-            #     ast_tree=tree,
-            #     processed_file=processed_file
-            # )
+            heuristics.heuristic_two(
+                ast_tree=tree,
+                processed_file=processed_file,
+                assignments=assignments
+            )
 
             # heuristics.heuristic_three(
             #     processed_file=processed_file,
@@ -495,7 +496,7 @@ class TypeInference:
 
 
 if __name__ == '__main__':
-    inferrer = TypeInference(name='', entry_point='basecase/case27.py')
+    inferrer = TypeInference(name='', entry_point='basecase/case19.py')
     inferrer.infer_types()
     for t in inferrer.get_types():
         print(t)

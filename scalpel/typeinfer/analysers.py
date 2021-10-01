@@ -757,7 +757,8 @@ class ReturnStmtVisitor(ast.NodeVisitor):
 
 class Heuristics:
     @staticmethod
-    def heuristic_two(ast_tree, processed_file):
+    def heuristic_two(ast_tree, processed_file, assignments):
+        assignments
         function_param_types = {}
         for node in ast.walk(ast_tree):
             if isinstance(node, ast.FunctionDef):
@@ -772,12 +773,17 @@ class Heuristics:
                 ]
 
             elif hasattr(node, "value") and isinstance(node.value, ast.Call):
+
+                if isinstance(node.value.func, ast.Attribute) or isinstance(node.value.func, ast.Name):
+                    continue
                 func_name = node.value.func.id
                 args = node.value.args
                 for i in range(len(args)):
                     arg = args[i]
                     if isinstance(arg, ast.Call):
                         function_param_types[func_name][i]["funcs"].append(arg.func.id)
+                    elif isinstance(arg, ast.Name):
+                        pass
                     else:
                         function_param_types[func_name][i]["possible_arg_types"].append(type(arg.value).__name__)
 
@@ -794,7 +800,7 @@ class Heuristics:
             if function_name in function_param_types:
                 for arg in function_param_types[function_name]:
                     if arg["param_name"] == parameter_name:
-                        if arg["type"] is not None or arg["type"] != "":
+                        if arg["type"] is not None and arg["type"] != "":
                             static_assignment.type = arg["type"]
 
     def heuristic_five(self, import_mappings, processed_file, function_node):
