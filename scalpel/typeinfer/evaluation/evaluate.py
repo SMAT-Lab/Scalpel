@@ -8,8 +8,8 @@ import ast
 import os
 import typing
 import tokenize
-import astunparse
 from pprint import pprint
+from typed_ast import ast3
 
 from scalpel.typeinfer.analysers import ClassSplitVisitor
 from scalpel.typeinfer.typeinfer import TypeInference
@@ -149,6 +149,90 @@ def get_nodes(tree):
     return fun_nodes, class_nodes, import_nodes
 
 
+def evaluate_repos():
+    # Run Scalpel type inference on each repository in the repos folder
+    repo_list = os.listdir('repos')
+    for repo in repo_list:
+        # Get scalpel inferred types
+        inferrer = TypeInference(name=repo, entry_point=f'repos/{repo}/{repo}')
+        inferrer.infer_types()
+        scalpel_inferred = inferrer.get_types()
+
+        # Get PyType inferred types from stub files
+        pytype_inferred = []
+        for file in os.listdir('repos/requests/pytype'):
+            pytype_inferred.extend(get_stub_types(f'repos/requests/pytype/{file}'))
+
+        compare_dict = {}
+        pytype_total = 0
+        for inferred in pytype_inferred:
+            file, function, p_type = inferred['file'], inferred['function'], inferred['type']
+            file = file.replace('.pyi', '.py')  # Replace file extension so we can compare to the same file name
+            if compare_dict.get(file):
+                compare_dict[file][function] = p_type
+            else:
+                compare_dict[file] = {function: p_type}
+
+            if p_type is not None:
+                # Only incrementing total if return type is not None,
+                # since our module doesn't report None for functions with no return
+                pytype_total += 1  # Increment PyType inferred total count
+
+        # Compare with Scalpel
+        scalpel_total = 0
+        for inferred in scalpel_inferred:
+            if 'variable' not in inferred and 'parameter' not in inferred:
+                file, function, s_type = inferred['file'], inferred['function'], inferred['type']
+                if file_types := compare_dict.get(file):
+                    if p_type := file_types.get(function):
+                        if len(s_type) == 1:
+                            s_type = next(iter(s_type))
+                            if p_type.lower() in s_type.lower():
+                                scalpel_total += 1
+        print(f'Repository: {repo}, Accuracy: {round(scalpel_total / pytype_total, 4) * 100}%')
+
+
+def get_stub_types(stub_file_path: str):
+    file_name = stub_file_path.split('/')[-1]
+    with open(stub_file_path, 'r') as stub_file:
+        source = stub_file.read()
+        try:
+            tree = ast3.parse(source, mode='exec')
+        except Exception as e:
+            print(e)
+
+        inferred_types = []
+
+        for node in ast3.walk(tree):
+            if isinstance(node, ast3.FunctionDef):
+                function_name = node.name
+
+                # Function return
+                return_node = node.returns
+                if isinstance(return_node, ast3.Subscript):
+                    return_type = return_node.value.id
+                elif isinstance(return_node, ast3.NameConstant):
+                    return_type = return_node.value
+                elif isinstance(return_node, ast3.Name):
+                    return_type = return_node.id
+                elif isinstance(return_node, ast3.Attribute):
+                    return_type = return_node.attr
+                else:
+                    raise Exception(f'Return node type not accounted for: {type(return_node)}')
+                inferred_types.append({
+                    'file': file_name,
+                    'function': function_name,
+                    'type': return_type
+                })
+
+                # Function parameters
+                for argument in node.args.args:
+                    print(function_name, argument.arg, argument.type_comment)
+
+    return inferred_types
+
+
 if __name__ == '__main__':
-    total, correct = basecase_scalpel_vs_pytype()
-    print(f"Total: {total}\nCorrect: {correct}")
+    # total, correct = basecase_scalpel_vs_pytype()
+    # print(f"Total: {total}\nCorrect: {correct}")
+    evaluate_repos()
