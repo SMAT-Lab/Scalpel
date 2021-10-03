@@ -225,21 +225,24 @@ class TypeInference:
         for node in self.leaves:
             # Function returns
             for function_name, type_values in node.node_type_dict.items():
+                added = False  # Used to check whether type has already been added to list for the loop
+
                 if type_values is None or len(type_values) == 0:
                     continue
 
                 for value in type_values:
-                    if value in ['unknown', '3call']:
+                    if value in ['unknown', '3call', 'self']:
                         type_list.append({
                             'file': node.name,
                             'line_number': node.line_numbers.get(function_name),
                             'function': function_name,
                             'type': {any.__name__}
                         })
+                        added = True
+                        break
 
-                if is_done(type_values):
+                if is_done(type_values) and not added:
                     n_known += 1
-                    # TODO: Resolve warning below
                     type_list.append({
                         'file': node.name,
                         'line_number': node.line_numbers.get(function_name),
@@ -265,7 +268,6 @@ class TypeInference:
                         'function': assignment.function,
                         'type': assignment.type
                     })
-            pprint(node.static_assignments)
         return type_list
 
     @staticmethod
@@ -503,7 +505,7 @@ class TypeInference:
 
 
 if __name__ == '__main__':
-    inferrer = TypeInference(name='', entry_point='basecase/case1.py')
+    inferrer = TypeInference(name='', entry_point='basecase/case28.py')
     inferrer.infer_types()
     for t in inferrer.get_types():
         print(t)

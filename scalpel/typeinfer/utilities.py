@@ -110,7 +110,6 @@ def get_type(node, imports=None) -> str:
     """
 
     # TODO: Implement consistent list types where required
-
     if node is None:
         return any.__name__
     elif isinstance(node, str) and node[0:3] == "org":
@@ -143,6 +142,7 @@ def get_type(node, imports=None) -> str:
         if node.id == 'self':
             return "self"
         return 'ID'
+
     if isinstance(node, ast.Num):
         if isinstance(node.n, int):
             return "int"
@@ -166,10 +166,10 @@ def get_type(node, imports=None) -> str:
         return "str"
     elif isinstance(node, ast.JoinedStr):
         return "str"
-    elif isinstance(node, ast.NameConstant):
-        return any.__name__
     elif isinstance(node, ast.Constant):
         return get_type(node.value)
+    elif isinstance(node, ast.NameConstant):
+        return any.__name__
     elif isinstance(node, ast.Lambda):
         return "lambda"
     elif isinstance(node, ast.DictComp):
@@ -218,6 +218,8 @@ def get_type(node, imports=None) -> str:
             return "call"
     elif isinstance(node, ast.Attribute):
         return "attr"
+    elif isinstance(node, bool):
+        return bool.__name__
     else:
         return "unknown"
 

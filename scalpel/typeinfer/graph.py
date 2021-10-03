@@ -125,7 +125,6 @@ class ImportGraph:
             return visitor.result, tree, visitor.pair
         except Exception as e:  # To avoid non-python code
             # Non-python code to handle here
-            print(e)
             return {}, None, None  # Return empty
 
     @staticmethod

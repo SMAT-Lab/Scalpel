@@ -129,7 +129,9 @@ class ImportTypeMap(_StaticAnalyzer):
             if isinstance(node, typed_ast._ast3.FunctionDef):
                 if isinstance(node.returns, typed_ast._ast3.Subscript):
                     return node.returns.value.id
-                return node.returns.id
+
+                if isinstance(node.returns, typed_ast._ast3.Name):
+                    return node.returns.id
             elif isinstance(node, typed_ast._ast3.AnnAssign):
                 return node.annotation.id
             elif isinstance(node, typed_ast._ast3.ClassDef):
@@ -496,7 +498,7 @@ class ClassSplitVisitor(ast.NodeVisitor):
         return node
 
     def visit_ClassDef(self, node):
-        self.bases = [n.id for n in node.bases if not isinstance(n, ast.Attribute)]
+        self.bases = [n.id for n in node.bases if not isinstance(n, ast.Attribute) and not isinstance(n, ast.Subscript)]
         for tmp_node in node.body:
             if not isinstance(tmp_node, ast.Assign):
                 continue
@@ -632,11 +634,12 @@ class ReturnStmtVisitor(ast.NodeVisitor):
             # TODO: Is block.id correct here?
             if type_val == 'attr' and isinstance(init_val.value, ast.Call):
                 # Check for super class call
-                if init_val.value.func.id == 'super':
-                    # Check super class attributes
-                    attribute_name = f"super.{init_val.attr}"
-                    if super_assign := self.class_assign_records.get(attribute_name):
-                        type_val = get_type(super_assign[0])
+                if not isinstance(init_val.value.func, ast.Attribute):
+                    if init_val.value.func.id == 'super':
+                        # Check super class attributes
+                        attribute_name = f"super.{init_val.attr}"
+                        if super_assign := self.class_assign_records.get(attribute_name):
+                            type_val = get_type(super_assign[0])
 
             lookup_name = block.id if type_val == "ID" else get_attr_name(init_val)
             if lookup_name in self.local_assign_records:
@@ -908,7 +911,8 @@ class Heuristics:
         for node in ast.walk(function_node):
             # Visit ast.Call nodes, checking for variable names
             if isinstance(node, ast.Call):
-                if not isinstance(node.func, ast.Attribute) and not isinstance(node.func, ast.Call):
+                if not isinstance(node.func, ast.Attribute) and not isinstance(node.func, ast.Call) \
+                        and not isinstance(node.func, ast.Subscript):
                     function_calls.append(node.func.id)
 
         # Get variables that are called
@@ -922,7 +926,8 @@ class Heuristics:
         is_instance_type_map = {}
         for node in ast.walk(function_node):
             if isinstance(node, ast.Call):
-                if not isinstance(node.func, ast.Attribute) and not isinstance(node.func, ast.Call):
+                if not isinstance(node.func, ast.Attribute) and not isinstance(node.func, ast.Call) \
+                        and not isinstance(node.func, ast.Subscript):
                     if node.func.id == 'isinstance':
                         # Check to see what the value being compared to is
                         variable, type_compared = node.args[0], node.args[1]

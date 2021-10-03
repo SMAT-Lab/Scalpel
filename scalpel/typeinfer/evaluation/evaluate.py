@@ -79,7 +79,6 @@ def basecase_scalpel_vs_pytype():
     correct, total = 0, 0
     for i in range(1, 13):
         file_name = f'case{i}.py'
-        print(file_name)
         pytype_stub_file = f'../basecase/basecase_pytype/pyi/{file_name}i'
 
         # Get PyType inferred types as dict
@@ -105,7 +104,7 @@ def basecase_scalpel_vs_pytype():
                 # Compare types
                 scalpel_return_set = scalpel_function.get('type')
                 pytype_return_set = {pytype_return}
-                print(scalpel_return_set, pytype_return_set)
+                # print(scalpel_return_set, pytype_return_set)
                 # Perform check
                 if scalpel_return_set == pytype_return_set:
                     correct += 1
@@ -151,17 +150,22 @@ def get_nodes(tree):
 
 def evaluate_repos():
     # Run Scalpel type inference on each repository in the repos folder
-    repo_list = os.listdir('repos')
+    repo_list = os.listdir('pytype_stubs')
+    repo_list = ['nvbn__thefuck']#, 'psf__black', 'minimaxir__big-list-of-naughty-strings', 'openai__gym', 'psf__requests']
     for repo in repo_list:
+        # Get file paths
+        print(repo)
+        path_dict = get_file_paths(repo)
+
         # Get scalpel inferred types
-        inferrer = TypeInference(name=repo, entry_point=f'repos/{repo}/{repo}')
+        inferrer = TypeInference(name=repo, entry_point=f'source_repos/{repo}')
         inferrer.infer_types()
         scalpel_inferred = inferrer.get_types()
 
         # Get PyType inferred types from stub files
         pytype_inferred = []
-        for file in os.listdir('repos/requests/pytype'):
-            pytype_inferred.extend(get_stub_types(f'repos/requests/pytype/{file}'))
+        for file in path_dict.keys():
+            pytype_inferred.extend(get_stub_types(file))
 
         compare_dict = {}
         pytype_total = 0
@@ -183,13 +187,19 @@ def evaluate_repos():
         for inferred in scalpel_inferred:
             if 'variable' not in inferred and 'parameter' not in inferred:
                 file, function, s_type = inferred['file'], inferred['function'], inferred['type']
+
                 if file_types := compare_dict.get(file):
                     if p_type := file_types.get(function):
+                        print(file, function, p_type, s_type)
                         if len(s_type) == 1:
                             s_type = next(iter(s_type))
                             if p_type.lower() in s_type.lower():
+                                print('adding')
                                 scalpel_total += 1
-        print(f'Repository: {repo}, Accuracy: {round(scalpel_total / pytype_total, 4) * 100}%')
+        try:
+            print(f'Repository: {repo}, Accuracy: {round(scalpel_total / pytype_total, 4) * 100}%')
+        except ZeroDivisionError:
+            print(f'Repository: {repo}, Accuracy: 100%')
 
 
 def get_stub_types(stub_file_path: str):
@@ -199,7 +209,8 @@ def get_stub_types(stub_file_path: str):
         try:
             tree = ast3.parse(source, mode='exec')
         except Exception as e:
-            print(e)
+            # print(e)
+            pass
 
         inferred_types = []
 
@@ -227,12 +238,26 @@ def get_stub_types(stub_file_path: str):
 
                 # Function parameters
                 for argument in node.args.args:
-                    print(function_name, argument.arg, argument.type_comment)
+                    # print(function_name, argument.arg, argument.type_comment)
+                    pass
 
     return inferred_types
+
+
+def get_file_paths(repo_name: str):
+    # Get PyType stub files
+    path_dict = {}
+    for root, subdirs, files in os.walk(f'pytype_stubs/{repo_name}/pyi'):
+        for file_name in files:
+            if file_name.endswith('.pyi'):
+                pyi_path = f'{root}/{file_name}'
+                scalpel_path = pyi_path.replace('/pyi/', '/')
+                path_dict[pyi_path] = scalpel_path
+    return path_dict
 
 
 if __name__ == '__main__':
     # total, correct = basecase_scalpel_vs_pytype()
     # print(f"Total: {total}\nCorrect: {correct}")
     evaluate_repos()
+    # get_file_paths('psf__black')
