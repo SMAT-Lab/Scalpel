@@ -8,6 +8,7 @@ import os
 import ast
 import astunparse
 from typing import List
+from pprint import pprint
 
 from scalpel.typeinfer.visitors import get_call_type
 from scalpel.typeinfer.classes import ProcessedFile, ScalpelVariable
@@ -264,7 +265,7 @@ class TypeInference:
                         'function': assignment.function,
                         'type': assignment.type
                     })
-
+            pprint(node.static_assignments)
         return type_list
 
     @staticmethod
@@ -472,7 +473,7 @@ class TypeInference:
 
         return processed_file
 
-    def print_types(self):
+    def print_types(self, functions=True, parameters=True, variables=True):
         self.infer_types()
         inferred_types = self.get_types()
         for case in inferred_types:
@@ -481,22 +482,28 @@ class TypeInference:
             function = case.get('function')
             line_no = case.get('line_number')
             if var_name := case.get('variable'):
-                # We have a variable
-                print(f"{file_name}:{line_no}: Variable {var_name} in function {function} has type {case_type}")
+                if variables:
+                    # We have a variable
+                    print(f"{file_name}:{line_no}: Variable {var_name} in function {function} has type {case_type}")
             elif param_name := case.get('parameter'):
-                # We have a parameter
-                print(f"{file_name}:{line_no}: Parameter {param_name} of function {function} has type {case_type}")
+                if parameters:
+                    # We have a parameter
+                    print(f"{file_name}:{line_no}: Parameter {param_name} of function {function} has type {case_type}")
             else:
                 # We have a function
-                if len(case_type) > 1:
-                    case_type = f"Union[{', '.join(case_type)}]"
-                else:
-                    case_type = case_type.pop()
-                print(f"{file_name}:{line_no}: Function {function} has return type {case_type}")
+                if functions:
+                    if len(case_type) > 1:
+                        if isinstance(case_type, str):
+                            case_type = case_type
+                        else:
+                            case_type = f"Union[{', '.join(case_type)}]"
+                    else:
+                        case_type = case_type.pop()
+                    print(f"{file_name}:{line_no}: Function {function} has return type {case_type}")
 
 
 if __name__ == '__main__':
-    inferrer = TypeInference(name='', entry_point='basecase/case19.py')
+    inferrer = TypeInference(name='', entry_point='basecase/case1.py')
     inferrer.infer_types()
     for t in inferrer.get_types():
         print(t)

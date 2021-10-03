@@ -97,25 +97,28 @@ class ImportTypeMap(_StaticAnalyzer):
     def map(self):
         import_mappings = {}  # Maps imported functions, variables, etc. to their types
         imports = {}  # Keeps a dictionary of imported libraries
+        module = None
         for node in ast.iter_child_nodes(self.root):
             if isinstance(node, ast.Import):
                 module = []
             elif isinstance(node, ast.ImportFrom):
-                module = node.module.split('.')
+                if node.module is not None:
+                    module = node.module.split('.')
             else:
                 continue
 
             for names in node.names:
-                for name in names.name.split('.'):
-                    import_name = ".".join(module + [name])
-                    if module:
-                        # Importing from module
-                        import_type = self.get_imported_type(import_name)
-                        if import_type is not None:
-                            import_mappings[name] = import_type
-                    else:
-                        # Importing whole module
-                        imports[import_name] = True
+                if module:
+                    for name in names.name.split('.'):
+                        import_name = ".".join(module + [name])
+                        if module:
+                            # Importing from module
+                            import_type = self.get_imported_type(import_name)
+                            if import_type is not None:
+                                import_mappings[name] = import_type
+                        else:
+                            # Importing whole module
+                            imports[import_name] = True
 
         return import_mappings, imports
 
@@ -219,7 +222,7 @@ class VariableAssignmentMap(_StaticAnalyzer):
                         )
                         variables.append(variable)
             elif isinstance(node, ast.Assign) and isinstance(node.targets[0], ast.Name):
-
+                variable_names = []
                 variable_name = node.targets[0].id
                 assignment_type = any.__name__
 
@@ -229,35 +232,45 @@ class VariableAssignmentMap(_StaticAnalyzer):
                     line=node.lineno,
                     type=assignment_type
                 )
-                if isinstance(node.value, ast.Call):
+                variable_type = 'any'
+                if isinstance(node.value, ast.Call) and not isinstance(node.value.func, ast.Attribute):
                     # Assignment is to a callable
-                    called = node.value.func.id  # Name of callable
-
-                    # Check to see if it is an imported callable
-                    if imported_type := self.imports.get(called):
-                        variable.type = imported_type
+                    if isinstance(node.value.func, ast.Name):
+                        called = node.value.func.id  # Name of callable
+                        # Check to see if it is an imported callable
+                        if imported_type := self.imports.get(called):
+                            variable_type = imported_type
 
                 elif isinstance(node.value, ast.Constant):
                     # String, int, float, boolean
-                    variable.type = type(node.value.value).__name__  # Determine specific type
+                    variable_type = type(node.value.value).__name__  # Determine specific type
                 elif isinstance(node.value, ast.Dict):
                     # Dictionary
                     key_type = check_consistent_list_types(node.value.keys)
                     value_type = check_consistent_list_types(node.value.values)
-                    variable.type = f"Dict[{key_type}, {value_type}]"
+                    variable_type = f"Dict[{key_type}, {value_type}]"
                 elif isinstance(node.value, ast.List) or isinstance(node.value, ast.Tuple):
                     # List or tuple, check to see if types in list are constant
                     values = node.value.elts
                     value_type = check_consistent_list_types(values)
-                    variable.type = f"{type(node.value).__name__}[{value_type}]"
+                    variable_type = f"{type(node.value).__name__}[{value_type}]"
                 elif isinstance(node.value, ast.IfExp) or isinstance(node.value, ast.Compare):
                     # Boolean, see heuristic 4
-                    variable.type = bool.__name__
+                    variable_type = bool.__name__
                 elif isinstance(node.value, ast.BinOp):
                     # Assignment to result of binary operation
                     variable.binary_operation = node.value
-                variables.append(variable)
+                elif isinstance(node.value, ast.BoolOp):
+                    variable_type = bool.__name__
 
+                variable.type = variable_type
+                if variable_name not in variable_names:
+                    variable_names.append(variable_name)
+                    variables.append(variable)
+                else:
+                    # Multiple declarations of the same variable
+                    # TODO: Add union types here?
+                    pass
         return variables
 
 
@@ -483,7 +496,7 @@ class ClassSplitVisitor(ast.NodeVisitor):
         return node
 
     def visit_ClassDef(self, node):
-        self.bases = [n.id for n in node.bases]
+        self.bases = [n.id for n in node.bases if not isinstance(n, ast.Attribute)]
         for tmp_node in node.body:
             if not isinstance(tmp_node, ast.Assign):
                 continue
@@ -869,7 +882,6 @@ class Heuristics:
                             variable.type = right_variable.type
                     elif isinstance(right_operation, ast.Constant):
                         variable.type = type(right_operation.value).__name__
-
         return assignments
 
     def heuristic_five_return(self, assignments, return_node: ast.BinOp):
@@ -894,7 +906,7 @@ class Heuristics:
         for node in ast.walk(function_node):
             # Visit ast.Call nodes, checking for variable names
             if isinstance(node, ast.Call):
-                if not isinstance(node.func, ast.Attribute):
+                if not isinstance(node.func, ast.Attribute) and not isinstance(node.func, ast.Call):
                     function_calls.append(node.func.id)
 
         # Get variables that are called
@@ -908,13 +920,14 @@ class Heuristics:
         is_instance_type_map = {}
         for node in ast.walk(function_node):
             if isinstance(node, ast.Call):
-                if not isinstance(node.func, ast.Attribute):
+                if not isinstance(node.func, ast.Attribute) and not isinstance(node.func, ast.Call):
                     if node.func.id == 'isinstance':
                         # Check to see what the value being compared to is
                         variable, type_compared = node.args[0], node.args[1]
                         if isinstance(variable, ast.Name) and isinstance(type_compared, ast.Name):
                             if type_list := is_instance_type_map.get(variable.id):
-                                type_list.append(type_compared.id)
+                                if type_compared.id not in type_list:
+                                    type_list.append(type_compared.id)
                             else:
                                 is_instance_type_map[variable.id] = [type_compared.id]
 
@@ -984,18 +997,17 @@ class Heuristics:
 
     @staticmethod
     def heuristic_nine(import_mappings, processed_file, function_node):
-        assignments = VariableAssignmentMap(function_node, imports=import_mappings).map()
-
-        for assignment in assignments:
-            assignment.function = function_node.name
-        processed_file.static_assignments.extend(assignments)
-
         # work through params
         for variable in [v for v in processed_file.static_assignments if v.type == 'any']:
             regex_query = r'\b^(.{0,12}_{0,1}(count|counter|sum)_{0,1}.{0,12}|(int|num|sum|count|counter))$\b'
             regex = re.search(regex_query, variable.name)
             if regex:
                 variable.type = 'int'
+
+
+    def heuristic_eleven(self, processed_file, function_node):
+        # Find what variables are in comparison operations and resolve types
+        pass
 
     @staticmethod
     def get_bin_op_involved(binary_operation: ast.BinOp):
@@ -1036,6 +1048,10 @@ class Heuristics:
                         return True
                 # Move to next right operation
                 left_operation = left_operation.left
-        if left_operation.id == variable.name or right_operation.id == variable.name:
-            return True
+        if isinstance(left_operation, ast.Name):
+            if left_operation.id == variable.name:
+                return True
+        if isinstance(right_operation, ast.Name):
+            if right_operation.id == variable.name:
+                return True
         return False
