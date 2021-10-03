@@ -789,16 +789,18 @@ class Heuristics:
 
                 if isinstance(node.value.func, ast.Attribute) or isinstance(node.value.func, ast.Name):
                     continue
-                func_name = node.value.func.id
-                args = node.value.args
-                for i in range(len(args)):
-                    arg = args[i]
-                    if isinstance(arg, ast.Call):
-                        function_param_types[func_name][i]["funcs"].append(arg.func.id)
-                    elif isinstance(arg, ast.Name):
-                        pass
-                    else:
-                        function_param_types[func_name][i]["possible_arg_types"].append(type(arg.value).__name__)
+
+                if hasattr(node.value.func, 'id'):
+                    func_name = node.value.func.id
+                    args = node.value.args
+                    for i in range(len(args)):
+                        arg = args[i]
+                        if isinstance(arg, ast.Call):
+                            function_param_types[func_name][i]["funcs"].append(arg.func.id)
+                        elif isinstance(arg, ast.Name):
+                            pass
+                        else:
+                            function_param_types[func_name][i]["possible_arg_types"].append(type(arg.value).__name__)
 
         for function in function_param_types.values():
             for arg in function:
