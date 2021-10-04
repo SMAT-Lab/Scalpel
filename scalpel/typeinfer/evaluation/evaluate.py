@@ -151,7 +151,7 @@ def get_nodes(tree):
 def evaluate_repos():
     # Run Scalpel type inference on each repository in the repos folder
     repo_list = os.listdir('pytype_stubs')
-    repo_list = ['nvbn__thefuck']#, 'psf__black', 'minimaxir__big-list-of-naughty-strings', 'openai__gym', 'psf__requests']
+    repo_list = ['nvbn__thefuck']#'minimaxir__big-list-of-naughty-strings']#, 'openai__gym', 'psf__requests', , 'psf__black']
     for repo in repo_list:
         # Get file paths
         print(repo)

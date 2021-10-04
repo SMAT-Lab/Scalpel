@@ -256,6 +256,8 @@ class VariableAssignmentMap(_StaticAnalyzer):
                     values = node.value.elts
                     value_type = check_consistent_list_types(values)
                     variable_type = f"{type(node.value).__name__}[{value_type}]"
+                elif isinstance(node.value, ast.ListComp):
+                    variable_type = list.__name__
                 elif isinstance(node.value, ast.IfExp) or isinstance(node.value, ast.Compare):
                     # Boolean, see heuristic 4
                     variable_type = bool.__name__
