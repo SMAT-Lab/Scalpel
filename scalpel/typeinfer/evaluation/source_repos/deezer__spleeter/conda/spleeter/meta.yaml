@@ -1,0 +1,55 @@
+{% set name = "spleeter" %}
+{% set version = "2.2.1" %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  - url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
+    sha256: 6cbe9e572474948515430804a22da255f774243aab77e58edb147566dbff7a42
+
+build:
+  number: 0
+  script: {{ PYTHON }} -m pip install . -vv
+  skip: True  # [osx]
+  entry_points:
+    - spleeter = spleeter.__main__:entrypoint
+
+requirements:
+  host:
+    - python {{ python }}
+    - pip
+    - poetry
+  run:
+    - python {{ python }}
+    - tensorflow ==2.3.0  # [linux]
+    - tensorflow ==2.3.0  # [win]
+    - numpy <1.20.0
+    - pandas
+    - ffmpeg-python
+    - norbert
+    - librosa
+    - typer
+    - httpx
+
+test:
+  imports:
+    - spleeter
+    - spleeter.model
+    - spleeter.utils
+    - spleeter.separator
+
+about:
+  home: https://github.com/deezer/spleeter
+  license: MIT
+  license_family: MIT
+  license_file: LICENSE
+  summary: The Deezer source separation library with pretrained models based on tensorflow.
+  doc_url: https://github.com/deezer/spleeter/wiki
+  dev_url: https://github.com/deezer/spleeter
+
+extra:
+  recipe-maintainers:
+    - Faylixe
+    - romi1502

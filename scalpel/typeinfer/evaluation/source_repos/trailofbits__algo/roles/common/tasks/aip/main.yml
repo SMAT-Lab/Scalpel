@@ -1,0 +1,15 @@
+---
+- name: Verify the provider
+  assert:
+    that: algo_provider in aip_supported_providers
+    msg: Algo does not support Alternative Ingress IP for {{ algo_provider }}
+
+- name: Include alternative ingress ip configuration
+  include_tasks:
+    file: "{{ algo_provider if algo_provider in aip_supported_providers else 'placeholder' }}.yml"
+  when: algo_provider in aip_supported_providers
+
+- name: Verify SNAT IPv4 found
+  assert:
+    that: snat_aipv4 | ipv4
+    msg: The SNAT IPv4 address not found. Cannot proceed with the alternative ingress ip.

@@ -1,0 +1,196 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Algo VPN stack'
+Parameters:
+  InstanceTypeParameter:
+    Type: String
+    Default: t2.micro
+  PublicSSHKeyParameter:
+    Type: String
+  ImageIdParameter:
+    Type: String
+  WireGuardPort:
+    Type: String
+  UseThisElasticIP:
+    Type: String
+    Default: ''
+  EbsEncrypted:
+    Type: String
+  UserData:
+    Type: String
+  SshPort:
+    Type: String
+Conditions:
+  AllocateNewEIP: !Equals [!Ref UseThisElasticIP, '']
+  AssociateExistingEIP: !Not [!Equals [!Ref UseThisElasticIP, '']]
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 172.16.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      InstanceTenancy: default
+      Tags:
+        - Key: Name
+          Value: !Ref AWS::StackName
+
+  VPCIPv6:
+    Type: AWS::EC2::VPCCidrBlock
+    Properties:
+      AmazonProvidedIpv6CidrBlock: true
+      VpcId: !Ref VPC
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Ref AWS::StackName
+
+  Subnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 172.16.254.0/23
+      MapPublicIpOnLaunch: false
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Ref AWS::StackName
+
+  VPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
+  RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Ref AWS::StackName
+
+  Route:
+    Type: AWS::EC2::Route
+    DependsOn:
+      - InternetGateway
+      - RouteTable
+      - VPCGatewayAttachment
+    Properties:
+      RouteTableId: !Ref RouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  RouteIPv6:
+    Type: AWS::EC2::Route
+    DependsOn:
+      - InternetGateway
+      - RouteTable
+      - VPCGatewayAttachment
+    Properties:
+      RouteTableId: !Ref RouteTable
+      DestinationIpv6CidrBlock: "::/0"
+      GatewayId: !Ref InternetGateway
+
+  SubnetIPv6:
+    Type: AWS::EC2::SubnetCidrBlock
+    DependsOn:
+      - RouteIPv6
+      - VPC
+      - VPCIPv6
+    Properties:
+      Ipv6CidrBlock:
+        "Fn::Join":
+            - ""
+            - - !Select [0, !Split [ "::", !Select [0, !GetAtt VPC.Ipv6CidrBlocks] ]]
+              - "::dead:beef/64"
+      SubnetId: !Ref Subnet
+
+  RouteSubnet:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    DependsOn:
+      - RouteTable
+      - Subnet
+      - Route
+    Properties:
+      RouteTableId: !Ref RouteTable
+      SubnetId: !Ref Subnet
+
+  InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    DependsOn:
+      - Subnet
+    Properties:
+      VpcId: !Ref VPC
+      GroupDescription: Enable SSH and IPsec
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: !Ref SshPort
+          ToPort: !Ref SshPort
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: udp
+          FromPort: '500'
+          ToPort: '500'
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: udp
+          FromPort: '4500'
+          ToPort: '4500'
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: udp
+          FromPort: !Ref WireGuardPort
+          ToPort: !Ref WireGuardPort
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: !Ref AWS::StackName
+
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    DependsOn:
+      - SubnetIPv6
+      - Subnet
+      - InstanceSecurityGroup
+    Properties:
+      InstanceType:
+        Ref: InstanceTypeParameter
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            DeleteOnTermination: true
+            VolumeSize: 8
+            Encrypted: !Ref EbsEncrypted
+      InstanceInitiatedShutdownBehavior: terminate
+      SecurityGroupIds:
+        - Ref: InstanceSecurityGroup
+      ImageId:
+        Ref: ImageIdParameter
+      SubnetId: !Ref Subnet
+      Ipv6AddressCount: 1
+      UserData: !Ref UserData
+      Tags:
+        - Key: Name
+          Value: !Ref AWS::StackName
+
+  ElasticIP:
+    Type: AWS::EC2::EIP
+    Condition: AllocateNewEIP
+    Properties:
+      Domain: vpc
+      InstanceId: !Ref EC2Instance
+    DependsOn:
+      - EC2Instance
+      - VPCGatewayAttachment
+
+  ElasticIPAssociation:
+    Type: AWS::EC2::EIPAssociation
+    Condition: AssociateExistingEIP
+    Properties:
+      AllocationId: !Ref UseThisElasticIP
+      InstanceId: !Ref EC2Instance
+
+
+Outputs:
+  ElasticIP:
+    Value: !GetAtt [EC2Instance, PublicIp]

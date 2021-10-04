@@ -1,0 +1,17 @@
+wheel
+gevent
+flask
+requests
+pygments
+dateutils
+fuzzywuzzy
+redis
+colored
+langdetect
+cffi
+polyglot
+PyICU
+pycld2
+colorama
+pyyaml
+python-Levenshtein

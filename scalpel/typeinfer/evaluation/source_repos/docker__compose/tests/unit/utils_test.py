@@ -1,0 +1,74 @@
+from compose import utils
+
+
+class TestJsonSplitter:
+
+    def test_json_splitter_no_object(self):
+        data = '{"foo": "bar'
+        assert utils.json_splitter(data) is None
+
+    def test_json_splitter_with_object(self):
+        data = '{"foo": "bar"}\n  \n{"next": "obj"}'
+        assert utils.json_splitter(data) == ({'foo': 'bar'}, '{"next": "obj"}')
+
+    def test_json_splitter_leading_whitespace(self):
+        data = '\n   \r{"foo": "bar"}\n\n   {"next": "obj"}'
+        assert utils.json_splitter(data) == ({'foo': 'bar'}, '{"next": "obj"}')
+
+
+class TestStreamAsText:
+
+    def test_stream_with_non_utf_unicode_character(self):
+        stream = [b'\xed\xf3\xf3']
+        output, = utils.stream_as_text(stream)
+        assert output == '���'
+
+    def test_stream_with_utf_character(self):
+        stream = ['ěĝ'.encode()]
+        output, = utils.stream_as_text(stream)
+        assert output == 'ěĝ'
+
+
+class TestJsonStream:
+
+    def test_with_falsy_entries(self):
+        stream = [
+            '{"one": "two"}\n{}\n',
+            "[1, 2, 3]\n[]\n",
+        ]
+        output = list(utils.json_stream(stream))
+        assert output == [
+            {'one': 'two'},
+            {},
+            [1, 2, 3],
+            [],
+        ]
+
+    def test_with_leading_whitespace(self):
+        stream = [
+            '\n  \r\n  {"one": "two"}{"x": 1}',
+            '  {"three": "four"}\t\t{"x": 2}'
+        ]
+        output = list(utils.json_stream(stream))
+        assert output == [
+            {'one': 'two'},
+            {'x': 1},
+            {'three': 'four'},
+            {'x': 2}
+        ]
+
+
+class TestParseBytes:
+    def test_parse_bytes(self):
+        assert utils.parse_bytes('123kb') == 123 * 1024
+        assert utils.parse_bytes(123) == 123
+        assert utils.parse_bytes('foobar') is None
+        assert utils.parse_bytes('123') == 123
+
+
+class TestMoreItertools:
+    def test_unique_everseen(self):
+        unique = utils.unique_everseen
+        assert list(unique([2, 1, 2, 1])) == [2, 1]
+        assert list(unique([2, 1, 2, 1], hash)) == [2, 1]
+        assert list(unique([2, 1, 2, 1], lambda x: 'key_%s' % x)) == [2, 1]

@@ -1,0 +1,2 @@
+simple:
+  image: busybox:1.31.0-uclibc

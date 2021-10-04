@@ -1,0 +1,14 @@
+.dockerignore
+.git
+.github
+.gitignore
+.travis.yml
+CONTRIBUTING.md
+Dockerfile
+README.md
+config.cfg
+configs
+docs
+.env
+logo.png
+tests

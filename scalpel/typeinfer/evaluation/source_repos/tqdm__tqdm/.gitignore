@@ -1,0 +1,26 @@
+*.py[cod]
+*.so
+__pycache__/
+.ipynb_checkpoints/
+
+# Packages
+/tqdm/_dist_ver.py
+/*.egg*/
+/build/
+/dist/
+/snapcraft.yaml
+/tqdm_*.snap
+/.dockerignore
+/Dockerfile
+
+# Unit test / coverage reports
+/.tox/
+/.coverage*
+/coverage.xml
+/.pytest_cache/
+/.asv/
+
+# Sumbodules
+/wiki/
+/docs/
+/feedstock/
