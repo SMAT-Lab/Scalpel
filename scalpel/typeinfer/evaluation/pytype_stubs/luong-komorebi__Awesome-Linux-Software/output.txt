@@ -1,0 +1,9 @@
+Computing dependencies
+Analyzing 4 sources with 0 local dependencies
+ninja: Entering directory `output/luong-komorebi__Awesome-Linux-Software'
+[1/4] check asort
+[2/4] check asort_pt-BR
+[3/4] check asort_zh
+[4/4] check asort_es-ES
+Leaving directory 'output/luong-komorebi__Awesome-Linux-Software'
+Success: no errors found

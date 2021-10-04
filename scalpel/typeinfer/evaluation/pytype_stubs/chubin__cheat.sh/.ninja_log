@@ -1,0 +1,11 @@
+# ninja log v5
+20	1527	1631695031996032700	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/chubin__cheat.sh/pyi/buttons.pyi	21c9d41222229705
+34	1544	1631695032013047300	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/chubin__cheat.sh/pyi/adapter/common.pyi	f385c1be5e8c2bd8
+38	1544	1631695032019052700	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/chubin__cheat.sh/pyi/fmt/__init__.pyi	28759a07ae8abf91
+26	1550	1631695032016050400	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/chubin__cheat.sh/pyi/options.pyi	fcac1165e804245b
+41	1589	1631695032074102800	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/chubin__cheat.sh/pyi/frontend/__init__.pyi	4e7c549842dbd782
+47	4280	1631695034721508500	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/chubin__cheat.sh/pyi/release.pyi	1bf0a2bbd8921f7c
+22	4344	1631695034790571400	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/chubin__cheat.sh/pyi/globals.pyi	b840436f2a8199d7
+29	4344	1631695034784566000	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/chubin__cheat.sh/pyi/colors.pyi	410015013f9f61e2
+49	4725	1631695035181927200	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/chubin__cheat.sh/pyi/clean_cache.pyi	7f0b839de1f6ce6a
+16	5041	1631695035476194300	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/chubin__cheat.sh/pyi/languages_data.pyi	4d6816a4982e242d

@@ -1,0 +1,6 @@
+Computing dependencies
+Analyzing 1 sources with 0 local dependencies
+ninja: Entering directory `output/vinta__awesome-python'
+[1/1] check sort
+Leaving directory 'output/vinta__awesome-python'
+Success: no errors found

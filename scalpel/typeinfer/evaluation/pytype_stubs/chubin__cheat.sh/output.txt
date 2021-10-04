@@ -1,0 +1,126 @@
+Computing dependencies
+Analyzing 42 sources with 0 local dependencies
+ninja: Entering directory `output/chubin__cheat.sh'
+[1/42] check buttons
+[2/42] check adapter.common
+[3/42] check fmt.__init__
+[4/42] check options
+[5/42] check frontend.__init__
+[6/42] check fmt.markdown
+FAILED: /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/chubin__cheat.sh/pyi/fmt/markdown.pyi 
+/mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/chubin__cheat.sh/imports/fmt.markdown.imports --module-name fmt.markdown -V 3.8 -o /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/chubin__cheat.sh/pyi/fmt/markdown.pyi --analyze-annotated --nofail --quick /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/chubin__cheat.sh/lib/fmt/markdown.py
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/chubin__cheat.sh/lib/fmt/markdown.py", line 11, in <module>: Can't find module 'ansiwrap'. [import-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/chubin__cheat.sh/lib/fmt/markdown.py", line 12, in <module>: Can't find module 'colored'. [import-error]
+
+For more details, see https://google.github.io/pytype/errors.html#import-error
+[7/42] check release
+[8/42] check fmt.internal
+FAILED: /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/chubin__cheat.sh/pyi/fmt/internal.pyi 
+/mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/chubin__cheat.sh/imports/fmt.internal.imports --module-name fmt.internal -V 3.8 -o /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/chubin__cheat.sh/pyi/fmt/internal.pyi --analyze-annotated --nofail --quick /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/chubin__cheat.sh/lib/fmt/internal.py
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/chubin__cheat.sh/lib/fmt/internal.py", line 9, in <module>: Can't find module 'colored'. [import-error]
+
+For more details, see https://google.github.io/pytype/errors.html#import-error
+[9/42] check globals
+[10/42] check colors
+[11/42] check clean_cache
+[12/42] check languages_data
+[13/42] check config
+FAILED: /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/chubin__cheat.sh/pyi/config.pyi 
+/mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/chubin__cheat.sh/imports/config.imports --module-name config -V 3.8 -o /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/chubin__cheat.sh/pyi/config.pyi --analyze-annotated --nofail --quick /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/chubin__cheat.sh/lib/config.py
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/chubin__cheat.sh/lib/config.py", line 152, in _absolute_path: No attribute 'startswith' on int [attribute-error]
+  In Union[List[Tuple[str, str]], List[str], int, str]
+Called from (traceback):
+  line 256, in current file
+  line 174, in update
+  line 162, in __setitem__
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/chubin__cheat.sh/lib/config.py", line 152, in _absolute_path: No attribute 'startswith' on int [attribute-error]
+  In Union[List[Tuple[str, str]], List[str], int, str]
+Called from (traceback):
+  line 256, in current file
+  line 177, in update
+  line 162, in __setitem__
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/chubin__cheat.sh/lib/config.py", line 152, in _absolute_path: No attribute 'startswith' on List[Tuple[str, str]] [attribute-error]
+  In Union[List[Tuple[str, str]], List[str], int, str]
+Called from (traceback):
+  line 256, in current file
+  line 174, in update
+  line 162, in __setitem__
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/chubin__cheat.sh/lib/config.py", line 152, in _absolute_path: No attribute 'startswith' on List[Tuple[str, str]] [attribute-error]
+  In Union[List[Tuple[str, str]], List[str], int, str]
+Called from (traceback):
+  line 256, in current file
+  line 177, in update
+  line 162, in __setitem__
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/chubin__cheat.sh/lib/config.py", line 152, in _absolute_path: No attribute 'startswith' on List[str] [attribute-error]
+  In Union[List[Tuple[str, str]], List[str], int, str]
+Called from (traceback):
+  line 256, in current file
+  line 174, in update
+  line 162, in __setitem__
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/chubin__cheat.sh/lib/config.py", line 152, in _absolute_path: No attribute 'startswith' on List[str] [attribute-error]
+  In Union[List[Tuple[str, str]], List[str], int, str]
+Called from (traceback):
+  line 256, in current file
+  line 177, in update
+  line 162, in __setitem__
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/chubin__cheat.sh/lib/config.py", line 152, in _absolute_path: No attribute 'startswith' on int [attribute-error]
+  In Optional[Union[Any, int]]
+Called from (traceback):
+  line 257, in current file
+  line 174, in update
+  line 162, in __setitem__
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/chubin__cheat.sh/lib/config.py", line 152, in _absolute_path: No attribute 'startswith' on int [attribute-error]
+  In Optional[Union[Any, int]]
+Called from (traceback):
+  line 257, in current file
+  line 177, in update
+  line 162, in __setitem__
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/chubin__cheat.sh/lib/config.py", line 161, in __setitem__: No attribute 'startswith' on int [attribute-error]
+  In Union[List[Tuple[str, str]], List[str], int, str]
+Called from (traceback):
+  line 256, in current file
+  line 174, in update
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/chubin__cheat.sh/lib/config.py", line 161, in __setitem__: No attribute 'startswith' on int [attribute-error]
+  In Union[List[Tuple[str, str]], List[str], int, str]
+Called from (traceback):
+  line 256, in current file
+  line 177, in update
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/chubin__cheat.sh/lib/config.py", line 161, in __setitem__: No attribute 'startswith' on List[Tuple[str, str]] [attribute-error]
+  In Union[List[Tuple[str, str]], List[str], int, str]
+Called from (traceback):
+  line 256, in current file
+  line 174, in update
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/chubin__cheat.sh/lib/config.py", line 161, in __setitem__: No attribute 'startswith' on List[Tuple[str, str]] [attribute-error]
+  In Union[List[Tuple[str, str]], List[str], int, str]
+Called from (traceback):
+  line 256, in current file
+  line 177, in update
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/chubin__cheat.sh/lib/config.py", line 161, in __setitem__: No attribute 'startswith' on List[str] [attribute-error]
+  In Union[List[Tuple[str, str]], List[str], int, str]
+Called from (traceback):
+  line 256, in current file
+  line 174, in update
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/chubin__cheat.sh/lib/config.py", line 161, in __setitem__: No attribute 'startswith' on List[str] [attribute-error]
+  In Union[List[Tuple[str, str]], List[str], int, str]
+Called from (traceback):
+  line 256, in current file
+  line 177, in update
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/chubin__cheat.sh/lib/config.py", line 161, in __setitem__: No attribute 'startswith' on int [attribute-error]
+  In Optional[Union[Any, int]]
+Called from (traceback):
+  line 257, in current file
+  line 174, in update
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/chubin__cheat.sh/lib/config.py", line 161, in __setitem__: No attribute 'startswith' on int [attribute-error]
+  In Optional[Union[Any, int]]
+Called from (traceback):
+  line 257, in current file
+  line 177, in update
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/chubin__cheat.sh/lib/config.py", line 161, in __setitem__: No attribute 'startswith' on int [attribute-error]
+  In Optional[Union[Any, int]]
+Called from (traceback):
+  line 259, in current file
+  line 174, in update
+
+For more details, see https://google.github.io/pytype/errors.html#attribute-error
+ninja: build stopped: subcommand failed.
+Leaving directory 'output/chubin__cheat.sh'

@@ -1,0 +1,3 @@
+# (generated with --quick)
+
+def pythagoras(opposite, adjacent, hypotenuse) -> str: ...

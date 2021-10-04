@@ -1,0 +1,111 @@
+rule infer
+  command = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info $imports --module-name $module -V 3.8 -o $out --no-report-errors --nofail --quick $in
+  description = infer $module
+rule check
+  command = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info $imports --module-name $module -V 3.8 -o $out --analyze-annotated --nofail --quick $in
+  description = check $module
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/compat.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__requests/requests/compat.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/imports/requests.compat.imports
+  module = requests.compat
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/_internal_utils.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__requests/requests/_internal_utils.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/compat.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/imports/requests._internal_utils.imports
+  module = requests._internal_utils
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/exceptions.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__requests/requests/exceptions.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/compat.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/imports/requests.exceptions.imports
+  module = requests.exceptions
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/structures.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__requests/requests/structures.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/compat.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/imports/requests.structures.imports
+  module = requests.structures
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/cookies.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__requests/requests/cookies.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/_internal_utils.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/compat.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/imports/requests.cookies.imports
+  module = requests.cookies
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/certs.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__requests/requests/certs.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/imports/requests.certs.imports
+  module = requests.certs
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/__version__.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__requests/requests/__version__.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/imports/requests.__version__.imports
+  module = requests.__version__
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/utils.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__requests/requests/utils.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/__version__.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/certs.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/_internal_utils.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/compat.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/cookies.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/structures.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/exceptions.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/imports/requests.utils.imports
+  module = requests.utils
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/status_codes.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__requests/requests/status_codes.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/structures.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/imports/requests.status_codes.imports
+  module = requests.status_codes
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/auth.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__requests/requests/auth.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/compat.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/cookies.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/_internal_utils.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/utils.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/imports/requests.auth.imports
+  module = requests.auth
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/hooks.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__requests/requests/hooks.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/imports/requests.hooks.imports
+  module = requests.hooks
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/models.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__requests/requests/models.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/hooks.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/structures.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/auth.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/cookies.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/exceptions.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/_internal_utils.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/utils.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/compat.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/status_codes.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/imports/requests.models.imports
+  module = requests.models
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/adapters.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__requests/requests/adapters.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/models.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/compat.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/utils.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/structures.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/cookies.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/exceptions.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/auth.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/imports/requests.adapters.imports
+  module = requests.adapters
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/sessions.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__requests/requests/sessions.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/auth.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/compat.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/cookies.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/models.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/hooks.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/_internal_utils.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/utils.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/exceptions.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/structures.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/adapters.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/status_codes.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/imports/requests.sessions.imports
+  module = requests.sessions
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/api.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__requests/requests/api.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/sessions.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/imports/requests.api.imports
+  module = requests.api
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/packages.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__requests/requests/packages.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/imports/requests.packages.imports
+  module = requests.packages
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/__init__.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__requests/requests/__init__.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/exceptions.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/__version__.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/utils.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/packages.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/models.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/api.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/sessions.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/status_codes.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/imports/requests.__init__.imports
+  module = requests.__init__
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/tests/compat.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__requests/tests/compat.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/compat.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/imports/tests.compat.imports
+  module = tests.compat
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/tests/utils.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__requests/tests/utils.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/imports/tests.utils.imports
+  module = tests.utils
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/tests/testserver/server.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__requests/tests/testserver/server.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/imports/tests.testserver.server.imports
+  module = tests.testserver.server
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/help.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__requests/requests/help.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/__version__.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/imports/requests.help.imports
+  module = requests.help
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/conf.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__requests/docs/conf.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/__init__.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/imports/conf.imports
+  module = conf
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/tests/conftest.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__requests/tests/conftest.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/compat.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/imports/tests.conftest.imports
+  module = tests.conftest
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/tests/test_utils.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__requests/tests/test_utils.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/compat.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/cookies.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/structures.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/utils.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/_internal_utils.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/tests/compat.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/imports/tests.test_utils.imports
+  module = tests.test_utils
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/tests/test_lowlevel.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__requests/tests/test_lowlevel.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/__init__.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/tests/testserver/server.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/tests/utils.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/imports/tests.test_lowlevel.imports
+  module = tests.test_lowlevel
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/tests/__init__.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__requests/tests/__init__.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/imports/tests.__init__.imports
+  module = tests.__init__
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/tests/test_requests.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__requests/tests/test_requests.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/__init__.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/adapters.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/auth.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/compat.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/cookies.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/exceptions.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/models.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/structures.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/sessions.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/hooks.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/tests/compat.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/tests/utils.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/imports/tests.test_requests.imports
+  module = tests.test_requests
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/flask_theme_support.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__requests/docs/_themes/flask_theme_support.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/imports/flask_theme_support.imports
+  module = flask_theme_support
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/tests/test_testserver.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__requests/tests/test_testserver.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/__init__.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/tests/testserver/server.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/imports/tests.test_testserver.imports
+  module = tests.test_testserver
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/tests/testserver/__init__.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__requests/tests/testserver/__init__.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/imports/tests.testserver.__init__.imports
+  module = tests.testserver.__init__
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/tests/test_hooks.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__requests/tests/test_hooks.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/hooks.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/imports/tests.test_hooks.imports
+  module = tests.test_hooks
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/setup.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__requests/setup.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/imports/setup.imports
+  module = setup
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/tests/test_packages.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__requests/tests/test_packages.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/__init__.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/imports/tests.test_packages.imports
+  module = tests.test_packages
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/tests/test_help.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__requests/tests/test_help.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/help.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/imports/tests.test_help.imports
+  module = tests.test_help
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/tests/test_structures.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__requests/tests/test_structures.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/structures.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/imports/tests.test_structures.imports
+  module = tests.test_structures

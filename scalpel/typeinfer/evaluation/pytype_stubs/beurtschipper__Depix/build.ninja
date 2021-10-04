@@ -1,0 +1,24 @@
+rule infer
+  command = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info $imports --module-name $module -V 3.8 -o $out --no-report-errors --nofail --quick $in
+  description = infer $module
+rule check
+  command = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info $imports --module-name $module -V 3.8 -o $out --analyze-annotated --nofail --quick $in
+  description = check $module
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/beurtschipper__Depix/pyi/depixlib/Rectangle.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/beurtschipper__Depix/depixlib/Rectangle.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/beurtschipper__Depix/imports/depixlib.Rectangle.imports
+  module = depixlib.Rectangle
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/beurtschipper__Depix/pyi/depixlib/functions.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/beurtschipper__Depix/depixlib/functions.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/beurtschipper__Depix/pyi/depixlib/Rectangle.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/beurtschipper__Depix/imports/depixlib.functions.imports
+  module = depixlib.functions
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/beurtschipper__Depix/pyi/depixlib/LoadedImage.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/beurtschipper__Depix/depixlib/LoadedImage.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/beurtschipper__Depix/imports/depixlib.LoadedImage.imports
+  module = depixlib.LoadedImage
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/beurtschipper__Depix/pyi/depixlib/__init__.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/beurtschipper__Depix/depixlib/__init__.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/beurtschipper__Depix/imports/depixlib.__init__.imports
+  module = depixlib.__init__
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/beurtschipper__Depix/pyi/depix.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/beurtschipper__Depix/depix.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/beurtschipper__Depix/pyi/depixlib/LoadedImage.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/beurtschipper__Depix/pyi/depixlib/Rectangle.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/beurtschipper__Depix/pyi/depixlib/functions.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/beurtschipper__Depix/imports/depix.imports
+  module = depix
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/beurtschipper__Depix/pyi/genpixed.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/beurtschipper__Depix/genpixed.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/beurtschipper__Depix/pyi/depixlib/LoadedImage.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/beurtschipper__Depix/pyi/depixlib/Rectangle.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/beurtschipper__Depix/pyi/depixlib/functions.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/beurtschipper__Depix/imports/genpixed.imports
+  module = genpixed

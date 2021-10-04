@@ -1,0 +1,6 @@
+# ninja log v5
+4	2470	1631694985122079900	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/sherlock-project__sherlock/pyi/sherlock/__init__.pyi	92b906db3e758346
+32	3121	1631694985781679400	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/sherlock-project__sherlock/pyi/sherlock/tests/__init__.pyi	4259a13a954ef0b3
+19	4700	1631694987238284000	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/sherlock-project__sherlock/pyi/sherlock/result.pyi	69ed3932df6f0f13
+24	5964	1631694988591947300	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/sherlock-project__sherlock/pyi/site_list.pyi	a9ac447fe87899fd
+21	7902	1631694990512692600	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/sherlock-project__sherlock/pyi/sherlock/sites.pyi	2593267965ca985e

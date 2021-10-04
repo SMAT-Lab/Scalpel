@@ -1,0 +1,6 @@
+# (generated with --quick)
+
+from typing import Any, Generator, List
+
+def palindromic_substrings(s) -> List[list]: ...
+def palindromic_substrings_iter(s) -> Generator[list, Any, None]: ...

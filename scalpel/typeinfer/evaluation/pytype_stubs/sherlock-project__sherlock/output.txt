@@ -1,0 +1,80 @@
+Computing dependencies
+Analyzing 10 sources with 0 local dependencies
+ninja: Entering directory `output/sherlock-project__sherlock'
+[1/10] check sherlock.__init__
+[2/10] check sherlock.tests.__init__
+[3/10] check sherlock.result
+[4/10] check sherlock.notify
+FAILED: /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/sherlock-project__sherlock/pyi/sherlock/notify.pyi 
+/mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/sherlock-project__sherlock/imports/sherlock.notify.imports --module-name sherlock.notify -V 3.8 -o /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/sherlock-project__sherlock/pyi/sherlock/notify.pyi --analyze-annotated --nofail --quick /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/sherlock-project__sherlock/sherlock/notify.py
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/sherlock-project__sherlock/sherlock/notify.py", line 6, in <module>: Can't find module 'result'. [import-error]
+
+For more details, see https://google.github.io/pytype/errors.html#import-error
+[5/10] check sherlock.tests.all
+FAILED: /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/sherlock-project__sherlock/pyi/sherlock/tests/all.pyi 
+/mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/sherlock-project__sherlock/imports/sherlock.tests.all.imports --module-name sherlock.tests.all -V 3.8 -o /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/sherlock-project__sherlock/pyi/sherlock/tests/all.pyi --analyze-annotated --nofail --quick /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/sherlock-project__sherlock/sherlock/tests/all.py
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/sherlock-project__sherlock/sherlock/tests/all.py", line 5, in <module>: Can't find module 'tests.base'. [import-error]
+
+For more details, see https://google.github.io/pytype/errors.html#import-error
+[6/10] check site_list
+[7/10] check sherlock.__main__
+FAILED: /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/sherlock-project__sherlock/pyi/sherlock/__main__.pyi 
+/mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/sherlock-project__sherlock/imports/sherlock.__main__.imports --module-name sherlock.__main__ -V 3.8 -o /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/sherlock-project__sherlock/pyi/sherlock/__main__.pyi --analyze-annotated --nofail --quick /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/sherlock-project__sherlock/sherlock/__main__.py
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/sherlock-project__sherlock/sherlock/__main__.py", line 30, in <module>: No attribute 'main' on module 'sherlock' [module-attr]
+
+For more details, see https://google.github.io/pytype/errors.html#module-attr
+[8/10] check sherlock.sites
+[9/10] check sherlock.tests.base
+FAILED: /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/sherlock-project__sherlock/pyi/sherlock/tests/base.pyi 
+/mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/sherlock-project__sherlock/imports/sherlock.tests.base.imports --module-name sherlock.tests.base -V 3.8 -o /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/sherlock-project__sherlock/pyi/sherlock/tests/base.pyi --analyze-annotated --nofail --quick /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/sherlock-project__sherlock/sherlock/tests/base.py
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/sherlock-project__sherlock/sherlock/tests/base.py", line 9, in <module>: Can't find module 'result'. [import-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/sherlock-project__sherlock/sherlock/tests/base.py", line 10, in <module>: Can't find module 'result'. [import-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/sherlock-project__sherlock/sherlock/tests/base.py", line 11, in <module>: Can't find module 'notify'. [import-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/sherlock-project__sherlock/sherlock/tests/base.py", line 12, in <module>: Can't find module 'sites'. [import-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/sherlock-project__sherlock/sherlock/tests/base.py", line 116, in username_check: No attribute 'sherlock' on module 'sherlock' [module-attr]
+
+For more details, see https://google.github.io/pytype/errors.html
+[10/10] check sherlock.sherlock
+FAILED: /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/sherlock-project__sherlock/pyi/sherlock/sherlock.pyi 
+/mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/sherlock-project__sherlock/imports/sherlock.sherlock.imports --module-name sherlock.sherlock -V 3.8 -o /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/sherlock-project__sherlock/pyi/sherlock/sherlock.pyi --analyze-annotated --nofail --quick /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/sherlock-project__sherlock/sherlock/sherlock.py
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/sherlock-project__sherlock/sherlock/sherlock.py", line 20, in <module>: Can't find module 'requests_futures.sessions'. [import-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/sherlock-project__sherlock/sherlock/sherlock.py", line 21, in <module>: Can't find module 'torrequest'. [import-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/sherlock-project__sherlock/sherlock/sherlock.py", line 22, in <module>: Can't find module 'result'. [import-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/sherlock-project__sherlock/sherlock/sherlock.py", line 23, in <module>: Can't find module 'result'. [import-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/sherlock-project__sherlock/sherlock/sherlock.py", line 24, in <module>: Can't find module 'notify'. [import-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/sherlock-project__sherlock/sherlock/sherlock.py", line 25, in <module>: Can't find module 'sites'. [import-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/sherlock-project__sherlock/sherlock/sherlock.py", line 277, in sherlock: No attribute 'reset_identity' on requests.models.Request [attribute-error]
+  In Union[Any, requests.models.Request]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/sherlock-project__sherlock/sherlock/sherlock.py", line 290, in sherlock: No attribute 'get' on None [attribute-error]
+  In Optional[Dict[str, Any]]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/sherlock-project__sherlock/sherlock/sherlock.py", line 291, in sherlock: No attribute 'get' on None [attribute-error]
+  In Optional[Dict[str, Any]]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/sherlock-project__sherlock/sherlock/sherlock.py", line 307, in sherlock: No attribute 'elapsed' on None [attribute-error]
+  In Optional[Any]
+Called from (traceback):
+  line 675, in current file
+  line 612, in main
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/sherlock-project__sherlock/sherlock/sherlock.py", line 313, in sherlock: No attribute 'status_code' on None [attribute-error]
+  In Optional[Any]
+Called from (traceback):
+  line 675, in current file
+  line 612, in main
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/sherlock-project__sherlock/sherlock/sherlock.py", line 317, in sherlock: No attribute 'text' on None [attribute-error]
+  In Optional[Any]
+Called from (traceback):
+  line 675, in current file
+  line 612, in main
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/sherlock-project__sherlock/sherlock/sherlock.py", line 317, in sherlock: No attribute 'encoding' on None [attribute-error]
+  In Optional[Any]
+Called from (traceback):
+  line 675, in current file
+  line 612, in main
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/sherlock-project__sherlock/sherlock/sherlock.py", line 446, in main: No attribute '__description__' on module 'requests' [module-attr]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/sherlock-project__sherlock/sherlock/sherlock.py", line 634, in main: No attribute 'status' on None [attribute-error]
+  In Optional[Union[Any, str]]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/sherlock-project__sherlock/sherlock/sherlock.py", line 634, in main: No attribute 'status' on str [attribute-error]
+  In Optional[Union[Any, str]]
+
+For more details, see https://google.github.io/pytype/errors.html
+ninja: build stopped: subcommand failed.
+Leaving directory 'output/sherlock-project__sherlock'

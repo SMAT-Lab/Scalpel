@@ -1,0 +1,9 @@
+# (generated with --quick)
+
+from typing import Tuple, Union
+
+random: module
+
+def decrypt(data, d, n) -> Union[float, int]: ...
+def encrypt(data, e, n) -> Union[float, int]: ...
+def generate_key(k, seed = ...) -> Tuple[int, int, int]: ...

@@ -1,0 +1,19 @@
+# (generated with --quick)
+
+from typing import Any
+
+DEBUG: int
+DISABLED: int
+ERROR: int
+INFO: int
+MIN_LEVEL: Any
+WARN: int
+colorize: module
+warnings: module
+
+def debug(msg, *args) -> None: ...
+def error(msg, *args) -> None: ...
+def info(msg, *args) -> None: ...
+def setLevel(level) -> None: ...
+def set_level(level) -> None: ...
+def warn(msg, *args) -> None: ...

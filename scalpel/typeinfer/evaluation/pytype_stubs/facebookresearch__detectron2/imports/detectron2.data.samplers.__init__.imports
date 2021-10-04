@@ -1,0 +1,4 @@
+detectron2/utils/env /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/facebookresearch__detectron2/pyi/detectron2/utils/env.pyi
+detectron2/utils/comm /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/facebookresearch__detectron2/pyi/detectron2/utils/comm.pyi
+detectron2/data/samplers/distributed_sampler /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/facebookresearch__detectron2/pyi/detectron2/data/samplers/distributed_sampler.pyi
+detectron2/data/samplers/grouped_batch_sampler /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/facebookresearch__detectron2/pyi/detectron2/data/samplers/grouped_batch_sampler.pyi

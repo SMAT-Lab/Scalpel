@@ -1,0 +1,9 @@
+# (generated with --quick)
+
+from typing import Any, Tuple, TypeVar
+
+_T0 = TypeVar('_T0')
+
+def partition(arr, first, last) -> Any: ...
+def quick_sort(arr: _T0, simulation = ...) -> _T0: ...
+def quick_sort_recur(arr: _T0, first, last, iteration, simulation) -> Tuple[_T0, Any]: ...

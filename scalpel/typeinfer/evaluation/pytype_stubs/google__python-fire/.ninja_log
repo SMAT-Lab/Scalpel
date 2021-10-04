@@ -1,0 +1,15 @@
+# ninja log v5
+46	1844	1631695009603971100	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/google__python-fire/pyi/examples/widget/__init__.pyi	af8f372158ecdbd5
+53	1874	1631695009636000300	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/google__python-fire/pyi/fire/console/__init__.pyi	f9df62b138db4ea6
+72	1914	1631695009676037000	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/google__python-fire/pyi/examples/__init__.pyi	d22373d733226dd2
+63	1915	1631695009677037600	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/google__python-fire/pyi/examples/cipher/__init__.pyi	fb3698d23f0ce630
+57	1970	1631695009740094900	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/google__python-fire/pyi/examples/diff/__init__.pyi	d932efac6cd6cf61
+49	2031	1631695009798147600	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/google__python-fire/pyi/examples/identity/__init__.pyi	b93ebe7521f3b0f4
+67	3499	1631695011255977700	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/google__python-fire/pyi/setup.pyi	ca954c9722586e6
+32	4752	1631695012489883800	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/google__python-fire/pyi/fire/formatting_windows.pyi	41ebf9e298fd217c
+39	4765	1631695012454852100	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/google__python-fire/pyi/fire/parser.pyi	f8e4afe4023b2f9e
+27	4783	1631695012481876400	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/google__python-fire/pyi/fire/console/text.pyi	2e2dda22a1135522
+34	4824	1631695012474870300	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/google__python-fire/pyi/fire/console/platforms.pyi	4d0a60281389a7ef
+37	4889	1631695012620002000	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/google__python-fire/pyi/fire/decorators.pyi	f7dca0f5448d5f5f
+30	6697	1631695014223458900	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/google__python-fire/pyi/fire/docstrings.pyi	ff016ebcc5e5e6cf
+17	8659	1631695016338473100	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/google__python-fire/pyi/fire/console/encoding.pyi	ca73a52c4796390f

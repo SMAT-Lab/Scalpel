@@ -1,0 +1,43 @@
+Computing dependencies
+Analyzing 306 sources with 58 local dependencies
+ninja: Entering directory `output/python-telegram-bot__python-telegram-bot'
+[1/526] check telegram.games.__init__
+[2/526] check telegram.inline.__init__
+[3/526] check telegram.vendor.__init__
+[4/526] check telegram.files.__init__
+[5/526] check telegram.payment.__init__
+[6/526] check tests.__init__
+[7/526] check telegram.ext.utils.__init__
+[8/526] check telegram.passport.__init__
+[9/526] check telegram.utils.__init__
+[10/526] check telegram.constants
+[11/526] check telegram.error
+[12/526] check tests.plugin_github_group
+FAILED: /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/python-telegram-bot__python-telegram-bot/pyi/tests/plugin_github_group.pyi 
+/mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/python-telegram-bot__python-telegram-bot/imports/tests.plugin_github_group.imports --module-name tests.plugin_github_group -V 3.8 -o /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/python-telegram-bot__python-telegram-bot/pyi/tests/plugin_github_group.pyi --analyze-annotated --nofail --quick /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/python-telegram-bot__python-telegram-bot/tests/plugin_github_group.py
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/python-telegram-bot__python-telegram-bot/tests/plugin_github_group.py", line 19, in <module>: Can't find module '_pytest'. [import-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/python-telegram-bot__python-telegram-bot/tests/plugin_github_group.py", line 20, in <module>: Can't find module 'pytest'. [import-error]
+
+For more details, see https://google.github.io/pytype/errors.html#import-error
+[13/526] check telegram.utils.deprecate
+[14/526] check conf
+[15/526] check setup
+[16/526] check tests.test_slots
+FAILED: /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/python-telegram-bot__python-telegram-bot/pyi/tests/test_slots.pyi 
+/mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/python-telegram-bot__python-telegram-bot/imports/tests.test_slots.imports --module-name tests.test_slots -V 3.8 -o /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/python-telegram-bot__python-telegram-bot/pyi/tests/test_slots.pyi --analyze-annotated --nofail --quick /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/python-telegram-bot__python-telegram-bot/tests/test_slots.py
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/python-telegram-bot__python-telegram-bot/tests/test_slots.py", line 53, in test_class_has_slots_and_dict: No attribute 'loader' on None [attribute-error]
+  In Optional[importlib.machinery.ModuleSpec]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/python-telegram-bot__python-telegram-bot/tests/test_slots.py", line 53, in test_class_has_slots_and_dict: No attribute 'exec_module' on importlib.abc._LoaderProtocol [attribute-error]
+  In Union[Any, importlib.abc._LoaderProtocol]
+
+For more details, see https://google.github.io/pytype/errors.html#attribute-error
+[17/526] check telegram.version
+[18/526] check tests.test_constants
+FAILED: /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/python-telegram-bot__python-telegram-bot/pyi/tests/test_constants.pyi 
+/mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/python-telegram-bot__python-telegram-bot/imports/tests.test_constants.imports --module-name tests.test_constants -V 3.8 -o /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/python-telegram-bot__python-telegram-bot/pyi/tests/test_constants.pyi --analyze-annotated --nofail --quick /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/python-telegram-bot__python-telegram-bot/tests/test_constants.py
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/python-telegram-bot__python-telegram-bot/tests/test_constants.py", line 19, in <module>: Can't find module 'pytest'. [import-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/python-telegram-bot__python-telegram-bot/tests/test_constants.py", line 20, in <module>: Can't find module 'flaky'. [import-error]
+
+For more details, see https://google.github.io/pytype/errors.html#import-error
+ninja: build stopped: subcommand failed.
+Leaving directory 'output/python-telegram-bot__python-telegram-bot'

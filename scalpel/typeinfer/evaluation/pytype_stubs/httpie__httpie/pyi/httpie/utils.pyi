@@ -1,0 +1,29 @@
+# (generated with --quick)
+
+import collections
+import requests.auth
+from typing import Any, List, Optional, Pattern, Type, TypeVar
+
+OrderedDict: Type[collections.OrderedDict]
+RE_COOKIE_SPLIT: Pattern[str]
+json: module
+mimetypes: module
+parse_ns_headers: Any
+re: module
+requests: module
+time: module
+
+_T0 = TypeVar('_T0')
+
+class ExplicitNullAuth(requests.auth.AuthBase):
+    __doc__: str
+    def __call__(self, r: _T0) -> _T0: ...
+
+def _max_age_to_expires(cookies, now) -> None: ...
+def get_content_type(filename) -> Optional[str]: ...
+def get_expired_cookies(cookies: str, now: float = ...) -> List[dict]: ...
+def humanize_bytes(n, precision = ...) -> str: ...
+def load_json_preserve_order(s) -> Any: ...
+def pformat(object: object, indent: int = ..., width: int = ..., depth: Optional[int] = ..., *, compact: bool = ..., sort_dicts: bool = ...) -> str: ...
+def repr_dict(d: dict) -> str: ...
+def split_cookies(cookies) -> List[str]: ...
