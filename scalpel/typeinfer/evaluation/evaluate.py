@@ -151,7 +151,7 @@ def get_nodes(tree):
 def evaluate_repos():
     # Run Scalpel type inference on each repository in the repos folder
     repo_list = os.listdir('pytype_stubs')
-    repo_list = ['nvbn__thefuck']#'minimaxir__big-list-of-naughty-strings']#, 'openai__gym', 'psf__requests', , 'psf__black']
+    repo_list = ['deezer__spleeter']#'minimaxir__big-list-of-naughty-strings']#, 'openai__gym', 'psf__requests', , 'psf__black']
     for repo in repo_list:
         # Get file paths
         print(repo)
@@ -193,7 +193,7 @@ def evaluate_repos():
                         print(file, function, p_type, s_type)
                         if len(s_type) == 1:
                             s_type = next(iter(s_type))
-                            if p_type.lower() in s_type.lower():
+                            if str(p_type).lower() in str(s_type).lower():
                                 print('adding')
                                 scalpel_total += 1
         try:

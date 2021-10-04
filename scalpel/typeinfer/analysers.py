@@ -133,7 +133,11 @@ class ImportTypeMap(_StaticAnalyzer):
                 if isinstance(node.returns, typed_ast._ast3.Name):
                     return node.returns.id
             elif isinstance(node, typed_ast._ast3.AnnAssign):
-                return node.annotation.id
+                if hasattr(node.annotation, "id"):
+                    return node.annotation.id
+                # bad catchall, will throw exception but we can improve on in future
+                else:
+                    return node.annotation.value.id
             elif isinstance(node, typed_ast._ast3.ClassDef):
                 return node.name  # Type is class name
         return None
