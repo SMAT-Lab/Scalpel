@@ -504,7 +504,12 @@ class ClassSplitVisitor(ast.NodeVisitor):
         return node
 
     def visit_ClassDef(self, node):
-        self.bases = [n.id for n in node.bases if not isinstance(n, ast.Attribute) and not isinstance(n, ast.Subscript)]
+        self.bases = []
+        for n in node.bases:
+            if not isinstance(n, ast.Attribute) and not isinstance(n, ast.Subscript):
+                if hasattr(n, 'id'):
+                    self.bases.append(n.id)
+
         for tmp_node in node.body:
             if not isinstance(tmp_node, ast.Assign):
                 continue
