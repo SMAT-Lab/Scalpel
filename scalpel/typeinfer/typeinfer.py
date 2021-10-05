@@ -249,6 +249,13 @@ class TypeInference:
                         'function': function_name,
                         'type': set(type_values)
                     })
+                else:
+                    type_list.append({
+                        'file': node.name,
+                        'line_number': node.line_numbers.get(function_name),
+                        'function': function_name,
+                        'type': {any.__name__}
+                    })
 
             # Static assignments
             for assignment in node.static_assignments:
@@ -501,7 +508,7 @@ class TypeInference:
 
 
 if __name__ == '__main__':
-    inferrer = TypeInference(name='', entry_point='basecase/case30.py')
+    inferrer = TypeInference(name='', entry_point='basecase/case29.py')
     inferrer.infer_types()
     for t in inferrer.get_types():
         print(t)

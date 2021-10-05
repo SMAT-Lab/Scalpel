@@ -151,10 +151,24 @@ def get_nodes(tree):
 def evaluate_repos():
     # Run Scalpel type inference on each repository in the repos folder
     repo_list = os.listdir('pytype_stubs')
-    repo_list = ['deezer__spleeter']#'minimaxir__big-list-of-naughty-strings']#, 'openai__gym', 'psf__requests', , 'psf__black']
+    #repo_list = ['psf__requests', 'deezer__spleeter', 'minimaxir__big-list-of-naughty-strings', 'openai__gym', 'psf__requests', 'psf__black']
+    repo_list = ['docker__compose', 'pallets__flask', 'drduh__macOS-Security-and-Privacy-Guide',
+                 'eriklindernoren__ML-From-Scratch', 'tqdm__tqdm', 'deezer__spleeter', 'wangzheng0822__algo',
+                 'luong-komorebi__Awesome-Linux-Software', 'josephmisiti__awesome-machine-learning',
+                 'beurtschipper__Depix', 'nvbn__thefuck', 'soimort__you-get', '521xueweihan__HelloGitHub',
+                 'tornadoweb__tornado', 'psf__black', 'sebastianruder__NLP-progress', 'keon__algorithms',
+                 'chubin__cheat.sh', 'faif__python-patterns', 'minimaxir__big-list-of-naughty-strings',
+                 'donnemartin__interactive-coding-challenges', 'httpie__httpie', 'shadowsocks__shadowsocks',
+                 'floodsung__Deep-Learning-Papers-Reading-Roadmap', 'littlecodersh__ItChat', 'locustio__locust',
+                 'openai__gym', 'python-telegram-bot__python-telegram-bot', 'vinta__awesome-python',
+                 'google-research__bert', 'public-apis__public-apis', 'facebookresearch__detectron2',
+                 'trailofbits__algo', 'swisskyrepo__PayloadsAllTheThings', 'google__python-fire',
+                 '0voice__interview_internal_reference', 'facebookresearch__Detectron', 'satwikkansal__wtfpython',
+                 'sherlock-project__sherlock', 'psf__requests']
+    repo_list = ['satwikkansal__wtfpython']
     for repo in repo_list:
-        # Get file paths
         print(repo)
+        # Get file paths
         path_dict = get_file_paths(repo)
 
         # Get scalpel inferred types
@@ -171,32 +185,86 @@ def evaluate_repos():
         pytype_total = 0
         for inferred in pytype_inferred:
             file, function, p_type = inferred['file'], inferred['function'], inferred['type']
+            parameter = inferred.get('parameter')
+
             file = file.replace('.pyi', '.py')  # Replace file extension so we can compare to the same file name
-            if compare_dict.get(file):
-                compare_dict[file][function] = p_type
+
+            if parameter is None:
+                # Function return
+                if compare_dict.get(file):
+                    compare_dict[file][function] = {'return': p_type}
+                else:
+                    compare_dict[file] = {function: {'return': p_type}}
+
+                if p_type is not None:
+                    # Only incrementing total if return type is not None,
+                    # since our module doesn't report None for functions with no return
+                    pytype_total += 1  # Increment PyType inferred total count
             else:
-                compare_dict[file] = {function: p_type}
+                if file_ref := compare_dict.get(file):
+                    if file_ref.get(function):
+                        compare_dict[file][function][parameter] = p_type
+                    else:
+                        compare_dict[file][function] = {parameter: p_type}
+                else:
+                    compare_dict[file] = {function: {parameter: p_type}}
+                pytype_total += 1  # No need to check for None since PyType gives None for no argument type
 
             if p_type is not None:
                 # Only incrementing total if return type is not None,
                 # since our module doesn't report None for functions with no return
                 pytype_total += 1  # Increment PyType inferred total count
-
+        # print(f"{pytype_total=}")
         # Compare with Scalpel
         scalpel_total = 0
         for inferred in scalpel_inferred:
-            if 'variable' not in inferred and 'parameter' not in inferred:
+            if 'variable' not in inferred:
                 file, function, s_type = inferred['file'], inferred['function'], inferred['type']
-
+                parameter = inferred.get('parameter')
+                # print(file, function, s_type)
                 if file_types := compare_dict.get(file):
-                    if p_type := file_types.get(function):
-                        print(file, function, p_type, s_type)
-                        if len(s_type) == 1:
-                            s_type = next(iter(s_type))
-                            if str(p_type).lower() in str(s_type).lower():
-                                print('adding')
-                                scalpel_total += 1
+                    if parameter is None:
+                        # Function/method returns
+
+                        # Check to see if we have a class method name from Scalpel
+                        split_name = function.split('.')
+                        if len(split_name) == 2:
+                            function = split_name[1]
+
+                        if p_function := file_types.get(function):
+                            #print(file, function, s_type, p_function)
+                            if p_type := p_function.get('return'):
+                                #print(file, function, p_type, s_type)
+                                if len(s_type) == 1:
+                                    s_type = next(iter(s_type))
+                                    if str(p_type).lower() in str(s_type).lower():
+                                        scalpel_total += 1
+                                        del p_function['return']  # Remove from dict
+                                        continue
+                    else:
+                        # Parameter type
+                        if p_function := file_types.get(function):
+                            if p_type := p_function.get(parameter):
+                                if len(s_type) == 1:
+                                    s_type = next(iter(s_type))
+                                    #print(file, function, p_type, s_type)
+                                    if str(p_type).lower() in str(s_type).lower():
+                                        scalpel_total += 1
+                                        del p_function[parameter]
+                                        continue
+                            else:
+                                # PyType couldn't infer the return type, check to see if Scalpel returned 'any'
+                                #print(s_type)
+                                if s_type == 'any':
+                                    scalpel_total += 1
+                                    try:
+                                        del p_function[parameter]
+                                    except:
+                                        pass
+                                    continue
+        pprint(compare_dict)
         try:
+            print(f'PyType Total: {pytype_total}, Scalpel Total: {scalpel_total}')
             print(f'Repository: {repo}, Accuracy: {round(scalpel_total / pytype_total, 4) * 100}%')
         except ZeroDivisionError:
             print(f'Repository: {repo}, Accuracy: 100%')
@@ -216,30 +284,40 @@ def get_stub_types(stub_file_path: str):
 
         for node in ast3.walk(tree):
             if isinstance(node, ast3.FunctionDef):
-                function_name = node.name
+                decorator_names = [d.id for d in node.decorator_list if isinstance(d, ast3.Name)]
+                if 'overload' not in decorator_names:
+                    function_name = node.name
+                    # Function return
+                    return_node = node.returns
+                    return_type = None
+                    if isinstance(return_node, ast3.Subscript):
+                        if isinstance(return_node.value, ast3.Name):
+                            return_type = return_node.value.id
+                    elif isinstance(return_node, ast3.NameConstant):
+                        return_type = return_node.value
+                    elif isinstance(return_node, ast3.Name):
+                        return_type = return_node.id
+                    elif isinstance(return_node, ast3.Attribute):
+                        return_type = return_node.attr
+                    else:
+                        raise Exception(f'Return node type not accounted for: {type(return_node)}')
 
-                # Function return
-                return_node = node.returns
-                if isinstance(return_node, ast3.Subscript):
-                    return_type = return_node.value.id
-                elif isinstance(return_node, ast3.NameConstant):
-                    return_type = return_node.value
-                elif isinstance(return_node, ast3.Name):
-                    return_type = return_node.id
-                elif isinstance(return_node, ast3.Attribute):
-                    return_type = return_node.attr
-                else:
-                    raise Exception(f'Return node type not accounted for: {type(return_node)}')
-                inferred_types.append({
-                    'file': file_name,
-                    'function': function_name,
-                    'type': return_type
-                })
+                    if return_type is not None:
+                        inferred_types.append({
+                            'file': file_name,
+                            'function': function_name,
+                            'type': return_type
+                        })
 
-                # Function parameters
-                for argument in node.args.args:
-                    # print(function_name, argument.arg, argument.type_comment)
-                    pass
+                    # Function parameters
+                    for argument in node.args.args:
+                        if argument.arg != 'self':
+                            inferred_types.append({
+                                'file': file_name,
+                                'function': function_name,
+                                'parameter': argument.arg,
+                                'type': argument.type_comment
+                            })
 
     return inferred_types
 

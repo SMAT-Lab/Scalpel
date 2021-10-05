@@ -934,8 +934,7 @@ class Heuristics:
         for node in ast.walk(function_node):
             # Visit ast.Call nodes, checking for variable names
             if isinstance(node, ast.Call):
-                if not isinstance(node.func, ast.Attribute) and not isinstance(node.func, ast.Call) \
-                        and not isinstance(node.func, ast.Subscript):
+                if isinstance(node.func, ast.Name):
                     function_calls.append(node.func.id)
 
         # Get variables that are called
@@ -949,8 +948,7 @@ class Heuristics:
         is_instance_type_map = {}
         for node in ast.walk(function_node):
             if isinstance(node, ast.Call):
-                if not isinstance(node.func, ast.Attribute) and not isinstance(node.func, ast.Call) \
-                        and not isinstance(node.func, ast.Subscript):
+                if isinstance(node.func, ast.Name):
                     if node.func.id == 'isinstance':
                         # Check to see what the value being compared to is
                         variable, type_compared = node.args[0], node.args[1]
