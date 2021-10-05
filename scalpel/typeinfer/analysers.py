@@ -919,6 +919,15 @@ class Heuristics:
                 # Constant, check its type
                 return type(i.value).__name__
 
+        # If we are here we've returned nothing
+        if hasattr(return_node, "op"):
+            operation = return_node.op
+            number_operations = [ast.Pow, ast.Mod]
+            if any([isinstance(operation, x) for x in number_operations]):
+                return "float"
+        else:
+            return "any"
+
     @staticmethod
     def heuristic_six(processed_file, function_node):
         function_calls = []
