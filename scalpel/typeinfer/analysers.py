@@ -785,7 +785,6 @@ class ReturnStmtVisitor(ast.NodeVisitor):
 class Heuristics:
     @staticmethod
     def heuristic_two(ast_tree, processed_file, assignments):
-        assignments
         function_param_types = {}
         for node in ast.walk(ast_tree):
             if isinstance(node, ast.FunctionDef):
@@ -847,7 +846,7 @@ class Heuristics:
                 # Get left and right for the binary operation
                 left_operation = variable.binary_operation.left
                 right_operation = variable.binary_operation.right
-
+                operation = variable.binary_operation.op
                 # Check for involved parameters
                 involved_params = [i for i in param_list if self.in_bin_op(i, variable.binary_operation)]
 
@@ -895,7 +894,11 @@ class Heuristics:
                     if isinstance(right_operation, ast.Name):
                         right_name = right_operation.id
                         if right_variable := assignment_dict.get(right_name):
-                            variable.type = right_variable.type
+                            if right_variable.type == "any" \
+                                    and (isinstance(operation, ast.Pow) or isinstance(operation, ast.Mod)):
+                                variable.type = "float"
+                            else:
+                                variable.type = right_variable.type
                     elif isinstance(right_operation, ast.Constant):
                         variable.type = type(right_operation.value).__name__
         return assignments
