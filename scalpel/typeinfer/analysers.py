@@ -689,6 +689,10 @@ class ReturnStmtVisitor(ast.NodeVisitor):
             if isinstance(init_val, ast.Name):
                 if init_val.id in self.args or init_val.id in self.class_assign_records["init_arg_name_lst"]:
                     self.r_types += ['input']
+            else:
+                # Can't deduce type, return Any
+                self.r_types += [any.__name__]
+
         else:
             # Known type
             self.r_types += [type_val]
