@@ -18,7 +18,8 @@ from scalpel.typeinfer.analysers import (
     ClassSplitVisitor,
     ReturnStmtVisitor,
     HeuristicParser,
-    Heuristics
+    Heuristics,
+    VariableAssignmentMap
 )
 from scalpel.typeinfer.graph import Tree, ImportGraph
 from scalpel.typeinfer.utilities import (
@@ -312,15 +313,21 @@ class TypeInference:
             processed_file.line_numbers[function_name] = function_node.lineno
             function_source = astunparse.unparse(function_node)
 
+            # Variable assignments
+            assignments = VariableAssignmentMap(function_node, imports=import_mappings).map()
+            for assignment in assignments:
+                assignment.function = function_node.name
+            processed_file.static_assignments.extend(assignments)
+
             # Heuristic 5
-            assignments = heuristics.heuristic_five(
+            heuristics.heuristic_five(
                 import_mappings=import_mappings,
                 processed_file=processed_file,
                 function_node=function_node
             )
 
             # Heuristic 8
-            function_params = [a for a in assignments if a.is_arg]
+            function_params = [a for a in processed_file.static_assignments if a.is_arg]
             heuristics.heuristic_eight(
                 ast_tree=tree,
                 function_name=function_name,
@@ -351,6 +358,13 @@ class TypeInference:
                 ast_tree=tree,
                 processed_file=processed_file,
                 assignments=assignments
+            )
+
+            # Heuristic 5 once more to account for newly inferred types
+            heuristics.heuristic_five(
+                import_mappings=import_mappings,
+                processed_file=processed_file,
+                function_node=function_node
             )
 
             # Import resolved assignments to the return visitor
@@ -408,15 +422,21 @@ class TypeInference:
                 # Get method header comment TODO: Is this needed?
                 processed_file.node_type_comment[function_name] = get_function_comment(function_source)
 
+                # Variable assignments
+                assignments = VariableAssignmentMap(function_node, imports=import_mappings).map()
+                for assignment in assignments:
+                    assignment.function = function_node.name
+                processed_file.static_assignments.extend(assignments)
+
                 # Heuristic 5
-                assignments = heuristics.heuristic_five(
+                heuristics.heuristic_five(
                     import_mappings=import_mappings,
                     processed_file=processed_file,
                     function_node=function_node
                 )
 
                 # Heuristic 8
-                function_params = [a for a in assignments if a.is_arg]
+                function_params = [a for a in processed_file.static_assignments if a.is_arg]
                 heuristics.heuristic_eight(
                     ast_tree=tree,
                     function_name=function_name,
@@ -431,6 +451,13 @@ class TypeInference:
 
                 # Heuristic 6
                 heuristics.heuristic_six(
+                    processed_file=processed_file,
+                    function_node=function_node
+                )
+
+                # Heuristic 5 once more to account for newly inferred types
+                heuristics.heuristic_five(
+                    import_mappings=import_mappings,
                     processed_file=processed_file,
                     function_node=function_node
                 )
@@ -508,7 +535,7 @@ class TypeInference:
 
 
 if __name__ == '__main__':
-    inferrer = TypeInference(name='', entry_point='basecase/case31.py')
+    inferrer = TypeInference(name='', entry_point='basecase/case32.py')
     inferrer.infer_types()
     for t in inferrer.get_types():
         print(t)

@@ -240,6 +240,7 @@ class VariableAssignmentMap(_StaticAnalyzer):
                 )
                 variable_type = 'any'
                 if isinstance(node.value, ast.Call) and not isinstance(node.value.func, ast.Attribute):
+
                     # Assignment is to a callable
                     if isinstance(node.value.func, ast.Name):
                         called = node.value.func.id  # Name of callable
@@ -673,7 +674,6 @@ class ReturnStmtVisitor(ast.NodeVisitor):
         elif type_val == "call":
             func_name = get_func_calls(init_val)
             func_name = func_name[0]
-
             first_part = func_name.split('.')[0]
             if func_name == "self.__class__":
                 # same as class itself
@@ -795,11 +795,11 @@ class Heuristics:
                 func_args = node.args.args
                 func_name = node.name
                 function_param_types[func_name] = [{
-                        "possible_arg_types": [],
-                        "funcs": [],
-                        "type": "",
-                        "param_name": x.arg
-                    } for x in func_args
+                    "possible_arg_types": [],
+                    "funcs": [],
+                    "type": "",
+                    "param_name": x.arg
+                } for x in func_args
                 ]
 
             elif hasattr(node, "value") and isinstance(node.value, ast.Call):
@@ -837,13 +837,8 @@ class Heuristics:
 
     def heuristic_five(self, import_mappings, processed_file, function_node):
         # Perform heuristic five within a function
-        assignments = VariableAssignmentMap(function_node, imports=import_mappings).map()
 
-        for assignment in assignments:
-            assignment.function = function_node.name
-        processed_file.static_assignments.extend(assignments)
-
-        param_list = [v for v in assignments if v.is_arg]
+        param_list = [v for v in processed_file.static_assignments if v.is_arg]
         assignment_dict = {v.name: v for v in processed_file.static_assignments}
         for variable in list(reversed(processed_file.static_assignments)):
             if variable.binary_operation is not None:
@@ -905,7 +900,6 @@ class Heuristics:
                                 variable.type = right_variable.type
                     elif isinstance(right_operation, ast.Constant):
                         variable.type = type(right_operation.value).__name__
-        return assignments
 
     def heuristic_five_return(self, assignments, return_node: ast.BinOp):
         # Perform heuristic five on a returned binary operation
@@ -965,7 +959,6 @@ class Heuristics:
 
         # Check static assignments for the variables involved in calls to isinstance
         involved = [s for s in processed_file.static_assignments if s.name in is_instance_type_map]
-
         for variable in involved:
             is_instance_types = is_instance_type_map[variable.name]
 
@@ -1035,7 +1028,6 @@ class Heuristics:
             regex = re.search(regex_query, variable.name)
             if regex:
                 variable.type = 'int'
-
 
     def heuristic_eleven(self, processed_file, function_node):
         # Find what variables are in comparison operations and resolve types
