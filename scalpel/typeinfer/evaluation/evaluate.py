@@ -3,16 +3,19 @@ Tomas Bolger 2021
 Python 3.9
 Automated comparison of Scalpel Type inference output to PyType stub file
 """
-
+import multiprocessing
 import ast
 import os
 import typing
 import tokenize
+import pandas
 from pprint import pprint
 from typed_ast import ast3
 
 from scalpel.typeinfer.analysers import ClassSplitVisitor
 from scalpel.typeinfer.typeinfer import TypeInference
+
+dirname = os.path.dirname(__file__)
 
 
 def get_stub_function_returns(stub_file_path):
@@ -148,6 +151,160 @@ def get_nodes(tree):
     return fun_nodes, class_nodes, import_nodes
 
 
+def do_evaluate_repo(repo):
+    print(repo)
+    filename = f"{repo}.xlsx"
+
+    output_data = []
+    # Get file paths
+    path_dict = get_file_paths(repo)
+
+    # Get scalpel inferred types
+    inferrer = TypeInference(name=repo, entry_point=f'source_repos/{repo}')
+    inferrer = TypeInference(name=repo, entry_point=os.path.join(dirname, "source_repos", repo))
+    inferrer.infer_types()
+    scalpel_inferred = inferrer.get_types()
+
+    # Get PyType inferred types from stub files
+    pytype_inferred = []
+    for file in path_dict.keys():
+        pytype_inferred.extend(get_stub_types(file))
+
+    output_dict = {}
+    compare_dict = {}
+    pytype_total = 0
+    for inferred in pytype_inferred:
+        file, function, p_type = inferred['file'], inferred['function'], inferred['type']
+        parameter = inferred.get('parameter')
+
+        file = file.replace('.pyi', '.py')  # Replace file extension so we can compare to the same file name
+
+        if parameter is None:
+            # Function return
+            if p_type is not None:
+                # Only including in total if return type is not None,
+                # since our module doesn't report None for functions with no return
+                if compare_dict.get(file):
+                    compare_dict[file][function] = {'return': p_type}
+                else:
+                    compare_dict[file] = {function: {'return': p_type}}
+                pytype_total += 1  # Increment PyType inferred total count
+        else:
+            if file_ref := compare_dict.get(file):
+                if file_ref.get(function):
+                    compare_dict[file][function][parameter] = p_type
+                else:
+                    compare_dict[file][function] = {parameter: p_type}
+            else:
+                compare_dict[file] = {function: {parameter: p_type}}
+            pytype_total += 1  # No need to check for None since PyType gives None for no argument type
+
+        if file not in output_dict:
+            output_dict[file] = {}
+        if function not in output_dict[file]:
+            output_dict[file][function] = {}
+        output_dict[file][function]["p_type"] = p_type if p_type else "Any"
+        # output_data.append([repo, file, function, p_type, ""])
+
+    # Compare with Scalpel
+    scalpel_total = 0
+    for inferred in scalpel_inferred:
+        if 'variable' not in inferred:
+            file, function, s_type = inferred['file'], inferred['function'], inferred['type']
+            parameter = inferred.get('parameter')
+
+            # print(file, function, s_type, parameter)
+            if file_types := compare_dict.get(file):
+                if parameter is None:
+                    # Function/method returns
+
+                    # Check to see if we have a class method name from Scalpel
+                    split_name = function.split('.')
+                    if len(split_name) == 2:
+                        function = split_name[1]
+
+                    if p_function := file_types.get(function):
+                        if p_type := p_function.get('return'):
+
+                            if file not in output_dict:
+                                output_dict[file] = {}
+                            if function not in output_dict[file]:
+                                output_dict[file][function] = {}
+                            output_dict[file][function]["s_type"] = s_type if s_type else "Unknown"
+
+                            output_data.append([repo, file, function, p_type if p_type else "Any", s_type])
+                            if len(s_type) == 1:
+                                s_type = next(iter(s_type))
+                                if str(p_type).lower() in str(s_type).lower():
+                                    scalpel_total += 1
+                                    del p_function['return']  # Remove from dict
+                                    continue
+                else:
+                    # Parameter type
+                    if p_function := file_types.get(function):
+                        # Check for named type
+                        if p_type := p_function.get(parameter):
+
+                            if file not in output_dict:
+                                output_dict[file] = {}
+                            if function not in output_dict[file]:
+                                output_dict[file][function] = {}
+                            output_dict[file][function]["s_type"] = s_type if s_type else "Unknown"
+                            output_data.append([repo, file, function, p_type if p_type else "Any", s_type])
+                            if len(s_type) == 1:
+                                s_type = next(iter(s_type))
+                                if str(p_type).lower() in str(s_type).lower():
+                                    scalpel_total += 1
+                                    del p_function[parameter]
+                                    continue
+                        else:
+
+                            if file not in output_dict:
+                                output_dict[file] = {}
+                            if function not in output_dict[file]:
+                                output_dict[file][function] = {}
+                            output_dict[file][function]["s_type"] = s_type if s_type else "Unknown"
+
+                            output_data.append([repo, file, function, p_type if p_type else "Any", s_type])
+                            # PyType couldn't infer the return type, check to see if Scalpel returned 'any'
+                            if s_type == 'any' and parameter in p_function.keys():
+                                scalpel_total += 1
+                                del p_function[parameter]
+                                continue
+
+    # Cleanup NoReturn (these are just functions with no return statement, Scalpel doesn't bother outputting this)
+    for file in compare_dict.keys():
+        for function in compare_dict[file].keys():
+            if r_type := compare_dict[file][function].get('return'):
+                if r_type == 'NoReturn' or r_type is None:
+                    scalpel_total += 1
+                    del compare_dict[file][function]['return']
+
+    # output_data = []
+    for repo_file_name, function_file in output_dict.items():
+        for function_name, function in function_file.items():
+            p_type = function["p_type"] if "p_type" in function else ""
+            s_type = function["s_type"] if "s_type" in function else ""
+            # output_data.append([repo, repo_file_name, function, p_type, s_type])
+
+    pprint(compare_dict)
+    try:
+        spreadsheet_headers = ["Repository", "File Name", "Function Name", "PyType Type", "Scalpel Type"]
+        output_data.append(
+            [f'PyType Total:', pytype_total, 'Scalpel Total:', scalpel_total, ""])
+        output_data.append([""] * (len(spreadsheet_headers) - 3) + ["Accuracy", round(scalpel_total / pytype_total, 4) * 100, ""])
+
+        df = pandas.DataFrame(output_data, columns=spreadsheet_headers)
+        df.to_excel(os.path.join(dirname, "evaluation_outputs", filename), index=False)
+
+        print(f'PyType Total: {pytype_total}, Scalpel Total: {scalpel_total}')
+        print(f'Repository: {repo}, Accuracy: {round(scalpel_total / pytype_total, 4) * 100}%')
+    except ZeroDivisionError:
+        print(f'Repository: {repo}, Accuracy: 100%')
+
+    print(f"Finished analysing {repo}")
+
+
 def evaluate_repos():
     # Run Scalpel type inference on each repository in the repos folder
     repo_list = os.listdir('pytype_stubs')
@@ -165,110 +322,18 @@ def evaluate_repos():
                  'trailofbits__algo', 'swisskyrepo__PayloadsAllTheThings', 'google__python-fire',
                  '0voice__interview_internal_reference', 'facebookresearch__Detectron', 'satwikkansal__wtfpython',
                  'sherlock-project__sherlock', 'psf__requests']
-    repo_list = ['psf__requests']
+    # repo_list = ['littlecodersh__ItChat']
+    all_threads = []
     for repo in repo_list:
-        print(repo)
-        # Get file paths
-        path_dict = get_file_paths(repo)
+        # do_evaluate_repo(repo)  # run this if you want it done without multithreading
 
-        # Get scalpel inferred types
-        inferrer = TypeInference(name=repo, entry_point=f'source_repos/{repo}')
-        inferrer.infer_types()
-        scalpel_inferred = inferrer.get_types()
+        # Multithreading doesn't work due to the changing of current working dirs/pwd
+        thread = multiprocessing.Process(target=do_evaluate_repo, args=[repo])
+        thread.start()
+        all_threads.append(thread)
 
-        # Get PyType inferred types from stub files
-        pytype_inferred = []
-        for file in path_dict.keys():
-            pytype_inferred.extend(get_stub_types(file))
-
-        compare_dict = {}
-        pytype_total = 0
-        for inferred in pytype_inferred:
-            file, function, p_type = inferred['file'], inferred['function'], inferred['type']
-            parameter = inferred.get('parameter')
-
-            file = file.replace('.pyi', '.py')  # Replace file extension so we can compare to the same file name
-
-            if parameter is None:
-                # Function return
-                if p_type is not None:
-                    # Only including in total if return type is not None,
-                    # since our module doesn't report None for functions with no return
-                    if compare_dict.get(file):
-                        compare_dict[file][function] = {'return': p_type}
-                    else:
-                        compare_dict[file] = {function: {'return': p_type}}
-                    pytype_total += 1  # Increment PyType inferred total count
-            else:
-                if file_ref := compare_dict.get(file):
-                    if file_ref.get(function):
-                        compare_dict[file][function][parameter] = p_type
-                    else:
-                        compare_dict[file][function] = {parameter: p_type}
-                else:
-                    compare_dict[file] = {function: {parameter: p_type}}
-                pytype_total += 1  # No need to check for None since PyType gives None for no argument type
-
-        # Compare with Scalpel
-        scalpel_total = 0
-        for inferred in scalpel_inferred:
-            if 'variable' not in inferred:
-                file, function, s_type = inferred['file'], inferred['function'], inferred['type']
-                parameter = inferred.get('parameter')
-
-                # print(file, function, s_type, parameter)
-
-                if file_types := compare_dict.get(file):
-                    if parameter is None:
-                        # Function/method returns
-
-                        # Check to see if we have a class method name from Scalpel
-                        split_name = function.split('.')
-                        if len(split_name) == 2:
-                            function = split_name[1]
-
-                        if p_function := file_types.get(function):
-                            if p_type := p_function.get('return'):
-                                # print(file, function, p_type, s_type)
-                                if len(s_type) == 1:
-                                    s_type = next(iter(s_type))
-                                    if str(p_type).lower() in str(s_type).lower():
-                                        scalpel_total += 1
-                                        del p_function['return']  # Remove from dict
-                                        continue
-                    else:
-                        # Parameter type
-                        if p_function := file_types.get(function):
-
-                            # Check for named type
-                            if p_type := p_function.get(parameter):
-                                if len(s_type) == 1:
-                                    s_type = next(iter(s_type))
-                                    if str(p_type).lower() in str(s_type).lower():
-                                        scalpel_total += 1
-                                        del p_function[parameter]
-                                        continue
-                            else:
-                                # PyType couldn't infer the return type, check to see if Scalpel returned 'any'
-                                if s_type == 'any' and parameter in p_function.keys():
-                                    scalpel_total += 1
-                                    del p_function[parameter]
-                                    continue
-
-        # Cleanup NoReturn (these are just functions with no return statement, Scalpel doesn't bother outputting this)
-        for file in compare_dict.keys():
-            for function in compare_dict[file].keys():
-                if r_type := compare_dict[file][function].get('return'):
-                    if r_type == 'NoReturn' or r_type is None:
-                        scalpel_total += 1
-                        del compare_dict[file][function]['return']
-
-        pprint(compare_dict)
-        try:
-            print(f'PyType Total: {pytype_total}, Scalpel Total: {scalpel_total}')
-            print(f'Repository: {repo}, Accuracy: {round(scalpel_total / pytype_total, 4) * 100}%')
-        except ZeroDivisionError:
-            print(f'Repository: {repo}, Accuracy: 100%')
+    for thread in all_threads:
+        thread.join()
 
 
 def get_stub_types(stub_file_path: str):

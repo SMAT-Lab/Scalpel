@@ -9,3 +9,5 @@ typed-ast
 typeshed-client
 mypy
 regex
+pandas
+openpyxl
