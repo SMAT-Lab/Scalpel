@@ -10,4 +10,5 @@ typeshed-client
 mypy
 regex
 pandas
+jinja2
 openpyxl

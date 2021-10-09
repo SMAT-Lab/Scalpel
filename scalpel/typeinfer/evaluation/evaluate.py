@@ -161,7 +161,11 @@ def do_evaluate_repo(repo):
 
     # Get scalpel inferred types
     # inferrer = TypeInference(name=repo, entry_point=f'source_repos/{repo}')
-    inferrer = TypeInference(name=repo, entry_point=os.path.join(dirname, "main_repos", repo))
+    if repo in ["beurtschipper__Depix", "deezer__spleeter", "facebookresearch__Detectron", "psf__black", "psf__requests"]:
+        repo_folder = "main_repos"
+    else:
+        repo_folder = "source_repos"
+    inferrer = TypeInference(name=repo, entry_point=os.path.join(dirname, repo_folder, repo))
     inferrer.infer_types()
     scalpel_inferred = inferrer.get_types()
 
@@ -189,6 +193,8 @@ def do_evaluate_repo(repo):
                 else:
                     compare_dict[file] = {function: {'return': p_type}}
                 pytype_total += 1  # Increment PyType inferred total count
+            else:
+                pass
         else:
             if file_ref := compare_dict.get(file):
                 if file_ref.get(function):
@@ -226,30 +232,25 @@ def do_evaluate_repo(repo):
                     if p_function := file_types.get(function):
                         if p_type := p_function.get('return'):
 
-                            if file not in output_dict:
-                                output_dict[file] = {}
-                            if function not in output_dict[file]:
-                                output_dict[file][function] = {}
-                            output_dict[file][function]["s_type"] = s_type if s_type else "Unknown"
-
                             output_data.append([repo, file, function, p_type if p_type else "Any", s_type])
-                            if len(s_type) == 1:
+                            # loop through the s_type set and check if any of the p_types equal the s_type and then
+                            # add and continue
+
+                            s_type = next(iter(s_type))
+                            # check if s_type is a set
+                            output_data.append([repo, file, function, p_type if p_type else "Any", s_type])
+                            if s_type is not None and len(s_type) == 1:
                                 s_type = next(iter(s_type))
                                 if str(p_type).lower() in str(s_type).lower():
                                     scalpel_total += 1
                                     del p_function['return']  # Remove from dict
                                     continue
+
                 else:
                     # Parameter type
                     if p_function := file_types.get(function):
                         # Check for named type
                         if p_type := p_function.get(parameter):
-
-                            if file not in output_dict:
-                                output_dict[file] = {}
-                            if function not in output_dict[file]:
-                                output_dict[file][function] = {}
-                            output_dict[file][function]["s_type"] = s_type if s_type else "Unknown"
                             output_data.append([repo, file, function, p_type if p_type else "Any", s_type])
                             if len(s_type) == 1:
                                 s_type = next(iter(s_type))
@@ -258,12 +259,6 @@ def do_evaluate_repo(repo):
                                     del p_function[parameter]
                                     continue
                         else:
-
-                            if file not in output_dict:
-                                output_dict[file] = {}
-                            if function not in output_dict[file]:
-                                output_dict[file][function] = {}
-                            output_dict[file][function]["s_type"] = s_type if s_type else "Unknown"
                             output_data.append([repo, file, function, p_type if p_type else "Any", s_type])
                             # PyType couldn't infer the return type, check to see if Scalpel returned 'any'
                             if s_type == 'any' and parameter in p_function.keys():
@@ -288,20 +283,93 @@ def do_evaluate_repo(repo):
 
     pprint(compare_dict)
     try:
-        spreadsheet_headers = ["Repository", "File Name", "Function Name", "PyType Type", "Scalpel Type"]
-        output_data.append(
-            [f'PyType Total:', pytype_total, 'Scalpel Total:', scalpel_total, ""])
-        output_data.append([""] * (len(spreadsheet_headers) - 3) + ["Accuracy", round(scalpel_total / pytype_total, 4) * 100, ""])
-
-        df = pandas.DataFrame(output_data, columns=spreadsheet_headers)
-        df.to_excel(os.path.join(dirname, "evaluation_outputs", filename), index=False)
-
         print(f'PyType Total: {pytype_total}, Scalpel Total: {scalpel_total}')
         print(f'Repository: {repo}, Accuracy: {round(scalpel_total / pytype_total, 4) * 100}%')
+        # find wins using comparisons between s_type and p_type and append to excel sheet
+        spreadsheet_headers = ["Repository", "File Name", "Function Name", "PyType Type", "Scalpel Type"]
+        df = pandas.DataFrame(output_data, columns=spreadsheet_headers)
+        parse_dataframe_status(df, filename)
+
     except ZeroDivisionError:
         print(f'Repository: {repo}, Accuracy: 100%')
 
     print(f"Finished analysing {repo}")
+
+
+def parse_dataframe_status(df, filename):
+    """
+    Parses a dataframe to calculate how many wins/losses we achieved
+    """
+
+    new_data = []
+    wins = 0
+    losses = 0
+    neutrals = 0
+    for item in df.iloc:
+        s_type = item["Scalpel Type"]
+        p_type = item["PyType Type"]
+        if p_type == None:
+            p_type = "Any"
+
+        if isinstance(s_type, set):
+
+            s_type = [x if x is not None else "any" for x in s_type]
+            try:
+                yes = any([x.lower() in p_type.lower() or p_type.lower() in x.lower() for x in s_type])
+            except:
+                print(f"none object occurred: {filename}")
+
+            if any([x.lower() in p_type.lower() or p_type.lower() in x.lower() for x in s_type]):
+                win_status = "Neutral"
+                neutrals += 1
+            elif "any" in p_type.lower() and not all(["any" in x.lower() for x in s_type]):
+                win_status = "Win"
+                wins += 1
+            else:
+                # probs lost here
+                # "any" in p_type and not all([x.lower() == "any" for x in s_type])
+                win_status = "Loss"
+                losses += 1
+        else:
+            s_type = "any" if s_type is None else s_type
+            if p_type.lower() in s_type.lower() or s_type.lower() in p_type.lower():
+                win_status = "Neutral"
+                neutrals += 1
+            elif "any" in p_type.lower() and "any" not in s_type.lower():
+                win_status = "Win"
+                wins += 1
+            else:
+                win_status = "Loss"
+                losses += 1
+        new_line = list(item.values) + [win_status]
+        new_data.append(new_line)
+
+    columns = list(df.columns) + ["Status"]
+
+    new_data.append(
+        [f'Total comparisons:', wins + neutrals + losses, 'PyType Wins:', losses, "Scalpel Wins:", wins])
+    # Divide by 1 if we have
+    new_data.append(
+        [""] * (len(columns) - 2) + ["Accuracy over PyType", round(wins / losses if losses else 1, 4) * 100])
+
+    new_df = pandas.DataFrame(new_data, columns=columns)
+    styled_df = new_df.style.applymap(colouring)
+
+    styled_df.to_excel(os.path.join(dirname, "evaluation_outputs", filename), index=False)
+    return new_df
+
+
+# code taken from https://stackoverflow.com/questions/43839112/format-the-color-of-a-cell-in-a-pandas-dataframe-according-to-multiple-condition/43839318 # noqa
+def colouring(val):
+    if val == "Win":
+        color = 'green'
+    elif val == "Neutral":
+        color = 'orange'
+    elif val == "Loss":
+        color = 'red'
+    else:
+        color = "white"
+    return f'background-color: {color}'
 
 
 def evaluate_repos():
@@ -321,25 +389,20 @@ def evaluate_repos():
                  'trailofbits__algo', 'swisskyrepo__PayloadsAllTheThings', 'google__python-fire',
                  '0voice__interview_internal_reference', 'facebookresearch__Detectron', 'satwikkansal__wtfpython',
                  'sherlock-project__sherlock', 'psf__requests']
-    repo_list = [
-        # "beurtschipper__Depix",
-        # "deezer__spleeter",
-        # "facebookresearch__Detectron",
-        "psf__black",
-        # "psf__requests",
-    ]
-    # repo_list = ['littlecodersh__ItChat']
+    # repo_list = ["beurtschipper__Depix", "deezer__spleeter", "facebookresearch__Detectron", "psf__black", "psf__requests", ]
+    # repo_list = ['psf__black']
     all_threads = []
     for repo in repo_list:
-        do_evaluate_repo(repo)  # run this if you want it done without multithreading
+        # do_evaluate_repo(repo)  # run this if you want it done without multithreading
 
         # Multithreading doesn't work due to the changing of current working dirs/pwd
-    #     thread = multiprocessing.Process(target=do_evaluate_repo, args=[repo])
-    #     thread.start()
-    #     all_threads.append(thread)
-    #
-    # for thread in all_threads:
-    #     thread.join()
+        # So we're using multiprocessing
+        thread = multiprocessing.Process(target=do_evaluate_repo, args=[repo])
+        thread.start()
+        all_threads.append(thread)
+
+    for thread in all_threads:
+        thread.join()
 
 
 def get_stub_types(stub_file_path: str):
