@@ -343,10 +343,10 @@ def parse_dataframe_status(df, filename):
     columns = list(df.columns) + ["Status"]
     total_checks = wins + neutrals + losses
     new_data.append([f'Total comparisons:', wins + neutrals + losses, 'PyType Wins:', losses, "Scalpel Wins:", wins])
-    new_data.append([""] * (len(columns) - 4) + ["Scalpel Accuracy:", round((total_checks - losses)/losses if losses else 1, 4) * 100])
+    new_data.append([""] * (len(columns) - 2) + ["Scalpel Accuracy:", round((total_checks - losses)/total_checks if total_checks else 1, 4) * 100])
     # Divide by 1 if we have
     new_data.append(
-        [""] * (len(columns) - 2) + ["Accuracy over PyType", round(wins / losses if losses else 1, 4) * 100])
+        [""] * (len(columns) - 2) + ["Accuracy vs PyType", round(wins / losses if losses else 1, 4) * 100])
 
     new_df = pandas.DataFrame(new_data, columns=columns)
     styled_df = new_df.style.applymap(colouring)
