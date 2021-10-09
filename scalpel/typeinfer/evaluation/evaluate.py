@@ -314,17 +314,13 @@ def parse_dataframe_status(df, filename):
         if isinstance(s_type, set):
 
             s_type = [x if x is not None else "any" for x in s_type]
-            try:
-                yes = any([x.lower() in p_type.lower() or p_type.lower() in x.lower() for x in s_type])
-            except:
-                print(f"none object occurred: {filename}")
 
-            if any([x.lower() in p_type.lower() or p_type.lower() in x.lower() for x in s_type]):
-                win_status = "Neutral"
-                neutrals += 1
-            elif "any" in p_type.lower() and not all(["any" in x.lower() for x in s_type]):
+            if "any" in p_type.lower() and not all(["any" in x.lower() for x in s_type]):
                 win_status = "Win"
                 wins += 1
+            elif any([x.lower() in p_type.lower() or p_type.lower() in x.lower() for x in s_type]):
+                win_status = "Neutral"
+                neutrals += 1
             else:
                 # probs lost here
                 # "any" in p_type and not all([x.lower() == "any" for x in s_type])
@@ -345,9 +341,9 @@ def parse_dataframe_status(df, filename):
         new_data.append(new_line)
 
     columns = list(df.columns) + ["Status"]
-
-    new_data.append(
-        [f'Total comparisons:', wins + neutrals + losses, 'PyType Wins:', losses, "Scalpel Wins:", wins])
+    total_checks = wins + neutrals + losses
+    new_data.append([f'Total comparisons:', wins + neutrals + losses, 'PyType Wins:', losses, "Scalpel Wins:", wins])
+    new_data.append([""] * (len(columns) - 4) + ["Scalpel Accuracy:", round((total_checks - losses)/losses if losses else 1, 4) * 100])
     # Divide by 1 if we have
     new_data.append(
         [""] * (len(columns) - 2) + ["Accuracy over PyType", round(wins / losses if losses else 1, 4) * 100])
@@ -390,7 +386,7 @@ def evaluate_repos():
                  '0voice__interview_internal_reference', 'facebookresearch__Detectron', 'satwikkansal__wtfpython',
                  'sherlock-project__sherlock', 'psf__requests']
     # repo_list = ["beurtschipper__Depix", "deezer__spleeter", "facebookresearch__Detectron", "psf__black", "psf__requests", ]
-    # repo_list = ['psf__black']
+    # repo_list = ['beurtschipper__Depix']
     all_threads = []
     for repo in repo_list:
         # do_evaluate_repo(repo)  # run this if you want it done without multithreading
