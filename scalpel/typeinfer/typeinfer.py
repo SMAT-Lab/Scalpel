@@ -112,6 +112,8 @@ class TypeInference:
         working_queue = [self.root_node]
         while len(working_queue) > 0:
             current_node = working_queue.pop(0)
+            if str(current_node) == ".git":
+                continue
             if current_node.name.endswith('.py'):
                 self.leaves.append(current_node)
             working_queue.extend(current_node.children)

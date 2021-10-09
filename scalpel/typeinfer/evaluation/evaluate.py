@@ -160,8 +160,8 @@ def do_evaluate_repo(repo):
     path_dict = get_file_paths(repo)
 
     # Get scalpel inferred types
-    inferrer = TypeInference(name=repo, entry_point=f'source_repos/{repo}')
-    inferrer = TypeInference(name=repo, entry_point=os.path.join(dirname, "source_repos", repo))
+    # inferrer = TypeInference(name=repo, entry_point=f'source_repos/{repo}')
+    inferrer = TypeInference(name=repo, entry_point=os.path.join(dirname, "main_repos", repo))
     inferrer.infer_types()
     scalpel_inferred = inferrer.get_types()
 
@@ -264,7 +264,6 @@ def do_evaluate_repo(repo):
                             if function not in output_dict[file]:
                                 output_dict[file][function] = {}
                             output_dict[file][function]["s_type"] = s_type if s_type else "Unknown"
-
                             output_data.append([repo, file, function, p_type if p_type else "Any", s_type])
                             # PyType couldn't infer the return type, check to see if Scalpel returned 'any'
                             if s_type == 'any' and parameter in p_function.keys():
@@ -322,18 +321,25 @@ def evaluate_repos():
                  'trailofbits__algo', 'swisskyrepo__PayloadsAllTheThings', 'google__python-fire',
                  '0voice__interview_internal_reference', 'facebookresearch__Detectron', 'satwikkansal__wtfpython',
                  'sherlock-project__sherlock', 'psf__requests']
+    repo_list = [
+        # "beurtschipper__Depix",
+        # "deezer__spleeter",
+        # "facebookresearch__Detectron",
+        "psf__black",
+        # "psf__requests",
+    ]
     # repo_list = ['littlecodersh__ItChat']
     all_threads = []
     for repo in repo_list:
-        # do_evaluate_repo(repo)  # run this if you want it done without multithreading
+        do_evaluate_repo(repo)  # run this if you want it done without multithreading
 
         # Multithreading doesn't work due to the changing of current working dirs/pwd
-        thread = multiprocessing.Process(target=do_evaluate_repo, args=[repo])
-        thread.start()
-        all_threads.append(thread)
-
-    for thread in all_threads:
-        thread.join()
+    #     thread = multiprocessing.Process(target=do_evaluate_repo, args=[repo])
+    #     thread.start()
+    #     all_threads.append(thread)
+    #
+    # for thread in all_threads:
+    #     thread.join()
 
 
 def get_stub_types(stub_file_path: str):
