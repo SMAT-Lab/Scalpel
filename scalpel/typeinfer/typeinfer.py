@@ -457,6 +457,20 @@ class TypeInference:
                     function_node=function_node
                 )
 
+                # Heuristic 9
+                heuristics.heuristic_nine(
+                    import_mappings=import_mappings,
+                    processed_file=processed_file,
+                    function_node=function_node
+                )
+
+                # # Heuristic 2
+                heuristics.heuristic_two(
+                    ast_tree=tree,
+                    processed_file=processed_file,
+                    assignments=assignments
+                )
+
                 # Heuristic 5 once more to account for newly inferred types
                 heuristics.heuristic_five(
                     import_mappings=import_mappings,

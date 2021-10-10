@@ -15,6 +15,8 @@ from typed_ast import ast3
 from scalpel.typeinfer.analysers import ClassSplitVisitor
 from scalpel.typeinfer.typeinfer import TypeInference
 
+from results_parser import output_results
+
 dirname = os.path.dirname(__file__)
 
 
@@ -161,7 +163,8 @@ def do_evaluate_repo(repo):
 
     # Get scalpel inferred types
     # inferrer = TypeInference(name=repo, entry_point=f'source_repos/{repo}')
-    if repo in ["beurtschipper__Depix", "deezer__spleeter", "facebookresearch__Detectron", "psf__black", "psf__requests"]:
+    if repo in ["beurtschipper__Depix", "deezer__spleeter", "facebookresearch__Detectron", "psf__black",
+                "psf__requests"]:
         repo_folder = "main_repos"
     else:
         repo_folder = "source_repos"
@@ -231,8 +234,6 @@ def do_evaluate_repo(repo):
 
                     if p_function := file_types.get(function):
                         if p_type := p_function.get('return'):
-
-                            output_data.append([repo, file, function, p_type if p_type else "Any", s_type])
                             # loop through the s_type set and check if any of the p_types equal the s_type and then
                             # add and continue
 
@@ -259,7 +260,7 @@ def do_evaluate_repo(repo):
                                     del p_function[parameter]
                                     continue
                         else:
-                            output_data.append([repo, file, function, p_type if p_type else "Any", s_type])
+                            # output_data.append([repo, file, function, p_type if p_type else "Any", s_type])
                             # PyType couldn't infer the return type, check to see if Scalpel returned 'any'
                             if s_type == 'any' and parameter in p_function.keys():
                                 scalpel_total += 1
@@ -300,6 +301,11 @@ def parse_dataframe_status(df, filename):
     """
     Parses a dataframe to calculate how many wins/losses we achieved
     """
+    exceptions = [
+        ["iterator", "generator"],
+        ["int", "num"],
+        ["empty", "any"]
+    ]
 
     new_data = []
     wins = 0
@@ -308,13 +314,9 @@ def parse_dataframe_status(df, filename):
     for item in df.iloc:
         s_type = item["Scalpel Type"]
         p_type = item["PyType Type"]
-        if p_type == None:
-            p_type = "Any"
 
         if isinstance(s_type, set):
-
             s_type = [x if x is not None else "any" for x in s_type]
-
             if "any" in p_type.lower() and not all(["any" in x.lower() for x in s_type]):
                 win_status = "Win"
                 wins += 1
@@ -328,7 +330,8 @@ def parse_dataframe_status(df, filename):
                 losses += 1
         else:
             s_type = "any" if s_type is None else s_type
-            if p_type.lower() in s_type.lower() or s_type.lower() in p_type.lower():
+            if p_type.lower() in s_type.lower() or s_type.lower() in p_type.lower() \
+                    or (any([p_type.lower() in x and s_type.lower() in x for x in exceptions])):
                 win_status = "Neutral"
                 neutrals += 1
             elif "any" in p_type.lower() and "any" not in s_type.lower():
@@ -343,10 +346,13 @@ def parse_dataframe_status(df, filename):
     columns = list(df.columns) + ["Status"]
     total_checks = wins + neutrals + losses
     new_data.append([f'Total comparisons:', wins + neutrals + losses, 'PyType Wins:', losses, "Scalpel Wins:", wins])
-    new_data.append([""] * (len(columns) - 2) + ["Scalpel Accuracy:", round((total_checks - losses)/total_checks if total_checks else 1, 4) * 100])
+    new_data.append([""] * (len(columns) - 2) + ["Scalpel Accuracy:",
+                                                 round((total_checks - losses) / total_checks if total_checks else 1,
+                                                       4) * 100])
     # Divide by 1 if we have
     new_data.append(
-        [""] * (len(columns) - 2) + ["Accuracy vs PyType", round(wins / losses if losses else 1, 4) * 100])
+        [""] * (len(columns) - 2) + ["Accuracy vs PyType",
+                                     f"{round((total_checks - losses) / (total_checks - wins), 4) * 100}%"])
 
     new_df = pandas.DataFrame(new_data, columns=columns)
     styled_df = new_df.style.applymap(colouring)
@@ -376,29 +382,35 @@ def evaluate_repos():
                  'eriklindernoren__ML-From-Scratch', 'tqdm__tqdm', 'deezer__spleeter', 'wangzheng0822__algo',
                  'luong-komorebi__Awesome-Linux-Software', 'josephmisiti__awesome-machine-learning',
                  'beurtschipper__Depix', 'nvbn__thefuck', 'soimort__you-get', '521xueweihan__HelloGitHub',
-                 'tornadoweb__tornado', 'psf__black', 'sebastianruder__NLP-progress', 'keon__algorithms',
+                 'tornadoweb__tornado', 'sebastianruder__NLP-progress', 'keon__algorithms',
                  'chubin__cheat.sh', 'faif__python-patterns', 'minimaxir__big-list-of-naughty-strings',
                  'donnemartin__interactive-coding-challenges', 'httpie__httpie', 'shadowsocks__shadowsocks',
-                 'floodsung__Deep-Learning-Papers-Reading-Roadmap', 'littlecodersh__ItChat', 'locustio__locust',
-                 'openai__gym', 'python-telegram-bot__python-telegram-bot', 'vinta__awesome-python',
-                 'google-research__bert', 'public-apis__public-apis', 'facebookresearch__detectron2',
-                 'trailofbits__algo', 'swisskyrepo__PayloadsAllTheThings', 'google__python-fire',
-                 '0voice__interview_internal_reference', 'facebookresearch__Detectron', 'satwikkansal__wtfpython',
-                 'sherlock-project__sherlock', 'psf__requests']
+                 'littlecodersh__ItChat', 'locustio__locust', 'openai__gym', 'python-telegram-bot__python-telegram-bot',
+                 'vinta__awesome-python', 'google-research__bert', 'public-apis__public-apis',
+                 'facebookresearch__detectron2', 'trailofbits__algo', 'swisskyrepo__PayloadsAllTheThings',
+                 'google__python-fire', '0voice__interview_internal_reference', 'facebookresearch__Detectron',
+                 'satwikkansal__wtfpython', 'sherlock-project__sherlock', 'psf__requests']
     # repo_list = ["beurtschipper__Depix", "deezer__spleeter", "facebookresearch__Detectron", "psf__black", "psf__requests", ]
-    # repo_list = ['beurtschipper__Depix']
+    # repo_list = ['psf__black']
     all_threads = []
     for repo in repo_list:
-        # do_evaluate_repo(repo)  # run this if you want it done without multithreading
+        do_evaluate_repo(repo)  # run this if you want it done without multithreading
 
-        # Multithreading doesn't work due to the changing of current working dirs/pwd
-        # So we're using multiprocessing
-        thread = multiprocessing.Process(target=do_evaluate_repo, args=[repo])
-        thread.start()
-        all_threads.append(thread)
+    #     # Multithreading doesn't work due to the changing of current working dirs/pwd
+    #     # So we're using multiprocessing
+    #     thread = multiprocessing.Process(target=do_evaluate_repo, args=[repo])
+    #     thread.start()
+    #     all_threads.append(thread)
+    #     # Join all threads if there's 5 due to multiprocessing bugs or something
+    #     if len(all_threads) > 4:
+    #         for thread in all_threads:
+    #             thread.join()
+    #         all_threads = []
 
     for thread in all_threads:
         thread.join()
+
+    output_results()
 
 
 def get_stub_types(stub_file_path: str):
