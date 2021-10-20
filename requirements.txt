@@ -2,3 +2,5 @@ astor
 graphviz
 nbformat
 numpy
+networkx
+nbconvert
