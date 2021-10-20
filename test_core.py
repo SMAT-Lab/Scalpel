@@ -8,7 +8,7 @@ from scalpel.core.vars_visitor import get_vars
 from scalpel.SSA.ssa import SSA
 
 # we need to define cretieras for variables
-def test_single_case(code_str, expected_name):
+def single_case(code_str, expected_name):
     ast_node = ast.parse(code_str)
     calls = get_func_calls(ast_node)
     assert len(calls)==1
@@ -16,25 +16,25 @@ def test_single_case(code_str, expected_name):
 
 def test_function_calls():
     code_str = """a = fun() """
-    test_single_case(code_str, "fun")
+    single_case(code_str, "fun")
 
     code_str = """a.fun() """
-    test_single_case(code_str, "a.fun")
+    single_case(code_str, "a.fun")
 
     code_str = """a.fun.fun() """
-    test_single_case(code_str, "a.fun.fun")
+    single_case(code_str, "a.fun.fun")
 
     code_str = """x+fun().fun() """
-    test_single_case(code_str, "fun.fun")
+    single_case(code_str, "fun.fun")
 
     code_str = """self.item.fun() """
-    test_single_case(code_str, "self.item.fun")
+    single_case(code_str, "self.item.fun")
 
     code_str = """self._local.__release_local__() """
-    test_single_case(code_str, "self._local.__release_local__")
+    single_case(code_str, "self._local.__release_local__")
 
     code_str = """object.__setattr__(self._local, "__ident_func__", value) """
-    test_single_case(code_str, "object.__setattr__")
+    single_case(code_str, "object.__setattr__")
 
 def test_get_vars():
     code_str = "ada.fit(X_std, y)"

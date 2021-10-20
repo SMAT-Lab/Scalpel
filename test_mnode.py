@@ -1,6 +1,6 @@
 from scalpel.core.mnode import MNode
 
-def main():
+def test_mnode():
     source = open("test-cases/mnode_case.py").read()
     mnode = MNode("local")
     mnode.source = source
@@ -42,4 +42,4 @@ def main():
     #print(func_body[1])
 
 if __name__ == "__main__":
-    main()
+    test_mnode()
