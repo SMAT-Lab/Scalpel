@@ -1,7 +1,7 @@
 from scalpel.core.mnode import MNode
 
 def test_mnode():
-    source = open("test-cases/mnode_case.py").read()
+    source = open("test-cases/basic/mnode_case.py").read()
     mnode = MNode("local")
     mnode.source = source
     mnode.gen_ast()
