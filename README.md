@@ -8,7 +8,7 @@ efficient solutions to software engineering researchers that are accessible to
 everybody and reusable in various contexts.
 See xxx and xx for complete documentation and user guide.
 
-![title](resources/scalpel_diagram.png)
+![title](resources/https://lucid.app/documents/embeddedchart/6a8be3fc-87b3-4dee-9c83-3e28e6a12804)
 
 ## Introduction
 ## TODO (Apps)
