@@ -72,7 +72,7 @@ def test_SSA():
         for inside_fun_name, inside_fun_cfg in class_cfg.functioncfgs.items():
             #if inside_fun_name == 'status_printer':
             #    inside_fun_cfg.build_visual('cfg', 'pdf')
-            live_ident_table.append(c_final_idents]
+            live_ident_table.append(c_final_idents)
             fun_ssa = SSA(source)
             fun_ssa.compute_SSA(inside_fun_cfg) 
             fun_ssa.test(live_ident_table=live_ident_table)

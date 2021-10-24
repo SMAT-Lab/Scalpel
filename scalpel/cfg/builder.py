@@ -1,9 +1,7 @@
 """
-Control flow graph builder.
+This implementation is partly adapted from the static cfg project
+https://github.com/coetaur0/staticfg
 """
-# Aurelien Coet, 2018.
-# Modified by Andrei Nacu, 2020
-
 
 import ast
 from .model import Block, Link, CFG
@@ -25,16 +23,15 @@ NAMECONSTANT_TYPE = ast.Constant if is_py38_or_higher() else ast.NameConstant
 # Continue
 # Try
 # ExceptHandler
+# finally
 # with
 # withitem
 
 def invert(node):
     """
     Invert the operation in an ast node object (get its negation).
-
     Args:
         node: An ast node object.
-
     Returns:
         An ast node object containing the inverse (negation) of the input node.
     """
@@ -60,7 +57,6 @@ def invert(node):
         inverse_node = NAMECONSTANT_TYPE(value=not node.value)
     else:
         inverse_node = ast.UnaryOp(op=ast.Not(), operand=node)
-
     return inverse_node
 
 
@@ -159,7 +155,6 @@ class CFGBuilder(ast.NodeVisitor):
     def new_block(self):
         """
         Create a new block with a new id.
-
         Returns:
             A Block object with a new unique id.
         """
@@ -169,7 +164,6 @@ class CFGBuilder(ast.NodeVisitor):
     def add_statement(self, block, statement):
         """
         Add a statement to a block.
-
         Args:
             block: A Block object to which a statement must be added.
             statement: An AST node representing the statement that must be
@@ -181,7 +175,6 @@ class CFGBuilder(ast.NodeVisitor):
     def add_exit(self, block, nextblock, exitcase=None):
         """
         Add a new exit to a block.
-
         Args:
             block: A block to which an exit must be added.
             nextblock: The block to which control jumps from the new exit.
@@ -212,7 +205,7 @@ class CFGBuilder(ast.NodeVisitor):
             self.add_exit(self.current_block, loopguard)
         return loopguard
 
-    def new_functionCFG(self, node, asynchr=False):
+    def new_functionCFG(self, node, asynchr=False, enclosing_block_id=-1):
         """
         Create a new sub-CFG for a function definition and add it to the
         function CFGs of the CFG being built.
@@ -227,7 +220,7 @@ class CFGBuilder(ast.NodeVisitor):
         # added to the function CFGs of the current CFG.
         func_body = ast.Module(body=node.body)
         func_builder = CFGBuilder()
-        self.cfg.functioncfgs[node.name] = func_builder.build(node.name,
+        self.cfg.functioncfgs[(enclosing_block_id,node.name)] = func_builder.build(node.name,
                                                               func_body,
                                                               asynchr,
                                                               self.current_id)
@@ -238,7 +231,7 @@ class CFGBuilder(ast.NodeVisitor):
                     arg_names.append( node.arg)
             return arg_names
 
-        self.cfg.function_args[node.name] = get_arg_names(node.args)
+        self.cfg.function_args[(enclosing_block_id, node.name)] = get_arg_names(node.args)
         self.current_id = func_builder.current_id + 1
 
     def new_ClassCFG(self, node, asynchr=False):
@@ -303,7 +296,6 @@ class CFGBuilder(ast.NodeVisitor):
             for exit in block.exits[:]:
                 self.clean_cfg(exit.target, visited)
 
-    # ---------- AST Node visitor methods ---------- #
     def goto_new_block(self, node):
         if self.separate_node_blocks:
             newblock = self.new_block()
@@ -311,6 +303,7 @@ class CFGBuilder(ast.NodeVisitor):
             self.current_block = newblock
         self.generic_visit(node)
 
+    # start visting all statements in AST tree
     def visit_Expr(self, node):
         self.add_statement(self.current_block, node)
         self.goto_new_block(node)
@@ -346,9 +339,25 @@ class CFGBuilder(ast.NodeVisitor):
         self.add_statement(self.current_block, node)
         self.goto_new_block(node)
 
+    def visit_Global(self, node):
+        self.add_statement(self.current_block, node)
+        self.goto_new_block(node)
+
+    def visit_Nonlocal(self, node):
+        self.add_statement(self.current_block, node)
+        self.goto_new_block(node)
+
+    def visit_Pass(self, node):
+        self.add_statement(self.current_block, node)
+        self.goto_new_block(node)
+
+    def visit_Delete(self, node):
+        self.add_statement(self.current_block, node)
+        self.goto_new_block(node)
     def visit_Raise(self, node):
-        # TODO
-        pass
+        self.add_statement(self.current_block, node)
+        self.cfg.finalblocks.append(self.current_block)
+        self.current_block = self.new_block()
 
     def visit_Assert(self, node):
         self.add_statement(self.current_block, node)
@@ -371,8 +380,11 @@ class CFGBuilder(ast.NodeVisitor):
         # Create a new block for the body of try.
         try_block = self.new_block()
         self.add_exit(self.current_block, try_block, ast.Constant(True))
+        n_else_stmts = len(node.orelse)
+        #else_block = self.new_block()
+        #self.add_exit(self.current_block, try_block, ast.Constant(True))
 
-        # Create a block for the code after the if-else.
+        # Create blocks for handlers
         n_handlers = len(node.handlers)
         handler_blocks = []
         for i in range(n_handlers):
@@ -380,11 +392,23 @@ class CFGBuilder(ast.NodeVisitor):
             handler_blocks += [h_block]
         after_try_block = self.new_block()
         #self.add_exit(self.current_block, after_try_block, ast.Constant(False))
-        current_block = self.current_block
+        # keep the original block
+        current_block = self.current_block 
+        #
         self.current_block = try_block
+
         for child in node.body:
             self.visit(child)
+
+        if n_else_stmts>0:
+            else_block = self.new_block()
+            self.add_exit(self.current_block, else_block)
+            self.current_block = else_block
+            # create else block
+            for child in node.orelse:
+                self.visit(child)
         self.add_exit(self.current_block, after_try_block)
+
 
         for i in range(n_handlers):
             self.current_block = current_block
@@ -392,7 +416,10 @@ class CFGBuilder(ast.NodeVisitor):
             self.add_exit(self.current_block, handler_blocks[i], handler.type)
             self.current_block = handler_blocks[i]
             self.visit(handler)
-            self.add_exit(self.current_block, after_try_block)
+            # If encountered a break, exit will have already been added
+            if not self.current_block.exits:
+                self.add_exit(self.current_block, after_try_block)
+            #self.add_exit(self.current_block, after_try_block)
 
         #if not self.current_block.exits:
         #    self.add_exit(self.current_block, after_try_block)
@@ -461,7 +488,6 @@ class CFGBuilder(ast.NodeVisitor):
         if not (isinstance(inverted_test, NAMECONSTANT_TYPE) and
                 inverted_test.value is False):
             self.add_exit(self.current_block, afterwhile_block, inverted_test)
-
         # Populate the while block.
         self.current_block = while_block
         for child in node.body:
@@ -502,7 +528,37 @@ class CFGBuilder(ast.NodeVisitor):
         # Popping the current after loop stack,taking care of errors in case of nested for loops
         self.after_loop_block_stack.pop()
         self.curr_loop_guard_stack.pop()
+    # Async for loops and async with context managers. 
+    # They have the same fields as For and With, respectively. 
+    # Only valid in the body of an AsyncFunctionDef.
+    # https://docs.python.org/3/library/ast.html
+    def visit_AsyncFor(self, node):
+        loop_guard = self.new_loopguard()
+        self.current_block = loop_guard
+        self.add_statement(self.current_block, node)
+        self.curr_loop_guard_stack.append(loop_guard)
+        # New block for the body of the for-loop.
+        for_block = self.new_block()
+        self.add_exit(self.current_block, for_block, node.iter)
 
+        # Block of code after the for loop.
+        afterfor_block = self.new_block()
+        self.add_exit(self.current_block, afterfor_block)
+        self.after_loop_block_stack.append(afterfor_block)
+        self.current_block = for_block
+
+        # Populate the body of the for loop.
+        for child in node.body:
+            self.visit(child)
+        if not self.current_block.exits:
+            # Did not encounter a break
+            self.add_exit(self.current_block, loop_guard)
+
+        # Continue building the CFG in the after-for block.
+        self.current_block = afterfor_block
+        # Popping the current after loop stack,taking care of errors in case of nested for loops
+        self.after_loop_block_stack.pop()
+        self.curr_loop_guard_stack.pop()
     def visit_Break(self, node):
         assert len(self.after_loop_block_stack), "Found break not inside loop"
         self.add_exit(self.current_block, self.after_loop_block_stack[-1])
@@ -519,11 +575,11 @@ class CFGBuilder(ast.NodeVisitor):
 
     def visit_FunctionDef(self, node):
         self.add_statement(self.current_block, node)
-        self.new_functionCFG(node, asynchr=False)
+        self.new_functionCFG(node, asynchr=False, enclosing_block_id=self.current_block.id)
 
     def visit_AsyncFunctionDef(self, node):
         self.add_statement(self.current_block, node)
-        self.new_functionCFG(node, asynchr=True)
+        self.new_functionCFG(node, asynchr=True,enclosing_block_id=self.current_block.id)
 
     def visit_ClassDef(self, node):
         self.add_statement(self.current_block, node)
@@ -550,21 +606,50 @@ class CFGBuilder(ast.NodeVisitor):
         self.current_block = afteryield_block
 
     def visit_With(self, node):
-        #self.cfg.asynchr = True
-        #self.add_statement(self.current_block, node)
-        #afterwith_block = self.new_block()
-        #self.add_exit(self.current_block, afterwith_block)
-        #self.current_block = afterwith_block
-        #
+        # add with statement to the current block
         self.add_statement(self.current_block, node)
         # New block for the body of the with.
         with_block = self.new_block()
+        # link current block to with block
         self.add_exit(self.current_block, with_block)
 
-        # Block of code after the with loop.
+        # Block of code after the with.
         afterwith_block = self.new_block()
         # no branch here
-        self.add_exit(with_block, afterwith_block)
+        # link with block and body of with
+        #print(with_block, afterwith_block)
+        #self.add_exit(with_block, afterwith_block)
+        # go to with block and create more 
+        self.current_block = with_block
+
+        # Populate the body of the with loop.
+        for child in node.body:
+            self.visit(child)
+
+        if not self.current_block.exits:
+            self.add_exit(self.current_block, afterwith_block)
+        # Continue building the CFG in the after-with block.
+        self.current_block = afterwith_block
+
+    # Async for loops and async with context managers. 
+    # They have the same fields as For and With, respectively. 
+    # Only valid in the body of an AsyncFunctionDef.
+    # https://docs.python.org/3/library/ast.html
+    def visit_AsyncWith(self, node):
+        # add with statement to the current block
+        self.add_statement(self.current_block, node)
+        # New block for the body of the with.
+        with_block = self.new_block()
+        # link current block to with block
+        self.add_exit(self.current_block, with_block)
+
+        # Block of code after the with.
+        afterwith_block = self.new_block()
+        # no branch here
+        # link with block and body of with
+        #print(with_block, afterwith_block)
+        #self.add_exit(with_block, afterwith_block)
+        # go to with block and create more 
         self.current_block = with_block
 
         # Populate the body of the with loop.

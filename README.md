@@ -12,6 +12,7 @@ See xxx and xx for complete documentation and user guide.
 
 ## Introduction
 ## TODO (Apps)
+- [ ] Doc for CFG construction 
 - [ ] Python different type of function arguments 
 - [ ] build an graph, to test reachbility for compitibity
 - [ ] Fix issues in CFG module including testing 
@@ -34,6 +35,9 @@ See xxx and xx for complete documentation and user guide.
 - [x] access attributes
 - [x] class in classes
 - [x] function in functions (def)
+
+## contributors
+TODO
 
 ## Acknowledgement
 This project has been inspired and supported by the following work. Some implementation of functionalities are taken from published work.
