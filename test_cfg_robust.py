@@ -45,6 +45,7 @@ def main():
         line_no = block.at()
         calls = block.get_calls()
     graph = cfg.build_visual("pdf")
+    graph.render("cfg-test", view=False)
 
 
 if __name__ == '__main__':
