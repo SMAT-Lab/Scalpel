@@ -1,0 +1,17 @@
+detectron2/utils/registry /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/facebookresearch__detectron2/pyi/detectron2/utils/registry.pyi
+detectron2/config/instantiate /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/facebookresearch__detectron2/pyi/detectron2/config/instantiate.pyi
+detectron2/utils/file_io /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/facebookresearch__detectron2/pyi/detectron2/utils/file_io.pyi
+detectron2/config/lazy /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/facebookresearch__detectron2/pyi/detectron2/config/lazy.pyi
+detectron2/utils/env /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/facebookresearch__detectron2/pyi/detectron2/utils/env.pyi
+detectron2/config/compat /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/facebookresearch__detectron2/pyi/detectron2/config/compat.pyi
+detectron2/config/config /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/facebookresearch__detectron2/pyi/detectron2/config/config.pyi
+detectron2/config/defaults /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/facebookresearch__detectron2/pyi/detectron2/config/defaults.pyi
+detectron2/config/__init__ /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/facebookresearch__detectron2/pyi/detectron2/config/__init__.pyi
+densepose/data/utils /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/facebookresearch__detectron2/pyi/densepose/data/utils.pyi
+densepose/data/meshes/catalog /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/facebookresearch__detectron2/pyi/densepose/data/meshes/catalog.pyi
+densepose/structures/mesh /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/facebookresearch__detectron2/pyi/densepose/structures/mesh.pyi
+densepose/structures/transform_data /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/facebookresearch__detectron2/pyi/densepose/structures/transform_data.pyi
+detectron2/data/transforms/transform /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/facebookresearch__detectron2/pyi/detectron2/data/transforms/transform.pyi
+detectron2/data/transforms/augmentation /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/facebookresearch__detectron2/pyi/detectron2/data/transforms/augmentation.pyi
+detectron2/data/transforms/augmentation_impl /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/facebookresearch__detectron2/pyi/detectron2/data/transforms/augmentation_impl.pyi
+detectron2/data/transforms/__init__ /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/facebookresearch__detectron2/pyi/detectron2/data/transforms/__init__.pyi

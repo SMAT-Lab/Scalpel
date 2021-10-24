@@ -1,0 +1,435 @@
+rule infer
+  command = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info $imports --module-name $module -V 3.8 -o $out --no-report-errors --nofail --quick $in
+  description = infer $module
+rule check
+  command = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info $imports --module-name $module -V 3.8 -o $out --analyze-annotated --nofail --quick $in
+  description = check $module
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/token.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/blib2to3/pgen2/token.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/blib2to3.pgen2.token.imports
+  module = blib2to3.pgen2.token
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/grammar.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/blib2to3/pgen2/grammar.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/token.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/blib2to3.pgen2.grammar.imports
+  module = blib2to3.pgen2.grammar
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/tokenize.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/blib2to3/pgen2/tokenize.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/token.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/grammar.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/blib2to3.pgen2.tokenize.imports
+  module = blib2to3.pgen2.tokenize
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/const.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/black/const.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/black.const.imports
+  module = black.const
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/pgen.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/blib2to3/pgen2/pgen.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/grammar.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/token.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/tokenize.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/blib2to3.pgen2.pgen.imports
+  module = blib2to3.pgen2.pgen
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/mode.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/black/mode.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/const.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/black.mode.imports
+  module = black.mode
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/driver.pyi-1: infer /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/blib2to3/pgen2/driver.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/grammar.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/token.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/tokenize.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/pgen.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/blib2to3.pgen2.driver.imports-1
+  module = blib2to3.pgen2.driver
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/parse.pyi-1: infer /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/blib2to3/pgen2/parse.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/grammar.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/token.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/tokenize.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/pgen.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/blib2to3.pgen2.parse.imports-1
+  module = blib2to3.pgen2.parse
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pygram.pyi-1: infer /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/blib2to3/pygram.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/grammar.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/token.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/tokenize.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/pgen.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/blib2to3.pygram.imports-1
+  module = blib2to3.pygram
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pytree.pyi-1: infer /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/blib2to3/pytree.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/grammar.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/token.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/tokenize.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/pgen.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/blib2to3.pytree.imports-1
+  module = blib2to3.pytree
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/driver.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/blib2to3/pgen2/driver.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/grammar.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/token.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/tokenize.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/pgen.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/driver.pyi-1 /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/parse.pyi-1 /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pygram.pyi-1 /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pytree.pyi-1
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/blib2to3.pgen2.driver.imports
+  module = blib2to3.pgen2.driver
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/parse.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/blib2to3/pgen2/parse.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/grammar.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/token.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/tokenize.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/pgen.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/driver.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/parse.pyi-1 /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pygram.pyi-1 /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pytree.pyi-1
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/blib2to3.pgen2.parse.imports
+  module = blib2to3.pgen2.parse
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pygram.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/blib2to3/pygram.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/grammar.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/token.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/tokenize.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/pgen.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/driver.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/parse.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pygram.pyi-1 /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pytree.pyi-1
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/blib2to3.pygram.imports
+  module = blib2to3.pygram
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pytree.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/blib2to3/pytree.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/grammar.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/token.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/tokenize.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/pgen.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/driver.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/parse.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pygram.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pytree.pyi-1
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/blib2to3.pytree.imports
+  module = blib2to3.pytree
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/strings.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/black/strings.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/black.strings.imports
+  module = black.strings
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/cache.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/black/cache.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/mode.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/black.cache.imports
+  module = black.cache
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/nodes.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/black/nodes.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/token.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/cache.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/strings.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/driver.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/parse.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pygram.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pytree.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/black.nodes.imports
+  module = black.nodes
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/output.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/black/output.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/black.output.imports
+  module = black.output
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/a.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/nested_gitignore_tests/root/child/a.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/a.imports
+  module = a
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/brackets.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/black/brackets.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/token.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/nodes.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/driver.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/parse.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pygram.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pytree.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/black.brackets.imports
+  module = black.brackets
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/report.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/black/report.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/output.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/black.report.imports
+  module = black.report
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/collections.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/collections.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/a.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/collections.imports
+  module = collections
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/comments.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/black/comments.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/token.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/nodes.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/driver.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/parse.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pygram.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pytree.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/black.comments.imports
+  module = black.comments
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/lines.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/black/lines.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/token.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/brackets.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/mode.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/nodes.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/driver.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/parse.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pygram.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pytree.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/black.lines.imports
+  module = black.lines
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/rusty.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/black/rusty.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/black.rusty.imports
+  module = black.rusty
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/handle_ipynb_magics.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/black/handle_ipynb_magics.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/collections.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/report.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/output.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/black.handle_ipynb_magics.imports
+  module = black.handle_ipynb_magics
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/trans.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/black/trans.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/collections.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/rusty.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/mode.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/nodes.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/lines.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/brackets.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/comments.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/strings.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/token.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/driver.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/parse.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pygram.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pytree.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/black.trans.imports
+  module = black.trans
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/numerics.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/black/numerics.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/driver.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/parse.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pygram.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pytree.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/black.numerics.imports
+  module = black.numerics
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/parsing.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/black/parsing.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/grammar.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/mode.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/nodes.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/driver.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/parse.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pygram.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pytree.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/black.parsing.imports
+  module = black.parsing
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/files.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/black/files.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/output.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/report.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/handle_ipynb_magics.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/black.files.imports
+  module = black.files
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/concurrency.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/black/concurrency.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/output.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/black.concurrency.imports
+  module = black.concurrency
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/linegen.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/black/linegen.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/nodes.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/brackets.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/lines.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/comments.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/numerics.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/strings.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/trans.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/mode.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/token.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/driver.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/parse.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pygram.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pytree.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/black.linegen.imports
+  module = black.linegen
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black_primer/lib.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/black_primer/lib.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/black_primer.lib.imports
+  module = black_primer.lib
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/debug.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/black/debug.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/token.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/nodes.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/output.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/parsing.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/driver.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/parse.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pygram.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pytree.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/black.debug.imports
+  module = black.debug
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/__init__.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/black/__init__.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/const.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/nodes.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/lines.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/linegen.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/comments.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/mode.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/cache.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/concurrency.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/output.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/report.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/files.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/parsing.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/handle_ipynb_magics.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/token.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/driver.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/parse.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pygram.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pytree.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/black.__init__.imports
+  module = black.__init__
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black_primer/cli.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/black_primer/cli.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black_primer/lib.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/black_primer.cli.imports
+  module = black_primer.cli
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/tests/util.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/util.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/__init__.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/output.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/debug.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/tests.util.imports
+  module = tests.util
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/Mode.pyi: infer /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/black/Mode.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/const.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/black.Mode.imports
+  module = black.Mode
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blackd/__init__.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/blackd/__init__.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/__init__.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/concurrency.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/blackd.__init__.imports
+  module = blackd.__init__
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/x.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/nested_gitignore_tests/x.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/x.imports
+  module = x
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/long_strings__edge_case.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/long_strings__edge_case.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/long_strings__edge_case.imports
+  module = long_strings__edge_case
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/python38.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/python38.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/python38.imports
+  module = python38
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black_primer/__init__.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/black_primer/__init__.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/black_primer.__init__.imports
+  module = black_primer.__init__
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/python2.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/python2.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/python2.imports
+  module = python2
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/fmtskip.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/fmtskip.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/fmtskip.imports
+  module = fmtskip
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/tests/__init__.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/__init__.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/tests.__init__.imports
+  module = tests.__init__
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/decorators.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/decorators.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/decorators.imports
+  module = decorators
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/tests/test_primer.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/test_primer.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black_primer/cli.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black_primer/lib.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/tests.test_primer.imports
+  module = tests.test_primer
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/remove_parens.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/remove_parens.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/remove_parens.imports
+  module = remove_parens
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/tests/test_no_ipynb.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/test_no_ipynb.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/tests/util.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/__init__.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/tests.test_no_ipynb.imports
+  module = tests.test_no_ipynb
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/fuzz.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/fuzz.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/__init__.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/tokenize.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/fuzz.imports
+  module = fuzz
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/slices.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/slices.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/slices.imports
+  module = slices
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/debug_visitor.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/debug_visitor.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/debug_visitor.imports
+  module = debug_visitor
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/fmtskip6.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/fmtskip6.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/fmtskip6.imports
+  module = fmtskip6
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/comment_after_escaped_newline.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/comment_after_escaped_newline.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/comment_after_escaped_newline.imports
+  module = comment_after_escaped_newline
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/fmtonoff3.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/fmtonoff3.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/fmtonoff3.imports
+  module = fmtonoff3
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/docstring.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/docstring.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/docstring.imports
+  module = docstring
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/class_methods_new_line.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/class_methods_new_line.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/class_methods_new_line.imports
+  module = class_methods_new_line
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/pep_572.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/pep_572.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/pep_572.imports
+  module = pep_572
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/tests/optional.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/optional.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/tests.optional.imports
+  module = tests.optional
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/missing_final_newline.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/missing_final_newline.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/missing_final_newline.imports
+  module = missing_final_newline
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/trailing_comma_optional_parens1.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/trailing_comma_optional_parens1.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/trailing_comma_optional_parens1.imports
+  module = trailing_comma_optional_parens1
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/force_py36.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/force_py36.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/force_py36.imports
+  module = force_py36
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/list_big.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/profiling/list_big.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/list_big.imports
+  module = list_big
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/comments4.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/comments4.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/comments4.imports
+  module = comments4
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/conf.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/docs/conf.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/conf.imports
+  module = conf
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/pep_570.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/pep_570.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/pep_570.imports
+  module = pep_570
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/numeric_literals.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/numeric_literals.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/numeric_literals.imports
+  module = numeric_literals
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/fmtonoff.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/fmtonoff.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/fmtonoff.imports
+  module = fmtonoff
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/python39.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/python39.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/python39.imports
+  module = python39
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/import_spacing.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/import_spacing.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/import_spacing.imports
+  module = import_spacing
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/tests/test_format.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/test_format.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/__init__.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/tests/util.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/tests.test_format.imports
+  module = tests.test_format
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blackd_diff.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/blackd_diff.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/blackd_diff.imports
+  module = blackd_diff
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/class_blank_parentheses.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/class_blank_parentheses.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/class_blank_parentheses.imports
+  module = class_blank_parentheses
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/fmtonoff4.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/fmtonoff4.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/fmtonoff4.imports
+  module = fmtonoff4
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/python2_print_function.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/python2_print_function.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/python2_print_function.imports
+  module = python2_print_function
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/long_strings__regression.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/long_strings__regression.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/long_strings__regression.imports
+  module = long_strings__regression
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/docstring_no_string_normalization.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/docstring_no_string_normalization.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/docstring_no_string_normalization.imports
+  module = docstring_no_string_normalization
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/long_strings.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/long_strings.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/long_strings.imports
+  module = long_strings
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/fmtskip2.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/fmtskip2.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/fmtskip2.imports
+  module = fmtskip2
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/comments.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/comments.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/a.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/comments.imports
+  module = comments
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/tupleassign.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/tupleassign.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/tupleassign.imports
+  module = tupleassign
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/function.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/function.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/function.imports
+  module = function
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/conv.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/blib2to3/pgen2/conv.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/blib2to3.pgen2.conv.imports
+  module = blib2to3.pgen2.conv
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/long_strings_flag_disabled.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/long_strings_flag_disabled.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/long_strings_flag_disabled.imports
+  module = long_strings_flag_disabled
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/cantfit.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/cantfit.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/cantfit.imports
+  module = cantfit
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/setup.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/setup.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/setup.imports
+  module = setup
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/trailing_comma_optional_parens2.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/trailing_comma_optional_parens2.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/trailing_comma_optional_parens2.imports
+  module = trailing_comma_optional_parens2
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/tests/test_black.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/test_black.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/__init__.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/cache.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/debug.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/output.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/report.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/files.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/tests/util.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/tests.test_black.imports
+  module = tests.test_black
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/mix_small.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/profiling/mix_small.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/mix_small.imports
+  module = mix_small
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/c.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/nested_gitignore_tests/root/child/c.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/c.imports
+  module = c
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/numeric_literals_skip_underscores.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/numeric_literals_skip_underscores.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/numeric_literals_skip_underscores.imports
+  module = numeric_literals_skip_underscores
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/force_pyi.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/force_pyi.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/force_pyi.imports
+  module = force_pyi
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/comments_non_breaking_space.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/comments_non_breaking_space.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/comments_non_breaking_space.imports
+  module = comments_non_breaking_space
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/mix_huge.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/profiling/mix_huge.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/mix_huge.imports
+  module = mix_huge
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/trailing_comma_optional_parens3.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/trailing_comma_optional_parens3.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/trailing_comma_optional_parens3.imports
+  module = trailing_comma_optional_parens3
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/fmtskip4.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/fmtskip4.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/fmtskip4.imports
+  module = fmtskip4
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/function2.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/function2.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/function2.imports
+  module = function2
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/composition_no_trailing_comma.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/composition_no_trailing_comma.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/composition_no_trailing_comma.imports
+  module = composition_no_trailing_comma
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/expression.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/expression.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/expression.imports
+  module = expression
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/tests/conftest.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/conftest.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/tests.conftest.imports
+  module = tests.conftest
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/comments3.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/comments3.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/comments3.imports
+  module = comments3
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/comments5.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/comments5.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/comments5.imports
+  module = comments5
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/__init__.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/blib2to3/pgen2/__init__.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/blib2to3.pgen2.__init__.imports
+  module = blib2to3.pgen2.__init__
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/pep_572_remove_parens.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/pep_572_remove_parens.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/pep_572_remove_parens.imports
+  module = pep_572_remove_parens
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/b.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/nested_gitignore_tests/root/child/b.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/b.imports
+  module = b
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/fmtonoff2.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/fmtonoff2.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/fmtonoff2.imports
+  module = fmtonoff2
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/c.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/nested_gitignore_tests/root/c.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/c.imports
+  module = c
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/async_as_identifier.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/async_as_identifier.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/async_as_identifier.imports
+  module = async_as_identifier
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/__main__.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/black/__main__.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/__init__.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/black.__main__.imports
+  module = black.__main__
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/comments6.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/comments6.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/comments6.imports
+  module = comments6
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/beginning_backslash.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/beginning_backslash.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/beginning_backslash.imports
+  module = beginning_backslash
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/mix_big.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/profiling/mix_big.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/mix_big.imports
+  module = mix_big
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/bracketmatch.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/bracketmatch.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/bracketmatch.imports
+  module = bracketmatch
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/list_huge.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/profiling/list_huge.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/list_huge.imports
+  module = list_huge
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/comments7.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/comments7.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/comments7.imports
+  module = comments7
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/fstring.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/fstring.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/fstring.imports
+  module = fstring
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/composition.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/composition.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/composition.imports
+  module = composition
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/tests/test_ipynb.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/test_ipynb.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/handle_ipynb_magics.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/__init__.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/black/Mode.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/tests.test_ipynb.imports
+  module = tests.test_ipynb
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/pgen2/literals.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/blib2to3/pgen2/literals.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/blib2to3.pgen2.literals.imports
+  module = blib2to3.pgen2.literals
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/a.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/nested_gitignore_tests/root/a.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/a.imports
+  module = a
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/percent_precedence.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/percent_precedence.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/percent_precedence.imports
+  module = percent_precedence
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/string_prefixes.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/string_prefixes.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/string_prefixes.imports
+  module = string_prefixes
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/function_trailing_comma.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/function_trailing_comma.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/function_trailing_comma.imports
+  module = function_trailing_comma
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/dict_big.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/profiling/dict_big.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/dict_big.imports
+  module = dict_big
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/fmtskip3.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/fmtskip3.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/fmtskip3.imports
+  module = fmtskip3
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/numeric_literals_py2.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/numeric_literals_py2.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/numeric_literals_py2.imports
+  module = numeric_literals_py2
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/main.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/action/main.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/main.imports
+  module = main
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blib2to3/__init__.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/src/blib2to3/__init__.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/blib2to3.__init__.imports
+  module = blib2to3.__init__
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/tests/test_blackd.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/test_blackd.py | /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/tests/util.pyi /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/blackd/__init__.pyi
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/tests.test_blackd.imports
+  module = tests.test_blackd
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/a.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/include_exclude_tests/b/dont_exclude/a.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/a.imports
+  module = a
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/b.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/nested_gitignore_tests/root/b.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/b.imports
+  module = b
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/string_quotes.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/string_quotes.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/string_quotes.imports
+  module = string_quotes
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/dict_huge.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/profiling/dict_huge.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/dict_huge.imports
+  module = dict_huge
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/a.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/include_exclude_tests/b/exclude/a.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/a.imports
+  module = a
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/empty_lines.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/empty_lines.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/empty_lines.imports
+  module = empty_lines
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/python37.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/python37.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/python37.imports
+  module = python37
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/python2_unicode_literals.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/python2_unicode_literals.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/python2_unicode_literals.imports
+  module = python2_unicode_literals
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/pep_572_do_not_remove_parens.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/pep_572_do_not_remove_parens.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/pep_572_do_not_remove_parens.imports
+  module = pep_572_do_not_remove_parens
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/comments2.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/comments2.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/comments2.imports
+  module = comments2
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/gallery.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/gallery/gallery.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/gallery.imports
+  module = gallery
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/tricky_unicode_symbols.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/tricky_unicode_symbols.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/tricky_unicode_symbols.imports
+  module = tricky_unicode_symbols
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/pyi/fmtskip5.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/psf__black/tests/data/fmtskip5.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__black/imports/fmtskip5.imports
+  module = fmtskip5

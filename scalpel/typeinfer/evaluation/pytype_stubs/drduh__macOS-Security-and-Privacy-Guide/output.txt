@@ -1,0 +1,15 @@
+Computing dependencies
+Analyzing 1 sources with 0 local dependencies
+ninja: Entering directory `output/drduh__macOS-Security-and-Privacy-Guide'
+[1/1] check read_launch_plists
+FAILED: /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/drduh__macOS-Security-and-Privacy-Guide/pyi/read_launch_plists.pyi 
+/mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/drduh__macOS-Security-and-Privacy-Guide/imports/read_launch_plists.imports --module-name read_launch_plists -V 3.8 -o /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/drduh__macOS-Security-and-Privacy-Guide/pyi/read_launch_plists.pyi --analyze-annotated --nofail --quick /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/drduh__macOS-Security-and-Privacy-Guide/launchd/read_launch_plists.py
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/drduh__macOS-Security-and-Privacy-Guide/launchd/read_launch_plists.py", line 27, in LoadPlist: Name 'err_data' is not defined [name-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/drduh__macOS-Security-and-Privacy-Guide/launchd/read_launch_plists.py", line 30, in LoadPlist: No attribute 'readPlistFromString' on module 'plistlib' [module-attr]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/drduh__macOS-Security-and-Privacy-Guide/launchd/read_launch_plists.py", line 86, in main: Function _csv.reader was called with the wrong arguments [wrong-arg-types]
+         Expected: (csvfile: Iterable[str], ...)
+  Actually passed: (csvfile: BinaryIO)
+
+For more details, see https://google.github.io/pytype/errors.html
+ninja: build stopped: subcommand failed.
+Leaving directory 'output/drduh__macOS-Security-and-Privacy-Guide'

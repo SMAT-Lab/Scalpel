@@ -1,0 +1,10 @@
+version: "2.2"
+
+services:
+  service:
+    image: busybox:1.27.2
+    command: top
+
+    environment:
+      foo: bar
+      hello: world

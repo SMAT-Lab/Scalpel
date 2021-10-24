@@ -1,0 +1,4 @@
+Computing dependencies
+Analyzing 75 sources with 0 local dependencies
+ninja: Entering directory `output/pallets__flask'
+Leaving directory 'output/pallets__flask'

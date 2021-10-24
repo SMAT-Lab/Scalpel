@@ -1,0 +1,18 @@
+# ninja log v5
+90	2267	1631694949272446800	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/faif__python-patterns/pyi/patterns/behavioral/__init__.pyi	82ac01a5a9e82b51
+89	2350	1631694949342297000	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/faif__python-patterns/pyi/patterns/__init__.pyi	aea699aa4e32386a
+102	2672	1631694949678602700	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/faif__python-patterns/pyi/patterns/structural/__init__.pyi	ca621ed32088425d
+93	5594	1631694952547840600	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/faif__python-patterns/pyi/patterns/other/graph_search.pyi	96a3d9a2581316c
+58	5595	1631694952539833400	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/faif__python-patterns/pyi/patterns/creational/borg.pyi	afcc3a60fac64467
+55	5760	1631694952715993600	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/faif__python-patterns/pyi/patterns/creational/pool.pyi	da3bfc1b6ae380c6
+71	5760	1631694952708986900	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/faif__python-patterns/pyi/patterns/structural/bridge.pyi	ad868307b483cff
+49	5780	1631694952753027000	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/faif__python-patterns/pyi/patterns/creational/builder.pyi	f5db48cd7745864f
+63	6137	1631694953100342600	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/faif__python-patterns/pyi/patterns/structural/decorator.pyi	fb225776e3698e48
+84	6137	1631694953084328200	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/faif__python-patterns/pyi/patterns/creational/abstract_factory.pyi	a1cbf96a802e6cd8
+45	6224	1631694953188422600	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/faif__python-patterns/pyi/patterns/creational/lazy_evaluation.pyi	a190c885c3658021
+109	6353	1631694953294519000	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/faif__python-patterns/pyi/patterns/behavioral/memento.pyi	6b045861f8ae0e32
+37	6418	1631694953390606700	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/faif__python-patterns/pyi/patterns/structural/proxy.pyi	64263306178ba27a
+61	6457	1631694953400615600	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/faif__python-patterns/pyi/patterns/behavioral/observer.pyi	47f560093f0a64d3
+25	6580	1631694953521725600	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/faif__python-patterns/pyi/patterns/creational/prototype.pyi	458231bbd0cb643f
+96	6667	1631694953607804400	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/faif__python-patterns/pyi/patterns/behavioral/visitor.pyi	bba978cf0b62d55c
+87	6834	1631694953812990200	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/faif__python-patterns/pyi/patterns/behavioral/publish_subscribe.pyi	6b28b465f51b9243

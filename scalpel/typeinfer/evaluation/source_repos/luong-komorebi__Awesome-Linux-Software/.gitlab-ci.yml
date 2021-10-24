@@ -1,0 +1,21 @@
+image: node:10
+
+cache:
+  paths:
+    - node_modules/ # Node modules and dependencies
+
+before_script:
+  - npm install gitbook-cli -g # install gitbook
+  - gitbook fetch 3.2.3 # fetch latest stable version
+  - gitbook install # add any requested plugins in book.json
+
+pages:
+  stage: deploy
+  script:
+    - gitbook build . public # build to public path
+  artifacts:
+    paths:
+      - public
+    expire_in: 1 week
+  only:
+    - master # this job will affect only the 'master' branch

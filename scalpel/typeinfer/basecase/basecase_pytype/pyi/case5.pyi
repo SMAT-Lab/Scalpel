@@ -1,0 +1,3 @@
+# (generated with --quick)
+
+def my_function() -> int: ...

@@ -1,0 +1,6 @@
+# (generated with --quick)
+
+from typing import List
+
+def generate_parenthesis_v1(n) -> List[str]: ...
+def generate_parenthesis_v2(n) -> List[str]: ...

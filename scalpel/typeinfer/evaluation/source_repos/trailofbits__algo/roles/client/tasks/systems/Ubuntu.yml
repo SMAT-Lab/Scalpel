@@ -1,0 +1,6 @@
+---
+- name: Set OS specific facts
+  set_fact:
+    prerequisites:
+      - libstrongswan-standard-plugins
+    configs_prefix: /etc

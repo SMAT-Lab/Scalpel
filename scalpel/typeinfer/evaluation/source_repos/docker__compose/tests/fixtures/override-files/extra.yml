@@ -1,0 +1,10 @@
+version: '2.2'
+services:
+  web:
+    depends_on:
+        - db
+        - other
+
+  other:
+    image: busybox:1.31.0-uclibc
+    command: "top"

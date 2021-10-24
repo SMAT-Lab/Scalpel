@@ -1,0 +1,37 @@
+Computing dependencies
+Analyzing 64 sources with 0 local dependencies
+ninja: Entering directory `output/tqdm__tqdm'
+[1/66] check benchmarks.__init__
+[2/66] check tests.__init__
+[3/66] check tqdm.version
+FAILED: /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/tqdm__tqdm/pyi/tqdm/version.pyi 
+/mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/tqdm__tqdm/imports/tqdm.version.imports --module-name tqdm.version -V 3.8 -o /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/tqdm__tqdm/pyi/tqdm/version.pyi --analyze-annotated --nofail --quick /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/tqdm__tqdm/tqdm/version.py
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/tqdm__tqdm/tqdm/version.py", line 3, in <module>: Can't find module '_dist_ver'. [import-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/tqdm__tqdm/tqdm/version.py", line 6, in <module>: Can't find module 'setuptools_scm'. [import-error]
+
+For more details, see https://google.github.io/pytype/errors.html#import-error
+[4/66] check setup
+FAILED: /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/tqdm__tqdm/pyi/setup.pyi 
+/mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/tqdm__tqdm/imports/setup.imports --module-name setup -V 3.8 -o /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/tqdm__tqdm/pyi/setup.pyi --analyze-annotated --nofail --quick /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/tqdm__tqdm/setup.py
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/tqdm__tqdm/setup.py", line 10, in <module>: Can't find module 'pymake'. [import-error]
+
+For more details, see https://google.github.io/pytype/errors.html#import-error
+[5/66] check tqdm._monitor
+[6/66] check tqdm.utils
+FAILED: /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/tqdm__tqdm/pyi/tqdm/utils.pyi 
+/mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/tqdm__tqdm/imports/tqdm.utils.imports --module-name tqdm.utils -V 3.8 -o /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/tqdm__tqdm/pyi/tqdm/utils.pyi --analyze-annotated --nofail --quick /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/tqdm__tqdm/tqdm/utils.py
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/tqdm__tqdm/tqdm/utils.py", line 12, in <module>: Name 'xrange' is not defined [name-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/tqdm__tqdm/tqdm/utils.py", line 17, in <module>: Name 'unichr' is not defined [name-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/tqdm__tqdm/tqdm/utils.py", line 22, in <module>: Name 'unicode' is not defined [name-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/tqdm__tqdm/tqdm/utils.py", line 27, in <module>: Name 'basestring' is not defined [name-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/tqdm__tqdm/tqdm/utils.py", line 68, in __lt__: No attribute '_comparable' on Comparable [attribute-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/tqdm__tqdm/tqdm/utils.py", line 74, in __eq__: No attribute '_comparable' on Comparable [attribute-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/tqdm__tqdm/tqdm/utils.py", line 96, in wrapper_getattr: No attribute '__getattr__' on Type[object] [attribute-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/tqdm__tqdm/tqdm/utils.py", line 240, in _screen_shape_windows: Can't find module 'ctypes.windll'. [import-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/tqdm__tqdm/tqdm/utils.py", line 283, in _screen_shape_linux: Function fcntl.ioctl was called with the wrong arguments [wrong-arg-types]
+         Expected: (__fd, __request, __arg: int = ..., ...)
+  Actually passed: (__fd, __request, __arg: str)
+
+For more details, see https://google.github.io/pytype/errors.html
+ninja: build stopped: subcommand failed.
+Leaving directory 'output/tqdm__tqdm'

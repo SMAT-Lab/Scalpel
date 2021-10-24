@@ -1,0 +1,7 @@
+Computing dependencies
+Analyzing 2 sources with 0 local dependencies
+ninja: Entering directory `output/521xueweihan__HelloGitHub'
+[1/2] check make_content
+[2/2] check github_bot
+Leaving directory 'output/521xueweihan__HelloGitHub'
+Success: no errors found

@@ -4,32 +4,42 @@ from collections import deque
 from ast import NodeVisitor
 from copy import deepcopy
 
+
 def is_py38_or_higher():
     if sys.version_info.major == 3 and sys.version_info.minor >= 8:
         return True
     return False
 
+
 NAMECONSTANT_TYPE = ast.Constant if is_py38_or_higher() else ast.NameConstant
+
 
 class CallTransformer(ast.NodeTransformer):
     def __init__(self):
         self.call_names = []
 
     def visit_Attribute(self, node):
-#        self.generic_visit(node.value)
+        #        self.generic_visit(node.value)
         return node
 
     def param2str(self, param):
         def get_func(node):
-           if type(node.func) is ast.Name:
-               mid = node.func.id
-           elif type(node.func) is ast.Attribute:
-               mid = node.func.attr
-           elif type(node.func) is ast.Call:
-               mid = get_func(node.func)
-           else:
-               raise Exception(str(type(node.func)))
-           return mid
+            if type(node.func) is ast.Name:
+                mid = node.func.id
+            elif type(node.func) is ast.Attribute:
+                mid = node.func.attr
+            elif type(node.func) is ast.Call:
+                mid = get_func(node.func)
+            elif isinstance(node.func, ast.Subscript):
+                if isinstance(node.func.value, ast.Name):
+                    mid = node.func.value.id
+                elif isinstance(node.func.value, ast.Attribute):
+                    mid = node.func.value.attr
+                else:
+                    raise Exception(str(type(node.func)))
+            else:
+                raise Exception(str(type(node.func)))
+            return mid
 
         if isinstance(param, ast.Subscript):
             return self.param2str(param.value)
@@ -71,10 +81,10 @@ class CallTransformer(ast.NodeTransformer):
         callvisitor = FuncCallVisitor()
         callvisitor.visit(tmp_fun_node)
 
-        call_info  = {  "name": callvisitor.name, 
-                        "lineno": tmp_fun_node.lineno, 
-                        "col_offset": tmp_fun_node.col_offset,
-                        "params": []
+        call_info = {"name": callvisitor.name,
+                     "lineno": tmp_fun_node.lineno,
+                     "col_offset": tmp_fun_node.col_offset,
+                     "params": []
                      }
         self.call_names += [call_info]
         for arg in node.args:
@@ -83,15 +93,17 @@ class CallTransformer(ast.NodeTransformer):
 
         for kw in node.keywords:
             call_info["params"] += [self.param2str(kw.value)]
-            self.generic_visit(kw) 
+            self.generic_visit(kw)
         self.generic_visit(tmp_fun_node)
 
         return node
+
 
 class FuncCallVisitor(ast.NodeVisitor):
     def __init__(self):
         self._name = deque()
         self.call_names = []
+
     def clear(self):
         self._name = deque()
         self.call_names = []
@@ -120,6 +132,7 @@ class FuncCallVisitor(ast.NodeVisitor):
         node.keywords = []
         self.generic_visit(node)
         return node
+
 
 def get_args(node):
     arg_type = []
@@ -154,15 +167,6 @@ def get_args(node):
             arg_type.append("Other")
     return arg_type
 
-def get_call_type(tree):
-    # how to remove 
-    func_calls = []
-    for node in ast.walk(tree):
-        if isinstance(node, ast.Call):
-            callvisitor = FuncCallVisitor()
-            callvisitor.visit(node.func)
-            func_calls += [(callvisitor.name, get_args(node))]
-    return func_calls
 
 def get_call_type(tree):
     # how to remove 
@@ -173,10 +177,21 @@ def get_call_type(tree):
             callvisitor.visit(node.func)
             func_calls += [(callvisitor.name, get_args(node))]
     return func_calls
+
+
+def get_call_type(tree):
+    # how to remove 
+    func_calls = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Call):
+            callvisitor = FuncCallVisitor()
+            callvisitor.visit(node.func)
+            func_calls += [(callvisitor.name, get_args(node))]
+    return func_calls
+
 
 def get_func_calls(tree):
     node = deepcopy(tree)
     transformer = CallTransformer()
     transformer.visit(node)
     return transformer.call_names
-

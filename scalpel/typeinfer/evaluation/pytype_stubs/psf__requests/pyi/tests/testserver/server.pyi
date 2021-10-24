@@ -1,0 +1,36 @@
+# (generated with --quick)
+
+from typing import Any, Tuple, Type, TypeVar
+
+select: module
+socket: module
+threading: module
+
+_TServer = TypeVar('_TServer', bound=Server)
+
+class Server(threading.Thread):
+    WAIT_EVENT_TIMEOUT: int
+    __doc__: str
+    handler: Any
+    handler_results: list
+    host: Any
+    port: Any
+    ready_event: threading.Event
+    requests_to_handle: Any
+    server_sock: socket.socket
+    stop_event: threading.Event
+    wait_to_close_event: Any
+    def __enter__(self) -> Tuple[Any, Any]: ...
+    def __exit__(self, exc_type, exc_value, traceback) -> bool: ...
+    def __init__(self, handler = ..., host = ..., port = ..., requests_to_handle = ..., wait_to_close_event = ...) -> None: ...
+    def _accept_connection(self) -> Any: ...
+    def _close_server_sock_ignore_errors(self) -> None: ...
+    def _create_socket_and_bind(self) -> socket.socket: ...
+    def _handle_requests(self) -> None: ...
+    @classmethod
+    def basic_response_server(cls: Type[_TServer], **kwargs) -> _TServer: ...
+    def run(self) -> None: ...
+    @classmethod
+    def text_response_server(cls: Type[_TServer], text, request_timeout = ..., **kwargs) -> _TServer: ...
+
+def consume_socket_content(sock, timeout = ...) -> bytes: ...

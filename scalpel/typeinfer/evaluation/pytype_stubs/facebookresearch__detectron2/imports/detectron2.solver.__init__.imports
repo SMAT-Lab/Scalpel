@@ -1,0 +1,11 @@
+detectron2/utils/registry /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/facebookresearch__detectron2/pyi/detectron2/utils/registry.pyi
+detectron2/config/instantiate /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/facebookresearch__detectron2/pyi/detectron2/config/instantiate.pyi
+detectron2/utils/file_io /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/facebookresearch__detectron2/pyi/detectron2/utils/file_io.pyi
+detectron2/config/lazy /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/facebookresearch__detectron2/pyi/detectron2/config/lazy.pyi
+detectron2/utils/env /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/facebookresearch__detectron2/pyi/detectron2/utils/env.pyi
+detectron2/config/compat /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/facebookresearch__detectron2/pyi/detectron2/config/compat.pyi
+detectron2/config/config /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/facebookresearch__detectron2/pyi/detectron2/config/config.pyi
+detectron2/config/defaults /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/facebookresearch__detectron2/pyi/detectron2/config/defaults.pyi
+detectron2/config/__init__ /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/facebookresearch__detectron2/pyi/detectron2/config/__init__.pyi
+detectron2/solver/lr_scheduler /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/facebookresearch__detectron2/pyi/detectron2/solver/lr_scheduler.pyi
+detectron2/solver/build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/facebookresearch__detectron2/pyi/detectron2/solver/build.pyi

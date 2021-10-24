@@ -1,0 +1,21 @@
+---
+- name: Deploy the template
+  cloudformation:
+    aws_access_key: "{{ access_key }}"
+    aws_secret_key: "{{ secret_key }}"
+    stack_name: "{{ stack_name }}"
+    state: "present"
+    region: "{{ algo_region }}"
+    template: roles/cloud-ec2/files/stack.yaml
+    template_parameters:
+      InstanceTypeParameter: "{{ cloud_providers.ec2.size }}"
+      PublicSSHKeyParameter: "{{ lookup('file', SSH_keys.public) }}"
+      ImageIdParameter: "{{ ami_image }}"
+      WireGuardPort: "{{ wireguard_port }}"
+      UseThisElasticIP: "{{ existing_eip }}"
+      EbsEncrypted: "{{ encrypted }}"
+      UserData: "{{ lookup('template', 'files/cloud-init/base.yml') | b64encode }}"
+      SshPort: "{{ ssh_port }}"
+    tags:
+      Environment: Algo
+  register: stack

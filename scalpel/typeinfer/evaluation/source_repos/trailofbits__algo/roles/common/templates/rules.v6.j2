@@ -1,0 +1,120 @@
+{% set subnets = ([strongswan_network_ipv6] if ipsec_enabled else []) + ([wireguard_network_ipv6] if wireguard_enabled else []) %}
+{% set ports = (['500', '4500'] if ipsec_enabled else []) + ([wireguard_port] if wireguard_enabled else []) + ([wireguard_port_actual] if wireguard_enabled and wireguard_port|int == wireguard_port_avoid|int else []) %}
+
+#### The mangle table
+# This table allows us to modify packet headers
+# Packets enter this table first
+#
+*mangle
+
+:PREROUTING ACCEPT [0:0]
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:POSTROUTING ACCEPT [0:0]
+
+{% if reduce_mtu|int > 0 and ipsec_enabled %}
+-A FORWARD -s {{ strongswan_network_ipv6 }} -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss {{ 1340 - reduce_mtu|int }}
+{% endif %}
+
+COMMIT
+
+#### The nat table
+# This table enables Network Address Translation
+# (This is technically a type of packet mangling)
+#
+*nat
+
+:PREROUTING ACCEPT [0:0]
+:POSTROUTING ACCEPT [0:0]
+
+{% if wireguard_enabled and wireguard_port|int == wireguard_port_avoid|int %}
+# Handle the special case of allowing access to WireGuard over an already used
+# port like 53
+-A PREROUTING -s {{ subnets|join(',') }} -p udp --dport {{ wireguard_port_avoid }} -j RETURN
+-A PREROUTING --in-interface {{ ansible_default_ipv6['interface'] }} -p udp --dport {{ wireguard_port_avoid }} -j REDIRECT --to-port {{ wireguard_port_actual }}
+{% endif %}
+# Allow traffic from the VPN network to the outside world, and replies
+-A POSTROUTING -s {{ subnets|join(',') }} -m policy --pol none --dir out {{ '-j SNAT --to ' + ipv6_egress_ip | ipaddr('address') if alternative_ingress_ip else '-j MASQUERADE' }}
+
+COMMIT
+
+#### The filter table
+# The default ipfilter table
+#
+*filter
+
+# By default, drop packets that are destined for this server
+:INPUT DROP [0:0]
+# By default, drop packets that request to be forwarded by this server
+:FORWARD DROP [0:0]
+# By default, accept any packets originating from this server
+:OUTPUT ACCEPT [0:0]
+
+# Create the ICMPV6-CHECK chain and its log chain
+# These chains are used later to prevent a type of bug that would
+# allow malicious traffic to reach over the server into the private network
+# An instance of such a bug on Cisco software is described here:
+# https://www.insinuator.net/2016/05/cve-2016-1409-ipv6-ndp-dos-vulnerability-in-cisco-software/
+# other software implementations might be at least as broken as the one in CISCO gear.
+:ICMPV6-CHECK - [0:0]
+:ICMPV6-CHECK-LOG - [0:0]
+
+# Accept packets destined for localhost
+-A INPUT -i lo -j ACCEPT
+# Accept any packet from an open TCP connection
+-A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+# Accept packets using the encapsulation protocol
+-A INPUT -p esp -j ACCEPT
+-A INPUT -m ah -j ACCEPT
+# rate limit ICMP traffic per source
+-A INPUT -p icmpv6 --icmpv6-type echo-request -m hashlimit --hashlimit-upto 5/s --hashlimit-mode srcip --hashlimit-srcmask 32 --hashlimit-name icmp-echo-drop -j ACCEPT
+# Accept IPSEC/WireGuard traffic to ports {{ subnets|join(',') }}
+-A INPUT -p udp -m multiport --dports {{ ports|join(',') }} -j ACCEPT
+# Allow new traffic to port {{ ansible_ssh_port }} (SSH)
+-A INPUT -p tcp --dport {{ ansible_ssh_port }} -m conntrack --ctstate NEW -j ACCEPT
+
+# Accept properly formatted Neighbor Discovery Protocol packets
+-A INPUT -p icmpv6 --icmpv6-type router-advertisement -m hl --hl-eq 255 -j ACCEPT
+-A INPUT -p icmpv6 --icmpv6-type neighbor-solicitation -m hl --hl-eq 255 -j ACCEPT
+-A INPUT -p icmpv6 --icmpv6-type neighbor-advertisement -m hl --hl-eq 255 -j ACCEPT
+-A INPUT -p icmpv6 --icmpv6-type redirect -m hl --hl-eq 255 -j ACCEPT
+
+# DHCP in AWS
+-A INPUT -m conntrack --ctstate NEW -m udp -p udp --dport 546 -d fe80::/64 -j ACCEPT
+
+# TODO:
+# The IP of the resolver should be bound to a DUMMY interface.
+# DUMMY interfaces are the proper way to install IPs without assigning them any
+# particular virtual (tun,tap,...) or physical (ethernet) interface.
+
+# Accept DNS traffic to the local DNS resolver
+-A INPUT -d {{ local_service_ipv6 }}/128 -p udp --dport 53 -j ACCEPT
+
+# Drop traffic between VPN clients
+-A FORWARD -s {{ subnets|join(',') }} -d {{ subnets|join(',') }} -j {{ "DROP" if BetweenClients_DROP else "ACCEPT" }}
+# Drop traffic to VPN clients from SSH tunnels
+-A OUTPUT -d {{ subnets|join(',') }} -m owner --gid-owner 15000 -j {{ "DROP" if BetweenClients_DROP else "ACCEPT" }}
+
+-A FORWARD -j ICMPV6-CHECK
+-A FORWARD -p tcp --dport 445 -j {{ "DROP" if block_smb else "ACCEPT" }}
+-A FORWARD -p udp -m multiport --ports 137,138 -j {{ "DROP" if block_netbios else "ACCEPT" }}
+-A FORWARD -p tcp -m multiport --ports 137,139 -j {{ "DROP" if block_netbios else "ACCEPT" }}
+
+-A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+{% if ipsec_enabled %}
+-A FORWARD -m conntrack --ctstate NEW -s {{ strongswan_network_ipv6 }} -m policy --pol ipsec --dir in -j ACCEPT
+{% endif %}
+{% if wireguard_enabled %}
+-A FORWARD -m conntrack --ctstate NEW -s {{ wireguard_network_ipv6 }} -m policy --pol none --dir in -j ACCEPT
+{% endif %}
+
+# Use the ICMPV6-CHECK chain, described above
+-A ICMPV6-CHECK -p icmpv6 -m hl ! --hl-eq 255 --icmpv6-type router-solicitation -j ICMPV6-CHECK-LOG
+-A ICMPV6-CHECK -p icmpv6 -m hl ! --hl-eq 255 --icmpv6-type router-advertisement -j ICMPV6-CHECK-LOG
+-A ICMPV6-CHECK -p icmpv6 -m hl ! --hl-eq 255 --icmpv6-type neighbor-solicitation -j ICMPV6-CHECK-LOG
+-A ICMPV6-CHECK -p icmpv6 -m hl ! --hl-eq 255 --icmpv6-type neighbor-advertisement -j ICMPV6-CHECK-LOG
+-A ICMPV6-CHECK-LOG -j LOG --log-prefix "ICMPV6-CHECK-LOG DROP "
+-A ICMPV6-CHECK-LOG -j DROP
+
+COMMIT

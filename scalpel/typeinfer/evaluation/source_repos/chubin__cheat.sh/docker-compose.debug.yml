@@ -1,0 +1,21 @@
+# Compose override, see https://docs.docker.com/compose/extends/
+#
+# - Run `flask` standalone server with more debug aids instead of `gevent`
+# - Turn on Flask debug mode to print tracebacks and autoreload code
+# - Mounts fresh sources from current dir as volume
+#
+# Usage:
+#   docker-compose -f docker-compose.yml -f docker-compose.debug.yml up
+#
+version: '2'
+services:
+  app:
+    environment:
+      FLASK_ENV: development
+      #FLASK_RUN_RELOAD: False
+      FLASK_APP: "bin/srv.py"
+      FLASK_RUN_HOST: 0.0.0.0
+      FLASK_RUN_PORT: 8002
+    entrypoint: ["/usr/bin/flask", "run"]
+    volumes:
+      - .:/app:Z

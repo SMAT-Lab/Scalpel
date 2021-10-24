@@ -1,0 +1,8 @@
+version: "2"
+services:
+  simple:
+    image: busybox:1.27.2
+    command: top
+  another:
+    image: busybox:1.27.2
+    command: top

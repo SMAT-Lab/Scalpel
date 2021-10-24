@@ -1,0 +1,117 @@
+Computing dependencies
+Analyzing 8 sources with 0 local dependencies
+ninja: Entering directory `output/trailofbits__algo'
+[1/8] check cloudstack_zones
+FAILED: /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/trailofbits__algo/pyi/cloudstack_zones.pyi 
+/mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/trailofbits__algo/imports/cloudstack_zones.imports --module-name cloudstack_zones -V 3.8 -o /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/trailofbits__algo/pyi/cloudstack_zones.pyi --analyze-annotated --nofail --quick /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/cloudstack_zones.py
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/cloudstack_zones.py", line 10, in <module>: Can't find module 'ansible.module_utils.basic'. [import-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/cloudstack_zones.py", line 11, in <module>: Can't find module 'ansible.module_utils.cloudstack'. [import-error]
+
+For more details, see https://google.github.io/pytype/errors.html#import-error
+[2/8] check linode_stackscript_v4
+FAILED: /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/trailofbits__algo/pyi/linode_stackscript_v4.pyi 
+/mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/trailofbits__algo/imports/linode_stackscript_v4.imports --module-name linode_stackscript_v4 -V 3.8 -o /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/trailofbits__algo/pyi/linode_stackscript_v4.pyi --analyze-annotated --nofail --quick /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/linode_stackscript_v4.py
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/linode_stackscript_v4.py", line 9, in <module>: Can't find module 'ansible.module_utils.basic'. [import-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/linode_stackscript_v4.py", line 10, in <module>: Can't find module 'ansible.module_utils.linode'. [import-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/linode_stackscript_v4.py", line 14, in <module>: Can't find module 'linode_api4'. [import-error]
+
+For more details, see https://google.github.io/pytype/errors.html#import-error
+[3/8] check lightsail_region_facts
+FAILED: /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/trailofbits__algo/pyi/lightsail_region_facts.pyi 
+/mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/trailofbits__algo/imports/lightsail_region_facts.imports --module-name lightsail_region_facts -V 3.8 -o /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/trailofbits__algo/pyi/lightsail_region_facts.pyi --analyze-annotated --nofail --quick /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/lightsail_region_facts.py
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/lightsail_region_facts.py", line 58, in <module>: Can't find module 'botocore'. [import-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/lightsail_region_facts.py", line 64, in <module>: Can't find module 'boto3'. [import-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/lightsail_region_facts.py", line 69, in <module>: Can't find module 'ansible.module_utils.basic'. [import-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/lightsail_region_facts.py", line 70, in <module>: Can't find module 'ansible.module_utils.ec2'. [import-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/lightsail_region_facts.py", line 93, in main: No attribute 'get_regions' on None [attribute-error]
+  In Optional[Any]
+
+For more details, see https://google.github.io/pytype/errors.html
+[4/8] check linode_v4
+FAILED: /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/trailofbits__algo/pyi/linode_v4.pyi 
+/mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/trailofbits__algo/imports/linode_v4.imports --module-name linode_v4 -V 3.8 -o /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/trailofbits__algo/pyi/linode_v4.pyi --analyze-annotated --nofail --quick /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/linode_v4.py
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/linode_v4.py", line 13, in <module>: Can't find module 'ansible.module_utils.basic'. [import-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/linode_v4.py", line 14, in <module>: Can't find module 'ansible.module_utils.linode'. [import-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/linode_v4.py", line 18, in <module>: Can't find module 'linode_api4'. [import-error]
+
+For more details, see https://google.github.io/pytype/errors.html#import-error
+[5/8] check gcp_compute_location_info
+FAILED: /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/trailofbits__algo/pyi/gcp_compute_location_info.pyi 
+/mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/trailofbits__algo/imports/gcp_compute_location_info.imports --module-name gcp_compute_location_info -V 3.8 -o /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/trailofbits__algo/pyi/gcp_compute_location_info.pyi --analyze-annotated --nofail --quick /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/gcp_compute_location_info.py
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/gcp_compute_location_info.py", line 17, in <module>: Can't find module 'ansible.module_utils.gcp_utils'. [import-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/gcp_compute_location_info.py", line 35, in main: No attribute 'get' on None [attribute-error]
+  In Optional[Any]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/gcp_compute_location_info.py", line 36, in main: No attribute 'get' on None [attribute-error]
+  In Optional[Any]
+
+For more details, see https://google.github.io/pytype/errors.html
+[6/8] check digital_ocean_floating_ip
+FAILED: /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/trailofbits__algo/pyi/digital_ocean_floating_ip.pyi 
+/mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/trailofbits__algo/imports/digital_ocean_floating_ip.imports --module-name digital_ocean_floating_ip -V 3.8 -o /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/trailofbits__algo/pyi/digital_ocean_floating_ip.pyi --analyze-annotated --nofail --quick /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/digital_ocean_floating_ip.py
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/digital_ocean_floating_ip.py", line 113, in <module>: Can't find module 'ansible.module_utils.basic'. [import-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/digital_ocean_floating_ip.py", line 114, in <module>: Can't find module 'ansible.module_utils.basic'. [import-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/digital_ocean_floating_ip.py", line 115, in <module>: Can't find module 'ansible.module_utils.urls'. [import-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/digital_ocean_floating_ip.py", line 116, in <module>: Can't find module 'ansible.module_utils.digital_ocean'. [import-error]
+
+For more details, see https://google.github.io/pytype/errors.html#import-error
+[7/8] check lightsail
+FAILED: /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/trailofbits__algo/pyi/lightsail.pyi 
+/mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/trailofbits__algo/imports/lightsail.imports --module-name lightsail -V 3.8 -o /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/trailofbits__algo/pyi/lightsail.pyi --analyze-annotated --nofail --quick /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/lightsail.py
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/lightsail.py", line 191, in <module>: Can't find module 'botocore'. [import-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/lightsail.py", line 197, in <module>: Can't find module 'boto3'. [import-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/lightsail.py", line 202, in <module>: Can't find module 'ansible.module_utils.basic'. [import-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/lightsail.py", line 203, in <module>: Can't find module 'ansible.module_utils.ec2'. [import-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/lightsail.py", line 253, in create_instance: No attribute 'create_instances' on None [attribute-error]
+  In Optional[Any]
+Called from (traceback):
+  line 551, in current file
+  line 545, in main
+  line 506, in core
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/lightsail.py", line 292, in create_instance: No attribute 'open_instance_public_ports' on None [attribute-error]
+  In Optional[Any]
+Called from (traceback):
+  line 551, in current file
+  line 545, in main
+  line 506, in core
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/lightsail.py", line 357, in delete_instance: No attribute 'delete_instance' on None [attribute-error]
+  In Optional[Any]
+Called from (traceback):
+  line 551, in current file
+  line 545, in main
+  line 500, in core
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/lightsail.py", line 415, in restart_instance: No attribute 'reboot_instance' on None [attribute-error]
+  In Optional[Any]
+Called from (traceback):
+  line 551, in current file
+  line 545, in main
+  line 504, in core
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/lightsail.py", line 471, in startstop_instance: No attribute 'start_instance' on None [attribute-error]
+  In Optional[Any]
+Called from (traceback):
+  line 551, in current file
+  line 545, in main
+  line 502, in core
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/lightsail.py", line 473, in startstop_instance: No attribute 'stop_instance' on None [attribute-error]
+  In Optional[Any]
+Called from (traceback):
+  line 551, in current file
+  line 545, in main
+  line 502, in core
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/lightsail.py", line 515, in _find_instance_info: No attribute 'get_instance' on None [attribute-error]
+  In Optional[Any]
+Called from (traceback):
+  line 551, in current file
+  ...
+  line 333, in delete_instance
+
+For more details, see https://google.github.io/pytype/errors.html
+[8/8] check scaleway_compute
+FAILED: /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/trailofbits__algo/pyi/scaleway_compute.pyi 
+/mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/trailofbits__algo/imports/scaleway_compute.imports --module-name scaleway_compute -V 3.8 -o /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/trailofbits__algo/pyi/scaleway_compute.pyi --analyze-annotated --nofail --quick /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/scaleway_compute.py
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/scaleway_compute.py", line 169, in <module>: Can't find module 'ansible.module_utils.basic'. [import-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/scaleway_compute.py", line 170, in <module>: Can't find module 'ansible.module_utils.six.moves.urllib.parse'. [import-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/trailofbits__algo/library/scaleway_compute.py", line 171, in <module>: Can't find module 'ansible.module_utils.scaleway'. [import-error]
+
+For more details, see https://google.github.io/pytype/errors.html#import-error
+ninja: build stopped: subcommand failed.
+Leaving directory 'output/trailofbits__algo'

@@ -1,0 +1,6 @@
+# (generated with --quick)
+
+from typing import Any, Generator
+
+def ladder_length(begin_word, end_word, word_list) -> int: ...
+def word_range(word) -> Generator[Any, Any, None]: ...

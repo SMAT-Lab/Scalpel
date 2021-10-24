@@ -1,0 +1,93 @@
+Computing dependencies
+Analyzing 62 sources with 0 local dependencies
+ninja: Entering directory `output/faif__python-patterns'
+[1/62] check patterns.other.hsm.hsm
+FAILED: /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/faif__python-patterns/pyi/patterns/other/hsm/hsm.pyi 
+/mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/faif__python-patterns/imports/patterns.other.hsm.hsm.imports --module-name patterns.other.hsm.hsm -V 3.8 -o /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/faif__python-patterns/pyi/patterns/other/hsm/hsm.pyi --analyze-annotated --nofail --quick /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/faif__python-patterns/patterns/other/hsm/hsm.py
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/faif__python-patterns/patterns/other/hsm/hsm.py", line 128, in on_fault_trigger: No attribute 'perform_switchover' on super [attribute-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/faif__python-patterns/patterns/other/hsm/hsm.py", line 160, in on_diagnostics_failed: No attribute 'send_diagnostics_failure_report' on super [attribute-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/faif__python-patterns/patterns/other/hsm/hsm.py", line 161, in on_diagnostics_failed: No attribute 'next_state' on super [attribute-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/faif__python-patterns/patterns/other/hsm/hsm.py", line 164, in on_diagnostics_passed: No attribute 'send_diagnostics_pass_report' on super [attribute-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/faif__python-patterns/patterns/other/hsm/hsm.py", line 165, in on_diagnostics_passed: No attribute 'clear_alarm' on super [attribute-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/faif__python-patterns/patterns/other/hsm/hsm.py", line 166, in on_diagnostics_passed: No attribute 'next_state' on super [attribute-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/faif__python-patterns/patterns/other/hsm/hsm.py", line 169, in on_operator_inservice: No attribute 'abort_diagnostics' on super [attribute-error]
+
+For more details, see https://google.github.io/pytype/errors.html#attribute-error
+[2/62] check patterns.behavioral.__init__
+[3/62] check patterns.__init__
+[4/62] check patterns.structural.__init__
+[5/62] check patterns.other.graph_search
+[6/62] check patterns.creational.borg
+[7/62] check patterns.creational.pool
+[8/62] check patterns.structural.bridge
+[9/62] check patterns.creational.builder
+[10/62] check patterns.structural.decorator
+[11/62] check patterns.creational.abstract_factory
+[12/62] check patterns.behavioral.specification
+FAILED: /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/faif__python-patterns/pyi/patterns/behavioral/specification.pyi 
+/mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/faif__python-patterns/imports/patterns.behavioral.specification.imports --module-name patterns.behavioral.specification -V 3.8 -o /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/faif__python-patterns/pyi/patterns/behavioral/specification.pyi --analyze-annotated --nofail --quick /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/faif__python-patterns/patterns/behavioral/specification.py
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/faif__python-patterns/patterns/behavioral/specification.py", line 11, in <module>: Stray abc.abstractmethod decorator on method Specification.is_satisfied_by [ignored-abstractmethod]
+  (Specification does not have metaclass abc.ABCMeta)
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/faif__python-patterns/patterns/behavioral/specification.py", line 26, in <module>: Stray abc.abstractmethod decorator on method CompositeSpecification.is_satisfied_by [ignored-abstractmethod]
+  (CompositeSpecification does not have metaclass abc.ABCMeta)
+
+For more details, see https://google.github.io/pytype/errors.html#ignored-abstractmethod
+[13/62] check patterns.creational.lazy_evaluation
+[14/62] check patterns.behavioral.memento
+[15/62] check patterns.structural.proxy
+[16/62] check patterns.structural.adapter
+FAILED: /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/faif__python-patterns/pyi/patterns/structural/adapter.pyi 
+/mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/faif__python-patterns/imports/patterns.structural.adapter.imports --module-name patterns.structural.adapter -V 3.8 -o /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/faif__python-patterns/pyi/patterns/structural/adapter.pyi --analyze-annotated --nofail --quick /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/faif__python-patterns/patterns/structural/adapter.py
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/faif__python-patterns/patterns/structural/adapter.py", line 77, in Adapter: Invalid type annotation 'T'  [invalid-annotation]
+  Appears only once in the signature
+
+For more details, see https://google.github.io/pytype/errors.html#invalid-annotation
+[17/62] check patterns.behavioral.observer
+[18/62] check patterns.creational.prototype
+[19/62] check patterns.behavioral.iterator
+FAILED: /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/faif__python-patterns/pyi/patterns/behavioral/iterator.pyi 
+/mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/faif__python-patterns/imports/patterns.behavioral.iterator.imports --module-name patterns.behavioral.iterator -V 3.8 -o /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/faif__python-patterns/pyi/patterns/behavioral/iterator.pyi --analyze-annotated --nofail --quick /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/faif__python-patterns/patterns/behavioral/iterator.py
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/faif__python-patterns/patterns/behavioral/iterator.py", line 18, in count_to_two: bad return type [bad-return-type]
+           Expected: None
+  Actually returned: Generator[nothing, Any, None]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/faif__python-patterns/patterns/behavioral/iterator.py", line 22, in count_to_five: bad return type [bad-return-type]
+           Expected: None
+  Actually returned: Generator[nothing, Any, None]
+
+For more details, see https://google.github.io/pytype/errors.html#bad-return-type
+[20/62] check patterns.behavioral.strategy
+FAILED: /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/faif__python-patterns/pyi/patterns/behavioral/strategy.pyi 
+/mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/faif__python-patterns/imports/patterns.behavioral.strategy.imports --module-name patterns.behavioral.strategy -V 3.8 -o /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/faif__python-patterns/pyi/patterns/behavioral/strategy.pyi --analyze-annotated --nofail --quick /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/faif__python-patterns/patterns/behavioral/strategy.py
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/faif__python-patterns/patterns/behavioral/strategy.py", line 33, in DiscountStrategyValidator: Type annotation for value does not match type of assignment [annotation-type-mismatch]
+  Annotation: Callable (Did you mean 'typing.Optional[Callable]'?)
+  Assignment: None
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/faif__python-patterns/patterns/behavioral/strategy.py", line 35, in __set__: No attribute 'private_name' on DiscountStrategyValidator [attribute-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/faif__python-patterns/patterns/behavioral/strategy.py", line 37, in __set__: No attribute 'private_name' on DiscountStrategyValidator [attribute-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/faif__python-patterns/patterns/behavioral/strategy.py", line 39, in DiscountStrategyValidator: Type annotation for objtype does not match type of assignment [annotation-type-mismatch]
+  Annotation: type (Did you mean 'typing.Optional[type]'?)
+  Assignment: None
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/faif__python-patterns/patterns/behavioral/strategy.py", line 40, in __get__: No attribute 'private_name' on DiscountStrategyValidator [attribute-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/faif__python-patterns/patterns/behavioral/strategy.py", line 46, in Order: Type annotation for discount_strategy does not match type of assignment [annotation-type-mismatch]
+  Annotation: Callable (Did you mean 'typing.Optional[Callable]'?)
+  Assignment: None
+
+For more details, see https://google.github.io/pytype/errors.html
+[21/62] check patterns.behavioral.visitor
+[22/62] check patterns.dependency_injection
+FAILED: /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/faif__python-patterns/pyi/patterns/dependency_injection.pyi 
+/mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/faif__python-patterns/imports/patterns.dependency_injection.imports --module-name patterns.dependency_injection -V 3.8 -o /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/faif__python-patterns/pyi/patterns/dependency_injection.pyi --analyze-annotated --nofail --quick /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/faif__python-patterns/patterns/dependency_injection.py
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/faif__python-patterns/patterns/dependency_injection.py", line 64, in get_current_time_as_html_fragment: No attribute 'time_provider' on SetterInjection [attribute-error]
+
+For more details, see https://google.github.io/pytype/errors.html#attribute-error
+[23/62] check patterns.behavioral.publish_subscribe
+[24/62] check patterns.behavioral.state
+FAILED: /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/faif__python-patterns/pyi/patterns/behavioral/state.pyi 
+/mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/faif__python-patterns/imports/patterns.behavioral.state.imports --module-name patterns.behavioral.state -V 3.8 -o /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/faif__python-patterns/pyi/patterns/behavioral/state.pyi --analyze-annotated --nofail --quick /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/faif__python-patterns/patterns/behavioral/state.py
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/faif__python-patterns/patterns/behavioral/state.py", line 18, in scan: No attribute 'pos' on State [attribute-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/faif__python-patterns/patterns/behavioral/state.py", line 19, in scan: No attribute 'stations' on State [attribute-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/faif__python-patterns/patterns/behavioral/state.py", line 21, in scan: No attribute 'stations' on State [attribute-error]
+File "/mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/faif__python-patterns/patterns/behavioral/state.py", line 21, in scan: No attribute 'name' on State [attribute-error]
+
+For more details, see https://google.github.io/pytype/errors.html#attribute-error
+ninja: build stopped: subcommand failed.
+Leaving directory 'output/faif__python-patterns'

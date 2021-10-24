@@ -1,0 +1,15 @@
+version: '3.2'
+services:
+    simple:
+      image: busybox:1.31.0-uclibc
+      command: top
+      ports:
+        - target: 3000
+        - target: 3001
+          published: 53222
+        - target: 3002
+          published: 53223
+          protocol: tcp
+        - target: 3003
+          published: 53224
+          protocol: udp

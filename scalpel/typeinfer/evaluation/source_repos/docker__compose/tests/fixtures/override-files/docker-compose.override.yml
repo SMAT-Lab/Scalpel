@@ -1,0 +1,7 @@
+version: '2.2'
+services:
+  web:
+    command: "top"
+
+  db:
+    command: "top"

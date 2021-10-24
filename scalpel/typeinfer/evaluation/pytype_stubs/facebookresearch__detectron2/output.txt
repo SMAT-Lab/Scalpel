@@ -1,0 +1,4 @@
+Computing dependencies
+Analyzing 429 sources with 12 local dependencies
+ninja: Entering directory `output/facebookresearch__detectron2'
+Leaving directory 'output/facebookresearch__detectron2'

@@ -1,0 +1,3 @@
+# (generated with --quick)
+
+class ParseError(Exception): ...

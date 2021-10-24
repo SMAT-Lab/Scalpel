@@ -1,0 +1,9 @@
+[attr]py-file  eol=lf
+*.py           py-file
+
+.git*          export-ignore
+.mailmap       export-ignore
+.meta/         export-ignore
+images/        export-ignore
+benchmarks/    export-ignore
+asv.conf.json  export-ignore
