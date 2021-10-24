@@ -1,0 +1,6 @@
+# (generated with --quick)
+
+string: module
+
+def base_to_int(s, base) -> int: ...
+def int_to_base(n, base) -> str: ...

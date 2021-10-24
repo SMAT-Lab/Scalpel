@@ -1,0 +1,11 @@
+compose/version /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/docker__compose/pyi/compose/version.pyi
+compose/const /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/docker__compose/pyi/compose/const.pyi
+compose/errors /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/docker__compose/pyi/compose/errors.pyi
+compose/timeparse /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/docker__compose/pyi/compose/timeparse.pyi
+compose/utils /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/docker__compose/pyi/compose/utils.pyi
+compose/config/errors /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/docker__compose/pyi/compose/config/errors.pyi
+compose/config/types /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/docker__compose/pyi/compose/config/types.pyi
+compose/config/environment /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/docker__compose/pyi/compose/config/environment.pyi
+compose/config/interpolation /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/docker__compose/pyi/compose/config/interpolation.pyi
+compose/config/sort_services /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/docker__compose/pyi/compose/config/sort_services.pyi
+compose/config/validation /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/docker__compose/pyi/compose/config/validation.pyi

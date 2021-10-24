@@ -1,0 +1,13 @@
+encodings/idna /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/imports/default.pyi
+requests/hooks /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/hooks.pyi
+requests/compat /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/compat.pyi
+requests/structures /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/structures.pyi
+requests/_internal_utils /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/_internal_utils.pyi
+requests/cookies /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/cookies.pyi
+requests/__version__ /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/__version__.pyi
+requests/certs /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/certs.pyi
+requests/exceptions /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/exceptions.pyi
+requests/utils /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/utils.pyi
+requests/auth /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/auth.pyi
+requests/status_codes /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/status_codes.pyi
+requests/models /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/models.pyi

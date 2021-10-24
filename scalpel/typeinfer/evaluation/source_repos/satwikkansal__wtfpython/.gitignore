@@ -1,0 +1,18 @@
+.DS_Store
+
+node_modules
+npm-debug.log
+wtfpython-pypi/build/
+wtfpython-pypi/dist/
+wtfpython-pypi/wtfpython.egg-info
+
+# Python-specific byte-compiled files should be ignored
+__pycache__/
+*.py[cod]
+*$py.class
+
+irrelevant/.ipynb_checkpoints/
+
+irrelevant/.python-version
+
+.idea/

@@ -1,11 +1,8 @@
- __pycache__/
- ./*.py
- *.row
- *.pyc
- *.swp
- **/*.swp
- *.pyc
- **/*.pyc
+__pycache__/
+*.pyc
+*.swp
+*.pyc
+**/*.pyc
 *.pdf
 exp*.py
 *.sh
@@ -14,3 +11,7 @@ dev/
 dataset/
 template
 lib_res/
+venv/
+env/
+.idea/
+Scalpel.egg-info/

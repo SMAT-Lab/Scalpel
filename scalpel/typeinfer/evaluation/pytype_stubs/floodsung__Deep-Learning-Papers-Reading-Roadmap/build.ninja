@@ -1,0 +1,9 @@
+rule infer
+  command = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info $imports --module-name $module -V 3.8 -o $out --no-report-errors --nofail --quick $in
+  description = infer $module
+rule check
+  command = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info $imports --module-name $module -V 3.8 -o $out --analyze-annotated --nofail --quick $in
+  description = check $module
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/floodsung__Deep-Learning-Papers-Reading-Roadmap/pyi/download.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/floodsung__Deep-Learning-Papers-Reading-Roadmap/download.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/floodsung__Deep-Learning-Papers-Reading-Roadmap/imports/download.imports
+  module = download

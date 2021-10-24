@@ -1,0 +1,4 @@
+Computing dependencies
+Analyzing 107 sources with 0 local dependencies
+ninja: Entering directory `output/tornadoweb__tornado'
+Leaving directory 'output/tornadoweb__tornado'

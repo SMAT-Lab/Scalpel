@@ -8,7 +8,7 @@ efficient solutions to software engineering researchers that are accessible to
 everybody and reusable in various contexts.
 See xxx and xx for complete documentation and user guide.
 
-![title](resources/scalpel_diagram.png)
+![title](https://lucid.app/publicSegments/view/079f413f-8fd5-4c4f-9ad2-1a3cad30583d/image.png)
 
 ## Introduction
 ## TODO (Apps)
@@ -35,6 +35,9 @@ See xxx and xx for complete documentation and user guide.
 - [x] access attributes
 - [x] class in classes
 - [x] function in functions (def)
+
+## contributors
+TODO
 
 ## Acknowledgement
 This project has been inspired and supported by the following work. Some implementation of functionalities are taken from published work.

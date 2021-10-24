@@ -1,0 +1,13 @@
+compose/__init__ /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/docker__compose/pyi/compose/__init__.pyi
+compose/version /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/docker__compose/pyi/compose/version.pyi
+compose/const /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/docker__compose/pyi/compose/const.pyi
+compose/cli/utils /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/docker__compose/pyi/compose/cli/utils.pyi
+compose/cli/errors /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/docker__compose/pyi/compose/cli/errors.pyi
+compose/cli/verbose_proxy /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/docker__compose/pyi/compose/cli/verbose_proxy.pyi
+compose/config/errors /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/docker__compose/pyi/compose/config/errors.pyi
+compose/config/environment /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/docker__compose/pyi/compose/config/environment.pyi
+compose/errors /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/docker__compose/pyi/compose/errors.pyi
+compose/timeparse /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/docker__compose/pyi/compose/timeparse.pyi
+compose/utils /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/docker__compose/pyi/compose/utils.pyi
+compose/cli/docker_client /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/docker__compose/pyi/compose/cli/docker_client.pyi
+tests/__init__ /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/docker__compose/pyi/tests/__init__.pyi

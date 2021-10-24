@@ -1,0 +1,17 @@
+[Interface]
+Address = {{ wireguard_server_ip }}
+ListenPort = {{ wireguard_port_actual if wireguard_port|int == wireguard_port_avoid|int else wireguard_port }}
+PrivateKey = {{ lookup('file', wireguard_pki_path + '/private/' + IP_subject_alt_name) }}
+SaveConfig = false
+
+{% for u in wireguard_users %}
+{% if u in users %}
+{% set index = loop.index %}
+
+[Peer]
+# {{ u }}
+PublicKey = {{ lookup('file', wireguard_pki_path + '/public/' + u) }}
+PresharedKey = {{ lookup('file', wireguard_pki_path + '/preshared/' + u) }}
+AllowedIPs = {{ wireguard_network_ipv4 | ipmath(index|int+1) | ipv4('address') }}/32{{ ',' + wireguard_network_ipv6 | ipmath(index|int+1) | ipv6('address') + '/128' if ipv6_support else '' }}
+{% endif %}
+{% endfor %}

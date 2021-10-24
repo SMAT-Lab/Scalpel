@@ -1,0 +1,3 @@
+---
+- name: Include prompts
+  import_tasks: prompts.yml

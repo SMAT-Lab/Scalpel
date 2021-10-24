@@ -1,0 +1,61 @@
+---
+ipsec_config_path: "configs/{{ IP_subject_alt_name }}/ipsec/"
+ipsec_pki_path: "{{ ipsec_config_path }}/.pki/"
+strongswan_shell: /usr/sbin/nologin
+strongswan_home: /var/lib/strongswan
+strongswan_service: "{{ 'strongswan-starter' if ansible_facts['distribution_version'] is version('20.04', '>=') else 'strongswan' }}"
+BetweenClients_DROP: true
+algo_ondemand_cellular: false
+algo_ondemand_wifi: false
+algo_ondemand_wifi_exclude: '_null'
+algo_dns_adblocking: false
+ipv6_support: false
+dns_encryption: true
+openssl_constraint_random_id: "{{ IP_subject_alt_name | to_uuid }}.algo"
+subjectAltName_type: "{{ 'DNS' if IP_subject_alt_name|regex_search('[a-z]') else 'IP' }}"
+subjectAltName: >-
+  {{ subjectAltName_type }}:{{ IP_subject_alt_name }}
+  {%- if ipv6_support -%},IP:{{ ansible_default_ipv6['address'] }}{%- endif -%}
+subjectAltName_USER: "email:{{ item }}@{{ openssl_constraint_random_id }}"
+nameConstraints: >-
+  critical,permitted;{{ subjectAltName_type }}:{{ IP_subject_alt_name }}{{- '/255.255.255.255' if subjectAltName_type == 'IP' else '' -}}
+  {%- if subjectAltName_type == 'IP' -%}
+  ,permitted;DNS:{{ openssl_constraint_random_id }}
+  {%- else -%}
+  ,excluded;IP:0.0.0.0/0.0.0.0
+  {%- endif -%}
+  ,permitted;email:{{ openssl_constraint_random_id }}
+  {%- if ipv6_support -%}
+  ,permitted;IP:{{ ansible_default_ipv6['address'] }}/ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff
+  {%- else -%}
+  ,excluded;IP:0:0:0:0:0:0:0:0/0:0:0:0:0:0:0:0
+  {%- endif -%}
+openssl_bin: openssl
+strongswan_enabled_plugins:
+  - aes
+  - gcm
+  - hmac
+  - kernel-netlink
+  - nonce
+  - openssl
+  - pem
+  - pgp
+  - pkcs12
+  - pkcs7
+  - pkcs8
+  - pubkey
+  - random
+  - revocation
+  - sha2
+  - socket-default
+  - stroke
+  - x509
+
+ciphers:
+  defaults:
+    ike: aes256gcm16-prfsha512-ecp384!
+    esp: aes256gcm16-ecp384!
+
+pkcs12_PayloadCertificateUUID: "{{ 900000 | random | to_uuid | upper }}"
+VPN_PayloadIdentifier: "{{ 800000 | random | to_uuid | upper }}"
+CA_PayloadIdentifier: "{{ 700000 | random | to_uuid | upper }}"

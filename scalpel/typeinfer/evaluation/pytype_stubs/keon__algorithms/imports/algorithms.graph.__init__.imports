@@ -1,0 +1,9 @@
+algorithms/graph/graph /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/keon__algorithms/pyi/algorithms/graph/graph.pyi
+algorithms/graph/tarjan /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/keon__algorithms/pyi/algorithms/graph/tarjan.pyi
+algorithms/graph/check_bipartite /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/keon__algorithms/pyi/algorithms/graph/check_bipartite.pyi
+algorithms/graph/maximum_flow /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/keon__algorithms/pyi/algorithms/graph/maximum_flow.pyi
+algorithms/graph/maximum_flow_bfs /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/keon__algorithms/pyi/algorithms/graph/maximum_flow_bfs.pyi
+algorithms/graph/maximum_flow_dfs /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/keon__algorithms/pyi/algorithms/graph/maximum_flow_dfs.pyi
+algorithms/graph/all_pairs_shortest_path /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/keon__algorithms/pyi/algorithms/graph/all_pairs_shortest_path.pyi
+algorithms/graph/bellman_ford /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/keon__algorithms/pyi/algorithms/graph/bellman_ford.pyi
+algorithms/graph/prims_minimum_spanning /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/keon__algorithms/pyi/algorithms/graph/prims_minimum_spanning.pyi

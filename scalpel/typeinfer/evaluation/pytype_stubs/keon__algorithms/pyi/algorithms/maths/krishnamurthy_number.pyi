@@ -1,0 +1,6 @@
+# (generated with --quick)
+
+from typing import Any
+
+def find_factorial(n) -> Any: ...
+def krishnamurthy_number(n) -> Any: ...

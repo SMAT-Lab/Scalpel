@@ -1,0 +1,10 @@
+pandas/__init__ /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/deezer__spleeter/imports/default.pyi
+spleeter/utils/tensor /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/deezer__spleeter/pyi/spleeter/utils/tensor.pyi
+spleeter/audio/convertor /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/deezer__spleeter/pyi/spleeter/audio/convertor.pyi
+spleeter/audio/spectrogram /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/deezer__spleeter/pyi/spleeter/audio/spectrogram.pyi
+spleeter/utils/logging /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/deezer__spleeter/pyi/spleeter/utils/logging.pyi
+spleeter/audio/__init__ /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/deezer__spleeter/pyi/spleeter/audio/__init__.pyi
+spleeter/__init__ /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/deezer__spleeter/pyi/spleeter/__init__.pyi
+spleeter/types /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/deezer__spleeter/pyi/spleeter/types.pyi
+spleeter/audio/adapter /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/deezer__spleeter/pyi/spleeter/audio/adapter.pyi
+spleeter/audio/ffmpeg /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/deezer__spleeter/pyi/spleeter/audio/ffmpeg.pyi

@@ -1,0 +1,4 @@
+Computing dependencies
+Analyzing 63 sources with 0 local dependencies
+ninja: Entering directory `output/wangzheng0822__algo'
+Leaving directory 'output/wangzheng0822__algo'

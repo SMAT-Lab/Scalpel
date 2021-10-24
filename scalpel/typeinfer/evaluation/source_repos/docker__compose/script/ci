@@ -1,0 +1,8 @@
+#!/bin/bash
+#
+# Backwards compatibility for jenkins
+#
+# TODO: remove this script after all current PRs and jenkins are updated with
+# the new script/test/ci change
+set -e
+exec script/test/ci

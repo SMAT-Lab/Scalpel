@@ -1,0 +1,16 @@
+astor~=0.8.1
+graphviz~=0.17
+nbformat
+numpy
+networkx~=2.6.2
+nbconvert
+astunparse~=1.6.3
+attrs~=21.2.0
+PyYAML~=5.4.1
+typed-ast
+typeshed-client
+mypy
+regex
+pandas
+jinja2
+openpyxl

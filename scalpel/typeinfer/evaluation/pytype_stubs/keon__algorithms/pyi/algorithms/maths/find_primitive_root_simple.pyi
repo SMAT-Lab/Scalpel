@@ -1,0 +1,9 @@
+# (generated with --quick)
+
+from typing import Any, List
+
+math: module
+
+def euler_totient(n) -> Any: ...
+def find_order(a, n) -> int: ...
+def find_primitive_root(n) -> List[int]: ...

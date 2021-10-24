@@ -1,0 +1,25 @@
+python/:list
+ls
+ls?T
+btrfs
+btrfs~volume                # search on page
+:intro
+:help
+:cht.sh
+cht.sh python copy file     # [online]
+python/copy+file            # [online]
+python/copy+file?Q          # [online]
+python/copy+file?QT         # [online]
+/
+//
+python/:learn
+latencies                   # [python3]
+az                          # chubin/cheat.sheets
+python/rosetta/Substring    # rosetta
+python/rosetta/Substring?T  # rosetta
+python/rosetta/:list        # rosetta
+js/:learn                   # short names check
+javascript/:learn           # short names check
+emacs:go-mode/:list         # special editor names
+mkffs.ffatt                 # unknown
+latencies                   # [python2]

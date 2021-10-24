@@ -1,0 +1,9 @@
+rule infer
+  command = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info $imports --module-name $module -V 3.8 -o $out --no-report-errors --nofail --quick $in
+  description = infer $module
+rule check
+  command = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info $imports --module-name $module -V 3.8 -o $out --analyze-annotated --nofail --quick $in
+  description = check $module
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/drduh__macOS-Security-and-Privacy-Guide/pyi/read_launch_plists.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/drduh__macOS-Security-and-Privacy-Guide/launchd/read_launch_plists.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/drduh__macOS-Security-and-Privacy-Guide/imports/read_launch_plists.imports
+  module = read_launch_plists

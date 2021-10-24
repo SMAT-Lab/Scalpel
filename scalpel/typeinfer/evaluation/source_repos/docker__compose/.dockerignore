@@ -1,0 +1,14 @@
+*.egg-info
+.coverage
+.git
+.github
+.tox
+build
+binaries
+coverage-html
+docs/_site
+*venv
+.tox
+**/__pycache__
+*.pyc
+Jenkinsfile

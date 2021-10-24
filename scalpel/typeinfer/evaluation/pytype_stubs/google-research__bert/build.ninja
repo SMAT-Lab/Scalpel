@@ -1,0 +1,45 @@
+rule infer
+  command = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info $imports --module-name $module -V 3.8 -o $out --no-report-errors --nofail --quick $in
+  description = infer $module
+rule check
+  command = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info $imports --module-name $module -V 3.8 -o $out --analyze-annotated --nofail --quick $in
+  description = check $module
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/google-research__bert/pyi/google-research__bert/optimization_test.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/google-research__bert/optimization_test.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/google-research__bert/imports/google-research__bert.optimization_test.imports
+  module = google-research__bert.optimization_test
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/google-research__bert/pyi/google-research__bert/optimization.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/google-research__bert/optimization.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/google-research__bert/imports/google-research__bert.optimization.imports
+  module = google-research__bert.optimization
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/google-research__bert/pyi/google-research__bert/tokenization_test.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/google-research__bert/tokenization_test.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/google-research__bert/imports/google-research__bert.tokenization_test.imports
+  module = google-research__bert.tokenization_test
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/google-research__bert/pyi/google-research__bert/run_classifier_with_tfhub.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/google-research__bert/run_classifier_with_tfhub.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/google-research__bert/imports/google-research__bert.run_classifier_with_tfhub.imports
+  module = google-research__bert.run_classifier_with_tfhub
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/google-research__bert/pyi/google-research__bert/__init__.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/google-research__bert/__init__.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/google-research__bert/imports/google-research__bert.__init__.imports
+  module = google-research__bert.__init__
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/google-research__bert/pyi/google-research__bert/create_pretraining_data.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/google-research__bert/create_pretraining_data.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/google-research__bert/imports/google-research__bert.create_pretraining_data.imports
+  module = google-research__bert.create_pretraining_data
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/google-research__bert/pyi/google-research__bert/extract_features.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/google-research__bert/extract_features.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/google-research__bert/imports/google-research__bert.extract_features.imports
+  module = google-research__bert.extract_features
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/google-research__bert/pyi/google-research__bert/run_pretraining.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/google-research__bert/run_pretraining.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/google-research__bert/imports/google-research__bert.run_pretraining.imports
+  module = google-research__bert.run_pretraining
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/google-research__bert/pyi/google-research__bert/modeling.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/google-research__bert/modeling.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/google-research__bert/imports/google-research__bert.modeling.imports
+  module = google-research__bert.modeling
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/google-research__bert/pyi/google-research__bert/modeling_test.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/google-research__bert/modeling_test.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/google-research__bert/imports/google-research__bert.modeling_test.imports
+  module = google-research__bert.modeling_test
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/google-research__bert/pyi/google-research__bert/run_squad.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/google-research__bert/run_squad.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/google-research__bert/imports/google-research__bert.run_squad.imports
+  module = google-research__bert.run_squad
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/google-research__bert/pyi/google-research__bert/tokenization.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/google-research__bert/tokenization.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/google-research__bert/imports/google-research__bert.tokenization.imports
+  module = google-research__bert.tokenization
+build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/google-research__bert/pyi/google-research__bert/run_classifier.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/google-research__bert/run_classifier.py
+  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/google-research__bert/imports/google-research__bert.run_classifier.imports
+  module = google-research__bert.run_classifier

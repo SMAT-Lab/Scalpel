@@ -1,0 +1,3 @@
+# (generated with --quick)
+
+def prime_check(n) -> bool: ...
