@@ -15,7 +15,7 @@ See xxx and xx for complete documentation and user guide.
 - [ ] Doc for CFG construction 
 - [ ] Python different type of function arguments 
 - [ ] build an graph, to test reachbility for compitibity
-- [ ] Fix issues in CFG module including testing 
+- [x] Fix issues in CFG module including testing 
 - [ ] intra-lib dependency  and inter-lib dependeny
 - [ ] User GUID
 - [ ] SSA-> None object not handled to see if there are in real Jupyter projects
