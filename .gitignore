@@ -1,8 +1,16 @@
  __pycache__/
+ ./*.py
+ *.row
  *.pyc
  *.swp
+ **/*.swp
  *.pyc
  **/*.pyc
 *.pdf
+exp*.py
+*.sh
 test-cases/
 dev/
+dataset/
+template
+lib_res/
