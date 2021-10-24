@@ -8,7 +8,7 @@ efficient solutions to software engineering researchers that are accessible to
 everybody and reusable in various contexts.
 See xxx and xx for complete documentation and user guide.
 
-![title](resources/https://lucid.app/documents/embeddedchart/6a8be3fc-87b3-4dee-9c83-3e28e6a12804)
+![title](https://lucid.app/publicSegments/view/079f413f-8fd5-4c4f-9ad2-1a3cad30583d/image.png)
 
 ## Introduction
 ## TODO (Apps)
