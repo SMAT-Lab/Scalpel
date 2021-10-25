@@ -239,14 +239,6 @@ class CFG(object):
         graph = gv.Digraph(name='cluster'+self.name, format=format,
                            graph_attr={'label': self.name})
         self._visit_blocks(graph, self.entryblock, visited=[], calls=False)
-
-        # Build the subgraphs for the function definitions in the CFG and add
-        # them to the graph.
-        #for subcfg in self.functioncfgs:
-        #    subgraph = self.functioncfgs[subcfg]._build_visual(format=format,
-        #                                                       calls=calls)
-        #    graph.subgraph(subgraph)
-
         return graph
 
     def get_return_value(self, block):
