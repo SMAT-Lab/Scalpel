@@ -1,8 +1,0 @@
-PyType fails to infer boolean return
-File: scalpel/typeinfer/evaluation/source_repos/nvbn__thefuck/thefuck/rules/cd_parent.py
-Function: match
-
-PyType fails to infer boolean return
-/Users/tomasbolger/Documents/GitHub/Scalpel/scalpel/typeinfer/evaluation/source_repos/nvbn__thefuck/thefuck/rules/dry.py
-Function: match
-
