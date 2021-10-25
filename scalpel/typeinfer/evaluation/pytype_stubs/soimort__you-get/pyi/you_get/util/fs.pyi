@@ -1,6 +1,0 @@
-# (generated with --quick)
-
-from typing import Any
-
-def detect_os() -> str: ...
-def legitimize(text, os = ...) -> Any: ...

@@ -1,9 +1,0 @@
-__pycache__
-*.pyc
-.idea
-*.egg-info/
-.tox/
-venv
-.vscode/
-.python-version
-.coverage

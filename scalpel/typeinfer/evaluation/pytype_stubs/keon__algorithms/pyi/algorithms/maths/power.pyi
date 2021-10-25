@@ -1,6 +1,0 @@
-# (generated with --quick)
-
-from typing import Any
-
-def power(a: int, n: int, r: int = ...) -> int: ...
-def power_recur(a: int, n: int, r: int = ...) -> Any: ...

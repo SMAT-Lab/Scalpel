@@ -1,9 +1,0 @@
-rule infer
-  command = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info $imports --module-name $module -V 3.8 -o $out --no-report-errors --nofail --quick $in
-  description = infer $module
-rule check
-  command = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/env/bin/python3 -m pytype.single --imports_info $imports --module-name $module -V 3.8 -o $out --analyze-annotated --nofail --quick $in
-  description = check $module
-build /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/vinta__awesome-python/pyi/sort.pyi: check /mnt/c/Users/nitram/PycharmProjects/git_cloner/all_repos/vinta__awesome-python/sort.py
-  imports = /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/vinta__awesome-python/imports/sort.imports
-  module = sort

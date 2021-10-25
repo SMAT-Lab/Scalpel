@@ -1,9 +1,0 @@
-requests/compat /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/compat.pyi
-requests/_internal_utils /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/_internal_utils.pyi
-requests/cookies /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/cookies.pyi
-requests/structures /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/structures.pyi
-requests/__version__ /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/__version__.pyi
-requests/certs /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/certs.pyi
-requests/exceptions /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/exceptions.pyi
-requests/utils /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/utils.pyi
-tests/compat /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/tests/compat.pyi

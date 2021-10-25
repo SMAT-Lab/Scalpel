@@ -1,3 +1,0 @@
-# (generated with --quick)
-
-def pattern_match(pattern, string) -> bool: ...

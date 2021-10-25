@@ -1,6 +1,0 @@
----
-- name: Set OS specific facts
-  set_fact:
-    prerequisites:
-      - epel-release
-    configs_prefix: /etc/strongswan

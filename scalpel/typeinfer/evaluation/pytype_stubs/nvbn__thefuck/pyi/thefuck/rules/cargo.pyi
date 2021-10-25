@@ -1,6 +1,0 @@
-# (generated with --quick)
-
-from typing import Any
-
-def get_new_command(command) -> str: ...
-def match(command) -> Any: ...

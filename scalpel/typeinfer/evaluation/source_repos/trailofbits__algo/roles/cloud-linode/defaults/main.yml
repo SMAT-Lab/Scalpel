@@ -1,2 +1,0 @@
----
-linode_venv: "{{ playbook_dir }}/configs/.venvs/linode"

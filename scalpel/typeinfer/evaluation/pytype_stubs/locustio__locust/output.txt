@@ -1,4 +1,0 @@
-Computing dependencies
-Analyzing 91 sources with 3 local dependencies
-ninja: Entering directory `output/locustio__locust'
-Leaving directory 'output/locustio__locust'

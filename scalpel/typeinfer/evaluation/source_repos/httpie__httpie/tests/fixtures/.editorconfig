@@ -1,6 +1,0 @@
-# https://editorconfig.org
-
-[{*.txt, *.json}]
-trim_trailing_whitespace = false
-insert_final_newline = false
-

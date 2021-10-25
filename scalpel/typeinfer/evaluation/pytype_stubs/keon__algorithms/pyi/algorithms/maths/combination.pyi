@@ -1,6 +1,0 @@
-# (generated with --quick)
-
-from typing import Any
-
-def combination(n, r) -> Any: ...
-def combination_memo(n, r) -> Any: ...

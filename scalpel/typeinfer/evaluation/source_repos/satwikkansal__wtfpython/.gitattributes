@@ -1,3 +1,0 @@
-* linguist-vendored
-*.py linguist-vendored=false
-README.md linguist-language=Python

@@ -1,7 +1,0 @@
-# ninja log v5
-30	1469	1631695008687138100	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/tests/testserver/__init__.pyi	b74a43052c1a2aaf
-16	1472	1631695008684135200	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/__version__.pyi	842e7347267c43a5
-18	1546	1631695008763207300	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/hooks.pyi	4c99b106a367f9df
-15	3125	1631695010342642600	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/requests/certs.pyi	db54ccad162e5b8c
-21	4101	1631695011277997400	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/tests/utils.pyi	9f6ce0da2c98eacc
-28	4342	1631695011533229200	/mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/psf__requests/pyi/flask_theme_support.pyi	bbaa63c7033f4eec

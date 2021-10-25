@@ -1,6 +1,0 @@
-Computing dependencies
-Analyzing 1 sources with 0 local dependencies
-ninja: Entering directory `output/sebastianruder__NLP-progress'
-[1/1] check export
-Leaving directory 'output/sebastianruder__NLP-progress'
-Success: no errors found

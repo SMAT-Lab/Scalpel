@@ -1,4 +1,0 @@
-Computing dependencies
-Analyzing 138 sources with 1 local dependencies
-ninja: Entering directory `output/psf__black'
-Leaving directory 'output/psf__black'

@@ -1,3 +1,0 @@
-# (generated with --quick)
-
-def get_terminal_size() -> tuple: ...

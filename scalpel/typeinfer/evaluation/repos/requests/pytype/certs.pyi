@@ -1,3 +1,0 @@
-# (generated with --quick)
-
-def where() -> str: ...

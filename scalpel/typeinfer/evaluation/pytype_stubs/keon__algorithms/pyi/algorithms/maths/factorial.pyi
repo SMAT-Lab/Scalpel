@@ -1,6 +1,0 @@
-# (generated with --quick)
-
-from typing import Any
-
-def factorial(n, mod = ...) -> Any: ...
-def factorial_recur(n, mod = ...) -> Any: ...

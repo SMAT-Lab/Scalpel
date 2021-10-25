@@ -1,3 +1,0 @@
-# (generated with --quick)
-
-def anagram(s1, s2) -> bool: ...

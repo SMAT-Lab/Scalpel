@@ -1,6 +1,0 @@
-# (generated with --quick)
-
-from typing import Any, List
-
-def get_factors(n) -> Any: ...
-def recursive_get_factors(n) -> List[list]: ...

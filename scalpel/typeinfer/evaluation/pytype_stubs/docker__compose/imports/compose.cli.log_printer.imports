@@ -1,7 +1,0 @@
-compose/version /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/docker__compose/pyi/compose/version.pyi
-compose/const /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/docker__compose/pyi/compose/const.pyi
-compose/cli/colors /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/docker__compose/pyi/compose/cli/colors.pyi
-compose/cli/signals /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/docker__compose/pyi/compose/cli/signals.pyi
-compose/errors /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/docker__compose/pyi/compose/errors.pyi
-compose/timeparse /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/docker__compose/pyi/compose/timeparse.pyi
-compose/utils /mnt/c/Users/nitram/PycharmProjects/pytype_runner/output/docker__compose/pyi/compose/utils.pyi

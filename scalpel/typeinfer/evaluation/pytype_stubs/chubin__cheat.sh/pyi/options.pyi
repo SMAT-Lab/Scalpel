@@ -1,3 +1,0 @@
-# (generated with --quick)
-
-def parse_args(args) -> dict: ...
