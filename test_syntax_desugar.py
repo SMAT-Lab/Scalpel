@@ -48,7 +48,7 @@ def rewrite(node):
                 return [ast.FunctionDef(fun_name, node.value.args, body_stmts,
                     decorator_list)]
 
-        if len(node.targets) ==1 and isinstance(node.value, ast.ListComp):
+        if len(node.targets) ==1 and not isinstance(node.targets[0], ast.Tuple) and isinstance(node.value, ast.ListComp):
             iter = node.value.generators[0].iter
             ifs  = node.value.generators[0].ifs
             #print(ast.dump(node))
@@ -57,27 +57,34 @@ def rewrite(node):
             #target = ast.Name(id=node.targets[0].id, ctx=ast.Store())
             target = node.value.generators[0].target
             orelse = []
-            new_lst_name = "_hidden_" + node.targets[0].id
+            #src = astor.to_source(node)
+            #print(src)
+            # X, Y = [cbook.safe_masked_invalid(a) for a in args[:2]]
+            #new_lst_name = "_hidden_" + node.targets[0].id
 
-            def_target = ast.Name(id=new_lst_name, ctx=ast.Store()) 
-            new_lst_def = ast.Assign([def_target], ast.List([], ast.Load()))
+            #if instance(node.targets[0])
+            #def_target = ast.Name(id=new_lst_name, ctx=ast.Store()) 
+            new_lst_def = ast.Assign(node.targets, ast.List([], ast.Load()))
+            #new_lst_def = ast.Assign([def_target], ast.List([], ast.Load()))
 
-            recover_assignment = ast.Assign(node.targets, ast.Name(id=new_lst_name, ctx=ast.Load()))
+            #recover_assignment = ast.Assign(node.targets, ast.Name(id=new_lst_name, ctx=ast.Load()))
 
             if len(ifs) == 0:
-                append_attr = ast.Attribute(value=ast.Name(id=new_lst_name, ctx=ast.Load()),attr='append', ctx=ast.Load())
+                #append_attr = ast.Attribute(value=ast.Name(id=new_lst_name, ctx=ast.Load()),attr='append', ctx=ast.Load())
+                append_attr = ast.Attribute(value=node.targets[0],attr='append', ctx=ast.Load())
                 append_call = ast.Call(append_attr, [node.value.elt], [])
                 append_stmt = ast.Expr(append_call)
                 body_stmts = [append_stmt]
             else:
-                append_attr = ast.Attribute(value=ast.Name(id=new_lst_name, ctx=ast.Load()),attr='append', ctx=ast.Load())
+                append_attr = ast.Attribute(value= node.targets[0],attr='append', ctx=ast.Load())
                 append_call = ast.Call(append_attr, [node.value.elt], [])
                 append_stmt = ast.Expr(append_call)
                 if_body_stmts = [append_stmt]
                 if_stmt = ast.If(ifs[0], if_body_stmts, [])
                 body_stmts = [if_stmt]
                 pass
-            return [new_lst_def, ast.For(target, iter, body_stmts, orelse), recover_assignment]
+            #return [new_lst_def, ast.For(target, iter, body_stmts, orelse), recover_assignment]
+            return [new_lst_def, ast.For(target, iter, body_stmts, orelse)]
         if isinstance(node.value, ast.Call):
             new_stmts = []
             n_args = len(node.value.args)
@@ -93,7 +100,6 @@ def rewrite(node):
                     res_name = "_hidden_res_{}_{}".format(node.value.args[i].lineno, node.value.args[i].col_offset)
                     res_name_obj = ast.Name(id=res_name, ctx = ast.Store())
                     assign_tmp = ast.Assign([res_name_obj], node.value.args[i])
-
                     arg_node = node.value.args[i]
                     iter = arg_node.generators[0].iter
                     ifs  = arg_node.generators[0].ifs
@@ -101,12 +107,8 @@ def rewrite(node):
                     orelse = []
 
                     res_lst_name = "_hidden_res_{}_{}".format(node.value.args[i].lineno, node.value.args[i].col_offset)
-
                     def_target = ast.Name(id=res_lst_name, ctx=ast.Store()) 
-
                     new_lst_def = ast.Assign([def_target], ast.List([], ast.Load()))
-
-
                     if len(ifs) == 0:
                         append_attr = ast.Attribute(value=ast.Name(id=res_lst_name, ctx=ast.Load()),attr='append', ctx=ast.Load())
                         append_call = ast.Call(append_attr, [arg_node.elt], [])
