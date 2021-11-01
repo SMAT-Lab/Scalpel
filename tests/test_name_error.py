@@ -71,7 +71,7 @@ def code_syntax_check(src_path):
         src = open('./tmp/'+fn).read()
     return src
 
-def test_SSA(source):
+def SSA_undefined_names(source):
 
     mnode = MNode("local")
     mnode.source = source
@@ -180,7 +180,7 @@ def test_SSA_single():
     except Exception as e:
         os.system('2to3 '+ src_path + ' -n -W  --output-dir=tmp/ > /dev/null')
         src = open('./tmp/'+fn).read()
-    res = test_SSA(src)
+    res = SSA_undefined_names(src)
     #print('--------------------')
     print(res)
 
@@ -208,7 +208,7 @@ def test_SSA_batch():
             continue
         #name = None
         try:
-            undefined_idents = test_SSA(src)
+            undefined_idents = SSA_undefined_names(src)
             #if name not in undefined_idents:
      #           print(fn, name, "not-found")
             #continue

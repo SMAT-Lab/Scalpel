@@ -3,7 +3,7 @@ import sys
 import ast
 import astor
 from scalpel.core.mnode import MNode
-from scalpel.SSA.const import SSA
+from scalpel.SSA.ssa import SSA
 
 def test_SSA():
 
