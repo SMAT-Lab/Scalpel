@@ -1,7 +1,9 @@
 """
 In this code we include a lightweight adaption algorithm for dominating relationships computing. The code is adapted from  Networkx
 Please see the original one at https://networkx.org/documentation/stable/_modules/networkx/algorithms/dominance.html#dominance_frontiers
+TODO: implement a datastructure such as G from networkx for control flow graph. so that networkx is not required in this library.
 """
+
 import networkx as nx
 from functools import reduce
 
@@ -113,6 +115,7 @@ def dominance_frontiers(G, start):
            A simple, fast dominance algorithm.
            Software Practice & Experience, 4:110, 2001.
     """
+    
     idom = immediate_dominators(G, start)
 
     df = {u: set() for u in idom}
