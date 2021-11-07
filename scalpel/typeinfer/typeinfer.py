@@ -407,7 +407,8 @@ class TypeInference:
 
             # Extend class assign records with super class assign records
             for superclass_name in class_visitor.bases:
-                if assign_records := class_assign_record_map.get(superclass_name):
+                assign_records = class_assign_record_map.get(superclass_name)
+                if assign_records:
                     for assignment_name, type_val in assign_records.items():
                         super_assignment = assignment_name.replace('self', 'super')
                         class_assign_records[super_assignment] = type_val
@@ -529,11 +530,13 @@ class TypeInference:
             file_name = case.get('file')
             function = case.get('function')
             line_no = case.get('line_number')
-            if var_name := case.get('variable'):
+            var_name = case.get('variable')
+            param_name = case.get('parameter')
+            if var_name:
                 if variables:
                     # We have a variable
                     print(f"{file_name}:{line_no}: Variable {var_name} in function {function} has type {case_type}")
-            elif param_name := case.get('parameter'):
+            elif param_name:
                 if parameters:
                     # We have a parameter
                     print(f"{file_name}:{line_no}: Parameter {param_name} of function {function} has type {case_type}")

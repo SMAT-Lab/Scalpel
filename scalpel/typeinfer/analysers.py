@@ -47,7 +47,8 @@ class BinaryOperatorMap:
         self._type_hash[operation.right] = operation.right_ast_type
 
     def __getitem__(self, item):
-        if hashed := self.hash.get(item):
+        hashed = self.hash.get(item)
+        if hashed:
             return hashed
         return None
 
@@ -245,7 +246,8 @@ class VariableAssignmentMap(_StaticAnalyzer):
                     if isinstance(node.value.func, ast.Name):
                         called = node.value.func.id  # Name of callable
                         # Check to see if it is an imported callable
-                        if imported_type := self.imports.get(called):
+                        imported_type = self.imports.get(called)
+                        if imported_type:
                             variable_type = imported_type
 
                 elif isinstance(node.value, ast.Constant):
@@ -650,7 +652,8 @@ class ReturnStmtVisitor(ast.NodeVisitor):
                     if init_val.value.func.id == 'super':
                         # Check super class attributes
                         attribute_name = f"super.{init_val.attr}"
-                        if super_assign := self.class_assign_records.get(attribute_name):
+                        super_assign = self.class_assign_records.get(attribute_name)
+                        if super_assign:
                             type_val = get_type(super_assign[0])
 
             lookup_name = block.id if type_val == "ID" else get_attr_name(init_val)
@@ -858,7 +861,8 @@ class Heuristics:
                             # Named variable
                             if isinstance(left_operation.right, ast.Name):
                                 right_name = left_operation.right.id
-                                if right_variable := assignment_dict.get(right_name):
+                                right_variable = assignment_dict.get(right_name)
+                                if right_variable:
                                     bin_op_types[right_variable.type] = True
                             elif isinstance(left_operation.right, ast.Constant):
                                 bin_op_types[type(left_operation.right.value).__name__] = True
@@ -884,7 +888,8 @@ class Heuristics:
                     # Check left
                     if isinstance(left_operation, ast.Name):
                         left_name = left_operation.id
-                        if left_variable := assignment_dict.get(left_name):
+                        left_variable = assignment_dict.get(left_name)
+                        if left_variable:
                             variable.type = left_variable.type
                     elif isinstance(left_operation, ast.Constant):
                         variable.type = type(left_operation.value).__name__
@@ -892,7 +897,8 @@ class Heuristics:
                     # Check right
                     if isinstance(right_operation, ast.Name):
                         right_name = right_operation.id
-                        if right_variable := assignment_dict.get(right_name):
+                        right_variable = assignment_dict.get(right_name)
+                        if right_variable:
                             if right_variable.type == "any" \
                                     and (isinstance(operation, ast.Pow) or isinstance(operation, ast.Mod)):
                                 variable.type = "float"
@@ -910,7 +916,8 @@ class Heuristics:
             if isinstance(i, ast.Name):
                 # Named variable, see if it is a known type
                 assignment_dict = {v.name: v for v in assignments}
-                if assignment := assignment_dict.get(i.id):
+                assignment = assignment_dict.get(i.id)
+                if assignment:
                     if assignment.type != 'any':
                         return assignment.type
             elif isinstance(i, ast.Constant):
@@ -951,7 +958,8 @@ class Heuristics:
                         # Check to see what the value being compared to is
                         variable, type_compared = node.args[0], node.args[1]
                         if isinstance(variable, ast.Name) and isinstance(type_compared, ast.Name):
-                            if type_list := is_instance_type_map.get(variable.id):
+                            type_list = is_instance_type_map.get(variable.id)
+                            if type_list:
                                 if type_compared.id not in type_list:
                                     type_list.append(type_compared.id)
                             else:
