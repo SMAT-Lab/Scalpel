@@ -144,8 +144,8 @@ class BaseCaseTests(unittest.TestCase):
         inferrer = TypeInference(name='case17', entry_point='tests/test-cases/typeinfer_basecase/case17.py')
         inferrer.infer_types()
         inferred = inferrer.get_types()
-        print(inferred)
-        assert inferred == [{'file': 'case17.py', 'line_number': 1, 'function': 'fun1', 'type': {'any'}},
+       
+        assert inferred == [{'file': 'case17.py', 'line_number': 1, 'function': 'fun1', 'type': {'float'}},
                             {'file': 'case17.py', 'line_number': 5, 'function': 'fun2', 'type': {'float'}},
                             {'file': 'case17.py', 'line_number': 1, 'parameter': 'a', 'function': 'fun1', 'type': 'float'},
                             {'file': 'case17.py', 'line_number': 5, 'parameter': 'a', 'function': 'fun2', 'type': 'any'}]
