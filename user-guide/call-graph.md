@@ -1,7 +1,7 @@
 
 ## Call Graph
 ### Overview
-`scalpel.pycg` module is used to construct the call graph of a python package. The basic node can be either a function, a class or a module. The edges represents calling relationships between program nodes. Call Graph is an essential component in most static analysis and can be used to build more sophisicated applications.
+`scalpel.pycg` module is a wrapper of `PyCG`[3]. It aims to construct the call graphs for given Python projects. The basic node can be either a function, a class or a module. The edges represents calling relationships between program nodes. Call Graph is an essential component in most static analysis and can be used to build more sophisicated applications.
 
   
 ### How to use Call Graph
@@ -62,4 +62,5 @@ The tutorial code can be found here:\
 ### Reference
 1. [Call Graph Concepts](https://en.wikipedia.org/wiki/Call_graph)
 2. [PyCG: Practical Call Graph Generation in Python. In 43rd International Conference on Software Engineering, 2021](https://vitsalis.com/papers/pycg.pdf). 
+3. [The pycg library ](https://pypi.org/project/pycg/)
 

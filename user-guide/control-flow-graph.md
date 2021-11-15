@@ -1,6 +1,6 @@
 
 ## Control Flow Graph
-`scalpel.cfg` module is used to construct the CFG of a piece of python program. The basic unit of the CFG, `Block`, contains a list of statements executed in a program without any control jumps. The `Block`s are linked by `Links`, which represents a control flow jump between two blocks and contains the jump condition in the form of an expression. The two components maks up a CFG.
+`scalpel.cfg` module is used to construct the control flow graph for given python programs. The basic unit ins the CFG are  `Block` containing a list of sequential statements that can be executed in a program without any control jumps. The `Block`s are linked by `Links` object, which represents a control flow jump between two blocks and contains the jump condition in the form of an expression. The two components are the fundemental data structures in the control flow graph module (`scalpel.cfg`).
 
 
 
