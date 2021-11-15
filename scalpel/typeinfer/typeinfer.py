@@ -21,7 +21,7 @@ from scalpel.typeinfer.analysers import (
     Heuristics,
     VariableAssignmentMap
 )
-from scalpel.typeinfer.graph import Tree, ImportGraph
+from scalpel.import_graph.import_graph import Tree, ImportGraph
 from scalpel.typeinfer.utilities import (
     generate_ast,
     parse_module,
