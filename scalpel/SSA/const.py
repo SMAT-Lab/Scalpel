@@ -27,19 +27,14 @@ class SSA:
     """
     Build SSA graph from a given AST node based on the CFG.
     """
-    def __init__ (self, src):
+    def __init__ (self):
         """
         Args:
             src: the source code as input.
         """
         # the class SSA takes a module as the input 
-        self.src = src   # source code
-        self.module_ast = ast.parse(src)
         self.numbering = {}  # numbering variables
         self.var_values = {}  # numbering variables
-        self.m_node = MNode("tmp")
-        self.m_node.source = self.src
-        self.m_node.gen_ast() 
         self.global_live_idents = []
         self.ssa_blocks = []
         self.error_paths = {}
@@ -86,7 +81,22 @@ class SSA:
         res = get_vars(ast_node)
         idents = [r['name'] for r in res if  r['name'] is not None and "." not in r['name']]
         return idents
+    
+
     def compute_SSA(self, cfg):
+        """
+        Compute single static assignment form representations for a given CFG. 
+        During the computing, constant value and alias pairs are generated.
+        # step 1a: compute the dominance frontier
+        # step 1b: use dominance frontier to place phi node
+        # if node X contains assignment to a, put phi node for a in dominance frontier of X
+        # adding phi function may require introducing additional phi function 
+        # start from the entry node 
+        # step2: rename variables so only one definition per name
+
+        Args:
+            cfg: a control flow graph.
+        """
         # to count how many times a var is defined
         ident_name_counter = {}
         # constant assignment dict
@@ -102,6 +112,7 @@ class SSA:
 
         block_renamed_stored = {block.id:[] for block in all_blocks}
         block_renamed_loaded = {block.id:[] for block in all_blocks}
+        
         DF = self.compute_DF(all_blocks)
 
         for block in all_blocks:
@@ -113,15 +124,18 @@ class SSA:
                 block_loaded_idents[block.id] += [loaded_idents]
                 block_stored_idents[block.id] += [stored_idents]
                 block_renamed_loaded[block.id] += [{ident:[] for ident in loaded_idents}]
-
             block_const_dict[block.id]  = tmp_const_dict
         
         for block in all_blocks:
             stored_idents = block_stored_idents[block.id]
+            loaded_idents = block_loaded_idents[block.id]
+            n_stmts = len(stored_idents)
+            assert (n_stmts == len(loaded_idents))
             affected_idents = []
             tmp_const_dict = block_const_dict[block.id]
-            
-            for stmt_stored_idents in stored_idents:
+            for i in range(n_stmts):
+                stmt_stored_idents = stored_idents[i]
+                stmt_loaded_idents = loaded_idents[i]
                 stmt_renamed_stored =  {}
                 for ident in stmt_stored_idents:
                     affected_idents.append(ident)
@@ -134,15 +148,30 @@ class SSA:
                         ident_const_dict[(ident, ident_name_counter[ident])] = tmp_const_dict[ident]
                     stmt_renamed_stored[ident] = ident_name_counter[ident]
                 block_renamed_stored[block.id] += [stmt_renamed_stored]
-            df_block_ids = DF[block.id]
+                
 
+                #same block, number used identifiers
+                for ident in stmt_loaded_idents:
+                    # a list of dictions for each of idents used in this statement
+                    phi_loaded_idents = block_renamed_loaded[block.id][i]
+                    if ident in ident_name_counter:
+                        phi_loaded_idents[ident].append(ident_name_counter[ident])
+                    #if ident in affected_idents:
+                    #    phi_loaded_idents = block_renamed_loaded[block.id][i]
+                    #    if ident in phi_loaded_idents:  
+                    #        phi_loaded_idents[ident].append(ident_name_counter[ident])
+                    #else if ident in ident_name_counter:
+
+                        
+                        
+    
+            df_block_ids = DF[block.id]
             for df_block_id in df_block_ids:
                 df_block = id2blocks[df_block_id] 
                 for af_ident in affected_idents:
                     for phi_loaded_idents in block_renamed_loaded[df_block_id]:
                         # place phi function here
                         # this var used
-                        
                         if af_ident in phi_loaded_idents:  
                             phi_loaded_idents[af_ident].append(ident_name_counter[af_ident])
                                        
@@ -150,20 +179,15 @@ class SSA:
         #print(block_renamed_stored[block.id])
         # now go to all ist DF nodes to rename loaded sets
  #      print(block_stored_idents[block.id])
-        # step 1b: use dominance frontier to place phi node
-        #  if node X contains assignment to a, put phi node for a in dominance frontier of X
-        #  adding phi function may require introducing additional phi function 
-        # start from the entry node 
-        # step2: rename variables so only one definition per name
-
-        # TODO: rename thouse in the dominating nodes 
+        
+        # TODO: rename those in the dominating nodes 
         # to refer to POST dominating relationships 
-        for b_id, phi_vals in block_renamed_loaded.items():
-            print(phi_vals)
+        #for b_id, phi_vals in block_renamed_loaded.items():
+        #    print(b_id, phi_vals)
         #print('--------------------------')
         #for k, v in ident_const_dict.items():
         #    print(k, v.__dict__)
-        return 0
+        return block_renamed_loaded, ident_const_dict
 
     def get_stmt_idents_ctx(self, stmt, del_set=[], const_dict = {}):
         # if this is a definition of class/function, ignore
@@ -175,12 +199,18 @@ class SSA:
             if hasattr(stmt.targets[0], "id"):
                 left_name = stmt.targets[0].id
                 const_dict[left_name] = stmt.value
-                
+            elif isinstance(stmt.targets[0], ast.Attribute):
+                #TODO: resolve attributes
+                pass
         # one target assignment with type annotations
         if isinstance(stmt, ast.AnnAssign):
             if hasattr(stmt.target, "id"):
                 left_name = stmt.targets[0].id
                 const_dict[left_name] = stmt.value
+            elif isinstance(stmt.target, ast.Attribute):
+                #TODO: resolve attributes
+                pass
+            
 
         if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef)):
             stored_idents.append(stmt.name)
