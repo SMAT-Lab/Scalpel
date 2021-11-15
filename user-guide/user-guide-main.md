@@ -8,8 +8,10 @@
   * [Rewriter](rewriter.md)
   * [Static Single Assignment](static-single-assignment.md)
 - [Middle Level Modules](middle-level-modules.md)
-  * [Import Graph](middle-level-modules.md#import-graph)
-  * [Import Graph](middle-level-modules.md#import-graph)
+  * [Import Graph](import-graph.md)
+  * [Type Inference](type-inference.md)
+  * [Syntax Simplification](syntax-simplification.md)
+  * [Constant Propagation](constant-propagation.md)
 - [Application Level Modules](#application-level-modules)
 
 
