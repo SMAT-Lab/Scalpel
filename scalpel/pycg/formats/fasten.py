@@ -24,7 +24,7 @@ from pkg_resources import Requirement
 
 from .base import BaseFormatter
 
-from pycg import utils
+from scalpel.pycg import utils
 
 class Fasten(BaseFormatter):
     def __init__(self, cg_generator, package, product, forge, version, timestamp):
