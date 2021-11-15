@@ -20,9 +20,9 @@
 #
 import ast
 
-from pycg.processing.base import ProcessingBase
-from pycg.machinery.definitions import Definition
-from pycg import utils
+from scalpel.pycg.processing.base import ProcessingBase
+from scalpel.pycg.machinery.definitions import Definition
+from scalpel.pycg import utils
 
 class PostProcessor(ProcessingBase):
     def __init__(self, input_file, modname,
