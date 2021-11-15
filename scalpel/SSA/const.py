@@ -27,19 +27,14 @@ class SSA:
     """
     Build SSA graph from a given AST node based on the CFG.
     """
-    def __init__ (self, src):
+    def __init__ (self):
         """
         Args:
             src: the source code as input.
         """
         # the class SSA takes a module as the input 
-        self.src = src   # source code
-        self.module_ast = ast.parse(src)
         self.numbering = {}  # numbering variables
         self.var_values = {}  # numbering variables
-        self.m_node = MNode("tmp")
-        self.m_node.source = self.src
-        self.m_node.gen_ast() 
         self.global_live_idents = []
         self.ssa_blocks = []
         self.error_paths = {}
