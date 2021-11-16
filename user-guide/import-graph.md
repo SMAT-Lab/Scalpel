@@ -2,7 +2,7 @@
 ## Import Graph
 `scalpel.import_graph` is a module for contructing an import graph of a python project. An import graph represents the dependency relationship of the modules in the project. Each node is a module and each edge represents a one-way import relationship.
 
-### How to use Control Flow Graph
+### How to use Import Graph
 Given three example python modules in */example root folder*, namely */example/module_a.py*, */example/module_b.py*, */example/module_c.py*.
 */example/module_a.py*
 ```python
