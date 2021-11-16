@@ -6,7 +6,7 @@ import glob
 
 def test_all():
 
-    os_projects_path = "./test-cases/cfg-tests/"
+    os_projects_path = "tests/test-cases/cfg-tests/"
     except_no = 0
     file_no = 0
     error_log = "error_log_cfg_robust.txt"

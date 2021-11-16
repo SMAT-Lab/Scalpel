@@ -19,7 +19,7 @@
 # under the License.
 #
 import symtable
-from pycg import utils
+from scalpel.pycg import utils
 
 class ScopeManager(object):
     """Manages the scope entries"""

@@ -18,8 +18,8 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-from pycg.machinery.pointers import NamePointer, LiteralPointer
-from pycg import utils
+from scalpel.pycg.machinery.pointers import NamePointer, LiteralPointer
+from scalpel.pycg import utils
 
 class DefinitionManager(object):
     def __init__(self):

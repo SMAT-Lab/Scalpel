@@ -21,7 +21,7 @@ from scalpel.typeinfer.analysers import (
     Heuristics,
     VariableAssignmentMap
 )
-from scalpel.typeinfer.graph import Tree, ImportGraph
+from scalpel.import_graph.import_graph import Tree, ImportGraph
 from scalpel.typeinfer.utilities import (
     generate_ast,
     parse_module,
@@ -228,6 +228,7 @@ class TypeInference:
         for node in self.leaves:
             # Function returns
             for function_name, type_values in node.node_type_dict.items():
+              
                 added = False  # Used to check whether type has already been added to list for the loop
 
                 if type_values is None or len(type_values) == 0:
@@ -261,6 +262,7 @@ class TypeInference:
                     })
 
             # Static assignments
+    
             for assignment in node.static_assignments:
                 if assignment.is_arg:
                     type_list.append({
@@ -278,6 +280,7 @@ class TypeInference:
                         'function': assignment.function,
                         'type': assignment.type
                     })
+     
         return type_list
 
     @staticmethod
@@ -385,9 +388,11 @@ class TypeInference:
                 continue
 
             # Function has at least one return if we reach here
+          
             processed_file.type_dict[function_name] = return_visitor.r_types
             stem_from_dict[function_name] = return_visitor.stem_from
             processed_file.type_gt[function_name] = function_node.returns
+            
 
         # Loop through class nodes
         class_assign_record_map = {}
@@ -407,7 +412,8 @@ class TypeInference:
 
             # Extend class assign records with super class assign records
             for superclass_name in class_visitor.bases:
-                if assign_records := class_assign_record_map.get(superclass_name):
+                assign_records = class_assign_record_map.get(superclass_name)
+                if assign_records:
                     for assignment_name, type_val in assign_records.items():
                         super_assignment = assignment_name.replace('self', 'super')
                         class_assign_records[super_assignment] = type_val
@@ -493,6 +499,7 @@ class TypeInference:
                 processed_file.type_gt[function_name] = function_node.returns
 
         # Loop through return statements that called another function -> see Heuristic 1
+     
         for function_name, stems in stem_from_dict.items():
             stems = list(dict.fromkeys(stems))
             for from_name in stems:
@@ -518,7 +525,7 @@ class TypeInference:
                     import_path = is_imported_fun(from_name, import_dict)
                     if import_path is not None:
                         processed_file.type_stem_links[function_name] = (import_path, from_name)
-
+   
         return processed_file
 
     def print_types(self, functions=True, parameters=True, variables=True):
@@ -529,11 +536,13 @@ class TypeInference:
             file_name = case.get('file')
             function = case.get('function')
             line_no = case.get('line_number')
-            if var_name := case.get('variable'):
+            var_name = case.get('variable')
+            param_name = case.get('parameter')
+            if var_name:
                 if variables:
                     # We have a variable
                     print(f"{file_name}:{line_no}: Variable {var_name} in function {function} has type {case_type}")
-            elif param_name := case.get('parameter'):
+            elif param_name:
                 if parameters:
                     # We have a parameter
                     print(f"{file_name}:{line_no}: Parameter {param_name} of function {function} has type {case_type}")
@@ -550,8 +559,3 @@ class TypeInference:
                     print(f"{file_name}:{line_no}: Function {function} has return type {case_type}")
 
 
-if __name__ == '__main__':
-    inferrer = TypeInference(name='', entry_point='basecase/case32.py')
-    inferrer.infer_types()
-    for t in inferrer.get_types():
-        print(t)

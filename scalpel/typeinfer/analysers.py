@@ -47,7 +47,8 @@ class BinaryOperatorMap:
         self._type_hash[operation.right] = operation.right_ast_type
 
     def __getitem__(self, item):
-        if hashed := self.hash.get(item):
+        hashed = self.hash.get(item)
+        if hashed:
             return hashed
         return None
 
@@ -245,7 +246,8 @@ class VariableAssignmentMap(_StaticAnalyzer):
                     if isinstance(node.value.func, ast.Name):
                         called = node.value.func.id  # Name of callable
                         # Check to see if it is an imported callable
-                        if imported_type := self.imports.get(called):
+                        imported_type = self.imports.get(called)
+                        if imported_type:
                             variable_type = imported_type
 
                 elif isinstance(node.value, ast.Constant):
@@ -593,52 +595,46 @@ class ReturnStmtVisitor(ast.NodeVisitor):
         self.r_types += ['generator']
         return node
 
-    @staticmethod
-    def get_return_value(block):
-        for stmt in block.statements:
-            if isinstance(stmt, ast.Return):
-                return stmt.value
-        return None
-
-    # input: the object to be back traced
-    def backward(self, cfg, block, return_value):
+    def infer_actual_return_value(self, actual_return_value):
+        # actual value means the value that has been traced back
         is_visited = set()
 
-        if return_value is None:
+        if actual_return_value is None:
             self.r_types += ["empty"]
             return
-        elif isinstance(return_value, ast.Name):
-            if return_value.id == "self":
+        elif isinstance(actual_return_value, ast.Name):
+            if actual_return_value.id == "self":
                 self.r_types += ["self"]
                 return
-            elif return_value.id in self.inner_fun_names:
+            elif actual_return_value.id in self.inner_fun_names:
                 # TODO: What about outer fun names or class methods
                 self.r_types += ["callable"]
                 return
 
-        init_val = cfg.backward(block, return_value, is_visited, None)
+        init_val = actual_return_value # 
         type_val = get_type(init_val, imports=self.imports)
 
-        if init_val is None and isinstance(return_value, ast.Name):
+        if init_val is None and isinstance(actual_return_value, ast.Name):
             if return_value.id in self.args:
                 self.r_types += ['input']
             if return_value.id in self.args:
                 self.r_types += ['input']
                 return
 
-        if isinstance(return_value, ast.Name):
+        if isinstance(actual_return_value, ast.Name):
             # Check to see if we have the return in our list of assignments
             for assignment in self.assignments:
-                if assignment.name == return_value.id:
+                if assignment.name == actual_return_value.id:
                     self.r_types += [assignment.type]
             return
-
-        if isinstance(return_value, ast.BinOp):
+        
+        if isinstance(actual_return_value, ast.BinOp):
             heuristics = Heuristics()
             return_type = heuristics.heuristic_five_return(
                 assignments=self.assignments,
-                return_node=return_value
+                return_node=actual_return_value
             )
+            
             self.r_types += [return_type]
             return
 
@@ -650,7 +646,8 @@ class ReturnStmtVisitor(ast.NodeVisitor):
                     if init_val.value.func.id == 'super':
                         # Check super class attributes
                         attribute_name = f"super.{init_val.attr}"
-                        if super_assign := self.class_assign_records.get(attribute_name):
+                        super_assign = self.class_assign_records.get(attribute_name)
+                        if super_assign:
                             type_val = get_type(super_assign[0])
 
             lookup_name = block.id if type_val == "ID" else get_attr_name(init_val)
@@ -672,7 +669,7 @@ class ReturnStmtVisitor(ast.NodeVisitor):
             else:
                 pass
         elif type_val == "call":
-            func_name = get_func_calls(init_val)
+            func_name = get_func_calls(actual_return_value)
             func_name = func_name[0]
             first_part = func_name.split('.')[0]
             if func_name == "self.__class__":
@@ -696,7 +693,7 @@ class ReturnStmtVisitor(ast.NodeVisitor):
         else:
             # Known type
             self.r_types += [type_val]
-
+    
     def type_infer_CFG(self, node):
         new_body = []
         for stmt in node.body:
@@ -712,17 +709,47 @@ class ReturnStmtVisitor(ast.NodeVisitor):
                         self.n_returns += 1
                         self.r_types += ["generator"]
                 new_body.append(stmt)
-
+        
         tmp_fun_node = ast.Module(body=new_body)
         cfg = CFGBuilder().build(node.name, tmp_fun_node)
+        
+        from scalpel.SSA.const import SSA
+        ssa_analyzer = SSA("")
+        ssa_results, ident_const_dict = ssa_analyzer.compute_SSA(cfg)
+
+        def get_return_value(block):
+            for idx, stmt in enumerate(block.statements):
+                if isinstance(stmt, (ast.Return, ast.Yield)):
+                    # when possible assignment can be found.
+         
+                    if isinstance(stmt.value, ast.Name):
+                        stmt_loaded_rec = ssa_results[block.id][idx]
+                        # use the first value 
+                        # TODO: consider multiple return values 
+                        ident_all_numbers = set(stmt_loaded_rec[stmt.value.id])
+                        if len(ident_all_numbers)>0:
+                            const_values = []
+                            for ident_no in ident_all_numbers:
+                                const_values.append(ident_const_dict[stmt.value.id, ident_no])
+                            return const_values
+                    # this includes the case when the return identifier cannot be traced to a definition
+                    return [stmt.value]
+            return None
+
 
         for block in cfg.finalblocks:
-            return_value = self.get_return_value(block)
-            if isinstance(return_value, ast.IfExp):
-                self.backward(cfg, block, return_value.body)
-                self.backward(cfg, block, return_value.orelse)
-            else:
-                self.backward(cfg, block, return_value)
+            return_values = get_return_value(block)
+            for return_value in return_values:
+                self.infer_actual_return_value(return_value)
+        
+           
+            
+            #if isinstance(return_value, ast.IfExp):
+                
+            #    self.backward(cfg, block, return_value.body)
+            #    self.backward(cfg, block, return_value.orelse)
+            #else:
+            #    self.backward(cfg, block, return_value)
 
     def query_assign_records(self, var_id):
         if var_id in self.local_assign_records:
@@ -858,7 +885,8 @@ class Heuristics:
                             # Named variable
                             if isinstance(left_operation.right, ast.Name):
                                 right_name = left_operation.right.id
-                                if right_variable := assignment_dict.get(right_name):
+                                right_variable = assignment_dict.get(right_name)
+                                if right_variable:
                                     bin_op_types[right_variable.type] = True
                             elif isinstance(left_operation.right, ast.Constant):
                                 bin_op_types[type(left_operation.right.value).__name__] = True
@@ -884,7 +912,8 @@ class Heuristics:
                     # Check left
                     if isinstance(left_operation, ast.Name):
                         left_name = left_operation.id
-                        if left_variable := assignment_dict.get(left_name):
+                        left_variable = assignment_dict.get(left_name)
+                        if left_variable:
                             variable.type = left_variable.type
                     elif isinstance(left_operation, ast.Constant):
                         variable.type = type(left_operation.value).__name__
@@ -892,7 +921,8 @@ class Heuristics:
                     # Check right
                     if isinstance(right_operation, ast.Name):
                         right_name = right_operation.id
-                        if right_variable := assignment_dict.get(right_name):
+                        right_variable = assignment_dict.get(right_name)
+                        if right_variable:
                             if right_variable.type == "any" \
                                     and (isinstance(operation, ast.Pow) or isinstance(operation, ast.Mod)):
                                 variable.type = "float"
@@ -910,7 +940,8 @@ class Heuristics:
             if isinstance(i, ast.Name):
                 # Named variable, see if it is a known type
                 assignment_dict = {v.name: v for v in assignments}
-                if assignment := assignment_dict.get(i.id):
+                assignment = assignment_dict.get(i.id)
+                if assignment:
                     if assignment.type != 'any':
                         return assignment.type
             elif isinstance(i, ast.Constant):
@@ -951,7 +982,8 @@ class Heuristics:
                         # Check to see what the value being compared to is
                         variable, type_compared = node.args[0], node.args[1]
                         if isinstance(variable, ast.Name) and isinstance(type_compared, ast.Name):
-                            if type_list := is_instance_type_map.get(variable.id):
+                            type_list = is_instance_type_map.get(variable.id)
+                            if type_list:
                                 if type_compared.id not in type_list:
                                     type_list.append(type_compared.id)
                             else:

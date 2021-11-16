@@ -99,9 +99,6 @@ class MNode:
             scope: a dotted string to provide name space. For instance, A.fun
             means to retreive the function named fun in the class A
         """
-        if scope == "":
-            results = get_vars(self.ast)
-            return results
         wanted_ast = self._retrieve_by_scope(self.ast, scope)
         results =  get_func_calls(wanted_ast)
         return results
@@ -162,6 +159,8 @@ class MNode:
             means to retreive the function named fun in the class A
 
         """
+        if scope == "":
+            return target_search_node
         if hasattr(target_search_node, "name") and target_search_node.name == scope:
             return target_search_node
         for node in target_search_node.body:

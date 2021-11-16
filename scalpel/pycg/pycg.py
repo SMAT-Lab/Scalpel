@@ -21,17 +21,17 @@
 import os
 import ast
 
-from pycg.processing.preprocessor import PreProcessor
-from pycg.processing.postprocessor import PostProcessor
-from pycg.processing.cgprocessor import CallGraphProcessor
+from scalpel.pycg.processing.preprocessor import PreProcessor
+from scalpel.pycg.processing.postprocessor import PostProcessor
+from scalpel.pycg.processing.cgprocessor import CallGraphProcessor
 
-from pycg.machinery.scopes import ScopeManager
-from pycg.machinery.definitions import DefinitionManager
-from pycg.machinery.imports import ImportManager
-from pycg.machinery.classes import ClassManager
-from pycg.machinery.callgraph import CallGraph
-from pycg.machinery.modules import ModuleManager
-from pycg import utils
+from scalpel.pycg.machinery.scopes import ScopeManager
+from scalpel.pycg.machinery.definitions import DefinitionManager
+from scalpel.pycg.machinery.imports import ImportManager
+from scalpel.pycg.machinery.classes import ClassManager
+from scalpel.pycg.machinery.callgraph import CallGraph
+from scalpel.pycg.machinery.modules import ModuleManager
+from scalpel.pycg import utils
 
 class CallGraphGenerator(object):
     def __init__(self, entry_points, package):

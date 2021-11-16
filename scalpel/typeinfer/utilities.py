@@ -183,7 +183,8 @@ def get_type(node, imports=None) -> str:
         func_name = func_name[0]
         # Check to see if it is an imported callable
         if imports is not None:
-            if imported_type := imports.get(func_name):
+            imported_type = imports.get(func_name)
+            if imported_type:
                 return imported_type
         if isinstance(node.func, ast.Name):
             if node.func.id == "dict":
