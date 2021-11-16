@@ -1,1 +1,1 @@
-from .call_graph import call_graph_single
+from pycg.pycg import CallGraphGenerator
