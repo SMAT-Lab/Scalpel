@@ -3,9 +3,19 @@
 `scalpel.import_graph` is a module for contructing an import graph of a python project. An import graph represents the dependency relationship of the modules in the project. Each node is a module and each edge represents a one-way import relationship.
 
 ### How to use Import Graph
-Given three example python modules in */example root folder*, namely */example/module_a.py*, */example/module_b.py*, */example/module_c.py*.
-*/example/module_a.py*
+
+Given three example python modules in the following example folder where three Python module files are defined. 
+
+```
+|-- example
+       |-- module_a.py
+       |-- module_b.py
+       |-- module_c.py
+
+```
+
 ```python
+#/example/module_b.py
 from .module_b import B
 from .module_c import C
 
@@ -13,15 +23,16 @@ class A:
     def foo(self):
         return
 ```
-*/example/module_b.py*
+
 ```python
+#/example/module_c.py
 from .module_c import C
 
 class B:
     def foo(self):
         return
 ```
-*/example/module_c.py*
+
 ```python
 import os
 
