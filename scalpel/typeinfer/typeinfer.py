@@ -112,6 +112,7 @@ class TypeInference:
         working_queue = [self.root_node]
         while len(working_queue) > 0:
             current_node = working_queue.pop(0)
+            # skip the git folder
             if str(current_node) == ".git":
                 continue
             if current_node.name.endswith('.py'):
@@ -196,6 +197,9 @@ class TypeInference:
                 # The same module
                 if node.node_type_dict[function_name] is None:
                     continue
+                # self: in the same class
+                # base: from the base class
+                # local: from the same module file
 
                 if from_where in ['self', 'base', 'local']:
                     from_name = rename_from_name(from_where, from_name, function_name)
@@ -233,7 +237,7 @@ class TypeInference:
 
                 if type_values is None or len(type_values) == 0:
                     continue
-
+                #TODO: why self is recognized as any type
                 for value in type_values:
                     if value in ['unknown', '3call', 'self']:
                         type_list.append({

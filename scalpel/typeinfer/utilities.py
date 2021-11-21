@@ -351,6 +351,7 @@ def is_valid_call_link(t_vals):
 def generate_ast(source: str):
     try:
         tree = ast.parse(source, mode='exec', type_comments=True)
+        #tree = ast.parse(source, mode='exec')
         return tree
     except Exception as e:
         print(e)
