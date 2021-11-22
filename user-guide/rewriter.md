@@ -47,7 +47,7 @@ print(new_src)
 ```
 
 The tutorial code can be found here:\
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Rewriter Example]([example.com](https://github.com/SMAT-Lab/Scalpel/blob/dev/examples/rewriter_example.py))
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Rewriter Example](https://github.com/SMAT-Lab/Scalpel/blob/dev/examples/rewriter_example.py))
 
 ### APIs
 [Place Holder](placeholder.com)\
