@@ -62,6 +62,9 @@ class BinaryOperatorMap:
 
 
 class _StaticAnalyzer(ast.NodeVisitor):
+    """
+    The base class of analyzer, provides functions that read and parse a python program file
+    """
     def __init__(self):
         self.file_name = None
 
@@ -611,7 +614,7 @@ class ReturnStmtVisitor(ast.NodeVisitor):
                 self.r_types += ["callable"]
                 return
 
-        init_val = actual_return_value # 
+        init_val = actual_return_value #
         type_val = get_type(init_val, imports=self.imports)
 
         if init_val is None and isinstance(actual_return_value, ast.Name):
@@ -627,14 +630,14 @@ class ReturnStmtVisitor(ast.NodeVisitor):
                 if assignment.name == actual_return_value.id:
                     self.r_types += [assignment.type]
             return
-        
+
         if isinstance(actual_return_value, ast.BinOp):
             heuristics = Heuristics()
             return_type = heuristics.heuristic_five_return(
                 assignments=self.assignments,
                 return_node=actual_return_value
             )
-            
+
             self.r_types += [return_type]
             return
 
@@ -693,7 +696,7 @@ class ReturnStmtVisitor(ast.NodeVisitor):
         else:
             # Known type
             self.r_types += [type_val]
-    
+
     def type_infer_CFG(self, node):
         new_body = []
         for stmt in node.body:
@@ -709,23 +712,23 @@ class ReturnStmtVisitor(ast.NodeVisitor):
                         self.n_returns += 1
                         self.r_types += ["generator"]
                 new_body.append(stmt)
-        
+
         tmp_fun_node = ast.Module(body=new_body)
         cfg = CFGBuilder().build(node.name, tmp_fun_node)
-        
+
         from scalpel.SSA.const import SSA
-        ssa_analyzer = SSA("")
+        ssa_analyzer = SSA()
         ssa_results, ident_const_dict = ssa_analyzer.compute_SSA(cfg)
 
         def get_return_value(block):
             for idx, stmt in enumerate(block.statements):
                 if isinstance(stmt, (ast.Return, ast.Yield)):
                     # when possible assignment can be found.
-         
+
                     if isinstance(stmt.value, ast.Name):
                         stmt_loaded_rec = ssa_results[block.id][idx]
-                        # use the first value 
-                        # TODO: consider multiple return values 
+                        # use the first value
+                        # TODO: consider multiple return values
                         ident_all_numbers = set(stmt_loaded_rec[stmt.value.id])
                         if len(ident_all_numbers)>0:
                             const_values = []
@@ -739,13 +742,17 @@ class ReturnStmtVisitor(ast.NodeVisitor):
 
         for block in cfg.finalblocks:
             return_values = get_return_value(block)
-            for return_value in return_values:
-                self.infer_actual_return_value(return_value)
-        
-           
-            
+            if return_values:
+                for return_value in return_values:
+                    self.infer_actual_return_value(return_value)
+                    #print(block.statements[0].lineno)
+                    #print(self.r_types)
+
+
+
+
             #if isinstance(return_value, ast.IfExp):
-                
+
             #    self.backward(cfg, block, return_value.body)
             #    self.backward(cfg, block, return_value.orelse)
             #else:
