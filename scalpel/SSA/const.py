@@ -205,7 +205,7 @@ class SSA:
         # one target assignment with type annotations
         if isinstance(stmt, ast.AnnAssign):
             if hasattr(stmt.target, "id"):
-                left_name = stmt.targets[0].id
+                left_name = stmt.target.id
                 const_dict[left_name] = stmt.value
             elif isinstance(stmt.target, ast.Attribute):
                 #TODO: resolve attributes
