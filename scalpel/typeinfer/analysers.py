@@ -22,6 +22,7 @@ from scalpel.typeinfer.utilities import (
     check_consistent_list_types
 )
 
+from scalpel.SSA.const import SSA
 
 class BinaryOperatorMap:
 
@@ -716,7 +717,6 @@ class ReturnStmtVisitor(ast.NodeVisitor):
         tmp_fun_node = ast.Module(body=new_body)
         cfg = CFGBuilder().build(node.name, tmp_fun_node)
 
-        from scalpel.SSA.const import SSA
         ssa_analyzer = SSA()
         ssa_results, ident_const_dict = ssa_analyzer.compute_SSA(cfg)
 

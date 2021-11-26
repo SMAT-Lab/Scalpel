@@ -1,14 +1,17 @@
 import os
 import sys
 import ast
+import astor  
 
-""" In python there are in total 23 statements to be considered 
+from scalpel.core.module_graph import MNode, ModuleGraph, UnitWalker
+
+""" In python there are in total 23 statements to be considered
 # the user must specify the match pattern as well as insert pattern
 # for instance.
 # it can be  Call - >  another_callname for instance
 # the given new stmt must be clearly linked to the original stmt if it needs
 # such information
-# for example, if the we have an assignment named a = 10 
+# for example, if the we have an assignment named a = 10
 # then we need to consturct an output stmt as print(a)
 # then the new pattern for the output should be Callstmt:args = [stmt.left[0]]
 # now the first step is to insert an stmt
@@ -16,7 +19,27 @@ import ast
 # make it easy, format string! such as the new stmt =
 # "print("","").format(stmt.targets[0])
 """
-class Rewriter(ast.NodeTransformer):
+
+class Rewriter:
+
+    def rewrite(self, src, rule_func= None):
+        if rule_func is None:
+            raise Exception("rule_func cannot be None type!")
+            
+        module_node = ast.parse(src)
+        Walker = UnitWalker(module_node)
+        for unit in Walker:
+            new_stmts = rule_func(unit.node)
+            if not isinstance(new_stmts, list):
+                raise Exception("The return type for rule_func function must be list type!")
+            unit.insert_stmts_before(new_stmts)
+
+        new_ast = ast.fix_missing_locations(module_node)
+        new_src = astor.to_source(new_ast)
+        return new_src 
+
+# here is the implementation of code rewriter at AST node level.
+class ASTRewriter(ast.NodeTransformer):
     #def __init__(self,src, pattern, new_stmt):
     def __init__(self, src):
         # pattern
@@ -34,7 +57,6 @@ class Rewriter(ast.NodeTransformer):
 
     def rewrite(self):
         self.generic_visit(self.ast)
-       
         return ast.fix_missing_locations(self.ast)
 
     # once or all 
