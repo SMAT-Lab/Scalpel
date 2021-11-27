@@ -1,14 +1,15 @@
 """
-Tree and import graph for type inference
+Import Graph module 
 """
 
 import os
 import ast
-
 from scalpel.core.source_visitor import SourceVisitor
 
 
 class Tree:
+    # a datastructure that contain information for a tree node 
+    # to be named 
     def __init__(self, name):
         self.name = name
         self.full_name = ""
@@ -28,41 +29,65 @@ class Tree:
     def __str__(self):
         return str(self.name)
 
-
 class ImportGraph:
 
-    def __init__(self, entry_point, root):
+    def __init__(self, entry_point):
+        # entry_point is the top level module folder 
         self.entry_point = entry_point
-        self.root = root
-
-    def build_dir_tree(self, node):
+        # note that the entry_point must not ends with slash. The recommended one is "a/b/c.py"
+        self.root = Tree(os.path.basename(self.entry_point))
+       
+    def _build_dir_tree(self, node):
         if os.path.isdir(node.name) is True:
             os.chdir(node.name)
             items = os.listdir('.')
             for item in items:
                 child_node = Tree(item)
                 child_node.parent = node
-                self.build_dir_tree(child_node)
+                self._build_dir_tree(child_node)
                 node.children.append(child_node)
             os.chdir('..')
         else:
             if node.name.endswith('.py'):
-                with open(node.name, 'rb') as source_file:
-                    source = source_file.read()
-                    node.source = source.decode("utf-8", errors="ignore")
+                with open(node.name, 'r') as f:
+                    print(node.name)
+                    source = f.read()
+                    node.source = source
                     res, tree, pair = self.extract_class_from_source(node.source)
                     node.cargo = res
                     node.ast = tree
                     node.class_pair = pair
                     node.prefix = self.leaf2root(node)
                     node.full_name = node.prefix + '.' + node.name
+              
 
+    def build_dir_tree(self):
+        # to build enhanced directory tree
+        cwd = os.getcwd()
+        working_dir = os.path.dirname(self.entry_point)
+        os.chdir(working_dir)
+        self._build_dir_tree(self.root)
+        os.chdir(cwd)
+    
+    def get_leaf_nodes(self):
+        leaf_nodes = []
+        working_queue = [self.root]
+        while len(working_queue) > 0:
+            cur_node = working_queue.pop(0)
+            # skip the git folder
+            if str(cur_node) == ".git":
+                continue
+            if cur_node.name.endswith('.py'):
+                leaf_nodes.append(cur_node)
+            working_queue.extend(cur_node.children)
+        return leaf_nodes
+     
+        
     def go_to_that_node(self, cur_node, visit_path):
         route_length = len(visit_path)
         tmp_node = None
         if route_length == 0:
             return self.root
-
         # Go to the siblings of the current node
         # This is the topmost node
         if cur_node.parent is None:
@@ -92,7 +117,6 @@ class ImportGraph:
         # we are still in the directory
         if tmp_node is not None and tmp_node.name.endswith('.py') is not True:
             tmp_node = self.find_node_by_name(tmp_node.children, '__init__.py')
-
         return tmp_node
 
     @staticmethod
@@ -118,15 +142,13 @@ class ImportGraph:
 
     @staticmethod
     def extract_class_from_source(source):
-        try:
-            tree = ast.parse(source, mode='exec')
-            visitor = SourceVisitor()
-            visitor.visit(tree)
-            return visitor.result, tree, visitor.pair
-        except Exception as e:  # To avoid non-python code
-            # Non-python code to handle here
-            return {}, None, None  # Return empty
-
+        
+        tree = ast.parse(source, mode='exec')
+        visitor = SourceVisitor()
+        visitor.visit(tree)
+     
+        return visitor.result, tree, visitor.pair
+    
     @staticmethod
     def leaf2root(node):
         tmp_node = node

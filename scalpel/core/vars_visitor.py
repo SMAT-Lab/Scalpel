@@ -95,7 +95,8 @@ class VarsVisitor(ast.NodeVisitor):
         for arg in node.args:
             self.visit(arg)
         for keyword in node.keywords:
-            self.visit(keyword)
+            if keyword.arg is not None:
+                self.visit(keyword)
 
     def visit_keyword(self, node):
         self.visit(node.value)
