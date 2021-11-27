@@ -10,4 +10,3 @@ setup(
       packages= ["scalpel", "scalpel.call_graph", "scalpel.import_graph",
           "scalpel.CFG", "scalpel.SSA"],
      )
-
