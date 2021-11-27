@@ -6,6 +6,7 @@ Utilities for type inference module
 
 import re
 import ast
+import sys
 import builtins
 from copy import deepcopy
 from collections import deque
@@ -350,7 +351,12 @@ def is_valid_call_link(t_vals):
 
 def generate_ast(source: str):
     try:
-        tree = ast.parse(source, mode='exec', type_comments=True)
+        if sys.version_info >= (3,8):
+            tree = ast.parse(source, mode='exec', type_comments=True)
+        elif sys.version_info >= (3,5) and sys.version_info < (3,8):
+            tree = ast.parse(source, mode='exec')
+        else:
+            raise Exception("Must use Python 3.5+ ")
         #tree = ast.parse(source, mode='exec')
         return tree
     except Exception as e:

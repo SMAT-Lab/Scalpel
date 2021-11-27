@@ -104,8 +104,8 @@ def test_pytest_case2():
         if next(iter(return_type_prediction)) == 'empty':
             assert format_type_annot(func_def.returns) == None
             continue
-        print(return_type_prediction)
-        print(format_type_annot(func_def.returns))
+        #print(return_type_prediction)
+        #print(format_type_annot(func_def.returns))
         assert format_type_annot(func_def.returns).lower() in return_type_prediction
     print(inferred)
     print(len(inferred))
@@ -126,31 +126,79 @@ def test_pytest_case3():
 '''
 
 
-# Below are error cases
-
-
+'''
+# Wrong Case
+# function TerminalWriter._highlight() uses external library function
 def test_pytest_case4():
     entry_point = current_directory + '/test-cases/typeinfer_basecase/pytest_io_terminalwriter.py'
     infferer = TypeInference(name='pytest_io_terminalwriter.py', entry_point=entry_point)
     infferer.infer_types()
     inferred = infferer.get_types()
     inferred = [item for item in inferred if 'parameter' not in item and 'variable' not in item]
+    file_ast = parse_file(entry_point)
+    for return_info in inferred:
+        func_def = get_func_def_at_lineno(file_ast, return_info['line_number'])
+        return_type_prediction = return_info['type']
+
+        if next(iter(return_type_prediction)) == 'empty':
+            assert format_type_annot(func_def.returns) == None
+            continue
+        print(return_type_prediction)
+        print(format_type_annot(func_def.returns))
+        #assert format_type_annot(func_def.returns).lower() in return_type_prediction
     print(inferred)
     print(len(inferred))
+'''
 
+'''
+# Wrong Case
 def test_pytest_case5():
     entry_point = current_directory + '/test-cases/typeinfer_basecase/pytest_unittest.py'
     infferer = TypeInference(name='pytest_unittest.py', entry_point=entry_point)
     infferer.infer_types()
     inferred = infferer.get_types()
     inferred = [item for item in inferred if 'parameter' not in item and 'variable' not in item]
+    file_ast = parse_file(entry_point)
+    for return_info in inferred:
+        func_def = get_func_def_at_lineno(file_ast, return_info['line_number'])
+        return_type_prediction = return_info['type']
+        print(return_type_prediction)
+        print(format_type_annot(func_def.returns))
+        if next(iter(return_type_prediction)) == 'empty':
+            assert format_type_annot(func_def.returns) == None
+            continue
+
+        # assert format_type_annot(func_def.returns).lower() in return_type_prediction
     print(inferred)
     print(len(inferred))
+'''
+
+def test_pytest_case5():
+    entry_point = current_directory + '/test-cases/typeinfer_basecase/pytest_nose.py'
+    infferer = TypeInference(name='pytest_nose.py', entry_point=entry_point)
+    infferer.infer_types()
+    inferred = infferer.get_types()
+    inferred = [item for item in inferred if 'parameter' not in item and 'variable' not in item]
+    file_ast = parse_file(entry_point)
+    for return_info in inferred:
+        func_def = get_func_def_at_lineno(file_ast, return_info['line_number'])
+        return_type_prediction = return_info['type']
+        #print(return_type_prediction)
+        #print(format_type_annot(func_def.returns))
+        if next(iter(return_type_prediction)) == 'empty':
+            assert format_type_annot(func_def.returns) == None
+            continue
+        
+        assert format_type_annot(func_def.returns).lower() in return_type_prediction
+    print(inferred)
+    print(len(inferred))
+
+
 
 
 if __name__ == "__main__":
     test_pytest_case1()
     test_pytest_case2()
     #test_pytest_case3()
-    test_pytest_case4()
+    #test_pytest_case4()
     test_pytest_case5()

@@ -21,10 +21,10 @@
 import os
 import ast
 
-from pycg import utils
-from pycg.processing.base import ProcessingBase
-from pycg.machinery.callgraph import CallGraph
-from pycg.machinery.definitions import Definition
+from scalpel.pycg import utils
+from scalpel.pycg.processing.base import ProcessingBase
+from scalpel.pycg.machinery.callgraph import CallGraph
+from scalpel.pycg.machinery.definitions import Definition
 
 class CallGraphProcessor(ProcessingBase):
     def __init__(self, filename, modname, import_manager,
