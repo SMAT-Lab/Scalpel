@@ -4,9 +4,9 @@ import os
 
 from scalpel.typeinfer.typeinfer import TypeInference
 
-
 path_to_current_file = os.path.realpath(__file__)
 current_directory = os.path.split(path_to_current_file)[0]
+
 
 def parse_file(filename):
     with tokenize.open(filename) as f:
@@ -34,6 +34,8 @@ def format_type_annot(annot):
         return annot.s
 
     elif isinstance(annot, ast.Constant):
+        if annot.value is None:
+            return "empty"
         return annot.value
     elif isinstance(annot, ast.Subscript):
         if isinstance(annot.value, ast.Name) and annot.value.id in ["Optional", "t.Optional"]:
@@ -58,41 +60,42 @@ def format_type_annot(annot):
         return ""
 
 
-def get_attr_name (node):
+def get_attr_name(node):
     if isinstance(node, ast.Call):
         # to be test
         return get_attr_name(node.func)
     if isinstance(node, ast.Name):
         return node.id
     elif isinstance(node, ast.Attribute):
-        return get_attr_name(node.value)+"."+node.attr
+        return get_attr_name(node.value) + "." + node.attr
     elif isinstance(node, ast.Subscript):
         return ""
     return ""  # other types
 
+
 def test_pytest_case1():
-    entry_point = current_directory+'/test-cases/typeinfer_basecase/pytest_outcomes.py'
-    infferer = TypeInference(name='pytest_outcomes.py', entry_point=entry_point)
+    entry_point = current_directory + '/test-cases/typeinfer_real_cases/pytest_case1.py'
+    infferer = TypeInference(name='pytest_case1.py', entry_point=entry_point)
     infferer.infer_types()
     inferred = infferer.get_types()
     inferred = [item for item in inferred if 'parameter' not in item and 'variable' not in item]
     file_ast = parse_file(entry_point)
     for return_info in inferred:
-        func_def = get_func_def_at_lineno(file_ast,return_info['line_number'])
+        func_def = get_func_def_at_lineno(file_ast, return_info['line_number'])
         return_type_prediction = return_info['type']
         if len(return_type_prediction) == 1:
-            return_type_prediction = return_type_prediction.pop()
-        if next(iter(return_type_prediction)) == 'empty':
-            assert format_type_annot(func_def.returns) == None
-            continue
+            return_type_prediction = list(return_type_prediction)[0]
+        #print(return_type_prediction)
+        #print(format_type_annot(func_def.returns).lower())
         assert return_type_prediction == format_type_annot(func_def.returns).lower()
 
     print(inferred)
     print(len(inferred))
 
+
 def test_pytest_case2():
-    entry_point = current_directory + '/test-cases/typeinfer_basecase/pytest_io_saferepr.py'
-    infferer = TypeInference(name='pytest_io_saferepr.py', entry_point=entry_point)
+    entry_point = current_directory + '/test-cases/typeinfer_real_cases/pytest_case2.py'
+    infferer = TypeInference(name='pytest_case2.py', entry_point=entry_point)
     infferer.infer_types()
     inferred = infferer.get_types()
     inferred = [item for item in inferred if 'parameter' not in item and 'variable' not in item]
@@ -100,38 +103,35 @@ def test_pytest_case2():
     for return_info in inferred:
         func_def = get_func_def_at_lineno(file_ast, return_info['line_number'])
         return_type_prediction = return_info['type']
-
-        if next(iter(return_type_prediction)) == 'empty':
-            assert format_type_annot(func_def.returns) == None
-            continue
-        #print(return_type_prediction)
-        #print(format_type_annot(func_def.returns))
-        assert format_type_annot(func_def.returns).lower() in return_type_prediction
+        if len(return_type_prediction) == 1:
+            return_type_prediction = list(return_type_prediction)[0]
+        # print(return_type_prediction)
+        # print(format_type_annot(func_def.returns).lower())
+        assert return_type_prediction == format_type_annot(func_def.returns).lower()
     print(inferred)
     print(len(inferred))
 
-
-'''
-# Wrong Case
-# function wcwidth() should return int type, instead of 'any'
 def test_pytest_case3():
-    entry_point = current_directory + '/test-cases/typeinfer_basecase/pytest_io_wcwidth.py'
-    infferer = TypeInference(name='pytest_io_wcwidth.py',
-                             entry_point=entry_point)
+    entry_point = current_directory + '/test-cases/typeinfer_real_cases/pytest_case3.py'
+    infferer = TypeInference(name='pytest_case3.py', entry_point=entry_point)
     infferer.infer_types()
     inferred = infferer.get_types()
     inferred = [item for item in inferred if 'parameter' not in item and 'variable' not in item]
+    file_ast = parse_file(entry_point)
+    for return_info in inferred:
+        func_def = get_func_def_at_lineno(file_ast, return_info['line_number'])
+        return_type_prediction = return_info['type']
+        if len(return_type_prediction) == 1:
+            return_type_prediction = list(return_type_prediction)[0]
+        # print(return_type_prediction)
+        # print(format_type_annot(func_def.returns).lower())
+        assert return_type_prediction == format_type_annot(func_def.returns).lower()
     print(inferred)
     print(len(inferred))
-'''
 
-
-'''
-# Wrong Case
-# function TerminalWriter._highlight() uses external library function
 def test_pytest_case4():
-    entry_point = current_directory + '/test-cases/typeinfer_basecase/pytest_io_terminalwriter.py'
-    infferer = TypeInference(name='pytest_io_terminalwriter.py', entry_point=entry_point)
+    entry_point = current_directory + '/test-cases/typeinfer_real_cases/pytest_case4.py'
+    infferer = TypeInference(name='pytest_case4.py', entry_point=entry_point)
     infferer.infer_types()
     inferred = infferer.get_types()
     inferred = [item for item in inferred if 'parameter' not in item and 'variable' not in item]
@@ -139,22 +139,17 @@ def test_pytest_case4():
     for return_info in inferred:
         func_def = get_func_def_at_lineno(file_ast, return_info['line_number'])
         return_type_prediction = return_info['type']
-
-        if next(iter(return_type_prediction)) == 'empty':
-            assert format_type_annot(func_def.returns) == None
-            continue
-        print(return_type_prediction)
-        print(format_type_annot(func_def.returns))
-        #assert format_type_annot(func_def.returns).lower() in return_type_prediction
+        if len(return_type_prediction) == 1:
+            return_type_prediction = list(return_type_prediction)[0]
+        # print(return_type_prediction)
+        # print(format_type_annot(func_def.returns).lower())
+        assert return_type_prediction == format_type_annot(func_def.returns).lower()
     print(inferred)
     print(len(inferred))
-'''
 
-'''
-# Wrong Case
 def test_pytest_case5():
-    entry_point = current_directory + '/test-cases/typeinfer_basecase/pytest_unittest.py'
-    infferer = TypeInference(name='pytest_unittest.py', entry_point=entry_point)
+    entry_point = current_directory + '/test-cases/typeinfer_real_cases/pytest_case5.py'
+    infferer = TypeInference(name='pytest_case5.py', entry_point=entry_point)
     infferer.infer_types()
     inferred = infferer.get_types()
     inferred = [item for item in inferred if 'parameter' not in item and 'variable' not in item]
@@ -162,20 +157,17 @@ def test_pytest_case5():
     for return_info in inferred:
         func_def = get_func_def_at_lineno(file_ast, return_info['line_number'])
         return_type_prediction = return_info['type']
-        print(return_type_prediction)
-        print(format_type_annot(func_def.returns))
-        if next(iter(return_type_prediction)) == 'empty':
-            assert format_type_annot(func_def.returns) == None
-            continue
-
-        # assert format_type_annot(func_def.returns).lower() in return_type_prediction
+        if len(return_type_prediction) == 1:
+            return_type_prediction = list(return_type_prediction)[0]
+        # print(return_type_prediction)
+        # print(format_type_annot(func_def.returns).lower())
+        assert return_type_prediction == format_type_annot(func_def.returns).lower()
     print(inferred)
     print(len(inferred))
-'''
 
-def test_pytest_case5():
-    entry_point = current_directory + '/test-cases/typeinfer_basecase/pytest_nose.py'
-    infferer = TypeInference(name='pytest_nose.py', entry_point=entry_point)
+def test_pytest_case6():
+    entry_point = current_directory + '/test-cases/typeinfer_real_cases/pytest_case6.py'
+    infferer = TypeInference(name='pytest_case6.py', entry_point=entry_point)
     infferer.infer_types()
     inferred = infferer.get_types()
     inferred = [item for item in inferred if 'parameter' not in item and 'variable' not in item]
@@ -183,13 +175,83 @@ def test_pytest_case5():
     for return_info in inferred:
         func_def = get_func_def_at_lineno(file_ast, return_info['line_number'])
         return_type_prediction = return_info['type']
-        #print(return_type_prediction)
-        #print(format_type_annot(func_def.returns))
-        if next(iter(return_type_prediction)) == 'empty':
-            assert format_type_annot(func_def.returns) == None
-            continue
-        
-        assert format_type_annot(func_def.returns).lower() in return_type_prediction
+        if len(return_type_prediction) == 1:
+            return_type_prediction = list(return_type_prediction)[0]
+        # print(return_type_prediction)
+        # print(format_type_annot(func_def.returns).lower())
+        assert return_type_prediction == format_type_annot(func_def.returns).lower()
+    print(inferred)
+    print(len(inferred))
+
+def test_pytest_case7():
+    entry_point = current_directory + '/test-cases/typeinfer_real_cases/pytest_case7.py'
+    infferer = TypeInference(name='pytest_case7.py', entry_point=entry_point)
+    infferer.infer_types()
+    inferred = infferer.get_types()
+    inferred = [item for item in inferred if 'parameter' not in item and 'variable' not in item]
+    file_ast = parse_file(entry_point)
+    for return_info in inferred:
+        func_def = get_func_def_at_lineno(file_ast, return_info['line_number'])
+        return_type_prediction = return_info['type']
+        if len(return_type_prediction) == 1:
+            return_type_prediction = list(return_type_prediction)[0]
+        # print(return_type_prediction)
+        # print(format_type_annot(func_def.returns).lower())
+        assert return_type_prediction == format_type_annot(func_def.returns).lower()
+    print(inferred)
+    print(len(inferred))
+
+def test_pytest_case8():
+    entry_point = current_directory + '/test-cases/typeinfer_real_cases/pytest_case8.py'
+    infferer = TypeInference(name='pytest_case8.py', entry_point=entry_point)
+    infferer.infer_types()
+    inferred = infferer.get_types()
+    inferred = [item for item in inferred if 'parameter' not in item and 'variable' not in item]
+    file_ast = parse_file(entry_point)
+    for return_info in inferred:
+        func_def = get_func_def_at_lineno(file_ast, return_info['line_number'])
+        return_type_prediction = return_info['type']
+        if len(return_type_prediction) == 1:
+            return_type_prediction = list(return_type_prediction)[0]
+        # print(return_type_prediction)
+        # print(format_type_annot(func_def.returns).lower())
+        assert return_type_prediction == format_type_annot(func_def.returns).lower()
+    print(inferred)
+    print(len(inferred))
+
+def test_pytest_case9():
+    entry_point = current_directory + '/test-cases/typeinfer_real_cases/pytest_case9.py'
+    infferer = TypeInference(name='pytest_case9.py', entry_point=entry_point)
+    infferer.infer_types()
+    inferred = infferer.get_types()
+    inferred = [item for item in inferred if 'parameter' not in item and 'variable' not in item]
+    file_ast = parse_file(entry_point)
+    for return_info in inferred:
+        func_def = get_func_def_at_lineno(file_ast, return_info['line_number'])
+        return_type_prediction = return_info['type']
+        if len(return_type_prediction) == 1:
+            return_type_prediction = list(return_type_prediction)[0]
+        # print(return_type_prediction)
+        # print(format_type_annot(func_def.returns).lower())
+        assert return_type_prediction == format_type_annot(func_def.returns).lower()
+    print(inferred)
+    print(len(inferred))
+
+def test_pytest_case10():
+    entry_point = current_directory + '/test-cases/typeinfer_real_cases/pytest_case10.py'
+    infferer = TypeInference(name='pytest_case10.py', entry_point=entry_point)
+    infferer.infer_types()
+    inferred = infferer.get_types()
+    inferred = [item for item in inferred if 'parameter' not in item and 'variable' not in item]
+    file_ast = parse_file(entry_point)
+    for return_info in inferred:
+        func_def = get_func_def_at_lineno(file_ast, return_info['line_number'])
+        return_type_prediction = return_info['type']
+        if len(return_type_prediction) == 1:
+            return_type_prediction = list(return_type_prediction)[0]
+        # print(return_type_prediction)
+        # print(format_type_annot(func_def.returns).lower())
+        assert return_type_prediction == format_type_annot(func_def.returns).lower()
     print(inferred)
     print(len(inferred))
 
@@ -201,4 +263,4 @@ if __name__ == "__main__":
     test_pytest_case2()
     #test_pytest_case3()
     #test_pytest_case4()
-    test_pytest_case5()
+    #test_pytest_case5()
