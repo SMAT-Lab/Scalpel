@@ -32,6 +32,16 @@ class Tree:
 class ImportGraph:
 
     def __init__(self, entry_point):
+        """
+        retrieve an AST node by the scope directive. 
+        Args:
+            target_search_node: the AST node to be examined for entries in the
+            given scope.
+            function/class definition.
+            scope: a dotted string to provide name space. For instance, A.fun
+            means to retreive the function named fun in the class A
+
+        """
         # entry_point is the top level module folder 
         self.entry_point = entry_point
         # note that the entry_point must not ends with slash. The recommended one is "a/b/c.py"
