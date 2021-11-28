@@ -36,10 +36,7 @@ The tutorial code can be found here:\
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Type Inference Example](../examples/type_infer_tutorial.py)
 
 ### APIs
-[Place Holder](placeholder.com)\
-[Place Holder](placeholder.com)\
-[Place Holder](placeholder.com)\
-[Place Holder](placeholder.com)
+[Please refer to the API documentation](https://smat-lab.github.io/scalpel/typeinfer.html)
 
 ### Reference
 1. [typegen4py](https://github.com/typegen4py/typegen4py).
