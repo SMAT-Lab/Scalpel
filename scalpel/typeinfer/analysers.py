@@ -24,6 +24,9 @@ from scalpel.typeinfer.utilities import (
 from scalpel.SSA.const import SSA
 
 class BinaryOperatorMap:
+    """
+    Class for storing binary operation information
+    """
 
     def __init__(self):
         self.hash: Dict[str, list] = {}
@@ -53,9 +56,8 @@ class BinaryOperatorMap:
         return None
 
     def chain_types(self):
-        """
-        TODO: Chain together types of variables involved in binary operations to determine types
-        """
+
+        #TODO: Chain together types of variables involved in binary operations to determine types
         for variable, operation_list in self.hash.items():
             if isinstance(self._type_hash.get(variable), ast.Constant):
                 pass
@@ -398,6 +400,9 @@ class BinaryOperationMap(_StaticAnalyzer):
 
 
 class HeuristicParser(ast.NodeVisitor):
+    """
+    A heuristic NodeVisitor for assisting type inference
+    """
     def __init__(self, node):
         self.node = node
         self.assign_nodes = []
@@ -1186,7 +1191,7 @@ class Heuristics:
     @staticmethod
     def get_bin_op_involved(binary_operation: ast.BinOp):
         """
-        Get list of variables/constants/callables involved in a binary operation\
+        Get list of variables/constants/callables involved in a binary operation
         Args:
             binary_operation: the binary operation to get the names for
         Returns:

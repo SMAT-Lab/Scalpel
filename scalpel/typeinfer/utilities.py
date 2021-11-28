@@ -19,6 +19,9 @@ def get_func_calls_type(tree):
 
 
 class TypeInferCallTransformer(ast.NodeTransformer):
+    """
+    A NodeTransformer class for getting function call information
+    """
     def __init__(self):
         self.call_names = []
 
@@ -52,6 +55,9 @@ class TypeInferCallTransformer(ast.NodeTransformer):
 
 
 class FuncCallVisitor(ast.NodeVisitor):
+    """
+    A NodeVisitor class for getting function call information
+    """
     def __init__(self):
         self._name = deque()
         self.call_names = []
