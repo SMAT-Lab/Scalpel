@@ -1,6 +1,4 @@
 """
-Tomas Bolger 2021
-Python 3.9
 Utilities for type inference module
 """
 

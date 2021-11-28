@@ -1,7 +1,6 @@
 """
-Tomas Bolger 2021
-Python 3.9
-Scalpel Type Inference Static Analysis Tools
+This module contains a set of helper classes for type inference, e.g. a few ast visitors for extracting data, heuristic
+functions, etc.
 """
 
 import ast

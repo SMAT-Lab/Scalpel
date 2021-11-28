@@ -1,7 +1,5 @@
 """
-Tomas Bolger 2021
-Python 3.9
-Data classes used in the Type Inference process
+This module contains a set of data classes.
 """
 import ast
 from dataclasses import dataclass, field

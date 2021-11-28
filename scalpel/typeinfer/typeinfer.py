@@ -1,9 +1,6 @@
 """
-Contribution List:
-Tomas Bolger 2021
-Haowei Quan 2021
-Jiawei Wang 2021 
-Scalpel Type Inference Static Analysis Tools
+This module is the main module of typeinfer. The module contains a single class named TypeInference which processes
+files and infer types.
 """
 
 import os
