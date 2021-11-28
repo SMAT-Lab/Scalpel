@@ -7,13 +7,5 @@ efficient solutions to software engineering researchers that are accessible to
 everybody and reusable in various contexts.
 """
 
-#from .import_graph import *
-#from .inherit import *
-#from .core import *
-#from .call_graph import *
-
-#from .CFG import *
-
-__all__ = ["cfg", "call_graph", "SSA", "core"]
-
+__all__ = ["cfg", "call_graph", "SSA", "core", "typeinfer", "import_graph", "rewriter"]
 __version__ = '1.0dev'
