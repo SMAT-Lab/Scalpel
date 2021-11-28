@@ -108,7 +108,7 @@ class SSA:
                 stored_idents, loaded_idents, func_names = self.get_stmt_idents_ctx(stmt, const_dict=tmp_const_dict) 
                 block_loaded_idents[block.id] += [loaded_idents]
                 block_stored_idents[block.id] += [stored_idents]
-                block_renamed_loaded[block.id] += [{ident:[] for ident in loaded_idents}]
+                block_renamed_loaded[block.id] += [{ident:set() for ident in loaded_idents}]
             block_const_dict[block.id]  = tmp_const_dict
         
         for block in all_blocks:
@@ -140,7 +140,7 @@ class SSA:
                     # a list of dictions for each of idents used in this statement
                     phi_loaded_idents = block_renamed_loaded[block.id][i]
                     if ident in ident_name_counter:
-                        phi_loaded_idents[ident].append(ident_name_counter[ident])
+                        phi_loaded_idents[ident].add(ident_name_counter[ident])
                     #if ident in affected_idents:
                     #    phi_loaded_idents = block_renamed_loaded[block.id][i]
                     #    if ident in phi_loaded_idents:  
@@ -158,7 +158,7 @@ class SSA:
                         # place phi function here
                         # this var used
                         if af_ident in phi_loaded_idents:  
-                            phi_loaded_idents[af_ident].append(ident_name_counter[af_ident])
+                            phi_loaded_idents[af_ident].add(ident_name_counter[af_ident])
                                        
        
         return block_renamed_loaded, ident_const_dict
