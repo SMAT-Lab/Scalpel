@@ -80,9 +80,10 @@ class _StaticAnalyzer(ast.NodeVisitor):
         """
         Read a file as tokens
 
-        :param file_name: The name of the file to read
-        :type file_name: str
-        :return: The read file tokens
+        Args:
+            file_name: The name of the file to read
+        Returns:
+            The read file tokens
         """
         with tokenize.open(file_name) as file:
             return file.read()
@@ -90,16 +91,23 @@ class _StaticAnalyzer(ast.NodeVisitor):
 
 class ImportTypeMap(_StaticAnalyzer):
     """
-    Class for mapping import types
+    Class for mapping imported functions, variables, etc. to their types
     """
 
     def __init__(self, root):
+        """
+        Args:
+            root: The root node of the input source file.
+        """
         super().__init__()
         self.imports: Dict[str, str] = {}
         self.typeshed_resolver = typeshed_client.Resolver()
         self.root = root
 
     def map(self):
+        """
+        Get the import type map
+        """
         import_mappings = {}  # Maps imported functions, variables, etc. to their types
         imports = {}  # Keeps a dictionary of imported libraries
         module = None
@@ -128,6 +136,12 @@ class ImportTypeMap(_StaticAnalyzer):
         return import_mappings, imports
 
     def get_imported_type(self, import_name: str):
+        """
+        Get the type of an imported function, variable, etc.
+        Args:
+            import_name: a fully qualified name of the function, the variable, etc.
+
+        """
         fully_qualified_name = self.typeshed_resolver.get_fully_qualified_name(import_name)
         if isinstance(fully_qualified_name, typeshed_client.parser.NameInfo):
             node = fully_qualified_name.ast
@@ -154,10 +168,17 @@ class ClassDefinitionMap(_StaticAnalyzer):
     """
 
     def __init__(self, root):
+        """
+        Args:
+            root: The root node of the input source file.
+        """
         super().__init__()
         self.root = root
 
     def map(self) -> List[ScalpelClass]:
+        """
+        Get the class definitions
+        """
         class_definitions = []
         for node in ast.iter_child_nodes(self.root):
             if isinstance(node, ast.ClassDef):
@@ -186,10 +207,17 @@ class FunctionDefinitionMap(_StaticAnalyzer):
     """
 
     def __init__(self, root):
+        """
+        Args:
+            root: The root node of the input source file.
+        """
         super().__init__()
         self.root = root
 
     def map(self) -> List[ScalpelFunction]:
+        """
+        Get the function definitions
+        """
         function_definitions = []
         for node in ast.iter_child_nodes(self.root):
             if isinstance(node, ast.FunctionDef):
@@ -209,6 +237,11 @@ class VariableAssignmentMap(_StaticAnalyzer):
     """
 
     def __init__(self, root, imports=None):
+        """
+        Args:
+            root: The root node of the input source file.
+            imports: The import type map of the input source file
+        """
         super().__init__()
         if imports is None:
             imports = {}
@@ -216,6 +249,9 @@ class VariableAssignmentMap(_StaticAnalyzer):
         self.imports = imports  # Pass in the imported types for a files
 
     def map(self) -> List[ScalpelVariable]:
+        """
+        Get the variable assignments
+        """
         # TODO: Ensure coverage of all variable types
         # TODO: Double variable assignment, e.g. if True: x = 5; else: x = "Hello";
         variables = []
@@ -291,14 +327,21 @@ class VariableAssignmentMap(_StaticAnalyzer):
 
 class BinaryOperationMap(_StaticAnalyzer):
     """
-    Class for retrieving variable assignments
+    Class for retrieving binary operations
     """
 
     def __init__(self, root):
+        """
+        Args:
+            root: The root node of the input source file.
+        """
         super().__init__()
         self.root = root
 
     def map(self) -> BinaryOperatorMap:
+        """
+        Get the binary operations
+        """
 
         binary_operator_map = BinaryOperatorMap()
         for node in ast.walk(self.root):
@@ -472,10 +515,23 @@ class HeuristicParser(ast.NodeVisitor):
 
 
 class SourceSplitVisitor(ast.NodeVisitor):
+    """
+    ast NodeVisitor class for retrieving assignments
+    """
     def __init__(self):
         self.assign_dict = {}
 
     def visit_Assign(self, node):
+        """
+        When visit Assign, add information to the assignment dictionary
+        Args:
+            ast_node_lst: a list of statements to be visited.
+            def_records: a list of dictionary, each of whose entry is a
+            function/class definition.
+            scope: the scope that is currently being visited. When it is "mod",
+            it is visiting under the entire module.
+
+        """
         if len(node.targets) > 1:
             return node
         left = node.targets[0]
@@ -493,6 +549,9 @@ class SourceSplitVisitor(ast.NodeVisitor):
 
 
 class ClassSplitVisitor(ast.NodeVisitor):
+    """
+    ast NodeVisitor class for retrieving compositions of a class: function nodes, bases and assignment records
+    """
     def __init__(self):
         self.fun_nodes = []
         self.class_assign_records = {"init_arg_name_lst": []}
@@ -535,7 +594,9 @@ class ClassSplitVisitor(ast.NodeVisitor):
 
 
 class ReturnStmtVisitor(ast.NodeVisitor):
-
+    """
+    Class for inferring function return types
+    """
     def __init__(self, imports=None, assignments=None):
         self.ast_nodes = []
         self.assign_records = {}
@@ -550,9 +611,19 @@ class ReturnStmtVisitor(ast.NodeVisitor):
         self.assignments = assignments  # List of variable assignment in a code block
 
     def import_assign_records(self, assign_records):
+        """
+        Import assignment records for return type inference
+        Args:
+            assign_records: a list of assignment records.
+        """
         self.assign_records = assign_records
 
     def import_class_assign_records(self, assign_records):
+        """
+        Import class assignment records for return type inference
+        Args:
+            assign_records: a list of assignment records in the class.
+        """
         self.class_assign_records = assign_records
 
     def import_assignments(self, assignments):
@@ -600,6 +671,11 @@ class ReturnStmtVisitor(ast.NodeVisitor):
         return node
 
     def infer_actual_return_value(self, actual_return_value):
+        """
+        Infer the return type with the help of assignment records and the possible return values
+        Args:
+            assign_records: a list of assignment records.
+        """
         # actual value means the value that has been traced back
         is_visited = set()
 
@@ -699,6 +775,11 @@ class ReturnStmtVisitor(ast.NodeVisitor):
             self.r_types += [type_val]
 
     def type_infer_CFG(self, node):
+        """
+        Conduct SSA analysis in CFG to get the possible return values
+        Args:
+            assign_records: a list of assignment records.
+        """
         new_body = []
         for stmt in node.body:
             if isinstance(stmt, ast.FunctionDef):
@@ -821,8 +902,17 @@ class ReturnStmtVisitor(ast.NodeVisitor):
 
 
 class Heuristics:
+    """
+    A set of heuristic function for assisting type inference
+    """
     @staticmethod
     def heuristic_two(ast_tree, processed_file, assignments):
+        """
+        Args:
+            ast_tree: the root node of the ast tree
+            processed_file: the files that have been processed
+            assignments: the assignment list
+        """
         function_param_types = {}
         for node in ast.walk(ast_tree):
             if isinstance(node, ast.FunctionDef):
@@ -870,6 +960,12 @@ class Heuristics:
                             static_assignment.type = arg["type"]
 
     def heuristic_five(self, import_mappings, processed_file, function_node):
+        """
+        Args:
+            import_mappings: the import mappings that have been generated
+            processed_file: the files that have been processed
+            function_node: the function node being checked
+        """
         # Perform heuristic five within a function
 
         param_list = [v for v in processed_file.static_assignments if v.is_arg]
@@ -966,6 +1062,11 @@ class Heuristics:
 
     @staticmethod
     def heuristic_six(processed_file, function_node):
+        """
+        Args:
+            processed_file: the files that have been processed
+            function_node: the function node being checked
+        """
         function_calls = []
         for node in ast.walk(function_node):
             # Visit ast.Call nodes, checking for variable names
@@ -980,6 +1081,11 @@ class Heuristics:
 
     @staticmethod
     def heuristic_seven(processed_file, function_node):
+        """
+        Args:
+            processed_file: the files that have been processed
+            function_node: the function node being checked
+        """
         # Track calls to isinstance()
         is_instance_type_map = {}
         for node in ast.walk(function_node):
@@ -1015,10 +1121,10 @@ class Heuristics:
         attempts to infer/check the types a developer likely intended for function
         parameters and provide a limited number of types to the actual number that
         may work
-
-        :param ast_tree: The ast tree for the module the function is in
-        :param function_name: The name of the function being checked
-        :param function_params: The function parameters from a variable assignment map
+        Args:
+            ast_tree: The ast tree for the module the function is in
+            function_name: The name of the function being checked
+            function_params: The function parameters from a variable assignment map
         """
         param_type_map = {p.name: {} for p in function_params}
         param_map = {p.name: p for p in function_params}
@@ -1061,6 +1167,12 @@ class Heuristics:
 
     @staticmethod
     def heuristic_nine(import_mappings, processed_file, function_node):
+        """
+        Args:
+            import_mappings: The import mappings that have been generated
+            processed_file: The files that have been processed
+            function_node: The function node being checked
+        """
         # work through params
         for variable in [v for v in processed_file.static_assignments if v.type == 'any']:
             regex_query = r'\b^(.{0,12}_{0,1}(count|counter|sum)_{0,1}.{0,12}|(int|num|sum|count|counter))$\b'
@@ -1075,9 +1187,11 @@ class Heuristics:
     @staticmethod
     def get_bin_op_involved(binary_operation: ast.BinOp):
         """
-        Get list of variables/constants/callables involved in a binary operation
-        :param binary_operation: The binary operation to get the names for
-        :return: List of variable/constants/callables
+        Get list of variables/constants/callables involved in a binary operation\
+        Args:
+            binary_operation: the binary operation to get the names for
+        Returns:
+            List: list of variable/constants/callables
         """
         involved = []
         left_operation = binary_operation.left
@@ -1096,9 +1210,11 @@ class Heuristics:
     def in_bin_op(variable: ScalpelVariable, binary_operation: ast.BinOp):
         """
         Determines whether a variable is featured in a binary operation
-        :param variable: The variable to check for
-        :param binary_operation: The binary operation to check
-        :return: True if it is within the binary operation, false otherwise
+        Args:
+            variable: The variable to check for
+            binary_operation: The binary operation to check
+        Returns:
+            Boolean: True if it is within the binary operation, false otherwise
         """
         left_operation = binary_operation.left
         right_operation = binary_operation.right

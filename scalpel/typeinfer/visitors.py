@@ -69,6 +69,11 @@ class TypeInferCallTransformer(ast.NodeTransformer):
 
 
 def get_args(node):
+    """
+    Get the argument types of the node
+    Args:
+        node: the node being checked
+    """
     arg_type = []
     for arg in node.args:
         if isinstance(arg, ast.Name):
@@ -110,6 +115,12 @@ def get_func_calls_type(tree):
 
 
 def get_call_type(tree):
+    """
+    Get the argument types of all function calls
+    Args:
+        tree: the ast tree being checked
+
+    """
     func_calls = []
     for node in ast.walk(tree):
         if isinstance(node, ast.Call):

@@ -85,10 +85,15 @@ def process_code_with_heuristics(node):
 
 class TypeInference:
     """
-    Infer types from a given AST node
+    Infer types for the modules accessible from the entrypoints with the help of a set of heuristic functions
     """
 
     def __init__(self, name: str, entry_point: str):
+        """
+        Args:
+            name: the name of the type inference analyser
+            entry_point: the entry point, can be the root folder of a package or a python file
+        """
         self.name = name
         self.entry_point = entry_point
         self.root_node = Tree(os.path.basename(self.entry_point))
@@ -210,6 +215,9 @@ class TypeInference:
                         node.node_type_dict[function_name] += ["3call"]
 
     def get_types(self) -> List[dict]:
+        """
+        Get the inferred type information in a list of dictionaries
+        """
         n_known = 0
         type_list = []
         for node in self.leaves:
@@ -272,6 +280,9 @@ class TypeInference:
 
     @staticmethod
     def process_file(source: str):
+        """
+        Process and extract information from the source files with a set of heuristic functions for type inference
+        """
         heuristics = Heuristics()
         processed_file = ProcessedFile()
 
@@ -520,6 +531,9 @@ class TypeInference:
         return processed_file
 
     def print_types(self, functions=True, parameters=True, variables=True):
+        """
+        Function for printing type inference results in a formatted way
+        """
         self.infer_types()
         inferred_types = self.get_types()
         for case in inferred_types:
