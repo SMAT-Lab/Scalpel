@@ -42,8 +42,8 @@ class BaseCaseTests(unittest.TestCase):
         ssa_results, const_dict = m_ssa.compute_SSA(cfg) 
         print(ssa_results)
         assert len(ssa_results) == 10
-        assert ('a' in ssa_results[3][2] and len(ssa_results[3][2]['a'])==5)
-        assert ('b' in ssa_results[3][2] and len(ssa_results[3][2]['b'])==4)
+        assert ('a' in ssa_results[3][2] and len(ssa_results[3][2]['a'])==4)
+        assert ('b' in ssa_results[3][2] and len(ssa_results[3][2]['b'])==3)
 
     def test_case_3(self):
         filename = "tests/test-cases/ssa_basecase/ssa_case7.py"
@@ -59,7 +59,7 @@ class BaseCaseTests(unittest.TestCase):
         assert len(ssa_results) == 4
         assert ('c' in ssa_results[1][1] and len(ssa_results[1][1]['c'])==1)
         assert ('c' in ssa_results[2][0] and len(ssa_results[2][0]['c'])==1)
-        assert ('t' in ssa_results[3][0] and len(ssa_results[3][0]['t'])==2)
+        assert ('t' in ssa_results[3][0] and len(ssa_results[3][0]['t'])==1)
 
 if __name__ == '__main__':
     unittest.main()
