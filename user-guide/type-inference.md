@@ -26,10 +26,10 @@ inferred = inferer.get_types()
 The first parameter of `TypeInference` is the desired name for the inference analyzer, and the second one is the path to a python file or the root folder of a python package. After instantiating a `TypeInference` analyzer, invoke `infer_types()` method to start the inferring process. `get_types()` will return a list containing inferred type information of all variables.
 The output is as follows. 
 ```python
-[{'file': 'case15.py', 'line_number': 11, 'function': 'my_function', 'type': {'str'}},
- {'file': 'case15.py', 'line_number': 12, 'variable': 'x', 'function': 'my_function', 'type': 'str'}]
+[{'file': 'type_infer_example.py', 'line_number': 4, 'function': 'my_function', 'type': {'str'}},
+ {'file': 'type_infer_example.py', 'line_number': 5, 'variable': 'x', 'function': 'my_function', 'type': 'str'}]
 ```
-The function return value is also inferred.
+As shown in the output, the type of the function return value is also inferred, which is `str`.
 
 \
 The tutorial code can be found here:\
