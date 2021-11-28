@@ -164,7 +164,7 @@ class SSA:
         return block_renamed_loaded, ident_const_dict
 
     def get_stmt_idents_ctx(self, stmt, del_set=[], const_dict = {}):
-         """
+        """
         Extract the contexual information of each of identifiers. 
         For assignment statements, the assigned values for each of variables will be stored.
         In addition, the del_set will store all deleted variables. 
