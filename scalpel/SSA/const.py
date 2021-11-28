@@ -48,21 +48,6 @@ class SSA:
         self.undefined_names_from = {}
         self.global_names = []
 
-    def get_global_live_vars(self):
-        #import_dict = self.m_node.parse_import_stmts()
-        #def_records = self.m_node.parse_func_defs()
-        #def_idents = [r['name'] for r in def_records if r['scope'] == 'mod']
-        #self.global_live_idents = def_idents + list(import_dict.keys())
-        self.global_live_idents = []
-
-    def flatten_tuple(ast_tuple):
-        """
-        input: ast tuple object
-        return a list of elements in the given tuple
-        """
-        output =[]
-        first = ast_tuple[0]
-        second = ast_tuple[1]
 
     def get_attribute_stmts(self, stmts):
         call_stmts = []
@@ -175,18 +160,7 @@ class SSA:
                         if af_ident in phi_loaded_idents:  
                             phi_loaded_idents[af_ident].append(ident_name_counter[af_ident])
                                        
-        #loaded_idents = block_loaded_idents[block.id]
-        #print(block_renamed_stored[block.id])
-        # now go to all ist DF nodes to rename loaded sets
- #      print(block_stored_idents[block.id])
-        
-        # TODO: rename those in the dominating nodes 
-        # to refer to POST dominating relationships 
-        #for b_id, phi_vals in block_renamed_loaded.items():
-        #    print(b_id, phi_vals)
-        #print('--------------------------')
-        #for k, v in ident_const_dict.items():
-        #    print(k, v.__dict__)
+       
         return block_renamed_loaded, ident_const_dict
 
     def get_stmt_idents_ctx(self, stmt, del_set=[], const_dict = {}):
