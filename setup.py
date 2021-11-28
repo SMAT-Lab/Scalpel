@@ -13,13 +13,13 @@ setup(
         'graphviz~=0.17',
         'nbformat',
         'nbconvert',
-        'numpy',
         'astunparse~=1.6.3',
         'typed-ast',
         'typeshed-client',
         'regex',
         'setuptools',
-        'dataclasses'
+        'dataclasses',
+        'pycg'
     ]
     )
 
