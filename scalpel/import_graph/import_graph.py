@@ -30,17 +30,17 @@ class Tree:
         return str(self.name)
 
 class ImportGraph:
+    """
+    The Import Graph class is a data structure that allows users to manipulate different files under a Python project. 
+    It leverage import relations in each of source files. 
+    """
 
     def __init__(self, entry_point):
         """
-        retrieve an AST node by the scope directive. 
+        To constuct a import graph.
         Args:
-            target_search_node: the AST node to be examined for entries in the
-            given scope.
-            function/class definition.
-            scope: a dotted string to provide name space. For instance, A.fun
-            means to retreive the function named fun in the class A
-
+        entry_point: the top level folder path such as "my-python-projects/homework1".
+        The argument must not endswith slash!
         """
         # entry_point is the top level module folder 
         self.entry_point = entry_point
@@ -72,7 +72,9 @@ class ImportGraph:
               
 
     def build_dir_tree(self):
-        # to build enhanced directory tree
+        """
+        To build enhanced directory tree for futher anaysis
+        """
         cwd = os.getcwd()
         working_dir = os.path.dirname(self.entry_point)
         os.chdir(working_dir)
@@ -80,6 +82,9 @@ class ImportGraph:
         os.chdir(cwd)
     
     def get_leaf_nodes(self):
+        """
+        To return all the leaf nodes in this tree. Each of leaf nodes represents a single Python script.
+        """
         leaf_nodes = []
         working_queue = [self.root]
         while len(working_queue) > 0:
@@ -94,6 +99,13 @@ class ImportGraph:
      
         
     def go_to_that_node(self, cur_node, visit_path):
+        """
+        To locate a particular node from the tree from the current node given a visit path from import statement. 
+        For instance,  a visit path of [example, module_a, func] means, if we can locate the function definition `func` from module_a under example folder. 
+        The function tries to locate the given path using both relative and absolute import path. 
+        Args:
+        visit_path: a list of names that represent different level python modules.
+        """
         route_length = len(visit_path)
         tmp_node = None
         if route_length == 0:
@@ -131,6 +143,12 @@ class ImportGraph:
 
     @staticmethod
     def parse_import(tree):
+        """
+        To parse import statements from the AST tree
+        Args:
+        tree: Python AST object
+        Returns: an import map data structure
+        """
         module_item_dict = {}
         try:
             for node in ast.walk(tree):
@@ -152,7 +170,12 @@ class ImportGraph:
 
     @staticmethod
     def extract_class_from_source(source):
-        
+        """
+        To parse import statements from the AST tree
+        Args:
+        source: source code text
+        Returns: class/function definitions, ast tree and alias pairs 
+        """
         tree = ast.parse(source, mode='exec')
         visitor = SourceVisitor()
         visitor.visit(tree)
@@ -161,6 +184,12 @@ class ImportGraph:
     
     @staticmethod
     def leaf2root(node):
+        """
+        To generate the full path to the top level module from the given node. 
+        Args:
+        node: the tree node 
+        Returns: the full path name in the form of dotted string.
+        """
         tmp_node = node
         path_to_root = []
         # not init.py
@@ -178,6 +207,9 @@ class ImportGraph:
 
     @staticmethod
     def find_child_by_name(node, name):
+        """
+        To locate a child node using node name
+        """
         for ch in node.children:
             if ch.name == name:
                 return ch
@@ -185,6 +217,9 @@ class ImportGraph:
 
     @staticmethod
     def find_node_by_name(nodes, name):
+        """
+        To locate a  node using node name
+        """
         for node in nodes:
             if node.name == name or node.name.rstrip('.py') == name:
                 return node
