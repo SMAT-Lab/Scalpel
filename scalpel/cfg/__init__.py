@@ -4,7 +4,7 @@ optimization and taint analysis.
 scalpel.cfg module is used to construct the control flow graph for given python programs. The basic unit in the CFG,
 Block, contains a list of sequential statements that can be executed in a program without any control jumps. The Blocks
 are linked by Link objects, which represent control flow jumps between two blocks and contain the jump conditions in
-the form of an expression.
+the form of an expression. Please see the example diagram a control flow graph [here](https://github.com/SMAT-Lab/Scalpel/blob/dev/resources/cfg_example.png)
 """
 from .builder import CFGBuilder
 from .model import Block, Link, CFG
