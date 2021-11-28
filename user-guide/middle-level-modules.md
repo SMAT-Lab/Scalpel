@@ -2,10 +2,6 @@
 ## Middle Level Modules
 The middle level modules of Scapel operates on the scope of the whole program (inter-procedural)
 
-### Parse Function/Class Definitions
-Introduction to Import Graph module...\
-How to use Import Graph\
-...
 
 ### API Name Qualifying
 The known qualified name is a dotted string that represent the path from top-level module down to the object iteself.  The name format is defined in [PEP 3155](https://www.python.org/dev/peps/pep-3155/). Obtainning the qualified API names are very import to API anaysis as the same function calls can appear in different source code with different names. Without qualifying them first,  it is hard to perform even basic statisitcal anaysis. 
