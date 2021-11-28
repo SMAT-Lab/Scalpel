@@ -13,13 +13,13 @@ In scalpel, we implement constant propagation along with the SSA for execution e
 The demo input python program we will be using is as follows.
 ```python
 code_str="""
-def func(a:int)->str:
-    b = 10
-    if b>0:
-        a = str(a)
-    else:
-        a = 10
-    return a
+c = 10
+a = -1
+if c>0:
+    a = a+1
+else:
+    a = 0
+total = c+a
 """
 ```
 It can be seen from the above code, the variable `a` has two possible values. By utilizing the phi functions in SSA, we are able to infer that the actual return value will have two potential values. We follow the algorithms from [4]. The input parameter for SSA computing is the CFG as it represents how the code blocks are organized in the program execution flow. 
