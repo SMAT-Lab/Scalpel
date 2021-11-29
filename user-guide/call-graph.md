@@ -2,7 +2,7 @@
 ## Call Graph
 ### Overview
 A call graph depicts calling relationships between subroutines in a computer program. It is an essential component in most static analysis and can be leveraged to build more sophisicated applications such as profiling, vunerability propagation and refactoring.
-`scalpel.pycg` module is a wrapper of `PyCG`[3]. It aims to construct the call graphs for given Python projects. The basic node can be either a function, a class or a module. The edges represent calling relationships between program nodes. 
+`scalpel.call_graph.pycg` module is a wrapper of `PyCG`[3]. It aims to construct the call graphs for given Python projects. The basic node can be either a function, a class or a module. The edges represent calling relationships between program nodes. 
 
   
 ### How to use Call Graph
@@ -16,10 +16,10 @@ We use */example_pkg* package as an example and below is the folder structure of
         -module2.py
     -sub_folder2
 ```
-To construct the call graph of a python application, import and use `CallGraphGenerator` from `scalple.pycg.pycg`.
+To construct the call graph of a python application, import and use `CallGraphGenerator` from `scalpel.call_graph.pycg`.
 
 ```python
-from scalpel.pycg.pycg import CallGraphGenerator
+from scalpel.call_graph.pycg import CallGraphGenerator
 cg_generator = CallGraphGenerator(["main.py"], "example_pkg")
 cg_generator.analyze()
 ```
@@ -38,14 +38,13 @@ To directly operates on the call graph, one can call `output`.
 ```python
 cg = cg_generator.output()
 ```
-`scalpel.pycg` also provides a tool `formats.Simple()` to store the call graph results in the JSON format.
+`scalpel.call_graph.pycg` also provides a tool `formats.Simple()` to store the call graph results in the JSON format.For more functions, please refer to [PyCG](https://pypi.org/project/pycg/).
 ```python
-from scalpel.pycg import formats
+from scalpel.call_graph.pycg import formats
 import json 
 formatter = formats.Simple(cg)
-if args.output:
-    with open("example_results.json", "w+") as f:
-        f.write(json.dumps(formatter.generate()))
+with open("example_results.json", "w+") as f:
+    f.write(json.dumps(formatter.generate()))
 ```
 
 
