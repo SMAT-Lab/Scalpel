@@ -8,6 +8,9 @@ from collections import deque
 
 
 class FuncCallVisitor(ast.NodeVisitor):
+    """
+    A NodeVisitor class for getting function call information
+    """
     def __init__(self):
         self._name = deque()
         self.call_names = []
@@ -43,6 +46,9 @@ class FuncCallVisitor(ast.NodeVisitor):
 
 
 class TypeInferCallTransformer(ast.NodeTransformer):
+    """
+    A NodeTransformer class for getting function call information
+    """
     def __init__(self):
         self.call_names = []
 
@@ -69,6 +75,11 @@ class TypeInferCallTransformer(ast.NodeTransformer):
 
 
 def get_args(node):
+    """
+    Get the argument types of the node
+    Args:
+        node: the node being checked
+    """
     arg_type = []
     for arg in node.args:
         if isinstance(arg, ast.Name):
@@ -110,6 +121,12 @@ def get_func_calls_type(tree):
 
 
 def get_call_type(tree):
+    """
+    Get the argument types of all function calls
+    Args:
+        tree: the ast tree being checked
+
+    """
     func_calls = []
     for node in ast.walk(tree):
         if isinstance(node, ast.Call):

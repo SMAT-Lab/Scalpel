@@ -1,28 +1,28 @@
 
 ## SSA & Constant Propagation
 
-Static Single Assignment (SSA) is a technique of IR in the compiling thoery, it also shows great benefits to static anaysis tasks such as constant propagation, Dead code elimination and etc.
+Static Single Assignment (SSA) is a technique of IR in the compiling thoery, it also shows great benefits to static anaysis tasks such as constant propagation, dead code elimination and etc.
 
-Constant propagation are also a matured technqiue in static anaysis. It is the process to evaluating or recognize the actual constant values or expressions at a particular program point.  This is realized by utilizing control flow and data flow information. Determining the possible values for variables before runtime gives great benefits to software anaysis. For instance, with constant value propagation, we can detect and remove dead code or perfrom type checking. 
+Constant propagation is also a matured technique in static anaysis. It is the process of evaluating or recognizing the actual constant values or expressions at a particular program point. This is realized by utilizing control flow and data flow information. Determining the possible values for variables before runtime gives great benefits to software anaysis. For instance, with constant value propagation, we can detect and remove dead code or perfrom type checking. 
 
  
-In scalpel, we implenent constant progagtion along with the SSA for execution effiency.  
+In scalpel, we implement constant propagation along with the SSA for execution efficiency.
 
-### How to use the SSA module and Constant Propagation
+### How to use the SSA and Constant Propagation module 
 
 The demo input python program we will be using is as follows.
 ```python
 code_str="""
-def func(a:int)->str:
-    b = 10
-    if b>0:
-        a = str(a)
-    else:
-        a = 10
-    return a
+c = 10
+a = -1
+if c>0:
+    a = a+1
+else:
+    a = 0
+total = c+a
 """
 ```
-It can be seen from the above code, the variable a has two possible values. By utilizing the phi functions in SSA, we are able to infer the actual return value will has two potenial values. We follow the algorithms from [4]. The input parameter for SSA computing is the CFG as it represent how the code blocks are organized in the program exection flow. 
+It can be seen from the above code, the variable `a` has two possible values. By utilizing the phi functions in SSA, we are able to infer that the actual return value will have two potential values. We follow the algorithms from [4]. The input parameter for SSA computing is the CFG as it represents how the code blocks are organized in the program execution flow. 
 
 ```python
 # create a mnode object.
@@ -30,7 +30,7 @@ mnode = MNode("local")
 # feed the code snippet
 mnode.source = code_str 
 mnode.gen_ast()
- # get the cfg
+# get the cfg
 cfg = mnode.gen_cfg() 
 m_ssa = SSA()
 # do the job
@@ -44,23 +44,24 @@ print(ssa_results)
 
 ```
 
-Please note that the funciton ` compute_SSA` returns two dictionary. For the first one, the key values are block numbers in the given CFG, the value is a list of dictioanary, each of which corresponds one statement in the block. Therefore, the `ssa_results[1]` is a list SSA representations for the first block. If we inspect the the last block (print statement is located), the results are 
+Please note that the funciton `compute_SSA` returns two dictionaries. For the first one, the key values are block numbers in the given CFG, the value is a list of dictioanaries, each of which corresponds to one statement in the block. For instance, the `ssa_results[3]` (block id is `3` in this casse ) is a list of SSA representations for the last block. If we inspect the the last block ( the variable `total` is assigned), the results are 
 
 ```python
- [{'print': [], 'a': [0, 1]}]}
+ 3: [{'c': {0}, 'a': {1, 2}}]
 ```
-This is due to the variable a can take values from two assignments. 
+This is due to that the variable `a` can take values from two assignments. This is can be easily observed from the following diagram. 
 
 
-The second one named `const_dict` are the global constant values for the numbered identifiers. For instance, `const_dict["(a,0)"]` are the constant value after the first assignment to variable `a`. The constant values in this module are the Python ```ast.expr``` type.  In this participular case `(a,0)` is an `ast.BinOp` type and `(a,1)` is an `ast.Num` type.
+![Fibonacci CFG](../resources/ssa_diagram.svg)
+
+
+The second one named `const_dict` is the global constant values for the numbered identifiers. For instance, `const_dict["(a,0)"]` is the constant value after the first assignment to variable `a`. The constant values in this module are instances of Python ```ast.expr```. In this participular case `(a,0)` is an `ast.BinOp` type and `(a,1)` is an `ast.Num` type.
 The tutorial code can be found here:\
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[SSA_example.py](example.com)
 
 ### APIs
-[Place Holder](placeholder.com)\
-[Place Holder](placeholder.com)\
-[Place Holder](placeholder.com)\
-[Place Holder](placeholder.com)
+[Please refer to the API documenation](https://smat-lab.github.io/scalpel/SSA.html)
+
 
 ### Reference
 1. [A Simple, Fast Dominance Algorithm](https://www.cs.rice.edu/~keith/EMBED/dom.pdf) Keith D. Cooper, Timothy J. Harvey, and Ken Kennedy

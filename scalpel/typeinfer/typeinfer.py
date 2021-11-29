@@ -1,7 +1,6 @@
 """
-Tomas Bolger 2021
-Python 3.9
-Scalpel Type Inference Static Analysis Tools
+This module is the main module of typeinfer. The module contains a single class named TypeInference which processes
+files and infer types.
 """
 
 import os
@@ -33,7 +32,6 @@ from scalpel.typeinfer.utilities import (
     is_done,
     find_class_by_attr,
 )
-
 
 def process_code_with_heuristics(node):
     def pick_type(type_lst):
@@ -84,39 +82,27 @@ def process_code_with_heuristics(node):
 
 class TypeInference:
     """
-    Infer types from a given AST node
+    Infer types for the modules accessible from the entrypoints with the help of a set of heuristic functions
     """
 
     def __init__(self, name: str, entry_point: str):
+        """
+        Args:
+            name: the name of the type inference analyser
+            entry_point: the entry point, can be the root folder of a package or a python file
+        """
         self.name = name
         self.entry_point = entry_point
-
-        if self.entry_point.endswith(".py"):
-            # Singular Python file being analysed
-            self.root_node = Tree(os.path.basename(self.entry_point))
-        else:
-            self.root_node = Tree(self.name)
-
+        self.root_node = Tree(os.path.basename(self.entry_point))
         self.import_graph = None
         self.leaves = []
 
         # Build graph of the directory
-        cwd = os.getcwd()
-        working_dir = os.path.dirname(self.entry_point)
-        os.chdir(working_dir)
-        self.import_graph = ImportGraph(self.entry_point, self.root_node)
-        self.import_graph.build_dir_tree(self.root_node)
-        os.chdir(cwd)
-
-        # Get stack of leaves
-        working_queue = [self.root_node]
-        while len(working_queue) > 0:
-            current_node = working_queue.pop(0)
-            if str(current_node) == ".git":
-                continue
-            if current_node.name.endswith('.py'):
-                self.leaves.append(current_node)
-            working_queue.extend(current_node.children)
+      
+        self.import_graph = ImportGraph(self.entry_point)
+        self.import_graph.build_dir_tree()
+        self.leaves = self.import_graph.get_leaf_nodes()
+      
 
     def infer_types(self):
         """
@@ -132,7 +118,7 @@ class TypeInference:
             node.static_assignments = processed_file.static_assignments
             node.line_numbers = processed_file.line_numbers
             node.imports = processed_file.imports
-
+           
         for node in self.leaves:
             type_hint_pairs, client_call_link, all_call_names = process_code_with_heuristics(node)
             for pair in type_hint_pairs:
@@ -196,6 +182,9 @@ class TypeInference:
                 # The same module
                 if node.node_type_dict[function_name] is None:
                     continue
+                # self: in the same class
+                # base: from the base class
+                # local: from the same module file
 
                 if from_where in ['self', 'base', 'local']:
                     from_name = rename_from_name(from_where, from_name, function_name)
@@ -223,6 +212,9 @@ class TypeInference:
                         node.node_type_dict[function_name] += ["3call"]
 
     def get_types(self) -> List[dict]:
+        """
+        Get the inferred type information in a list of dictionaries
+        """
         n_known = 0
         type_list = []
         for node in self.leaves:
@@ -233,7 +225,7 @@ class TypeInference:
 
                 if type_values is None or len(type_values) == 0:
                     continue
-
+                #TODO: why self is recognized as any type
                 for value in type_values:
                     if value in ['unknown', '3call', 'self']:
                         type_list.append({
@@ -285,6 +277,9 @@ class TypeInference:
 
     @staticmethod
     def process_file(source: str):
+        """
+        Process and extract information from the source files with a set of heuristic functions for type inference
+        """
         heuristics = Heuristics()
         processed_file = ProcessedFile()
 
@@ -292,6 +287,7 @@ class TypeInference:
         class2base = {}
 
         # Generate AST from source
+        
         tree = generate_ast(source)
         if tree is None:
             return processed_file
@@ -308,7 +304,9 @@ class TypeInference:
         assign_records = split_visitor.assign_dict
 
         return_visitor.import_assign_records(assign_records)
+        
         all_methods, all_classes, import_nodes = parse_module(tree)  # TODO: This doesn't need to be a function?
+        
 
         import_dict = get_api_ref_id(import_nodes)  # TODO: Replace with import map?
 
@@ -317,6 +315,7 @@ class TypeInference:
             function_name = function_node.name
             processed_file.line_numbers[function_name] = function_node.lineno
             function_source = astunparse.unparse(function_node)
+          
 
             # Variable assignments
             assignments = VariableAssignmentMap(function_node, imports=import_mappings).map()
@@ -529,6 +528,9 @@ class TypeInference:
         return processed_file
 
     def print_types(self, functions=True, parameters=True, variables=True):
+        """
+        Function for printing type inference results in a formatted way
+        """
         self.infer_types()
         inferred_types = self.get_types()
         for case in inferred_types:

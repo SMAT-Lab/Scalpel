@@ -1,11 +1,10 @@
 """
-Tomas Bolger 2021
-Python 3.9
 Utilities for type inference module
 """
 
 import re
 import ast
+import sys
 import builtins
 from copy import deepcopy
 from collections import deque
@@ -20,6 +19,9 @@ def get_func_calls_type(tree):
 
 
 class TypeInferCallTransformer(ast.NodeTransformer):
+    """
+    A NodeTransformer class for getting function call information
+    """
     def __init__(self):
         self.call_names = []
 
@@ -53,6 +55,9 @@ class TypeInferCallTransformer(ast.NodeTransformer):
 
 
 class FuncCallVisitor(ast.NodeVisitor):
+    """
+    A NodeVisitor class for getting function call information
+    """
     def __init__(self):
         self._name = deque()
         self.call_names = []
@@ -103,10 +108,11 @@ def get_built_in_types() -> Dict:
 def get_type(node, imports=None) -> str:
     """
     Get the type of a node
-
-    :param node: The node to get the type of
-    :param imports: Dictionary of known imported types
-    :return: The type of the node
+    Args:
+        node: The node to get the type of
+        imports: Dictionary of known imported types
+    Returns:
+        The type of the node
     """
 
     # TODO: Implement consistent list types where required
@@ -268,8 +274,10 @@ def is_camel_case(s: str) -> bool:
     """
     Determines whether a string is written in camel case
 
-    :param s: The string to check
-    :return: True if the string is camel case, False otherwise
+    Args:
+        s: The string to check
+    Returns:
+        True if the string is camel case, False otherwise
     """
     pattern = '([A-Z][a-z]*)+'
     if re.search(pattern, s):
@@ -280,9 +288,10 @@ def is_camel_case(s: str) -> bool:
 def parse_module(m_ast):
     """
     Get the function, class and import nodes for a module
-
-    :param m_ast: The AST tree to get the nodes for
-    :return: Tuple containing list of function nodes, list of class nodes and list of import nodes
+    Args:
+        m_ast: The AST tree to get the nodes for
+    Returns:
+        Tuple containing list of function nodes, list of class nodes and list of import nodes
     """
     fun_nodes = []
     class_nodes = []
@@ -325,9 +334,11 @@ def is_imported_fun(func_name: str, import_dict: dict) -> Union[str, None]:
     """
     Determines whether a function is imported from another library
 
-    :param func_name: The name of the function to check
-    :param import_dict: Dictionary of import modules
-    :return: The module that the function was import from or None if it was not imported
+    Args:
+        func_name: The name of the function to check
+        import_dict: Dictionary of import modules
+    Returns:
+        The module that the function was import from or None if it was not imported
     """
     name_parts = func_name.split('.')
     if name_parts[0] in import_dict:
@@ -349,8 +360,17 @@ def is_valid_call_link(t_vals):
 
 
 def generate_ast(source: str):
+    """
+    Generates ast from the source string
+    """
     try:
-        tree = ast.parse(source, mode='exec', type_comments=True)
+        if sys.version_info >= (3,8):
+            tree = ast.parse(source, mode='exec', type_comments=True)
+        elif sys.version_info >= (3,5) and sys.version_info < (3,8):
+            tree = ast.parse(source, mode='exec')
+        else:
+            raise Exception("Must use Python 3.5+ ")
+        #tree = ast.parse(source, mode='exec')
         return tree
     except Exception as e:
         print(e)
@@ -360,9 +380,10 @@ def generate_ast(source: str):
 def get_function_comment(source: str) -> str:
     """
     Get the function comment header for function source code
-
-    :param source: The function source code to check
-    :return: The function header comment
+    Args:
+        source: The function source code to check
+    Returns:
+        The function header comment
     """
     matches = re.findall(r"\'(.+?)\'", source)
     comment = ""
@@ -374,9 +395,10 @@ def get_function_comment(source: str) -> str:
 def is_done(t_vals: List[str]) -> bool:
     """
     Determines whether a list of type values is in a finished state
-
-    :param t_vals: List of type values to check
-    :return: True if in a finished state, False otherwise
+    Args:
+        t_vals: List of type values to check
+    Returns:
+        True if in a finished state, False otherwise
     """
     return all(x not in ['ID', 'call', 'unknown', 'input', '3call'] for x in t_vals)
 

@@ -15,17 +15,6 @@ def is_py38_or_higher():
     return False
 
 NAMECONSTANT_TYPE = ast.Constant if is_py38_or_higher() else ast.NameConstant
-# contrl flow statements
-# If 
-# For
-# While
-# Break
-# Continue
-# Try
-# ExceptHandler
-# finally
-# with
-# withitem
 
 def invert(node):
     """

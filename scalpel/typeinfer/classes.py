@@ -1,7 +1,5 @@
 """
-Tomas Bolger 2021
-Python 3.9
-Data classes used in the Type Inference process
+This module contains a set of data classes.
 """
 import ast
 from dataclasses import dataclass, field
@@ -10,6 +8,9 @@ from typing import List, Dict
 
 @dataclass
 class TypeWarning:
+    """
+    Holds information about a type warning
+    """
     warning: str  # Stores warning text
     line: int  # Line number of warning
     file: str  # Line where the warning was found
@@ -21,6 +22,9 @@ class TypeWarning:
 
 @dataclass
 class ScalpelVariable:
+    """
+    Holds information about a variable
+    """
     name: str  # The name of the variable
     function: str  # The name of the function where the variable is defined
     line: int  # The line number that the variable is defined at

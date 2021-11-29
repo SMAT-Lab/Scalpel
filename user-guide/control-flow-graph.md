@@ -1,12 +1,13 @@
 
 ## Control Flow Graph
-`scalpel.cfg` module is used to construct the control flow graph for given python programs. The basic unit ins the CFG are  `Block` containing a list of sequential statements that can be executed in a program without any control jumps. The `Block`s are linked by `Links` object, which represents a control flow jump between two blocks and contains the jump condition in the form of an expression. The two components are the fundemental data structures in the control flow graph module (`scalpel.cfg`).
+`scalpel.cfg` module is used to construct the control flow graph for given python programs. The basic unit in the CFG, `Block`, contains a list of sequential statements that can be executed in a program without any control jumps. The `Block`s are linked by `Link` objects, which represent control flow jumps between two blocks and contain the jump conditions in the form of an expression. The two components are the fundemental data structures in the control flow graph module (`scalpel.cfg`).
 
 
 
 ### How to use Control Flow Graph
-Below is the demo input python program we will be using. The piece of code generates the Fibonacci sequence and is named "example.py".
+Below is the demo input python program we will be using. The piece of code generates the Fibonacci sequence.
 ```python
+code_str="""
 def fib():
     a, b = 0, 1
     while True:
@@ -16,8 +17,9 @@ def fib():
 fib_gen = fib()
 for _ in range(10):
     next(fib_gen)
+"""
 ```
-To build the cfg of a python file, simply import `CFGBuilder` in `scalpel.cfg` and use `build_from_file(name, file_path)`. Other functions can also be used to build a cfg from an python AST tree or a source string.
+To build the cfg of a source string, simply import `CFGBuilder` in `scalpel.cfg` and use `build_from_src(name, file_path)`. Other functions can also be used to build a cfg from an python AST tree or a source file.
 
 ```python
 from scalpel.cfg import CFGBuilder
@@ -48,11 +50,9 @@ The tutorial code can be found here:\
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Control Flow Graph Example](../examples/cfg_tutorial.py)
 
 ### APIs
-[Place Holder](placeholder.com)\
-[Place Holder](placeholder.com)\
-[Place Holder](placeholder.com)\
-[Place Holder](placeholder.com)
+[Please refer to the API documentation](https://smat-lab.github.io/scalpel/cfg.html)
 
 ### Reference
 1. [StaticCFG](https://github.com/coetaur0/staticfg).
-2. 
+2. [ECE 5775 High-Level Digital Design Automation](https://www.csl.cornell.edu/courses/ece5775/pdf/lecture06.pdf), Cornell University
+3. [CS153: Compilers](https://groups.seas.harvard.edu/courses/cs153/2018fa/lectures/Lec17-CFG-dataflow.pdf), Harvard University

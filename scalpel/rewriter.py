@@ -1,27 +1,53 @@
+""" 
+The objective of rewriting module of Scalple is to provide APIs that allow users to rewrite their code implenmentation. 
+This can be used for various purposes such as code desugaring (removing code sugar usages), testing and code instrumentation.
+Code rewriting can bring great benefits such as API extraction and dynamic testing.
+"""
+
 import os
 import sys
 import ast
+import astor  
 
-""" In python there are in total 23 statements to be considered 
-# the user must specify the match pattern as well as insert pattern
-# for instance.
-# it can be  Call - >  another_callname for instance
-# the given new stmt must be clearly linked to the original stmt if it needs
-# such information
-# for example, if the we have an assignment named a = 10 
-# then we need to consturct an output stmt as print(a)
-# then the new pattern for the output should be Callstmt:args = [stmt.left[0]]
-# now the first step is to insert an stmt
-# the second step is to think about how to write template rules
-# make it easy, format string! such as the new stmt =
-# "print("","").format(stmt.targets[0])
-"""
-class Rewriter(ast.NodeTransformer):
-    #def __init__(self,src, pattern, new_stmt):
+from scalpel.core.module_graph import MNode, ModuleGraph, UnitWalker
+
+
+class Rewriter:
+    """
+    The rewriter class contains a set of static methods. 
+    """
+    @staticmethod
+    def rewrite(self, src, rule_func= None):
+        """
+        To constuct a import graph.
+        Args:
+        src: the source code to be rewritten
+        rule_func: the function that should be applied for each of statements. 
+        The value of rule_func must not be None
+        """
+        if rule_func is None:
+            raise Exception("rule_func cannot be None type!")
+            
+        module_node = ast.parse(src)
+        Walker = UnitWalker(module_node)
+        for unit in Walker:
+            new_stmts = rule_func(unit.node)
+            if not isinstance(new_stmts, list):
+                raise Exception("The return type for rule_func function must be list type!")
+            unit.insert_stmts_before(new_stmts)
+
+        new_ast = ast.fix_missing_locations(module_node)
+        new_src = astor.to_source(new_ast)
+        return new_src 
+
+
+class ASTRewriter(ast.NodeTransformer):
+    """
+    Here is the implementation of code rewriter at AST node level.
+    """
+  
     def __init__(self, src):
-        # pattern
-#        self.pattern = pattern
-#        self.new_stmt = new_stmt
+  
         self.src = src
         self.ast = None
         self.ast = ast.parse(self.src, mode='exec')
@@ -34,7 +60,6 @@ class Rewriter(ast.NodeTransformer):
 
     def rewrite(self):
         self.generic_visit(self.ast)
-       
         return ast.fix_missing_locations(self.ast)
 
     # once or all 

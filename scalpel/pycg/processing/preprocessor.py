@@ -22,9 +22,9 @@ import ast
 import os
 import importlib
 
-from pycg.machinery.definitions import DefinitionManager, Definition
-from pycg import utils
-from pycg.processing.base import ProcessingBase
+from scalpel.pycg.machinery.definitions import DefinitionManager, Definition
+from scalpel.pycg import utils
+from scalpel.pycg.processing.base import ProcessingBase
 
 class PreProcessor(ProcessingBase):
     def __init__(self, filename, modname,

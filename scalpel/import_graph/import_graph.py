@@ -1,14 +1,15 @@
 """
-Tree and import graph for type inference
+Import Graph module 
 """
 
 import os
 import ast
-
 from scalpel.core.source_visitor import SourceVisitor
 
 
 class Tree:
+    # a datastructure that contain information for a tree node 
+    # to be named 
     def __init__(self, name):
         self.name = name
         self.full_name = ""
@@ -28,41 +29,87 @@ class Tree:
     def __str__(self):
         return str(self.name)
 
-
 class ImportGraph:
+    """
+    The Import Graph class is a data structure that allows users to manipulate different files under a Python project. 
+    It leverage import relations in each of source files. 
+    """
 
-    def __init__(self, entry_point, root):
+    def __init__(self, entry_point):
+        """
+        To constuct a import graph.
+        Args:
+        entry_point: the top level folder path such as "my-python-projects/homework1".
+        The argument must not endswith slash!
+        """
+        # entry_point is the top level module folder 
         self.entry_point = entry_point
-        self.root = root
-
-    def build_dir_tree(self, node):
+        # note that the entry_point must not ends with slash. The recommended one is "a/b/c.py"
+        self.root = Tree(os.path.basename(self.entry_point))
+       
+    def _build_dir_tree(self, node):
         if os.path.isdir(node.name) is True:
             os.chdir(node.name)
             items = os.listdir('.')
             for item in items:
                 child_node = Tree(item)
                 child_node.parent = node
-                self.build_dir_tree(child_node)
+                self._build_dir_tree(child_node)
                 node.children.append(child_node)
             os.chdir('..')
         else:
             if node.name.endswith('.py'):
-                with open(node.name, 'rb') as source_file:
-                    source = source_file.read()
-                    node.source = source.decode("utf-8", errors="ignore")
+                with open(node.name, 'r') as f:
+                    print(node.name)
+                    source = f.read()
+                    node.source = source
                     res, tree, pair = self.extract_class_from_source(node.source)
                     node.cargo = res
                     node.ast = tree
                     node.class_pair = pair
                     node.prefix = self.leaf2root(node)
                     node.full_name = node.prefix + '.' + node.name
+              
 
+    def build_dir_tree(self):
+        """
+        To build enhanced directory tree for futher anaysis
+        """
+        cwd = os.getcwd()
+        working_dir = os.path.dirname(self.entry_point)
+        os.chdir(working_dir)
+        self._build_dir_tree(self.root)
+        os.chdir(cwd)
+    
+    def get_leaf_nodes(self):
+        """
+        To return all the leaf nodes in this tree. Each of leaf nodes represents a single Python script.
+        """
+        leaf_nodes = []
+        working_queue = [self.root]
+        while len(working_queue) > 0:
+            cur_node = working_queue.pop(0)
+            # skip the git folder
+            if str(cur_node) == ".git":
+                continue
+            if cur_node.name.endswith('.py'):
+                leaf_nodes.append(cur_node)
+            working_queue.extend(cur_node.children)
+        return leaf_nodes
+     
+        
     def go_to_that_node(self, cur_node, visit_path):
+        """
+        To locate a particular node from the tree from the current node given a visit path from import statement. 
+        For instance,  a visit path of [example, module_a, func] means, if we can locate the function definition `func` from module_a under example folder. 
+        The function tries to locate the given path using both relative and absolute import path. 
+        Args:
+        visit_path: a list of names that represent different level python modules.
+        """
         route_length = len(visit_path)
         tmp_node = None
         if route_length == 0:
             return self.root
-
         # Go to the siblings of the current node
         # This is the topmost node
         if cur_node.parent is None:
@@ -92,11 +139,16 @@ class ImportGraph:
         # we are still in the directory
         if tmp_node is not None and tmp_node.name.endswith('.py') is not True:
             tmp_node = self.find_node_by_name(tmp_node.children, '__init__.py')
-
         return tmp_node
 
     @staticmethod
     def parse_import(tree):
+        """
+        To parse import statements from the AST tree
+        Args:
+        tree: Python AST object
+        Returns: an import map data structure
+        """
         module_item_dict = {}
         try:
             for node in ast.walk(tree):
@@ -118,17 +170,26 @@ class ImportGraph:
 
     @staticmethod
     def extract_class_from_source(source):
-        try:
-            tree = ast.parse(source, mode='exec')
-            visitor = SourceVisitor()
-            visitor.visit(tree)
-            return visitor.result, tree, visitor.pair
-        except Exception as e:  # To avoid non-python code
-            # Non-python code to handle here
-            return {}, None, None  # Return empty
-
+        """
+        To parse import statements from the AST tree
+        Args:
+        source: source code text
+        Returns: class/function definitions, ast tree and alias pairs 
+        """
+        tree = ast.parse(source, mode='exec')
+        visitor = SourceVisitor()
+        visitor.visit(tree)
+     
+        return visitor.result, tree, visitor.pair
+    
     @staticmethod
     def leaf2root(node):
+        """
+        To generate the full path to the top level module from the given node. 
+        Args:
+        node: the tree node 
+        Returns: the full path name in the form of dotted string.
+        """
         tmp_node = node
         path_to_root = []
         # not init.py
@@ -146,6 +207,9 @@ class ImportGraph:
 
     @staticmethod
     def find_child_by_name(node, name):
+        """
+        To locate a child node using node name
+        """
         for ch in node.children:
             if ch.name == name:
                 return ch
@@ -153,6 +217,9 @@ class ImportGraph:
 
     @staticmethod
     def find_node_by_name(nodes, name):
+        """
+        To locate a  node using node name
+        """
         for node in nodes:
             if node.name == name or node.name.rstrip('.py') == name:
                 return node

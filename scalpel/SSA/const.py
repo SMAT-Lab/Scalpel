@@ -48,21 +48,6 @@ class SSA:
         self.undefined_names_from = {}
         self.global_names = []
 
-    def get_global_live_vars(self):
-        #import_dict = self.m_node.parse_import_stmts()
-        #def_records = self.m_node.parse_func_defs()
-        #def_idents = [r['name'] for r in def_records if r['scope'] == 'mod']
-        #self.global_live_idents = def_idents + list(import_dict.keys())
-        self.global_live_idents = []
-
-    def flatten_tuple(ast_tuple):
-        """
-        input: ast tuple object
-        return a list of elements in the given tuple
-        """
-        output =[]
-        first = ast_tuple[0]
-        second = ast_tuple[1]
 
     def get_attribute_stmts(self, stmts):
         call_stmts = []
@@ -86,13 +71,13 @@ class SSA:
     def compute_SSA(self, cfg):
         """
         Compute single static assignment form representations for a given CFG. 
-        During the computing, constant value and alias pairs are generated.
-        # step 1a: compute the dominance frontier
-        # step 1b: use dominance frontier to place phi node
-        # if node X contains assignment to a, put phi node for a in dominance frontier of X
-        # adding phi function may require introducing additional phi function 
-        # start from the entry node 
-        # step2: rename variables so only one definition per name
+        During the computing, constant value and alias pairs are generated. The following steps are used to compute SSA representations:
+        step 1a: compute the dominance frontier
+        step 1b: use dominance frontier to place phi node
+        if node X contains assignment to a, put phi node for a in dominance frontier of X
+        adding phi function may require introducing additional phi function 
+        start from the entry node 
+        step2: rename variables so only one definition per name
 
         Args:
             cfg: a control flow graph.
@@ -123,7 +108,7 @@ class SSA:
                 stored_idents, loaded_idents, func_names = self.get_stmt_idents_ctx(stmt, const_dict=tmp_const_dict) 
                 block_loaded_idents[block.id] += [loaded_idents]
                 block_stored_idents[block.id] += [stored_idents]
-                block_renamed_loaded[block.id] += [{ident:[] for ident in loaded_idents}]
+                block_renamed_loaded[block.id] += [{ident:set() for ident in loaded_idents}]
             block_const_dict[block.id]  = tmp_const_dict
         
         for block in all_blocks:
@@ -155,7 +140,7 @@ class SSA:
                     # a list of dictions for each of idents used in this statement
                     phi_loaded_idents = block_renamed_loaded[block.id][i]
                     if ident in ident_name_counter:
-                        phi_loaded_idents[ident].append(ident_name_counter[ident])
+                        phi_loaded_idents[ident].add(ident_name_counter[ident])
                     #if ident in affected_idents:
                     #    phi_loaded_idents = block_renamed_loaded[block.id][i]
                     #    if ident in phi_loaded_idents:  
@@ -173,23 +158,21 @@ class SSA:
                         # place phi function here
                         # this var used
                         if af_ident in phi_loaded_idents:  
-                            phi_loaded_idents[af_ident].append(ident_name_counter[af_ident])
+                            phi_loaded_idents[af_ident].add(ident_name_counter[af_ident])
                                        
-        #loaded_idents = block_loaded_idents[block.id]
-        #print(block_renamed_stored[block.id])
-        # now go to all ist DF nodes to rename loaded sets
- #      print(block_stored_idents[block.id])
-        
-        # TODO: rename those in the dominating nodes 
-        # to refer to POST dominating relationships 
-        #for b_id, phi_vals in block_renamed_loaded.items():
-        #    print(b_id, phi_vals)
-        #print('--------------------------')
-        #for k, v in ident_const_dict.items():
-        #    print(k, v.__dict__)
+       
         return block_renamed_loaded, ident_const_dict
 
     def get_stmt_idents_ctx(self, stmt, del_set=[], const_dict = {}):
+        """
+        Extract the contexual information of each of identifiers. 
+        For assignment statements, the assigned values for each of variables will be stored.
+        In addition, the del_set will store all deleted variables. 
+        Args:
+            stmt: statement from AST trees.
+            del_set: deleted identifiers
+            const_dict: a mapping relationship between variables and their assigned values in this statement
+        """
         # if this is a definition of class/function, ignore
         stored_idents = []
         loaded_idents = []
@@ -205,7 +188,7 @@ class SSA:
         # one target assignment with type annotations
         if isinstance(stmt, ast.AnnAssign):
             if hasattr(stmt.target, "id"):
-                left_name = stmt.targets[0].id
+                left_name = stmt.target.id
                 const_dict[left_name] = stmt.value
             elif isinstance(stmt.target, ast.Attribute):
                 #TODO: resolve attributes
@@ -215,12 +198,6 @@ class SSA:
         if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef)):
             stored_idents.append(stmt.name)
             func_names.append(stmt.name)
-            #for arg in stmt.args.args: 
-            #    if isinstance(arg.annotation, ast.Name):
-            #        loaded_idents.append(arg.annotation.id)
-            #    if isinstance(arg.annotation, ast.Attribute):
-            #        if isinstance(arg.annotation.value, ast.Name):
-            #            loaded_idents.append(arg.annotation.value.id)
             new_stmt = stmt
             new_stmt.body = []
             ident_info = get_vars(new_stmt)
@@ -293,12 +270,15 @@ class SSA:
         pass
 
     def print_block(self, block):
-        #for stmt in block.statements:
-        #print(block.get_source())
         return block.get_source()
 
     # compute the dominators 
     def compute_idom(self, ssa_blocks):
+        """
+        Compute immediate immediate dominators for each of blocks
+        Args:
+            ssa_blocks: blocks from a control flow graph.
+        """
         # construct the Graph
         entry_block = ssa_blocks[0]
         G = nx.DiGraph()
@@ -314,6 +294,11 @@ class SSA:
 
     # compute dominance frontiers
     def compute_DF(self, ssa_blocks):
+        """
+        Compute dominating frontiers for each of blocks
+        Args:
+            ssa_blocks: blocks from a control flow graph.
+        """
         # construct the Graph
         entry_block = ssa_blocks[0]
         G = nx.DiGraph()
