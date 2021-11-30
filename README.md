@@ -15,7 +15,7 @@ Detailed user guides can be found [Here]().
 
 We aim to provide Scalpel as a generic Python static analysis framework that includes as many functions as possible (e.g., to easily build inter-function control-flow graph, to interpret the import relationship of different Python modules, etc.) towards facilitating developers to implement their dedicated problem-focused static analyzers. The following figure depicts the current architecture of its design.
 
-![Scalpel Design](scalpel_design.pdf)
+![Scalpel Design](./scalpel_design.pdf)
 
 * Function 1: Code Rewriter. The code rewriter module is designed as a fundamental function for supporting systematic changes of existing Python programs. Two preliminary usages of this function are to (1) simplify the programs for better static analysis and (2) optimize or repair problematic programs. For supporting the first usage, we integrate into the framework a database including a set of rules indicating how matched code snippets should be transformed. This database should be continuously extended to fulfill the complicated simplification requirements for achieving effective static analysis of Python programs. For supporting the second usage, inspired by the optimization mechanism provided by Soot (one of the most famous static Java program analysis frameworks), we also set up a transformation process with dedicated callback methods to be rewritten by users to optimize Python code based on their customized needs.
 
