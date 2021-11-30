@@ -14,9 +14,7 @@ You can download the source code of Scalpel to install mannuly or use `pip` to i
 ```python
 python setup.py
 ```
-```shell
-pip install scalpel
-```
+
 ### Roadmap
 As a general purpose framework, Scalpel is a layered structure and designed to support tasks at different granularity. You can know more from this user guide about different modules.
 ![title](https://lucid.app/publicSegments/view/079f413f-8fd5-4c4f-9ad2-1a3cad30583d/image.png)
