@@ -1,35 +1,50 @@
 
-# Static Anaysis for Python Programs
-## Introduction
+# Scalpel: The Python Static Anaysis Framework
 
+Scalpel is a Python Static Analysis Framework. It provides essential program analysis functions for facilitating the implementation of client applications focusing on statically resolving dedicated problems.
 
-
-Scalpel is a Python module integrating classical program anaysis algorithms
-with tailored features for Python language. It aims to provide simple and
-efficient solutions to software engineering researchers that are accessible to
-everybody and reusable in various contexts.
-
-### Setting up Scalpel
+## Setting up Scalpel
 You can download the source code of Scalpel to install mannuly or use `pip` to install automatically.
 ```python
 python setup.py
 ```
 
-### Roadmap
-As a general purpose framework, Scalpel is a layered structure and designed to support tasks at different granularity. You can know more from this user guide about different modules.
-![title](https://lucid.app/publicSegments/view/079f413f-8fd5-4c4f-9ad2-1a3cad30583d/image.png)
+## Brief Introduction
 
+Detailed user guides can be found [Here]().
 
+We aim to provide Scalpel as a generic Python static analysis framework that includes as many functions as possible (e.g., to easily build inter-function control-flow graph, to interpret the import relationship of different Python modules, etc.) towards facilitating developers to implement their dedicated problem-focused static analyzers. The following figure depicts the current architecture of its design.
+
+![Scalpel Design](scalpel_design.pdf)
+
+* Function 1: Code Rewriter. The code rewriter module is designed as a fundamental function for supporting systematic changes of existing Python programs. Two preliminary usages of this function are to (1) simplify the programs for better static analysis and (2) optimize or repair problematic programs. For supporting the first usage, we integrate into the framework a database including a set of rules indicating how matched code snippets should be transformed. This database should be continuously extended to fulfill the complicated simplification requirements for achieving effective static analysis of Python programs. For supporting the second usage, inspired by the optimization mechanism provided by Soot (one of the most famous static Java program analysis frameworks), we also set up a transformation process with dedicated callback methods to be rewritten by users to optimize Python code based on their customized needs.
+
+* Function 2: Control-Flow Graph Construction. The control-flow graph(CFG) construction module generates intra-procedural CFGs, which are an essential component in static flow analysis with applications such as program optimization and taint analysis. A CFG represents all paths that might be traversed through a program during its execution. The CFGs of a Python project can be combined with the call graph to generate an inter-procedural CFG of the project.
+
+* Function 3: Static Single Assignment (SSA) Representation. The static single assignment module provides compiler-level intermediate representations (IR) for code analysis. It can not only be used for symbolic execution, but also for constant propagation. By renaming each variable assignment with different names,  we are able to obtain explicit use-def chains, therefore precisely tracking how data flow in the program. 
+
+* Function 4: Alias Analysis. Since variables can point to the same memory location or identical values, the alias analysis function is designed to model such usages. This function can be vital to sound constant propagation. In addition, alias analysis will also benefit type checking as well as API name qualifying. 
+
+* Function 5: Constant Propagation. The constant propagation module will evaluate the actual values for variables at certain program points in different execution paths before runtime. With the actual values known beforehand, we are able to optimize code and detect bugs.  The constant propagation will utilize the representation from the SSA module to keep recording values from each assignment for a single variable. 
+
+* Function 6: Import Graph Construction. In python,  import flows and relations have been pointed out to be important for API mapping, dependency analysis. Our import graph construction aims to provide a data structure to represent these import relationships across the Python module files in the same project. The import graphs of multiple Python projects can be combined to perform inter-library dataflow analysis.
+
+* Function 7: Fully Qualified Name Inferrer. Python APIs or function names can be invoked in different ways depending on how they are imported. However, this results in inconveniences to API usage analysis. In this module, we will convert all function call names to their fully-qualified names which are dotted strings that can represent the path from the top-level module down to the object itself. Various tasks can be benefited from this functionality such as understanding deprecated API  usage, dependency parsing as well as building sound call graphs. 
+
+* Function 8: Call Graph Construction. A call graph depicts calling relationships between methods in a software program. It is a fundamental component in static flow analysis and can be leveraged in tasks such as profiling, vulnerability propagation, and refactoring. This module addresses the challenges brought by complicated features adopted in Python, such as higher-order functions and nested function definitions, to construct the precise call graphs for given Python projects.
+
+* Function 9: Type Inference. Python, as a dynamically typed language, faces the problem of being hard to utilize the full power of traditional static analysis. This module infers the type information of all variables including function return values and function parameters in a Python program, making more sophisticated static analysis possible for Python. We utilize backward data-flow analysis and a set of heuristic rules to achieve high precision.
+
+## API Documentation
+
+The Scalpel's API documentation is available at [Here](https://smat-lab.github.io/scalpel.html)
 
 ## Acknowledgement
-This project has been inspired and supported by many existing work. Some implementation of functionalities are taken from published work. If you think your work appear in this project, but not mentioned yet, please let us know by any means. 
+This project has been inspired and supported by many existing works. If you think your work appears in this project but has not been mentioned yet, please let us know by any means.
 
 1. [Fuzzyingbook](https://www.fuzzingbook.org/).
-
 2. [Debugging book](https://www.debuggingbook.org/).
-
 3. [StaticCFG](https://github.com/coetaur0/staticfg).
-
 4. [PyCG: Practical Call Graph Generation in Python. In 43rd International Conference on Software Engineering, 2021](https://vitsalis.com/papers/pycg.pdf). 
 5. [A Simple, Fast Dominance Algorithm](https://www.cs.rice.edu/~keith/EMBED/dom.pdf) Keith D. Cooper, Timothy J. Harvey, and Ken Kennedy
 6. [COS598C Advanced Compilers](https://www.cs.princeton.edu/courses/archive/spr04/cos598C/lectures/02-ControlFlow.pdf), Princeton University
