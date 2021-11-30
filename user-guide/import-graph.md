@@ -57,11 +57,7 @@ print(len(leaf_nodes))
 
 ```
 For each of leaf notes, we can future to extract its type information, function definition list or more meta information. 
-\
-\
-Example output here.
-\
-\
+
 The tutorial code can be found here:\
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Import Graph Example](../examples/import_graph_tutorial.py)
 
