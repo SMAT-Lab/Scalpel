@@ -11,7 +11,7 @@ python setup.py
 
 ## Brief Introduction
 
-Detailed user guides can be found [Here]().
+Detailed user guides can be found [Here](user-guide/user-guide-main.md).
 
 We aim to provide Scalpel as a generic Python static analysis framework that includes as many functions as possible (e.g., to easily build inter-function control-flow graph, to interpret the import relationship of different Python modules, etc.) towards facilitating developers to implement their dedicated problem-focused static analyzers. The following figure depicts the current architecture of its design.
 
