@@ -17,7 +17,7 @@ class Rewriter:
     The rewriter class contains a set of static methods. 
     """
     @staticmethod
-    def rewrite(self, src, rule_func= None):
+    def rewrite(src, rule_func= None):
         """
         To constuct a import graph.
         Args:
@@ -27,7 +27,7 @@ class Rewriter:
         """
         if rule_func is None:
             raise Exception("rule_func cannot be None type!")
-            
+
         module_node = ast.parse(src)
         Walker = UnitWalker(module_node)
         for unit in Walker:
