@@ -277,46 +277,6 @@ class CFG(object):
         #def dfs(start_block):
         #    # non-recurisve implementation of DFS search
 
-
-    def backward(self, block, value, is_visited, visit_link):
-        # if not found in the current block, get all lookup results of the predecessors block 
-        # recursively traceback
-        if not isinstance(value, ast.Name):
-            return value
-
-        if block.id in is_visited:
-            return None
-        is_visited.add(block.id)
-
-        for stmt in block.statements:
-            if isinstance(stmt, (ast.If, ast.IfExp)):
-                if isinstance(stmt.test, ast.Call) and isinstance(stmt.test.func, ast.Name) and visit_link is not None:
-                    entry_link = visit_link.get_exitcase()
-                    if stmt.test.func.id == "isinstance" and entry_link[0:3]!="not": 
-                        if isinstance(stmt.test.args[1], ast.Name):
-                            return "org:" + stmt.test.args[1].id
-            elif isinstance(stmt, ast.Assign):
-                # this is an alias
-                # revisit the current block
-                if len(stmt.targets) == 1 and isinstance(stmt.targets[0], ast.Name) and stmt.targets[0].id == value.id:
-                    is_visited.remove(block.id)
-                    return self.backward(block, stmt.value, is_visited, None)
-            elif isinstance(stmt, ast.AnnAssign):
-                # what if it is a tuple or attribute
-                # revisit the current block
-                if isinstance(stmt.target, ast.Name) and stmt.target.id == value.id:
-                    is_visited.remove(block.id)
-                    return self.backward(block, stmt.value, is_visited, None)
-            else:
-                pass
-
-        # when  reaches here, no def found so far. Then return all the
-        # possible lookup results
-        for pre_link in block.predecessors:
-           # condition_str = pre_link.get_exitcase() 
-            return self.backward(pre_link.source, value, is_visited, pre_link)
-        return None
-
     def build_visual(self, format, calls=True, show=True):
         """
         Build a visualisation of the CFG with graphviz and output it in a DOT
@@ -331,7 +291,6 @@ class CFG(object):
         """
         graph = self._build_visual(format, calls)
         return graph
-        #graph.render(filepath, view=show)
 
     def __iter__(self):
         """
