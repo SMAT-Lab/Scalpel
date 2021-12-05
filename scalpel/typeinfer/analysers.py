@@ -718,8 +718,11 @@ class ReturnStmtVisitor(ast.NodeVisitor):
                 assignments=self.assignments,
                 return_node=actual_return_value
             )
-
-            self.r_types += [return_type]
+            if isinstance(return_type, list):
+                for type in return_type:
+                    self.r_types.append(type)
+            else:
+                self.r_types += [return_type]
             return
 
         if type_val in ["ID", "attr"]:
@@ -1114,7 +1117,7 @@ class Heuristics:
             # Variable hasn't been resolved by any other heuristics
             if variable.type == 'any':
                 if len(is_instance_types) > 1:
-                    variable.type = f'Union[{", ".join(is_instance_types)}]'
+                    variable.type = is_instance_types
                 else:
                     variable.type = is_instance_types[0]
 
@@ -1167,7 +1170,7 @@ class Heuristics:
                 elif len(type_values) > 0:
                     # Couldn't infer type from other heuristic, set as union of passed in types
                     union_types = f"Union[{', '.join(type_values)}]"
-                    parameter.type = union_types
+                    parameter.type = type_values
 
     @staticmethod
     def heuristic_nine(import_mappings, processed_file, function_node):
