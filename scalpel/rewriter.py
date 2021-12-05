@@ -7,15 +7,21 @@ Code rewriting can bring great benefits such as API extraction and dynamic testi
 import os
 import sys
 import ast
-import astor  
+import random 
+import astor
+from astor.source_repr import count  
 
 from scalpel.core.module_graph import MNode, ModuleGraph, UnitWalker
-
+from scalpel.core.vars_visitor import get_vars
 
 class Rewriter:
     """
     The rewriter class contains a set of static methods. 
     """
+    def __init__(self, src):
+        self.src = src
+        self.ast = ast.parse(src)
+        
     @staticmethod
     def rewrite(src, rule_func= None):
         """
@@ -40,6 +46,110 @@ class Rewriter:
         new_src = astor.to_source(new_ast)
         return new_src 
 
+    def random_var_renaming(self, new_name = None):
+        
+        all_vars = get_vars(self.ast)
+
+        var_name_set = [var["name"] for var in all_vars if "." not in var["name"] ]
+        selected_name = random.sample(var_name_set, 1)[0]
+     
+        renamer = VarRenamer(selected_name, new_name)
+        self.ast = renamer.visit(self.ast)
+        self.ast = ast.fix_missing_locations(self.ast)
+        
+
+    def unused_stmt_insertion(self):    
+        inserted_stmt = ast.Expr(ast.Call(ast.Name("print", ast.Load()), [ast.Name("this is an unused statement", ast.Load())], []))
+       
+        num_insertion_point = 0
+        walker = UnitWalker(self.ast)
+        for unit in walker:
+            num_insertion_point += 1
+        insertion_loc = random.randint(0, num_insertion_point-1)
+        idx = 0
+        walker = UnitWalker(self.ast)
+        for unit in walker: 
+            if idx == insertion_loc:
+                unit.insert_stmts_before([inserted_stmt, unit.node])
+            
+            idx += 1
+        self.ast = ast.fix_missing_locations(self.ast)
+    
+    def for2while(self, node):
+        if isinstance(node, ast.For) and isinstance(node.target, ast.Name):
+            iter_object = ast.Name("_iter_obj_"+str(node.lineno), ast.Store())
+            counter_var = ast.Name("_counter_"+str(node.lineno), ast.Store())
+            max_counter_var = ast.Name("_len_of_iter_" +str(node.lineno), ast.Store())
+
+            iter_save_stmt = ast.Assign([iter_object], node.iter)
+            counter_init_stmt = ast.Assign([counter_var], ast.Constant(0))
+            max_counter_init_stmt = ast.Assign([max_counter_var], ast.Call(ast.Name("len"), [iter_object], []))
+            test_node = ast.Compare(counter_var, [ast.Lt()], [max_counter_var]) 
+
+            counter_inc_stmt = ast.AugAssign(counter_var, ast.Add(), ast.Constant(1))
+            #print(astor.to_source(iter_save_stmt))
+            #print(astor.to_source(counter_init_stmt))
+            #print(astor.to_source(max_counter_init_stmt))
+            #print(astor.to_source(test_node))
+            
+            new_body = node.body+[counter_inc_stmt]
+            while_node = ast.While(test_node, new_body, node.orelse)
+            renamer = VarRenamer(node.target.id, iter_object.id)
+            while_node = renamer.visit(while_node)
+
+            return [iter_save_stmt, counter_init_stmt, max_counter_init_stmt, while_node]
+        raise "Invalid Input!"
+        return node 
+    def loop_exchange(self):
+        Walker = UnitWalker(self.ast)
+        for unit in Walker:
+            if isinstance(unit.node, ast.For):
+                new_stmts = self.for2while(unit.node) 
+                unit.insert_stmts_before(new_stmts)
+
+        self.ast = ast.fix_missing_locations(self.ast)
+        
+    
+    def get_src(self):
+        return astor.to_source(self.ast)
+        
+        
+class VarRenamer(ast.NodeTransformer):
+    """
+    Here is the implementation of code rewriter at AST node level.
+    """
+  
+    def __init__(self, old_name, new_name):
+  
+        self.old_name = old_name
+        self.new_name = new_name
+        assert self.old_name is not None 
+    
+    def visit_Name(self, node):
+        if node.id == self.old_name:
+            if self.new_name is not None:
+                node.id = self.new_name
+            else:
+                node.id = "_renamed_" + node.id
+        self.generic_visit(node)
+        return node
+
+class LoopExchanger(ast.NodeTransformer):
+    """
+    Here is the implementation of code rewriter at AST node level.
+    """
+
+    def visit_For(self, node):
+        # let something to be assigned by node.iter
+        iter_var = ast.Assign()
+        # copy the body
+        # get the test 
+        #make a test
+        #new_while_node = ast.While(node.test, node.body, node.orelse)
+
+        return node
+
+   
 
 class ASTRewriter(ast.NodeTransformer):
     """
