@@ -355,6 +355,11 @@ class TypeInference:
                 function_name=function_name,
                 function_params=function_params
             )
+            heuristics.heuristic_twelve(
+                function_node=function_node,
+                function_params=function_params
+            )
+
 
             # Heuristic 7
             heuristics.heuristic_seven(
