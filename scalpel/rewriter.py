@@ -54,7 +54,9 @@ class Rewriter:
         selected_name = random.sample(var_name_set, 1)[0]
      
         renamer = VarRenamer(selected_name, new_name)
+        
         self.ast = renamer.visit(self.ast)
+        
         self.ast = ast.fix_missing_locations(self.ast)
         
 
@@ -85,8 +87,10 @@ class Rewriter:
             counter_init_stmt = ast.Assign([counter_var], ast.Constant(0))
             max_counter_init_stmt = ast.Assign([max_counter_var], ast.Call(ast.Name("len"), [iter_object], []))
             test_node = ast.Compare(counter_var, [ast.Lt()], [max_counter_var]) 
-
             counter_inc_stmt = ast.AugAssign(counter_var, ast.Add(), ast.Constant(1))
+
+            new_target_var =  ast.Subscript(iter_object,counter_var, ast.Load())
+
             #print(astor.to_source(iter_save_stmt))
             #print(astor.to_source(counter_init_stmt))
             #print(astor.to_source(max_counter_init_stmt))
@@ -94,7 +98,7 @@ class Rewriter:
             
             new_body = node.body+[counter_inc_stmt]
             while_node = ast.While(test_node, new_body, node.orelse)
-            renamer = VarRenamer(node.target.id, iter_object.id)
+            renamer = VarRenamer(node.target.id, iter_object.id,  inserted_node=new_target_var)
             while_node = renamer.visit(while_node)
 
             return [iter_save_stmt, counter_init_stmt, max_counter_init_stmt, while_node]
@@ -119,20 +123,33 @@ class VarRenamer(ast.NodeTransformer):
     Here is the implementation of code rewriter at AST node level.
     """
   
-    def __init__(self, old_name, new_name):
+    def __init__(self, old_name, new_name, inserted_node =None):
   
         self.old_name = old_name
         self.new_name = new_name
+        self.inserted_node = inserted_node
         assert self.old_name is not None 
     
     def visit_Name(self, node):
         if node.id == self.old_name:
+            if self.inserted_node is not None:
+                return self.inserted_node 
             if self.new_name is not None:
                 node.id = self.new_name
             else:
                 node.id = "_renamed_" + node.id
         self.generic_visit(node)
         return node
+    def visit_arg(self, node):
+       
+        if node.arg == self.old_name:
+            if self.new_name is not None:
+                node.arg = self.new_name
+            else:
+                node.arg = "_renamed_" + node.id
+        self.generic_visit(node)
+        return node
+        
 
 class LoopExchanger(ast.NodeTransformer):
     """
@@ -286,8 +303,7 @@ class ASTRewriter(ast.NodeTransformer):
                 return ast.FunctionDef(fun_name, node.value.args, body_stmts, decorator_list)
 
         if len(node.targets) ==1 and isinstance(node.value, ast.ListComp):
-            print(ast.dump(node.value))
-
+        
             iter = node.value.generators[0].iter
             ifs  = node.value.generators[0].ifs
             target_name = node.value.generators[0].target.id
