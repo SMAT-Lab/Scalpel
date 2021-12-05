@@ -112,6 +112,7 @@ class Unit:
         if self.parent is not None and hasattr(self.parent, "body"):
             try:
                 pos = self.parent.body.index(self.node)
+               
                 self.parent.body[pos:pos+1] = new_stmts
             except Exception as e:
                 raise "Insertion Failure"
@@ -135,7 +136,7 @@ class Unit:
 
 def UnitWalker(module_node):
     # this code is adapted from the implementation of ast.walk
-    # it does only handle statment level
+    # it does only handle statement level
     # offset to the first
     from collections import deque
     init_stmts = []
