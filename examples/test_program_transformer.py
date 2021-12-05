@@ -164,9 +164,17 @@ def sina_download_by_vkey(vkey, title=None, output_dir='.', merge=True, info_onl
 
 '''
 
+src11 = """
+def func(x,y):
+    z = 0.
+    for i in range(x+y):
+        z+=i
+    return z
+"""
+
 def main():
-    rewriter = Rewriter(src6)
-    print(src6)
+    rewriter = Rewriter(src11)
+    print(src11)
     rewriter.random_var_renaming(new_name = "_renamed_one")
     rewriter.unused_stmt_insertion()
     rewriter.loop_exchange()
