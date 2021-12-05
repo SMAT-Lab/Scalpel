@@ -59,7 +59,7 @@ class Rewriter:
         
 
     def unused_stmt_insertion(self):    
-        inserted_stmt = ast.Expr(ast.Call(ast.Name("print", ast.Load()), [ast.Name("this is an unused statement", ast.Load())], []))
+        inserted_stmt = ast.Expr(ast.Call(ast.Name("print", ast.Load()), [ast.Constant("this is an unused statement")], []))
        
         num_insertion_point = 0
         walker = UnitWalker(self.ast)
