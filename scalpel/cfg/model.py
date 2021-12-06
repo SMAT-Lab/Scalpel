@@ -26,7 +26,6 @@ class Block(object):
         self.id = id
         # Statements in the block.
         self.statements = []
-        self.ssa_form = {}
         # Calls to functions inside the block (represents context switches to
         # some functions' CFGs).
         self.func_calls = []
