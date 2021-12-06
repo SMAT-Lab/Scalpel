@@ -48,7 +48,7 @@ class Rewriter:
 
     def random_var_renaming(self, new_name = None):
         
-        all_vars = get_vars(self.ast)
+        all_vars = get_vars(self.ast, skip_call_name=True)
 
         var_name_set = [var["name"] for var in all_vars if "." not in var["name"] ]
         selected_name = random.sample(var_name_set, 1)[0]
