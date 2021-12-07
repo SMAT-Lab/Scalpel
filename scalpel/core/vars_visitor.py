@@ -1,8 +1,9 @@
 import ast
 
 class VarsVisitor(ast.NodeVisitor):
-    def __init__(self):
+    def __init__(self, skip_call_name =False):
         self.result = list()
+        self.skip_call_name = skip_call_name
 
     def visit_Name(self, node):
         var_info = {"name": node.id, "lineno": node.lineno, "col_offset":
@@ -91,7 +92,11 @@ class VarsVisitor(ast.NodeVisitor):
             self.visit(c)
 
     def visit_Call(self, node):
-        self.visit(node.func)
+        if self.skip_call_name == False:
+            self.visit(node.func)
+        if self.skip_call_name is True and not isinstance(node.func, ast.Name):
+            self.visit(node.func)
+
         for arg in node.args:
             self.visit(arg)
         for keyword in node.keywords:
@@ -179,7 +184,7 @@ class VarsVisitor(ast.NodeVisitor):
         #    self.visit(target)
 
 
-def get_vars(node):
-    visitor = VarsVisitor()
+def get_vars(node, skip_call_name=False):
+    visitor = VarsVisitor(skip_call_name=skip_call_name)
     visitor.visit(node)
     return visitor.result
