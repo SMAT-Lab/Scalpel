@@ -257,21 +257,39 @@ class TypeInference:
     
             for assignment in node.static_assignments:
                 if assignment.is_arg:
-                    type_list.append({
-                        'file': node.name,
-                        'line_number': assignment.line,
-                        'parameter': assignment.name,
-                        'function': assignment.function,
-                        'type': assignment.type
-                    })
+                    if isinstance(assignment.type,list):
+                        type_list.append({
+                            'file': node.name,
+                            'line_number': assignment.line,
+                            'parameter': assignment.name,
+                            'function': assignment.function,
+                            'type': set(assignment.type)
+                        })
+                    else:
+                        type_list.append({
+                            'file': node.name,
+                            'line_number': assignment.line,
+                            'parameter': assignment.name,
+                            'function': assignment.function,
+                            'type': {assignment.type}
+                        })
                 else:
-                    type_list.append({
-                        'file': node.name,
-                        'line_number': assignment.line,
-                        'variable': assignment.name,
-                        'function': assignment.function,
-                        'type': assignment.type
-                    })
+                    if isinstance(assignment.type, list):
+                        type_list.append({
+                            'file': node.name,
+                            'line_number': assignment.line,
+                            'variable': assignment.name,
+                            'function': assignment.function,
+                            'type': set(assignment.type)
+                        })
+                    else:
+                        type_list.append({
+                            'file': node.name,
+                            'line_number': assignment.line,
+                            'variable': assignment.name,
+                            'function': assignment.function,
+                            'type': {assignment.type}
+                        })
      
         return type_list
 
@@ -337,6 +355,11 @@ class TypeInference:
                 function_name=function_name,
                 function_params=function_params
             )
+            heuristics.heuristic_twelve(
+                function_node=function_node,
+                function_params=function_params
+            )
+
 
             # Heuristic 7
             heuristics.heuristic_seven(
@@ -387,7 +410,6 @@ class TypeInference:
                 continue
 
             # Function has at least one return if we reach here
-          
             processed_file.type_dict[function_name] = return_visitor.r_types
             stem_from_dict[function_name] = return_visitor.stem_from
             processed_file.type_gt[function_name] = function_node.returns

@@ -29,7 +29,7 @@ class BaseCaseTests(unittest.TestCase):
             assert inferred == [
                 {'file': 'case1.py', 'line_number': 10, 'function': 'my_function', 'type': {'Dict[str, str]'}},
                 {'file': 'case1.py', 'line_number': 14, 'variable': 'my_var', 'function': 'my_function',
-                 'type': 'Dict[str, str]'}]
+                 'type': {'Dict[str, str]'}}]
         else:
             assert inferred == [
                 {'file': 'case1.py', 'line_number': 10, 'function': 'my_function', 'type': {'Dict[any, any]'}},
@@ -51,9 +51,9 @@ class BaseCaseTests(unittest.TestCase):
             assert inferred == [
                 {'file': 'case3.py', 'line_number': 8, 'function': 'my_function', 'type': {'str', 'int'}},
                 {'file': 'case3.py', 'line_number': 8, 'parameter': 'my_bool', 'function': 'my_function',
-                 'type': 'any'},
-                {'file': 'case3.py', 'line_number': 10, 'variable': 'my_int', 'function': 'my_function', 'type': 'int'},
-                {'file': 'case3.py', 'line_number': 13, 'variable': 'my_str', 'function': 'my_function', 'type': 'str'}]
+                 'type': {'any'}},
+                {'file': 'case3.py', 'line_number': 10, 'variable': 'my_int', 'function': 'my_function', 'type': {'int'}},
+                {'file': 'case3.py', 'line_number': 13, 'variable': 'my_str', 'function': 'my_function', 'type': {'str'}}]
         else:
             assert inferred == [
                 {'file': 'case3.py', 'line_number': 8, 'function': 'my_function', 'type': {'str', 'int'}},
@@ -75,19 +75,19 @@ class BaseCaseTests(unittest.TestCase):
         if py_version_above_38:
             assert inferred == [{'file': 'case5.py', 'line_number': 9, 'function': 'my_function', 'type': {'int'}},
                                 {'file': 'case5.py', 'line_number': 10, 'variable': 'x', 'function': 'my_function',
-                                 'type': 'int'},
+                                 'type': {'int'}},
                                 {'file': 'case5.py', 'line_number': 11, 'variable': 'y', 'function': 'my_function',
-                                 'type': 'int'},
+                                 'type': {'int'}},
                                 {'file': 'case5.py', 'line_number': 12, 'variable': 'z', 'function': 'my_function',
-                                 'type': 'int'}]
+                                 'type': {'int'}}]
         else:
             assert inferred == [{'file': 'case5.py', 'line_number': 9, 'function': 'my_function', 'type': {None}},
                                 {'file': 'case5.py', 'line_number': 10, 'variable': 'x', 'function': 'my_function',
-                                 'type': 'any'},
+                                 'type': {'any'}},
                                 {'file': 'case5.py', 'line_number': 11, 'variable': 'y', 'function': 'my_function',
-                                 'type': 'any'},
+                                 'type': {'any'}},
                                 {'file': 'case5.py', 'line_number': 12, 'variable': 'z', 'function': 'my_function',
-                                 'type': 'any'}]
+                                 'type': {'any'}}]
 
     def test_case_6(self):
         infferer = TypeInference(name='case6.py', entry_point=current_directory+'/test-cases/typeinfer_basecase/case6.py')
@@ -96,19 +96,19 @@ class BaseCaseTests(unittest.TestCase):
         if py_version_above_38:
             assert inferred == [{'file': 'case6.py', 'line_number': 9, 'function': 'my_function', 'type': {'str'}},
                                 {'file': 'case6.py', 'line_number': 10, 'variable': 'x', 'function': 'my_function',
-                                 'type': 'int'},
+                                 'type': {'int'}},
                                 {'file': 'case6.py', 'line_number': 11, 'variable': 'y', 'function': 'my_function',
-                                 'type': 'int'},
+                                 'type': {'int'}},
                                 {'file': 'case6.py', 'line_number': 12, 'variable': 'z', 'function': 'my_function',
-                                 'type': 'int'}]
+                                 'type': {'int'}}]
         else:
             assert inferred == [{'file': 'case6.py', 'line_number': 9, 'function': 'my_function', 'type': {'str'}},
                                 {'file': 'case6.py', 'line_number': 10, 'variable': 'x', 'function': 'my_function',
-                                 'type': 'any'},
+                                 'type': {'any'}},
                                 {'file': 'case6.py', 'line_number': 11, 'variable': 'y', 'function': 'my_function',
-                                 'type': 'any'},
+                                 'type': {'any'}},
                                 {'file': 'case6.py', 'line_number': 12, 'variable': 'z', 'function': 'my_function',
-                                 'type': 'any'}]
+                                 'type': {'any'}}]
 
     def test_case_7(self):
         infferer = TypeInference(name='case7.py', entry_point=current_directory+'/test-cases/typeinfer_basecase/case7.py')
@@ -142,7 +142,7 @@ class BaseCaseTests(unittest.TestCase):
         inferred = infferer.get_types()
         assert inferred == [{'file': 'case10.py', 'line_number': 10, 'function': 'my_function', 'type': {'defaultdict'}},
              {'file': 'case10.py', 'line_number': 11, 'variable': 'my_default_dict', 'function': 'my_function',
-              'type': 'defaultdict'}]
+              'type': {'defaultdict'}}]
 
     def test_case_11(self):
         infferer = TypeInference(name='case11.py', entry_point=current_directory+'/test-cases/typeinfer_basecase/case11.py')
@@ -152,9 +152,9 @@ class BaseCaseTests(unittest.TestCase):
             assert inferred == [
                 {'file': 'case11.py', 'line_number': 7, 'function': 'my_function', 'type': {'int', 'str'}},
                 {'file': 'case11.py', 'line_number': 7, 'parameter': 'my_bool', 'function': 'my_function',
-                 'type': 'any'},
-                {'file': 'case11.py', 'line_number': 9, 'variable': 'x', 'function': 'my_function', 'type': 'int'},
-                {'file': 'case11.py', 'line_number': 11, 'variable': 'x', 'function': 'my_function', 'type': 'str'}]
+                 'type': {'any'}},
+                {'file': 'case11.py', 'line_number': 9, 'variable': 'x', 'function': 'my_function', 'type': {'int'}},
+                {'file': 'case11.py', 'line_number': 11, 'variable': 'x', 'function': 'my_function', 'type': {'str'}}]
         else:
             assert inferred == [
                 {'file': 'case11.py', 'line_number': 7, 'function': 'my_function', 'type': {'int', 'str'}},
@@ -171,15 +171,15 @@ class BaseCaseTests(unittest.TestCase):
         if py_version_above_38:
             assert inferred == [{'file': 'case12.py', 'line_number': 12, 'function': 'my_function', 'type': {'int'}},
                                 {'file': 'case12.py', 'line_number': 12, 'parameter': 'my_val',
-                                 'function': 'my_function', 'type': 'int'},
+                                 'function': 'my_function', 'type': {'int'}},
                                 {'file': 'case12.py', 'line_number': 13, 'variable': 'x', 'function': 'my_function',
-                                 'type': 'int'},
+                                 'type': {'int'}},
                                 {'file': 'case12.py', 'line_number': 14, 'variable': 'y', 'function': 'my_function',
-                                 'type': 'int'},
+                                 'type': {'int'}},
                                 {'file': 'case12.py', 'line_number': 15, 'variable': 'g', 'function': 'my_function',
-                                 'type': 'int'},
+                                 'type': {'int'}},
                                 {'file': 'case12.py', 'line_number': 16, 'variable': 'z', 'function': 'my_function',
-                                 'type': 'int'}]
+                                 'type': {'int'}}]
         else:
             assert inferred == [{'file': 'case12.py', 'line_number': 12, 'function': 'my_function', 'type': {None}},
                                 {'file': 'case12.py', 'line_number': 12, 'parameter': 'my_val',
@@ -208,9 +208,9 @@ class BaseCaseTests(unittest.TestCase):
         if py_version_above_38:
             assert inferred == [{'file': 'case14.py', 'line_number': 8, 'function': 'my_function', 'type': {'int'}},
                                 {'file': 'case14.py', 'line_number': 9, 'variable': 'x', 'function': 'my_function',
-                                 'type': 'int'},
+                                 'type': {'int'}},
                                 {'file': 'case14.py', 'line_number': 10, 'variable': 'z', 'function': 'my_function',
-                                 'type': 'int'}]
+                                 'type': {'int'}}]
         else:
             assert inferred == [{'file': 'case14.py', 'line_number': 8, 'function': 'my_function', 'type': {None}},
                                 {'file': 'case14.py', 'line_number': 9, 'variable': 'x', 'function': 'my_function',
@@ -226,7 +226,7 @@ class BaseCaseTests(unittest.TestCase):
         if py_version_above_38:
             assert inferred == [{'file': 'case15.py', 'line_number': 11, 'function': 'my_function', 'type': {'str'}},
                                 {'file': 'case15.py', 'line_number': 12, 'variable': 'x', 'function': 'my_function',
-                                 'type': 'str'}]
+                                 'type': {'str'}}]
         else:
             assert inferred == [{'file': 'case15.py', 'line_number': 11, 'function': 'my_function', 'type': {None}},
                                 {'file': 'case15.py', 'line_number': 12, 'variable': 'x', 'function': 'my_function',
@@ -243,7 +243,7 @@ class BaseCaseTests(unittest.TestCase):
                 {'file': 'file1.py', 'line_number': 7, 'function': 'MyClass.class_method', 'type': {'Tuple[str]'}},
                 {'file': 'file2.py', 'line_number': 1, 'function': 'imported_function', 'type': {'Tuple[str]'}},
                 {'file': 'file2.py', 'line_number': 2, 'variable': 'return_value', 'function': 'imported_function',
-                 'type': 'Tuple[str]'}]
+                 'type': {'Tuple[str]'}}]
         else:
             assert inferred == [
                 {'file': 'file1.py', 'line_number': 6, 'function': 'class_method', 'type': {'Tuple[str]'}},
@@ -263,9 +263,9 @@ class BaseCaseTests(unittest.TestCase):
             assert inferred == [{'file': 'case17.py', 'line_number': 1, 'function': 'fun1', 'type': {'float'}},
                                 {'file': 'case17.py', 'line_number': 5, 'function': 'fun2', 'type': {'float'}},
                                 {'file': 'case17.py', 'line_number': 1, 'parameter': 'a', 'function': 'fun1',
-                                 'type': 'float'},
+                                 'type': {'float'}},
                                 {'file': 'case17.py', 'line_number': 5, 'parameter': 'a', 'function': 'fun2',
-                                 'type': 'any'}]
+                                 'type': {'any'}}]
         else:
             assert inferred == [{'file': 'case17.py', 'line_number': 1, 'function': 'fun1', 'type': {'any'}},
                                 {'file': 'case17.py', 'line_number': 5, 'function': 'fun2', 'type': {None}},
@@ -293,11 +293,12 @@ class BaseCaseTests(unittest.TestCase):
         inferrer.infer_types()
         inferred = inferrer.get_types()
         if py_version_above_38:
-            assert inferred == [{'file': 'case20.py', 'line_number': 1, 'function': 'add', 'type': {'Union[str, int]'}},
+            assert inferred == [{'file': 'case20.py', 'line_number': 1, 'function': 'add', 'type': {'int', 'str'}},
                                 {'file': 'case20.py', 'line_number': 1, 'parameter': 'x', 'function': 'add',
-                                 'type': 'Union[str, int]'},
+                                 'type': {'int', 'str'}},
                                 {'file': 'case20.py', 'line_number': 1, 'parameter': 'y', 'function': 'add',
-                                 'type': 'Union[str, int]'}]
+                                 'type': {'int', 'str'}}]
+
         else:
             assert inferred == [{'file': 'case20.py', 'line_number': 1, 'function': 'add', 'type': {None}},
                                 {'file': 'case20.py', 'line_number': 1, 'parameter': 'x', 'function': 'add',
@@ -309,17 +310,18 @@ class BaseCaseTests(unittest.TestCase):
         inferrer = TypeInference(name='case23', entry_point=current_directory+'/test-cases/typeinfer_basecase/case23.py')
         inferrer.infer_types()
         inferred = inferrer.get_types()
-        assert inferred == [{'file': 'case23.py', 'line_number': 1, 'function': 'my_function', 'type': {'str', 'int'}},
-             {'file': 'case23.py', 'line_number': 1, 'parameter': 'x', 'function': 'my_function',
-              'type': 'Union[int, str]'}]
+        assert inferred == [{'file': 'case23.py', 'line_number': 1, 'function': 'my_function',
+                             'type': {'int', 'str'}},
+                            {'file': 'case23.py', 'line_number': 1, 'parameter': 'x', 'function': 'my_function',
+                             'type': {'str', 'int'}}]
 
     def test_case_24(self):
         inferrer = TypeInference(name='case24', entry_point=current_directory+'/test-cases/typeinfer_basecase/case24.py')
         inferrer.infer_types()
         inferred = inferrer.get_types()
         assert inferred == [{'file': 'case24.py', 'line_number': 1, 'function': 'my_function', 'type': {'any'}},
-             {'file': 'case24.py', 'line_number': 1, 'parameter': 'x', 'function': 'my_function', 'type': 'callable'},
-             {'file': 'case24.py', 'line_number': 2, 'variable': 'y', 'function': 'my_function', 'type': 'any'}]
+             {'file': 'case24.py', 'line_number': 1, 'parameter': 'x', 'function': 'my_function', 'type': {'callable'}},
+             {'file': 'case24.py', 'line_number': 2, 'variable': 'y', 'function': 'my_function', 'type': {'any'}}]
 
 
 if __name__ == '__main__':

@@ -718,8 +718,11 @@ class ReturnStmtVisitor(ast.NodeVisitor):
                 assignments=self.assignments,
                 return_node=actual_return_value
             )
-
-            self.r_types += [return_type]
+            if isinstance(return_type, list):
+                for type in return_type:
+                    self.r_types.append(type)
+            else:
+                self.r_types += [return_type]
             return
 
         if type_val in ["ID", "attr"]:
@@ -1114,7 +1117,7 @@ class Heuristics:
             # Variable hasn't been resolved by any other heuristics
             if variable.type == 'any':
                 if len(is_instance_types) > 1:
-                    variable.type = f'Union[{", ".join(is_instance_types)}]'
+                    variable.type = is_instance_types
                 else:
                     variable.type = is_instance_types[0]
 
@@ -1166,8 +1169,7 @@ class Heuristics:
                     # TODO: Raise warning for types that are passed as input incorrectly?
                 elif len(type_values) > 0:
                     # Couldn't infer type from other heuristic, set as union of passed in types
-                    union_types = f"Union[{', '.join(type_values)}]"
-                    parameter.type = union_types
+                    parameter.type = type_values
 
     @staticmethod
     def heuristic_nine(import_mappings, processed_file, function_node):
@@ -1187,6 +1189,59 @@ class Heuristics:
     def heuristic_eleven(self, processed_file, function_node):
         # Find what variables are in comparison operations and resolve types
         pass
+
+    @staticmethod
+    def heuristic_twelve(function_node, function_params):
+        """
+        Performs heuristic 8 for a function's inputs. Note that this heuristic
+        attempts to infer/check the types a developer likely intended for function
+        parameters and provide a limited number of types to the actual number that
+        may work
+        Args:
+            ast_tree: The ast tree for the module the function is in
+            function_name: The name of the function being checked
+            function_params: The function parameters from a variable assignment map
+        """
+        param_type_map = {p.name: {} for p in function_params}
+        param_map = {p.name: p for p in function_params}
+
+        # Collect parameter input types
+        args = function_node.args
+        kwarg = args.kwarg
+        kw_defaults=args.kw_defaults
+        defaults = args.defaults
+        position = 0
+        if len(defaults)>0 :
+            for arg in list(param_type_map.keys())[-len(defaults):]:
+                # None is not helpful, not providing any hint
+                if defaults[position].value is not None:
+                    param_type_map[arg][type(defaults[position].value).__name__] = True
+                    position+=1
+
+        # Assign parameter input types to parameters
+        for param_name, param_types in param_type_map.items():
+            parameter = param_map.get(param_name)
+            type_values = list(param_types.keys())
+            if len(type_values) == 1:
+                # Validate
+                if parameter.type == 'any':
+                    parameter.type = type_values[0]
+                elif not param_types.get(parameter.type):
+                    # Mismatched inferred types
+                    # TODO: Raise a warning here?
+                    pass
+
+            else:
+                # See if we already inferred type from another heuristic, and check against the input type
+                if parameter.type != 'any':
+                    if parameter.type not in type_values:
+                        # Bad input to function
+                        # TODO: Raise a warning here?
+                        pass
+                    # TODO: Raise warning for types that are passed as input incorrectly?
+                elif len(type_values) > 0:
+                    # Couldn't infer type from other heuristic, set as union of passed in types
+                    parameter.type = type_values
 
     @staticmethod
     def get_bin_op_involved(binary_operation: ast.BinOp):
