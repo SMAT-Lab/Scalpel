@@ -517,6 +517,7 @@ class CFGBuilder(ast.NodeVisitor):
         # Popping the current after loop stack,taking care of errors in case of nested for loops
         self.after_loop_block_stack.pop()
         self.curr_loop_guard_stack.pop()
+
     # Async for loops and async with context managers. 
     # They have the same fields as For and With, respectively. 
     # Only valid in the body of an AsyncFunctionDef.
