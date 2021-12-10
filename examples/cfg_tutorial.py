@@ -1,6 +1,6 @@
 from scalpel.cfg import CFGBuilder
 
-code_str="""
+src="""
 def fib():
     a, b = 0, 1
     while True:
@@ -14,15 +14,18 @@ for _ in range(10):
 
 
 def main():
-    cfg = CFGBuilder().build_from_src('example.py', code_str)
-    cfg.build_visual('pdf')
+    cfg = CFGBuilder().build_from_src("example", src)
+    fun_cfg = cfg.functioncfgs.items()
+    for (block_id, fun_name), fun_cfg in cfg.functioncfgs.items():
+        if fun_name == "fib":
+            graph = fun_cfg.build_visual('png')
+            graph.render("function_fib_cfg", view=False)
+    return 0
+    #graph = cfg.build_visual('pdf')
+    #graph.render("example_cfg.pdf", view=False)
     for block in cfg:
         calls = block.get_calls()
         print(calls)
-    example_block = cfg.get_all_blocks()[-1]
-    a_value = cfg.backward(example_block,'a',[],[])
-    print(a_value)
-
 
 if __name__ == "__main__":
     main()

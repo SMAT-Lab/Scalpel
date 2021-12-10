@@ -45,6 +45,17 @@ for block in cfg:
     calls = block.get_calls()
 ```
 
+### Visualizations of CFG objects
+
+Scalpel offeres some functionalities to render the CFG diagrams into PDF, PNG, JPG or SVGs. Please notice this requires the graphviz package installed in your computer. Please refer to [graphviz](https://graphviz.readthedocs.io/en/stable/manual.html) get it installed. 
+
+Developers can use ```cfg.build_visual()``` to build an ```graphviz.dot.Digraph``` object, then call ```render``` function to generate the image file as shown in the following code snippet.
+
+```python
+dot = fun_cfg.build_visual('png')
+dot.render("cfg_diagram", view=False)
+```
+
 ### Visiting Function CFGs
 
 In thoery, there is no control flow constaints between subprocedures such as functions. Therefore, Scalpel generates control flow graphs for every functions in the given source files. Considering the the nested structure of Python class and function definition, we integrate recursive data data sturcture for storing control flow graphs.
