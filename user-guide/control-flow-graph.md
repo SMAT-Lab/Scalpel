@@ -45,7 +45,7 @@ for block in cfg:
     calls = block.get_calls()
 ```
 
-### Visiting  function cfgs
+### Visiting Function CFGs
 
 In thoery, there is no control flow constaints between subprocedures such as functions. Therefore, Scalpel generates control flow graphs for every functions in the given source files. Considering the the nested structure of Python class and function definition, we integrate recursive data data sturcture for storing control flow graphs.
 
