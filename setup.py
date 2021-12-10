@@ -13,6 +13,7 @@ setup(
         'graphviz~=0.17',
         'nbformat',
         'nbconvert',
+        'networkx',
         'astunparse~=1.6.3',
         'typed-ast',
         'typeshed-client',
