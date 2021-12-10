@@ -32,22 +32,65 @@ This returns the CFG for the code in *./example.py* in the cfg variable. This bu
 cfg.build_visual('pdf')
 ```
 Below is the produced *exampleCFG.pdf*.
-![Fibonacci CFG](../resources/cfg_example.png)
+
+| ![Fibonacci CFG](../resources/cfg_example.png) |
+|:--:|
+| <b>Fig.1 The control flow graph for the given source files </b>|
+
+
 Apart from generating the visual graph, the CFG can be use for many other static analysis purpose.
 For example, `get_calls` can be used to get all function calls in each block.
 ```python
 for block in cfg:
     calls = block.get_calls()
 ```
-`backward` can be used to find a variable's value, if not found in the current block, by backtracing in the CFG.
+
+### Visiting  function cfgs
+
+In thoery, there is no control flow constaints between subprocedures such as functions. Therefore, Scalpel generates control flow graphs for every functions in the given source files. Considering the the nested structure of Python class and function definition, we integrate recursive data data sturcture for storing control flow graphs.
+
+Take the above source code for example, scalpel will generate two CFGs, one is shown in fig. 1 , the other is for the function ```fib```. 
+
+we can use the following way to visit all the function cfgs in the given source. 
+
+Please note that function cfgs can be indexed by both function name and its block id. This is due to Python language allow users to define functions with same names in the same domain such as:
+
 ```python
-example_block = cfg.get_all_blocks()[-1]
-a_value = cfg.backward(example_block,'a',[],[])
+x = 0
+if some condition:
+   def solve():
+       ...
+else:
+   def solve():
+       ...
+solve(x)
 ```
-One can also combined call graph and CFG to construct interprecedual CFG.
+
+The implementation of the function ```solve``` can be different depending the actual condition. Therefore, we need more than function name to index a function CFG. Now, if we take the fig. 1 for example, we can visit all function CFGs in the following way and try to create an pdf file for the diagram of CFG of function ```fib```: 
+
+
+```python
+for (block_id, fun_name), fun_cfg in cfg.functioncfgs.items():
+    ... # do something
+    if fun_name == "fib":
+        graph = fun_cfg.build_visual('png')
+        graph.render("fig_cfg", view=False) 
+```
+
+| ![Fib CFG](../resources/function_fib_cfg.png) |
+|:--:|
+| Fig.2 The control flow graph for the function ```fib``` |
+
+Please note, as their might be functions defined inside a function defintion, you can continue perform the similar operation on the ```fun_cfg``` to retrieve the nested function CFGs. These CFGs can be combined for anaysis. 
+
+
 \
 The tutorial code can be found here:\
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Control Flow Graph Example](../examples/cfg_tutorial.py)
+
+
+
+
 
 ### APIs
 [Please refer to the API documentation](https://smat-lab.github.io/scalpel/cfg.html)
