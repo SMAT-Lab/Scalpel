@@ -13,15 +13,16 @@ from ..core.mnode import MNode
 from ..core.vars_visitor  import get_vars
 
 def parse_val(node):
-   # does not return anything
-   if isinstance(node, ast.Constant):
+    # does not return anything
+    if isinstance(node, ast.Constant):
        return node.value
-   if isinstance(node, ast.Str):
-       if hasattr(node, "value"):
-           return node.value
-       else:
-           return node.s
-   return "other"
+    if isinstance(node, ast.Str):
+        if hasattr(node, "value"):
+            return node.value
+        else:
+            return node.s
+    return "other"
+
 
 class SSA:
     """
@@ -48,7 +49,6 @@ class SSA:
         self.undefined_names_from = {}
         self.global_names = []
 
-
     def get_attribute_stmts(self, stmts):
         call_stmts = []
         for stmt in stmts:
@@ -66,7 +66,6 @@ class SSA:
         res = get_vars(ast_node)
         idents = [r['name'] for r in res if  r['name'] is not None and "." not in r['name']]
         return idents
-    
 
     def compute_SSA(self, cfg):
         """
@@ -147,9 +146,6 @@ class SSA:
                     #        phi_loaded_idents[ident].append(ident_name_counter[ident])
                     #else if ident in ident_name_counter:
 
-                        
-                        
-    
             df_block_ids = DF[block.id]
             for df_block_id in df_block_ids:
                 df_block = id2blocks[df_block_id] 
@@ -159,8 +155,7 @@ class SSA:
                         # this var used
                         if af_ident in phi_loaded_idents:  
                             phi_loaded_idents[af_ident].add(ident_name_counter[af_ident])
-                                       
-       
+
         return block_renamed_loaded, ident_const_dict
 
     def get_stmt_idents_ctx(self, stmt, del_set=[], const_dict = {}):
@@ -193,7 +188,6 @@ class SSA:
             elif isinstance(stmt.target, ast.Attribute):
                 #TODO: resolve attributes
                 pass
-            
 
         if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef)):
             stored_idents.append(stmt.name)

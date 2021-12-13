@@ -6,6 +6,7 @@ from scalpel.core.module_graph import MNode, ModuleGraph, UnitWalker
 from scalpel.rewriter import Rewriter
 from scalpel.SSA.ssa import SSA
 
+
 def listcomp2loop(comp_node, target_name):
     iter = comp_node.generators[0].iter
     ifs  = comp_node.generators[0].ifs
@@ -28,6 +29,7 @@ def listcomp2loop(comp_node, target_name):
         body_stmts = [if_stmt]
         pass
     return [new_lst_def, ast.For(target, iter, body_stmts, orelse)]
+
 
 def rewrite(node):
     if isinstance(node, ast.Assign): 
@@ -133,6 +135,7 @@ def rewrite(node):
 
     return [node]
 
+
 def test_syntax_desugar():
     filename = sys.argv[1]
     source = open(filename).read()
@@ -151,6 +154,7 @@ def test_syntax_desugar():
     #print(source)
     #print('---------------------------')
     print(new_src)
+
 
 if __name__ == '__main__':
     test_syntax_desugar()

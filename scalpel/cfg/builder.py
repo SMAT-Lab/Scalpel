@@ -14,7 +14,9 @@ def is_py38_or_higher():
         return True
     return False
 
+
 NAMECONSTANT_TYPE = ast.Constant if is_py38_or_higher() else ast.NameConstant
+
 
 def invert(node):
     """
@@ -210,9 +212,10 @@ class CFGBuilder(ast.NodeVisitor):
         func_body = ast.Module(body=node.body)
         func_builder = CFGBuilder()
         self.cfg.functioncfgs[(enclosing_block_id,node.name)] = func_builder.build(node.name,
-                                                              func_body,
-                                                              asynchr,
-                                                              self.current_id)
+                                                                                   func_body,
+                                                                                   asynchr,
+                                                                                   self.current_id)
+
         def get_arg_names(argument_node):
             arg_names = []
             for node in ast.walk(argument_node):
@@ -230,7 +233,7 @@ class CFGBuilder(ast.NodeVisitor):
 
         Args:
             node: The AST node containing the function definition.
-            async: Boolean indicating whether the function for which the CFG is
+            asynchr: Boolean indicating whether the function for which the CFG is
                    being built is asynchronous or not.
         """
         self.current_id += 1
@@ -239,9 +242,9 @@ class CFGBuilder(ast.NodeVisitor):
         func_body = ast.Module(body=node.body)
         func_builder = CFGBuilder()
         self.cfg.class_cfgs[node.name] = func_builder.build(node.name,
-                                                              func_body,
-                                                              asynchr,
-                                                              self.current_id)
+                                                            func_body,
+                                                            asynchr,
+                                                            self.current_id)
         self.current_id = func_builder.current_id + 1
 
     def clean_cfg(self, block, visited=[]):
@@ -343,6 +346,7 @@ class CFGBuilder(ast.NodeVisitor):
     def visit_Delete(self, node):
         self.add_statement(self.current_block, node)
         self.goto_new_block(node)
+
     def visit_Raise(self, node):
         self.add_statement(self.current_block, node)
         self.cfg.finalblocks.append(self.current_block)

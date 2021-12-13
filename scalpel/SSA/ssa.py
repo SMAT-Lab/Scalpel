@@ -43,16 +43,18 @@ BUILT_IN_FUNCTIONS = {
         "__version__", "__all__",  "__docformat__", "__package__"
         }
 
+
 def parse_val(node):
-   # does not return anything
-   if isinstance(node, ast.Constant):
-       return node.value
-   if isinstance(node, ast.Str):
-       if hasattr(node, "value"):
-           return node.value
-       else:
-           return node.s
-   return "other"
+    # does not return anything
+    if isinstance(node, ast.Constant):
+        return node.value
+    if isinstance(node, ast.Str):
+        if hasattr(node, "value"):
+            return node.value
+        else:
+            return node.s
+    return "other"
+
 
 class SSA:
     """
@@ -368,7 +370,6 @@ class SSA:
     def hit_scope(self, ident_name, block_ident_gen, block_ident_unorder):
         gen_sets = list(block_ident_gen.values()) + list(block_ident_unorder.values())
         return any(ident_name in g_s for g_s in gen_sets)
-
 
     def is_undefined(self, load_idents):
         ident_phi_fun = {}

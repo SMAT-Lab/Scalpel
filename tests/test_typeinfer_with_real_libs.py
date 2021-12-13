@@ -111,6 +111,7 @@ def test_pytest_case2():
     print(inferred)
     print(len(inferred))
 
+
 def test_pytest_case3():
     entry_point = current_directory + '/test-cases/typeinfer_real_cases/pytest_case3.py'
     infferer = TypeInference(name='pytest_case3.py', entry_point=entry_point)
@@ -128,6 +129,7 @@ def test_pytest_case3():
         assert return_type_prediction == format_type_annot(func_def.returns).lower()
     print(inferred)
     print(len(inferred))
+
 
 def test_pytest_case4():
     entry_point = current_directory + '/test-cases/typeinfer_real_cases/pytest_case4.py'
@@ -147,6 +149,7 @@ def test_pytest_case4():
     print(inferred)
     print(len(inferred))
 
+
 def test_pytest_case5():
     entry_point = current_directory + '/test-cases/typeinfer_real_cases/pytest_case5.py'
     infferer = TypeInference(name='pytest_case5.py', entry_point=entry_point)
@@ -164,6 +167,7 @@ def test_pytest_case5():
         assert return_type_prediction == format_type_annot(func_def.returns).lower()
     print(inferred)
     print(len(inferred))
+
 
 def test_pytest_case6():
     entry_point = current_directory + '/test-cases/typeinfer_real_cases/pytest_case6.py'
@@ -183,6 +187,7 @@ def test_pytest_case6():
     print(inferred)
     print(len(inferred))
 
+
 def test_pytest_case7():
     entry_point = current_directory + '/test-cases/typeinfer_real_cases/pytest_case7.py'
     infferer = TypeInference(name='pytest_case7.py', entry_point=entry_point)
@@ -200,6 +205,7 @@ def test_pytest_case7():
         assert return_type_prediction == format_type_annot(func_def.returns).lower()
     print(inferred)
     print(len(inferred))
+
 
 def test_pytest_case8():
     entry_point = current_directory + '/test-cases/typeinfer_real_cases/pytest_case8.py'
@@ -219,6 +225,7 @@ def test_pytest_case8():
     print(inferred)
     print(len(inferred))
 
+
 def test_pytest_case9():
     entry_point = current_directory + '/test-cases/typeinfer_real_cases/pytest_case9.py'
     infferer = TypeInference(name='pytest_case9.py', entry_point=entry_point)
@@ -237,6 +244,7 @@ def test_pytest_case9():
     print(inferred)
     print(len(inferred))
 
+
 def test_pytest_case10():
     entry_point = current_directory + '/test-cases/typeinfer_real_cases/pytest_case10.py'
     infferer = TypeInference(name='pytest_case10.py', entry_point=entry_point)
@@ -254,8 +262,6 @@ def test_pytest_case10():
         assert return_type_prediction == format_type_annot(func_def.returns).lower()
     print(inferred)
     print(len(inferred))
-
-
 
 
 if __name__ == "__main__":

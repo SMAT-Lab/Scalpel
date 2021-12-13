@@ -102,7 +102,6 @@ class TypeInference:
         self.import_graph = ImportGraph(self.entry_point)
         self.import_graph.build_dir_tree()
         self.leaves = self.import_graph.get_leaf_nodes()
-      
 
     def infer_types(self):
         """

@@ -50,7 +50,7 @@ class CallTransformer(ast.NodeTransformer):
         elif isinstance(param, ast.Num):
             # python 3.6  
             return param.n
-            return param.value
+            #return param.value
         elif isinstance(param, ast.List):
             return "List"
         elif isinstance(param, ast.ListComp):

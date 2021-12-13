@@ -7,6 +7,7 @@ TODO: implement a datastructure such as G from networkx for control flow graph. 
 import networkx as nx
 from functools import reduce
 
+
 def immediate_dominators(G, start):
     """Returns the immediate dominators of all nodes of a directed graph.
 
@@ -78,6 +79,7 @@ def immediate_dominators(G, start):
 
     return idom
 
+
 def dominance_frontiers(G, start):
     """Returns the dominance frontiers of all nodes of a directed graph.
 
@@ -128,11 +130,13 @@ def dominance_frontiers(G, start):
                         v = idom[v]
     return df
 
+
 def main():
     G = nx.DiGraph([(1, 2), (1, 3), (2, 5), (3, 4), (4, 5)])
     res = sorted((u, sorted(df)) for u, df in dominance_frontiers(G, 1).items())
     
     assert res == [(1, []), (2, [5]), (3, [5]), (4, [5]), (5, [])]
+
 
 if __name__ == "__main__":
     main()

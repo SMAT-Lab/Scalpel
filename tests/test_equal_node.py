@@ -2,6 +2,7 @@ import os
 import ast
 from scalpel.cfg.builder import invert
 
+
 def main():
     src = "a is True"
     src2 = "a is not True"
@@ -41,6 +42,7 @@ def main():
         print('testing')
 
     pass
+
 
 if __name__ == '__main__':
     main()

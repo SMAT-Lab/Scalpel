@@ -61,6 +61,7 @@ class BaseCaseTests(unittest.TestCase):
         assert ('c' in ssa_results[2][0] and len(ssa_results[2][0]['c'])==1)
         assert ('t' in ssa_results[3][0] and len(ssa_results[3][0]['t'])==1)
 
+
 if __name__ == '__main__':
     unittest.main()
 

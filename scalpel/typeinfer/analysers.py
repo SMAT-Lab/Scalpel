@@ -23,6 +23,7 @@ from scalpel.typeinfer.utilities import (
 
 from scalpel.SSA.const import SSA
 
+
 class BinaryOperatorMap:
     """
     Class for storing binary operation information
@@ -826,7 +827,6 @@ class ReturnStmtVisitor(ast.NodeVisitor):
                     # this includes the case when the return identifier cannot be traced to a definition
                     return [stmt.value]
             return None
-
 
         for block in cfg.finalblocks:
             return_values = get_return_value(block)

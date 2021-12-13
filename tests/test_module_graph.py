@@ -7,6 +7,7 @@ from scalpel.SSA.ssa import SSA
 
 # we need to define cretieras for variables
 
+
 def test_ssa():
     filename = sys.argv[1]
     source = open(filename).read()
@@ -42,6 +43,7 @@ def test_ssa():
     m_ssa.test()
     pass
 
+
 def test_SSA():
     filename = sys.argv[1]
     source = open(filename).read()
@@ -52,6 +54,7 @@ def test_SSA():
     m_ssa = SSA(source)
     m_ssa.gen()
     m_ssa.test()
+
 
 def test_code_rewrite():
     filename = sys.argv[1]
@@ -70,6 +73,7 @@ def test_code_rewrite():
     new_ast = ast.fix_missing_locations(mnode.ast)
     new_src = astor.to_source(new_ast)
     print(new_src)
+
 
 def main():
 
@@ -104,6 +108,7 @@ def main():
     #    print(r)
     #print(func_call_records)
     return 0
+
 
 if __name__ == '__main__':
     #main()

@@ -14,6 +14,7 @@ from astor.source_repr import count
 from scalpel.core.module_graph import MNode, ModuleGraph, UnitWalker
 from scalpel.core.vars_visitor import get_vars
 
+
 class Rewriter:
     """
     The rewriter class contains a set of static methods. 
@@ -58,7 +59,6 @@ class Rewriter:
         self.ast = renamer.visit(self.ast)
         
         self.ast = ast.fix_missing_locations(self.ast)
-        
 
     def unused_stmt_insertion(self):    
         inserted_stmt = ast.Expr(ast.Call(ast.Name("print", ast.Load()), [ast.Constant("this is an unused statement")], []))
@@ -103,7 +103,8 @@ class Rewriter:
 
             return [iter_save_stmt, counter_init_stmt, max_counter_init_stmt, while_node]
         raise "Invalid Input!"
-        return node 
+        return node
+
     def loop_exchange(self):
         Walker = UnitWalker(self.ast)
         for unit in Walker:
@@ -112,7 +113,6 @@ class Rewriter:
                 unit.insert_stmts_before(new_stmts)
 
         self.ast = ast.fix_missing_locations(self.ast)
-        
     
     def get_src(self):
         return astor.to_source(self.ast)
@@ -140,8 +140,8 @@ class VarRenamer(ast.NodeTransformer):
                 node.id = "_renamed_" + node.id
         self.generic_visit(node)
         return node
+
     def visit_arg(self, node):
-       
         if node.arg == self.old_name:
             if self.new_name is not None:
                 node.arg = self.new_name
@@ -155,7 +155,6 @@ class LoopExchanger(ast.NodeTransformer):
     """
     Here is the implementation of code rewriter at AST node level.
     """
-
     def visit_For(self, node):
         # let something to be assigned by node.iter
         iter_var = ast.Assign()

@@ -2,6 +2,9 @@ import ast
 from  _ast import *
 import pkgutil
 import astor
+import os
+import sys
+
 
 def iter_fields(node):
     """
@@ -13,6 +16,7 @@ def iter_fields(node):
             yield field, getattr(node, field)
         except AttributeError:
             pass
+
 
 def iter_child_nodes(node):
     """
@@ -27,6 +31,7 @@ def iter_child_nodes(node):
                 if isinstance(item, AST):
                     yield item
 
+
 def iter_stmt_children(node):
     """
     Yield all direct child nodes of *node*, that is, all fields that are nodes
@@ -40,6 +45,7 @@ def iter_stmt_children(node):
             for item in field:
                 if isinstance(item, ast.stmt):
                     yield item
+
 
 def find_local_modules(import_smts):
     smts = "\n".join(import_smts)
@@ -65,8 +71,9 @@ def find_local_modules(import_smts):
     result = []
     for m_name in module_names:
         if m_name not in all_modules:
-            result  += [m_name]
+            result += [m_name]
     return result
+
 
 def get_path_by_extension(root_dir, num_of_required_paths, flag='.ipynb'):
     paths = []
@@ -79,6 +86,7 @@ def get_path_by_extension(root_dir, num_of_required_paths, flag='.ipynb'):
                 if len(paths) == num_of_required_paths:
                     return paths
     return paths
+
 
 class Unit:
     def __init__(self, node, parent):
@@ -152,6 +160,7 @@ def UnitWalker(module_node):
             for ch_node in  node.body:
                 ch_node.parent = node
                 todo.append(ch_node)
+
 
 class StmtIterator:
 

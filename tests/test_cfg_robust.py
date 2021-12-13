@@ -34,6 +34,7 @@ def test_all():
     print("Number of py files: "+str(file_no))
     print("Number of exception: "+str(except_no))
 
+
 def main():
     src_file = sys.argv[1]
     src = open(src_file).read()

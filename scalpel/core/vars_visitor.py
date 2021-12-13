@@ -1,5 +1,6 @@
 import ast
 
+
 class VarsVisitor(ast.NodeVisitor):
     def __init__(self, skip_call_name =False):
         self.result = list()
@@ -19,7 +20,6 @@ class VarsVisitor(ast.NodeVisitor):
         else:
             raise "unknown variable context"
         self.result.append(var_info)
-
 
     def visit_BoolOp(self, node):
         for v in node.values:
@@ -72,7 +72,6 @@ class VarsVisitor(ast.NodeVisitor):
             self.comprehension(gen)
         self.visit(node.key)
         self.visit(node.value)
-
 
     def visit_GeneratorComp(self, node):
         self.visit(node.elt)

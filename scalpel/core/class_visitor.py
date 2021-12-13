@@ -7,11 +7,13 @@ def get_keywords(node):
     defaults = args.defaults
     for arg in args.args:
         arg_names += [arg.arg]
-    return (arg_names, len(defaults))
+    return arg_names, len(defaults)
+
 
 class ClassVisitor(ast.NodeVisitor):
     def __init__(self):
         self.result = {}
+
     def visit_FunctionDef(self, node): 
         kw_names = get_keywords(node)
         self.result[node.name] = kw_names

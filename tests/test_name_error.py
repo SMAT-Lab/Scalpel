@@ -9,6 +9,7 @@ from scalpel.core.mnode import MNode
 from scalpel.SSA.ssa import SSA
 from scalpel.util import  get_path_by_ext
 
+
 # we need to define cretieras for variables
 def filter_line(line):
     if len(line)==0:
@@ -20,6 +21,7 @@ def filter_line(line):
     if line.split(' ')[0]  in ["cat", "ls", "mkdir", "less", "sudo", "cd"]:
         return False
     return True
+
 
 def do_single_notebook(filename):
 
@@ -52,6 +54,7 @@ def do_single_notebook(filename):
         print(e)
         return None
 
+
 def get_name_from_msg(msg):
     patter = r"/'((?:''|[^'])*)'/"
     idx2 = msg.find("is not defined")
@@ -59,6 +62,7 @@ def get_name_from_msg(msg):
     if len(groups)>0:
         return groups[-1]
     return None
+
 
 def code_syntax_check(src_path):
     src = open(src_path).read()
@@ -70,6 +74,7 @@ def code_syntax_check(src_path):
         os.system('2to3 '+ src_path + ' -n -W  --output-dir=tmp/')
         src = open('./tmp/'+fn).read()
     return src
+
 
 def SSA_undefined_names(source):
 
@@ -150,6 +155,7 @@ def SSA_undefined_names(source):
     #    return True
     #return False
 
+
 def test_SSA_single():
     #fn = "TilakD@Time-Series-Prediction-and-Text-Generation---RNN.py" # case
     #passed
@@ -183,6 +189,7 @@ def test_SSA_single():
     res = SSA_undefined_names(src)
     #print('--------------------')
     print(res)
+
 
 def test_SSA_batch():
     #filename = sys.argv[1]
@@ -218,6 +225,7 @@ def test_SSA_batch():
         except:
             pass
 
+
 def main():
     #all_rows = open("all.row").readlines()
     #all_rows = open("nameerror.row").readlines()
@@ -243,6 +251,8 @@ def main():
         #break
         #break
     return 0
+
+
 if __name__ == '__main__':
     #main()
     test_SSA_batch()

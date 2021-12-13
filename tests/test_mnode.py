@@ -1,5 +1,6 @@
 from scalpel.core.mnode import MNode
 
+
 def test_mnode():
     source = open("tests/test-cases/basic/mnode_case.py").read()
     mnode = MNode("local")
@@ -40,6 +41,7 @@ def test_mnode():
     #assert func_body[1]['Test2'] == ['Test']
     #print(func_body[0]['AA'])
     #print(func_body[1])
+
 
 if __name__ == "__main__":
     test_mnode()

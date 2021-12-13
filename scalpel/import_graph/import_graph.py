@@ -8,7 +8,7 @@ from scalpel.core.source_visitor import SourceVisitor
 
 
 class Tree:
-    # a datastructure that contain information for a tree node 
+    # a data structure that contain information for a tree node
     # to be named 
     def __init__(self, name):
         self.name = name
@@ -28,6 +28,7 @@ class Tree:
 
     def __str__(self):
         return str(self.name)
+
 
 class ImportGraph:
     """
@@ -69,11 +70,10 @@ class ImportGraph:
                     node.class_pair = pair
                     node.prefix = self.leaf2root(node)
                     node.full_name = node.prefix + '.' + node.name
-              
 
     def build_dir_tree(self):
         """
-        To build enhanced directory tree for futher anaysis
+        To build enhanced directory tree for further analysis
         """
         cwd = os.getcwd()
         working_dir = os.path.dirname(self.entry_point)
@@ -96,7 +96,6 @@ class ImportGraph:
                 leaf_nodes.append(cur_node)
             working_queue.extend(cur_node.children)
         return leaf_nodes
-     
         
     def go_to_that_node(self, cur_node, visit_path):
         """

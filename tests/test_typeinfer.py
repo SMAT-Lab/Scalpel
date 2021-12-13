@@ -19,6 +19,7 @@ elif sys.version_info >= (3, 5) and sys.version_info < (3, 8):
 else:
     raise Exception("Must use Python 3.5+ ")
 
+
 class BaseCaseTests(unittest.TestCase):
 
     def test_case_1(self):
@@ -35,7 +36,6 @@ class BaseCaseTests(unittest.TestCase):
                 {'file': 'case1.py', 'line_number': 10, 'function': 'my_function', 'type': {'Dict[any, any]'}},
                 {'file': 'case1.py', 'line_number': 14, 'variable': 'my_var', 'function': 'my_function',
                  'type': 'Dict[any, any]'}]
-
 
     def test_case_2(self):
         infferer = TypeInference(name='case2.py', entry_point=current_directory+'/test-cases/typeinfer_basecase/case2.py')

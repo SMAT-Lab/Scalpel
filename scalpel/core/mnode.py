@@ -5,16 +5,11 @@ and code instrumentation. In addition, scope information can also be given for
 fine-grained operations. 
 """
 import ast
-import os
-import re
-import sys
-import json
-from queue import Queue
-from copy import deepcopy
 from ..core.vars_visitor import get_vars
 from ..core.func_call_visitor import get_func_calls
 from scalpel.core.util import UnitWalker
 from ..cfg.builder import CFGBuilder
+
 
 def get_attr_name (node):
     if isinstance(node, ast.Call):
@@ -27,6 +22,7 @@ def get_attr_name (node):
     elif isinstance(node, ast.Subscript):
         return get_attr_name(node.value)
 
+
 class ImportRelation:
 
     def __init__(self):
@@ -35,6 +31,7 @@ class ImportRelation:
         self.dest:MNode
         self.payload = [] 
         self.stmts = []
+
 
 class MNode:
     """

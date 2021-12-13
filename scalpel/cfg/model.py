@@ -7,7 +7,6 @@ import ast
 import re
 import astor
 import graphviz as gv
-#from util import tell_type
 
 
 class Block(object):
@@ -243,7 +242,6 @@ class CFG(object):
                            graph_attr={'label': self.name})
         self._visit_blocks(graph, self.entryblock, visited=[], calls=False)
         return graph
-
 
     def get_all_blocks(self):
         """
