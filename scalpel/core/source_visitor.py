@@ -26,7 +26,8 @@ class SourceVisitor(ast.NodeVisitor):
         visitor = ClassVisitor()
         visitor.visit(node)
         if len(node.bases)>0:
-            self.pair[node.name] = node.bases[0].id
+            if hasattr(node.bases[0],"id"):
+                self.pair[node.name] = node.bases[0].id
         else:
             self.pair[node.name] = None
         self.result[node.name] = visitor.result
