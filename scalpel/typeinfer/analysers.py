@@ -1214,9 +1214,10 @@ class Heuristics:
         if len(defaults)>0 :
             for arg in list(param_type_map.keys())[-len(defaults):]:
                 # None is not helpful, not providing any hint
-                if defaults[position].value is not None:
-                    param_type_map[arg][type(defaults[position].value).__name__] = True
-                    position+=1
+                if hasattr(defaults[position], "value"):
+                    if defaults[position].value is not None:
+                        param_type_map[arg][type(defaults[position].value).__name__] = True
+                        position+=1
 
         # Assign parameter input types to parameters
         for param_name, param_types in param_type_map.items():

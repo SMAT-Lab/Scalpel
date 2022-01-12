@@ -60,7 +60,7 @@ The tutorial code can be found here:\
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[SSA_example.py](example.com)
 
 ### APIs
-[Please refer to the API documenation](https://smat-lab.github.io/scalpel/SSA.html)
+[Please refer to the API documenation](https://smat-lab.github.io/Scalpel/scalpel/SSA.html)
 
 
 ### Reference
