@@ -50,7 +50,7 @@ The tutorial code can be found here:\
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Control Flow Graph Example](../examples/cfg_tutorial.py)
 
 ### APIs
-[Please refer to the API documentation](https://smat-lab.github.io/scalpel/cfg.html)
+[Please refer to the API documentation](https://smat-lab.github.io/Scalpel/scalpel/cfg.html)
 
 ### Reference
 1. [StaticCFG](https://github.com/coetaur0/staticfg).
