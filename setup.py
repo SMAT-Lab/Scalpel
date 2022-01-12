@@ -19,7 +19,8 @@ setup(
         'regex',
         'setuptools',
         'dataclasses',
-        'pycg'
+        'pycg',
+        'networkx'
     ]
     )
 
