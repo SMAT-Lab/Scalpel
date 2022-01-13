@@ -6,7 +6,6 @@ __pycache__/
 *.pdf
 exp*.py
 *.sh
-test-cases/
 dev/
 dataset/
 template
