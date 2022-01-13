@@ -155,7 +155,7 @@ class SSA:
                         # this var used
                         if af_ident in phi_loaded_idents:  
                             phi_loaded_idents[af_ident].add(ident_name_counter[af_ident])
-
+    
         return block_renamed_loaded, ident_const_dict
 
     def get_stmt_idents_ctx(self, stmt, del_set=[], const_dict = {}):
@@ -188,6 +188,17 @@ class SSA:
             elif isinstance(stmt.target, ast.Attribute):
                 #TODO: resolve attributes
                 pass
+        if isinstance(stmt, ast.AugAssign):
+            # note here , we need to rewrite this value to its extended form
+            # if the statement is "a += 1", then the assigned value should be a+1
+            if hasattr(stmt.target, "id"):
+                left_name = stmt.target.id
+                extended_right = ast.BinOp(ast.Name(left_name, ast.Load()), stmt.op, stmt.value)
+                const_dict[left_name] = extended_right
+            elif isinstance(stmt.target, ast.Attribute):
+                #TODO: resolve attributes
+                pass
+            
 
         if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef)):
             stored_idents.append(stmt.name)
