@@ -1,5 +1,4 @@
 
-## Import Graph
 `scalpel.import_graph` creates data structure for describing import relationships of a python project. 
 An import graph represents the dependency relationship of  module files  in the given project. 
 This information can be important to understand the import flow, hierarchy, encapsulation as well as software architecture.

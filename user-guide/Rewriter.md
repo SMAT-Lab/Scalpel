@@ -1,5 +1,3 @@
-
-## Rewriter
 The objective of  rewriting module of Scalple is to provide APIs that allow users to rewrite their code implenmentation. This can be
 for code desugaring (removing code sugar usages), testing and code instrumentation for various purpose. Code rewriting can bring great benefits such as API extraction and dynamic testing.
 
@@ -47,7 +45,7 @@ print(new_src)
 ```
 
 The tutorial code can be found here:\
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Rewriter Example](https://github.com/SMAT-Lab/Scalpel/blob/dev/examples/rewriter_example.py))
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Rewriter Example](https://github.com/SMAT-Lab/Scalpel/blob/scalpel-dev/examples/rewriter_example.py)
 
 ### APIs
 [Place Holder](placeholder.com)\

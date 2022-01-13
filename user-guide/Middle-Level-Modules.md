@@ -1,5 +1,4 @@
 
-## Middle Level Modules
 The middle level modules of Scapel operates on the scope of the whole program (inter-procedural)
 
 

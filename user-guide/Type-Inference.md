@@ -1,5 +1,4 @@
 
-## Type Inference
 
 Type inference module in Scalpel can identify type information for the usage context. As a dynamically type languages, the variabes' type are unknown until runtime, making it difficult to perform type checking. Though benefiting from the coding flexibility for rapid development, Python programs can miss the opportunity to separate data from behavior and detect bugs and errors at an early stage. 
 

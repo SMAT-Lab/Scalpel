@@ -1,5 +1,4 @@
 
-# Static Anaysis for Python Programs
 ## Introduction
 
 
