@@ -1,3 +1,6 @@
+"""
+The script is retrieved from https://github.com/ishepard/pydriller
+"""
 from pydriller.repository_mining import RepositoryMining
 
 
