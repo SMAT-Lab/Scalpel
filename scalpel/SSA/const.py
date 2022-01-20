@@ -173,13 +173,42 @@ class SSA:
         loaded_idents = []
         func_names = []
         # assignment with only one target
-        if isinstance(stmt, ast.Assign) and len(stmt.targets) == 1:
-            if hasattr(stmt.targets[0], "id"):
-                left_name = stmt.targets[0].id
-                const_dict[left_name] = stmt.value
-            elif isinstance(stmt.targets[0], ast.Attribute):
-                #TODO: resolve attributes
-                pass
+        
+        if isinstance(stmt, ast.Assign):
+            #print(stmt.targets)
+            targets = stmt.targets
+            if len(targets) == 1:
+                if hasattr(targets[0], "id"):
+                    left_name = stmt.targets[0].id
+                    const_dict[left_name] = stmt.value
+                elif isinstance(targets[0], ast.Attribute):
+                    #TODO: resolve attributes
+                    pass
+                # multiple targets are represented as tuple 
+                elif isinstance(targets[0], ast.Tuple):
+                    for elt in targets[0].elts:
+                        if hasattr(elt, "id"):
+                            left_name = elt.id
+                            const_dict[left_name] = None
+                        elif isinstance(targets[0], ast.Attribute):
+                            #TODO: resolve attributes
+                            pass
+            else:
+                # Note  in some python versions, there are more than one target for an assignment 
+                # while in some other python versions, multiple targets are deemed as ast.Tuple type in assignment statement
+                for target in stmt.targets:
+                    # this is an assignment to tuple such as a,b = fun()
+                    # then no valid constant value can be recorded for this statement
+                    print("testing")
+                    if hasattr(stmt.targets[0], "id"):
+                        left_name = stmt.targets[0].id
+                        const_dict[left_name] = None  # TODO: design a type for these kind of values 
+                    elif isinstance(stmt.targets[0], ast.Attribute):
+                        #TODO: resolve attributes
+                        pass
+
+
+
         # one target assignment with type annotations
         if isinstance(stmt, ast.AnnAssign):
             if hasattr(stmt.target, "id"):
@@ -198,7 +227,17 @@ class SSA:
             elif isinstance(stmt.target, ast.Attribute):
                 #TODO: resolve attributes
                 pass
-            
+        if isinstance(stmt, ast.For):
+            # there is a variation of assignment in for loop
+            # in the case of :  for i in [1,2,3]
+            # the element of stmt.iter is the value of this assignment
+            if hasattr(stmt.target, "id"):   
+                left_name = stmt.target.id
+                iter_value = stmt.iter
+                const_dict[left_name] = None
+            elif isinstance(stmt.target, ast.Attribute):
+                #TODO: resolve attributes
+                pass
 
         if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef)):
             stored_idents.append(stmt.name)
