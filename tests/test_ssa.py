@@ -61,7 +61,7 @@ class BaseCaseTests(unittest.TestCase):
         assert ('c' in ssa_results[2][0] and len(ssa_results[2][0]['c'])==1)
         assert ('t' in ssa_results[3][0] and len(ssa_results[3][0]['t'])==1)
     def test_case_4(self):
-        filename = "tests/test-cases/typeinfer_real_cases/pydriller_case1.py"
+        filename = "tests/test-cases/ssa_basecase/ssa_case_4.py"
         source = open(filename).read()
         mnode = MNode("local")
         mnode.source = source
@@ -72,8 +72,34 @@ class BaseCaseTests(unittest.TestCase):
         ssa_results, const_dict = m_ssa.compute_SSA(cfg) 
         assert ("count",0) in const_dict
         assert ("count",1) in const_dict
+    def test_case_5(self):
+        filename = "tests/test-cases/ssa_basecase/ssa_case_10.py"
+        source = open(filename).read()
+        mnode = MNode("local")
+        mnode.source = source
+        mnode.gen_ast()
+        ast_node = mnode.ast
+        cfg = mnode.gen_cfg()
+        m_ssa = SSA()
+        ssa_results, const_dict = m_ssa.compute_SSA(cfg) 
+        assert ('url', 0) in const_dict and const_dict[('url',0)] is None
+    def test_case_5(self):
+        filename = "tests/test-cases/ssa_basecase/ssa_case_9.py"
+        source = open(filename).read()
+        mnode = MNode("local")
+        mnode.source = source
+        mnode.gen_ast()
+        ast_node = mnode.ast
+        cfg = mnode.gen_cfg()
+        m_ssa = SSA()
+        ssa_results, const_dict = m_ssa.compute_SSA(cfg) 
+        assert ('result',1) in const_dict
+        assert const_dict[('result',1)] is None
         
+
+
 
 
 if __name__ == '__main__':
     unittest.main()
+    #test_case_5()
