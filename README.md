@@ -3,6 +3,10 @@
 
 Scalpel is a Python Static Analysis Framework. It provides essential program analysis functions for facilitating the implementation of client applications focusing on statically resolving dedicated problems.
 
+# Contributing
+
+* Feel free to [submit your issues](https://github.com/SMAT-Lab/Scalpel/issues), we are happy to see any issues including new feature requirements, new ideas, bug reports or other code quality issues. 
+
 ## Setting up Scalpel
 You can download the source code of Scalpel to install mannuly or use `pip` to install automatically.
 ```python
@@ -39,9 +43,6 @@ We aim to provide Scalpel as a generic Python static analysis framework that inc
 
 The Scalpel's API documentation is available at [Here](https://smat-lab.github.io/Scalpel/)
 
-
-# Contributing
-* Feel free to [submit your issues](https://github.com/SMAT-Lab/Scalpel/issues), we are happy to see any issues including new feature requirements, bug reports or other code quality issues.
 
 ## Acknowledgement
 This project has been inspired and supported by many existing works. If you think your work appears in this project but has not been mentioned yet, please let us know by any means.
