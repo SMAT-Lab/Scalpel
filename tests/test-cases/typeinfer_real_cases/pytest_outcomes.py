@@ -104,7 +104,7 @@ class _WithException(Protocol[_F, _ET]):
 
 
 def _with_exception(exception_type: _ET) -> Callable[[_F], _WithException[_F, _ET]]:
-    def decorate(func: _F) -> Any:
+    def decorate(func: _F) -> _WithException[_F, _ET]:
         func_with_exception = cast(_WithException[_F, _ET], func)
         func_with_exception.Exception = exception_type
         return func_with_exception
@@ -201,7 +201,7 @@ def fail(
 
 def _resolve_msg_to_reason(
     func_name: str, reason: str, msg: Optional[str] = None
-) -> Optional[str]:
+) -> str:
     """
     Handles converting the deprecated msg parameter if provided into
     reason, raising a deprecation warning.  This function will be removed
