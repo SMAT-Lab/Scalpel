@@ -60,6 +60,7 @@ class BaseCaseTests(unittest.TestCase):
         assert ('c' in ssa_results[1][1] and len(ssa_results[1][1]['c'])==1)
         assert ('c' in ssa_results[2][0] and len(ssa_results[2][0]['c'])==1)
         assert ('t' in ssa_results[3][0] and len(ssa_results[3][0]['t'])==1)
+
     def test_case_4(self):
         filename = "tests/test-cases/ssa_basecase/ssa_case_4.py"
         source = open(filename).read()
@@ -72,6 +73,7 @@ class BaseCaseTests(unittest.TestCase):
         ssa_results, const_dict = m_ssa.compute_SSA(cfg) 
         assert ("count",0) in const_dict
         assert ("count",1) in const_dict
+
     def test_case_5(self):
         filename = "tests/test-cases/ssa_basecase/ssa_case_10.py"
         source = open(filename).read()
@@ -83,7 +85,8 @@ class BaseCaseTests(unittest.TestCase):
         m_ssa = SSA()
         ssa_results, const_dict = m_ssa.compute_SSA(cfg) 
         assert ('url', 0) in const_dict and const_dict[('url',0)] is None
-    def test_case_5(self):
+
+    def test_case_6(self):
         filename = "tests/test-cases/ssa_basecase/ssa_case_9.py"
         source = open(filename).read()
         mnode = MNode("local")
@@ -95,7 +98,19 @@ class BaseCaseTests(unittest.TestCase):
         ssa_results, const_dict = m_ssa.compute_SSA(cfg) 
         assert ('result',1) in const_dict
         assert const_dict[('result',1)] is None
-        
+
+    def test_case_7(self):
+        filename = "tests/test-cases/ssa_basecase/ssa_case_11.py"
+        source = open(filename).read()
+        mnode = MNode("local")
+        mnode.source = source
+        mnode.gen_ast()
+        ast_node = mnode.ast
+        cfg = mnode.gen_cfg()
+        m_ssa = SSA()
+        ssa_results, const_dict = m_ssa.compute_SSA(cfg) 
+        assert ('adapter', 0) in const_dict
+        assert const_dict[('adapter', 0)] is None
 
 
 
