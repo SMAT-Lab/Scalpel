@@ -6,7 +6,7 @@ functions, etc.
 import ast
 import re
 import tokenize
-import typed_ast
+from typed_ast import ast3
 import typeshed_client
 from typing import List, Dict
 
@@ -147,19 +147,19 @@ class ImportTypeMap(_StaticAnalyzer):
         fully_qualified_name = self.typeshed_resolver.get_fully_qualified_name(import_name)
         if isinstance(fully_qualified_name, typeshed_client.parser.NameInfo):
             node = fully_qualified_name.ast
-            if isinstance(node, typed_ast._ast3.FunctionDef):
-                if isinstance(node.returns, typed_ast._ast3.Subscript):
+            if isinstance(node, ast.FunctionDef):
+                if isinstance(node.returns, ast3.Subscript):
                     return node.returns.value.id
 
-                if isinstance(node.returns, typed_ast._ast3.Name):
+                if isinstance(node.returns, ast.Name):
                     return node.returns.id
-            elif isinstance(node, typed_ast._ast3.AnnAssign):
+            elif isinstance(node, ast3.AnnAssign):
                 if hasattr(node.annotation, "id"):
                     return node.annotation.id
                 # bad catchall, will throw exception but we can improve on in future
                 else:
                     return node.annotation.value.id
-            elif isinstance(node, typed_ast._ast3.ClassDef):
+            elif isinstance(node, ast3.ClassDef):
                 return node.name  # Type is class name
         return None
 

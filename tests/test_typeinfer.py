@@ -35,7 +35,7 @@ class BaseCaseTests(unittest.TestCase):
             assert inferred == [
                 {'file': 'case1.py', 'line_number': 10, 'function': 'my_function', 'type': {'Dict[any, any]'}},
                 {'file': 'case1.py', 'line_number': 14, 'variable': 'my_var', 'function': 'my_function',
-                 'type': 'Dict[any, any]'}]
+                 'type': {'Dict[any, any]'}}]
 
     def test_case_2(self):
         infferer = TypeInference(name='case2.py', entry_point=current_directory+'/test-cases/typeinfer_basecase/case2.py')
@@ -58,9 +58,9 @@ class BaseCaseTests(unittest.TestCase):
             assert inferred == [
                 {'file': 'case3.py', 'line_number': 8, 'function': 'my_function', 'type': {'str', 'int'}},
                 {'file': 'case3.py', 'line_number': 8, 'parameter': 'my_bool', 'function': 'my_function',
-                 'type': 'any'},
-                {'file': 'case3.py', 'line_number': 10, 'variable': 'my_int', 'function': 'my_function', 'type': 'any'},
-                {'file': 'case3.py', 'line_number': 13, 'variable': 'my_str', 'function': 'my_function', 'type': 'any'}]
+                 'type': {'any'}},
+                {'file': 'case3.py', 'line_number': 10, 'variable': 'my_int', 'function': 'my_function', 'type': {'any'}},
+                {'file': 'case3.py', 'line_number': 13, 'variable': 'my_str', 'function': 'my_function', 'type': {'any'}}]
 
     def test_case_4(self):
         infferer = TypeInference(name='case4.py', entry_point=current_directory+'/test-cases/typeinfer_basecase/case4.py')
@@ -159,9 +159,9 @@ class BaseCaseTests(unittest.TestCase):
             assert inferred == [
                 {'file': 'case11.py', 'line_number': 7, 'function': 'my_function', 'type': {'int', 'str'}},
                 {'file': 'case11.py', 'line_number': 7, 'parameter': 'my_bool', 'function': 'my_function',
-                 'type': 'any'},
-                {'file': 'case11.py', 'line_number': 9, 'variable': 'x', 'function': 'my_function', 'type': 'any'},
-                {'file': 'case11.py', 'line_number': 11, 'variable': 'x', 'function': 'my_function', 'type': 'any'}]
+                 'type': {'any'}},
+                {'file': 'case11.py', 'line_number': 9, 'variable': 'x', 'function': 'my_function', 'type': {'any'}},
+                {'file': 'case11.py', 'line_number': 11, 'variable': 'x', 'function': 'my_function', 'type': {'any'}}]
 
 
     def test_case_12(self):
@@ -183,15 +183,15 @@ class BaseCaseTests(unittest.TestCase):
         else:
             assert inferred == [{'file': 'case12.py', 'line_number': 12, 'function': 'my_function', 'type': {None}},
                                 {'file': 'case12.py', 'line_number': 12, 'parameter': 'my_val',
-                                 'function': 'my_function', 'type': 'any'},
+                                 'function': 'my_function', 'type': {'any'}},
                                 {'file': 'case12.py', 'line_number': 13, 'variable': 'x', 'function': 'my_function',
-                                 'type': 'any'},
+                                 'type': {'any'}},
                                 {'file': 'case12.py', 'line_number': 14, 'variable': 'y', 'function': 'my_function',
-                                 'type': 'any'},
+                                 'type': {'any'}},
                                 {'file': 'case12.py', 'line_number': 15, 'variable': 'g', 'function': 'my_function',
-                                 'type': 'any'},
+                                 'type': {'any'}},
                                 {'file': 'case12.py', 'line_number': 16, 'variable': 'z', 'function': 'my_function',
-                                 'type': 'any'}]
+                                 'type': {'any'}}]
 
     def test_case_13(self):
         infferer = TypeInference(name='case13.py', entry_point=current_directory+'/test-cases/typeinfer_basecase/case13.py')
@@ -214,9 +214,9 @@ class BaseCaseTests(unittest.TestCase):
         else:
             assert inferred == [{'file': 'case14.py', 'line_number': 8, 'function': 'my_function', 'type': {None}},
                                 {'file': 'case14.py', 'line_number': 9, 'variable': 'x', 'function': 'my_function',
-                                 'type': 'any'},
+                                 'type': {'any'}},
                                 {'file': 'case14.py', 'line_number': 10, 'variable': 'z', 'function': 'my_function',
-                                 'type': 'any'}]
+                                 'type': {'any'}}]
 
     def test_case_15(self):
         infferer = TypeInference(name='case15.py', entry_point=current_directory+'/test-cases/typeinfer_basecase/case15.py')
@@ -230,7 +230,7 @@ class BaseCaseTests(unittest.TestCase):
         else:
             assert inferred == [{'file': 'case15.py', 'line_number': 11, 'function': 'my_function', 'type': {None}},
                                 {'file': 'case15.py', 'line_number': 12, 'variable': 'x', 'function': 'my_function',
-                                 'type': 'any'}]
+                                 'type': {'any'}}]
 
     def test_case_16(self):
         inferrer = TypeInference(name='case16', entry_point=current_directory+'/test-cases/typeinfer_basecase/case16')
@@ -250,7 +250,7 @@ class BaseCaseTests(unittest.TestCase):
                 {'file': 'file1.py', 'line_number': 6, 'function': 'MyClass.class_method', 'type': {'Tuple[str]'}},
                 {'file': 'file2.py', 'line_number': 1, 'function': 'imported_function', 'type': {'Tuple[str]'}},
                 {'file': 'file2.py', 'line_number': 2, 'variable': 'return_value', 'function': 'imported_function',
-                 'type': 'Tuple[str]'}]
+                 'type': {'Tuple[str]'}}]
 
 
     def test_case_17(self):
@@ -270,9 +270,9 @@ class BaseCaseTests(unittest.TestCase):
             assert inferred == [{'file': 'case17.py', 'line_number': 1, 'function': 'fun1', 'type': {'any'}},
                                 {'file': 'case17.py', 'line_number': 5, 'function': 'fun2', 'type': {None}},
                                 {'file': 'case17.py', 'line_number': 1, 'parameter': 'a', 'function': 'fun1',
-                                 'type': 'any'},
+                                 'type': {'any'}},
                                 {'file': 'case17.py', 'line_number': 5, 'parameter': 'a', 'function': 'fun2',
-                                 'type': 'any'}]
+                                 'type': {'any'}}]
 
     def test_case_18(self):
         inferrer = TypeInference(name='case18', entry_point=current_directory+'/test-cases/typeinfer_basecase/case18.py')
@@ -302,9 +302,9 @@ class BaseCaseTests(unittest.TestCase):
         else:
             assert inferred == [{'file': 'case20.py', 'line_number': 1, 'function': 'add', 'type': {None}},
                                 {'file': 'case20.py', 'line_number': 1, 'parameter': 'x', 'function': 'add',
-                                 'type': 'any'},
+                                 'type': {'any'}},
                                 {'file': 'case20.py', 'line_number': 1, 'parameter': 'y', 'function': 'add',
-                                 'type': 'any'}]
+                                 'type': {'any'}}]
 
     def test_case_23(self):
         inferrer = TypeInference(name='case23', entry_point=current_directory+'/test-cases/typeinfer_basecase/case23.py')

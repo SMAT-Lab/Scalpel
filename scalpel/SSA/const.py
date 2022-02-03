@@ -235,9 +235,17 @@ class SSA:
                 left_name = stmt.target.id
                 iter_value = stmt.iter
                 const_dict[left_name] = None
+
+            elif isinstance(stmt.target, ast.Tuple):
+                # to handle for-loop uch as:
+                # for x, y in fun():
+                for elt in stmt.target.elts:
+                    if hasattr(elt, "id"):
+                        const_dict[elt.id] = None
             elif isinstance(stmt.target, ast.Attribute):
                 #TODO: resolve attributes
                 pass
+            
 
         if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef)):
             stored_idents.append(stmt.name)

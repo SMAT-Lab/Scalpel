@@ -2,6 +2,7 @@
 https://github.com/pytest-dev/pytest
 """
 """Discover and run std-library "unittest" style tests."""
+"""Discover and run std-library "unittest" style tests."""
 import sys
 import traceback
 import types
@@ -30,7 +31,7 @@ from _pytest.outcomes import skip
 from _pytest.outcomes import xfail
 from _pytest.python import Class
 from _pytest.python import Function
-from _pytest.python import PyCollector
+from _pytest.python import Module
 from _pytest.runner import CallInfo
 from _pytest.scope import Scope
 
@@ -45,7 +46,7 @@ if TYPE_CHECKING:
 
 
 def pytest_pycollect_makeitem(
-    collector: PyCollector, name: str, obj: object
+    collector: Union[Module, Class], name: str, obj: object
 ) -> Optional["UnitTestCase"]:
     # Has unittest been imported and is obj a subclass of its TestCase?
     try:
