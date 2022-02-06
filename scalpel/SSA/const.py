@@ -140,19 +140,21 @@ class SSA:
                     phi_loaded_idents = block_renamed_loaded[block.id][i]
                     if ident in ident_name_counter:
                         phi_loaded_idents[ident].add(ident_name_counter[ident])
-                    #if ident in affected_idents:
-                    #    phi_loaded_idents = block_renamed_loaded[block.id][i]
-                    #    if ident in phi_loaded_idents:  
-                    #        phi_loaded_idents[ident].append(ident_name_counter[ident])
-                    #else if ident in ident_name_counter:
-
+                   
             df_block_ids = DF[block.id]
             for df_block_id in df_block_ids:
                 df_block = id2blocks[df_block_id] 
+                block_ident_gen_produced = []
+                df_block_stored_idents = block_stored_idents[df_block_id]
                 for af_ident in affected_idents:
-                    for phi_loaded_idents in block_renamed_loaded[df_block_id]:
-                        # place phi function here
-                        # this var used
+                    # this for-loop process every statement in the block
+                    for idx, phi_loaded_idents in enumerate(block_renamed_loaded[df_block_id]):
+                        block_ident_gen_produced.extend(df_block_stored_idents[idx])
+                        if af_ident in block_ident_gen_produced:
+                            continue 
+                        # place phi function here this var used
+                        # if af_ident has been assigned in this block beforclee this statement, then discard it
+                        # so theck af_ident has been generated in this block 
                         if af_ident in phi_loaded_idents:  
                             phi_loaded_idents[af_ident].add(ident_name_counter[af_ident])
     
