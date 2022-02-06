@@ -83,7 +83,7 @@ class BaseCaseTests(unittest.TestCase):
         m_ssa = SSA()
         ssa_results, const_dict = m_ssa.compute_SSA(cfg) 
         assert ('url', 0) in const_dict and const_dict[('url',0)] is None
-    def test_case_5(self):
+    def test_case_6(self):
         filename = "tests/test-cases/ssa_basecase/ssa_case_9.py"
         source = open(filename).read()
         mnode = MNode("local")
@@ -96,10 +96,27 @@ class BaseCaseTests(unittest.TestCase):
         assert ('result',1) in const_dict
         assert const_dict[('result',1)] is None
         
-
+def test_case_6():
+    filename = "tests/test-cases/ssa_basecase/ssa_case_11.py"
+    source = open(filename).read()
+    mnode = MNode("local")
+    mnode.source = source
+    mnode.gen_ast()
+    ast_node = mnode.ast
+    cfg = mnode.gen_cfg()
+    graph = cfg.build_visual('pdf')
+    graph.render("example_cfg.pdf", view=False)
+    m_ssa = SSA()
+    ssa_results, const_dict = m_ssa.compute_SSA(cfg) 
+    for k, v in const_dict.items():
+        print(k, v)
+    for b_id, block_rep in ssa_results.items():
+        print(block_rep)
+    #assert ('result',1) in const_dict
+    #assert const_dict[('result',1)] is None
 
 
 
 if __name__ == '__main__':
-    unittest.main()
-    #test_case_5()
+    #unittest.main()
+    test_case_6()
