@@ -201,9 +201,8 @@ class SSA:
                 for target in stmt.targets:
                     # this is an assignment to tuple such as a,b = fun()
                     # then no valid constant value can be recorded for this statement
-                    print("testing")
-                    if hasattr(stmt.targets[0], "id"):
-                        left_name = stmt.targets[0].id
+                    if hasattr(target, "id"):
+                        left_name = target.id
                         const_dict[left_name] = None  # TODO: design a type for these kind of values 
                     elif isinstance(stmt.targets[0], ast.Attribute):
                         #TODO: resolve attributes
