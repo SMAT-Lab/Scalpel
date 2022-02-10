@@ -9,7 +9,7 @@ from typing import Optional
 from typing import Sequence
 from typing import TextIO
 
-from .pytest_io_wcwidth import wcswidth
+from .wcwidth import wcswidth
 from _pytest.compat import final
 
 

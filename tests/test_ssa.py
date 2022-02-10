@@ -95,28 +95,40 @@ class BaseCaseTests(unittest.TestCase):
         ssa_results, const_dict = m_ssa.compute_SSA(cfg) 
         assert ('result',1) in const_dict
         assert const_dict[('result',1)] is None
-        
-def test_case_6():
-    filename = "tests/test-cases/ssa_basecase/ssa_case_11.py"
-    source = open(filename).read()
-    mnode = MNode("local")
-    mnode.source = source
-    mnode.gen_ast()
-    ast_node = mnode.ast
-    cfg = mnode.gen_cfg()
-    graph = cfg.build_visual('pdf')
-    graph.render("example_cfg.pdf", view=False)
-    m_ssa = SSA()
-    ssa_results, const_dict = m_ssa.compute_SSA(cfg) 
-    for k, v in const_dict.items():
-        print(k, v)
-    for b_id, block_rep in ssa_results.items():
-        print(block_rep)
-    #assert ('result',1) in const_dict
-    #assert const_dict[('result',1)] is None
+
+    def test_case_7(self):
+        filename = "tests/test-cases/ssa_basecase/ssa_case_11.py"
+        source = open(filename).read()
+        mnode = MNode("local")
+        mnode.source = source
+        mnode.gen_ast()
+        ast_node = mnode.ast
+        cfg = mnode.gen_cfg()
+        m_ssa = SSA()
+        ssa_results, const_dict = m_ssa.compute_SSA(cfg) 
+        assert len(ssa_results) == 4 # 4 blocks
+        assert ssa_results[1] == [{}, {'isinstance': set(), 'a': {0}, 'int': set()}]
+        assert ssa_results[2] == [{}]
+        assert ssa_results[4] == [{}]
+        assert ssa_results[3] == [{}, {'a': {0}, 'b': {2}}]
+
+
+    def test_case_8(self):
+        filename = "tests/test-cases/ssa_basecase/ssa_case_12.py"
+        source = open(filename).read()
+        mnode = MNode("local")
+        mnode.source = source
+        mnode.gen_ast()
+        ast_node = mnode.ast
+        cfg = mnode.gen_cfg()
+        graph = cfg.build_visual('pdf')
+        graph.render("example_cfg.pdf", view=False)
+        m_ssa = SSA()
+        ssa_results, const_dict = m_ssa.compute_SSA(cfg) 
+        assert  ("a", 0) in const_dict
+        assert  ("b", 0) in const_dict
 
 
 
 if __name__ == '__main__':
-    #unittest.main()
-    test_case_6()
+    unittest.main()

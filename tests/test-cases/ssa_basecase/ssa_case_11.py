@@ -6,3 +6,5 @@ else:
 
 b = "abc"
 c = a*b
+
+
