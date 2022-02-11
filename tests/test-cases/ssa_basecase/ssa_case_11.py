@@ -1,9 +1,10 @@
+a = 10
+if isinstance(a, int):
+    b = "abc"
+else:
+    b = 10.0
 
-for (prefix, adapter) in self.adapters.items():
+b = "abc"
+c = a*b
 
-    if url.lower().startswith(prefix):
-        return adapter
-
-# Nothing matches :-/
-raise InvalidSchema("No connection adapters were found for '%s'" % url)
 
