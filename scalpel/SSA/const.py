@@ -246,10 +246,10 @@ class SSA:
             elif isinstance(stmt.target, ast.Attribute):
                 #TODO: resolve attributes
                 pass
-            
 
         if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef)):
             stored_idents.append(stmt.name)
+            const_dict[stmt.name] = None
             func_names.append(stmt.name)
             new_stmt = stmt
             new_stmt.body = []
@@ -263,6 +263,7 @@ class SSA:
         
         if isinstance(stmt, ast.ClassDef):
             stored_idents.append(stmt.name)
+            const_dict[stmt.name] = None
             func_names.append(stmt.name)
             return stored_idents, loaded_idents, func_names
 

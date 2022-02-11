@@ -128,6 +128,18 @@ class BaseCaseTests(unittest.TestCase):
         assert  ("a", 0) in const_dict
         assert  ("b", 0) in const_dict
 
+    def test_case_9(self):
+        filename = "tests/test-cases/ssa_basecase/ssa_case_13.py"
+        source = open(filename).read()
+        mnode = MNode("local")
+        mnode.source = source
+        mnode.gen_ast()
+        ast_node = mnode.ast
+        cfg = mnode.gen_cfg()
+        m_ssa = SSA()
+        ssa_results, const_dict = m_ssa.compute_SSA(cfg) 
+        assert ("reprec", 1) in const_dict and const_dict[("reprec", 1)] ==  None
+
 
 
 if __name__ == '__main__':
