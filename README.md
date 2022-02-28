@@ -44,7 +44,6 @@ We aim to provide Scalpel as a generic Python static analysis framework that inc
 The Scalpel's API documentation is available at [Here](https://smat-lab.github.io/Scalpel/)
 
 <br />
-<br />
 <p>We release Scalpel source code in the hope of benefiting others. You are kindly asked to acknowledge usage of the tool by citing the following article: </p>
 
 ```
