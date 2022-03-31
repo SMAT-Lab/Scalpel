@@ -59,7 +59,6 @@ class Rewriter:
         if K>len(new_name_candidates):
             raise("K is too large for given new name candidates")   
             
-
         chosen_vars = random.sample(var_name_set, K)
         chosen_new_names = random.sample(new_name_candidates, K)
         renaming_pairs = zip(chosen_vars, chosen_new_names)
@@ -111,8 +110,8 @@ class Rewriter:
             
             new_body = node.body+[counter_inc_stmt]
             while_node = ast.While(test_node, new_body, node.orelse)
-            renamer = VarRenamer(node.target.id, iter_object.id,  inserted_node=new_target_var)
-            while_node = renamer.visit(while_node)
+            #renamer = VarRenamer(node.target.id, iter_object.id,  inserted_node=new_target_var)
+            #while_node = renamer.visit(while_node)
 
             return [iter_save_stmt, counter_init_stmt, max_counter_init_stmt, while_node]
         raise "Invalid Input!"
