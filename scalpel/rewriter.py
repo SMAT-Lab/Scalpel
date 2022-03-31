@@ -50,13 +50,18 @@ class Rewriter:
 
     def random_var_renaming(self, new_name_candidates = [], K = 2):
         
-        assert K<=len(new_name_candidates)
-
         all_vars = get_vars(self.ast, skip_call_name=True)
-        var_name_set = [var["name"] for var in all_vars if "." not in var["name"] ]
 
-        chosen_vars = random.choices(var_name_set, k=2)
-        chosen_new_names = random.choices(new_name_candidates, k=2)
+        var_name_set = [var["name"] for var in all_vars if "." not in var["name"] ]
+        if K>len(var_name_set):
+            raise("K is too large for given input")   
+             
+        if K>len(new_name_candidates):
+            raise("K is too large for given new name candidates")   
+            
+
+        chosen_vars = random.sample(var_name_set, K)
+        chosen_new_names = random.sample(new_name_candidates, K)
         renaming_pairs = zip(chosen_vars, chosen_new_names)
         
         
