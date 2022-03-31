@@ -110,8 +110,9 @@ class Rewriter:
             
             new_body = node.body+[counter_inc_stmt]
             while_node = ast.While(test_node, new_body, node.orelse)
-            #renamer = VarRenamer(node.target.id, iter_object.id,  inserted_node=new_target_var)
-            #while_node = renamer.visit(while_node)
+            renaming_dict = {node.target.id: new_target_var}
+            renamer = VarRenamer(renaming_dict)
+            while_node = renamer.visit(while_node)
 
             return [iter_save_stmt, counter_init_stmt, max_counter_init_stmt, while_node]
         raise "Invalid Input!"
@@ -141,8 +142,15 @@ class VarRenamer(ast.NodeTransformer):
     
     def visit_Name(self, node):
         if node.id in self.renaming_dict:
-            node.id = self.renaming_dict[node.id]
-            return node 
+            #if type(self.renaming_dict[node.id]) == ast.expr:
+            #    print("testing")
+            
+            target = self.renaming_dict[node.id]
+            if type(target) == str:
+                node.id = target 
+                return node 
+            return target 
+
         return node 
         
     def visit_arg(self, node):
