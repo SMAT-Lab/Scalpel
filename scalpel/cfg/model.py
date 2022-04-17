@@ -18,7 +18,7 @@ class Block(object):
     a list of Links that represent control flow jumps.
     """
 
-    __slots__ = ["id", "statements", "ssa_form", "func_calls", "predecessors", "exits"]
+    __slots__ = ["id", "statements", "func_calls", "predecessors", "exits"]
 
     def __init__(self, id):
         # Id of the block.
@@ -32,6 +32,13 @@ class Block(object):
         self.predecessors = []
         # Links to the next blocks in a control flow graph.
         self.exits = []
+
+    def __del__(self):
+        self.statements.clear()
+        self.func_calls.clear()
+        self.predecessors.clear()
+        self.exits.clear()
+        print("removing blocks ")
 
     def __str__(self):
         if self.statements:
@@ -184,7 +191,6 @@ class CFG(object):
     possible 'final' blocks (blocks with no exits representing the end of the
     CFG).
     """
-
     def __init__(self, name, asynchr=False):
         """
         The constructor of CFG class. Only name of this graph is required. 
@@ -207,6 +213,25 @@ class CFG(object):
 
         self.function_args = {}
         self.class_args = {}
+
+    def __del__(self):
+        self.finalblocks = []
+        # Sub-CFGs for functions defined inside the current CFG.
+        #self.functioncfgs = {}
+        #self.class_cfgs = {}
+
+        self.function_args = {}
+        self.class_args = {}
+        self.finalblocks.clear()
+        for _, sub_cfg in self.functioncfgs.items():
+            del sub_cfg
+
+        for _, sub_cfg in self.class_cfgs.items():
+            del sub_cfg
+        
+        for block in self:
+            block.__del__()
+
 
     def __str__(self):
         return "CFG for {}".format(self.name)
