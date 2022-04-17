@@ -38,7 +38,6 @@ class Block(object):
         self.func_calls.clear()
         self.predecessors.clear()
         self.exits.clear()
-        print("removing blocks ")
 
     def __str__(self):
         if self.statements:
