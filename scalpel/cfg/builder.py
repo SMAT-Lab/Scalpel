@@ -258,9 +258,11 @@ class CFGBuilder(ast.NodeVisitor):
                      clean_cfg (recursive function).
         """
         # Don't visit blocks twice.
-        if block in visited:
+        if block.id in visited:
             return
-        visited.append(block)
+        
+        visited.append(block.id)
+        
 
         # Empty blocks are removed from the CFG.
         if block.is_empty():
@@ -278,12 +280,12 @@ class CFGBuilder(ast.NodeVisitor):
                 if pred in pred.source.exits:
                     pred.source.exits.remove(pred)
 
-            block.predecessors = []
+            block.predecessors.clear()
             # as the exits may be modified during the recursive call, it is unsafe to iterate on block.exits
             # Created a copy of block.exits before calling clean cfg , and iterate over it instead.
             for exit in block.exits[:]:
                 self.clean_cfg(exit.target, visited)
-            block.exits = []
+            block.exits.clear()
         else:
             for exit in block.exits[:]:
                 self.clean_cfg(exit.target, visited)
