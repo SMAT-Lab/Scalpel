@@ -150,6 +150,8 @@ class VarsVisitor(ast.NodeVisitor):
         elif isinstance(node,ast.Tuple):
             for elt in node.elts:
                 self.visit(elt)
+        elif isinstance(node, ast.UnaryOp):
+            self.visit(node.operand)
         else:
             self.visit(node.value)
 
