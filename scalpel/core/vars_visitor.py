@@ -135,6 +135,7 @@ class VarsVisitor(ast.NodeVisitor):
             return None
 
     def slicev(self, node):
+
         if isinstance(node, ast.Slice):
             if node.lower:
                 self.visit(node.lower)
@@ -146,6 +147,9 @@ class VarsVisitor(ast.NodeVisitor):
             if node.dims:
                 for d in node.dims:
                     self.visit(d)
+        elif isinstance(node,ast.Tuple):
+            for elt in node.elts:
+                self.visit(elt)
         else:
             self.visit(node.value)
 
