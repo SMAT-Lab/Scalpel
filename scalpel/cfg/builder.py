@@ -263,7 +263,7 @@ class CFGBuilder(ast.NodeVisitor):
         
         visited.append(block.id)
         
-
+        
         # Empty blocks are removed from the CFG.
         if block.is_empty():
             for pred in block.predecessors:
@@ -318,8 +318,8 @@ class CFGBuilder(ast.NodeVisitor):
 
         #func = node.func
         #func_name = visit_func(func)
-        func_name = get_func_calls(node)[0]
-        self.current_block.func_calls.append(func_name)
+        #func_name = get_func_calls(node)[0]
+        #self.current_block.func_calls.append(func_name)
 
     def visit_Assign(self, node):
         self.add_statement(self.current_block, node)

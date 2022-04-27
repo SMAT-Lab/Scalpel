@@ -185,7 +185,7 @@ class Link(object):
         self.target = None
         # 'Case' leading to a control flow jump through this link.
         self.exitcase = None
-      
+
 
 
 class CFG(object):
