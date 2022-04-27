@@ -109,7 +109,8 @@ class CFGBuilder(ast.NodeVisitor):
         self.cfg.entryblock = self.current_block
         # Actual building of the CFG is done here.
         self.visit(tree)
-        self.clean_cfg(self.cfg.entryblock)
+        visited = []
+        self.clean_cfg(self.cfg.entryblock,visited)
         return self.cfg
 
     def build_from_src(self, name, src):
@@ -247,7 +248,7 @@ class CFGBuilder(ast.NodeVisitor):
                                                             self.current_id)
         self.current_id = func_builder.current_id + 1
 
-    def clean_cfg(self, block, visited=[]):
+    def clean_cfg(self, block, visited):
         """
         Remove the useless (empty) blocks from a CFG.
 
@@ -260,10 +261,8 @@ class CFGBuilder(ast.NodeVisitor):
         # Don't visit blocks twice.
         if block.id in visited:
             return
-        
         visited.append(block.id)
-        
-        
+
         # Empty blocks are removed from the CFG.
         if block.is_empty():
             for pred in block.predecessors:
@@ -280,12 +279,12 @@ class CFGBuilder(ast.NodeVisitor):
                 if pred in pred.source.exits:
                     pred.source.exits.remove(pred)
 
-            block.predecessors.clear()
+            block.predecessors = []
             # as the exits may be modified during the recursive call, it is unsafe to iterate on block.exits
             # Created a copy of block.exits before calling clean cfg , and iterate over it instead.
             for exit in block.exits[:]:
                 self.clean_cfg(exit.target, visited)
-            block.exits.clear()
+            block.exits = []
         else:
             for exit in block.exits[:]:
                 self.clean_cfg(exit.target, visited)
@@ -318,8 +317,8 @@ class CFGBuilder(ast.NodeVisitor):
 
         #func = node.func
         #func_name = visit_func(func)
-        #func_name = get_func_calls(node)[0]
-        #self.current_block.func_calls.append(func_name)
+        func_name = get_func_calls(node)[0]
+        self.current_block.func_calls.append(func_name)
 
     def visit_Assign(self, node):
         self.add_statement(self.current_block, node)
