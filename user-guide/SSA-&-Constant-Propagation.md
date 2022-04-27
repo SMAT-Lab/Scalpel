@@ -5,6 +5,8 @@ Static Single Assignment (SSA) is a technique of IR in the compiling thoery, it 
 
 Constant propagation is also a matured technique in static anaysis. It is the process of evaluating or recognizing the actual constant values or expressions at a particular program point. This is realized by utilizing control flow and data flow information. Determining the possible values for variables before runtime gives great benefits to software anaysis. For instance, with constant value propagation, we can detect and remove dead code or perfrom type checking. 
 
+Alias anaysis is to locate the variable pairs in the source code that point to the same location of memory. This can be useful to flow-sensitive anaysis of data flows. 
+
  
 In scalpel, we implement constant propagation along with the SSA for execution efficiency.
 
@@ -56,11 +58,35 @@ This is due to that the variable `a` can take values from two assignments. This 
 
 
 The second one named `const_dict` is the global constant values for the numbered identifiers. For instance, `const_dict["(a,0)"]` is the constant value after the first assignment to variable `a`. The constant values in this module are instances of Python ```ast.expr```. In this participular case `(a,0)` is an `ast.BinOp` type and `(a,1)` is an `ast.Num` type.
-The tutorial code can be found here:\
+The tutorial code can be found here:
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[SSA_example.py](example.com)
+
+
+### How to implement alias anaysis.
+
+As stated above, the `const_dict` stores the all values that are assigned to given variable (renamed in this situation), therefore, alias pairs can be implemented in an simple way. The idea is to scan all the values for a particular variable and see if the value assgined to the variable is an `ast.Name` object. The following code snippet shows how to find out the alias pair in the above.
+
+```python
+# create a mnode object.
+mnode = MNode("local")
+# feed the code snippet
+mnode.source = code_str 
+mnode.gen_ast()
+# get the cfg
+cfg = mnode.gen_cfg() 
+m_ssa = SSA()
+# do the job
+ssa_results, const_dict = m_ssa.compute_SSA(cfg) 
+alias_name_pairs = []
+for name, value in const_dict.items():
+  if isinstance(value, ast.Name):
+    alias_name_pairs.append((name, value.id))
+```
 
 ### APIs
 [Please refer to the API documenation](https://smat-lab.github.io/Scalpel/scalpel/SSA.html)
+
+
 
 
 ### Reference

@@ -11,8 +11,9 @@ import random
 import astor
 from astor.source_repr import count  
 
-from scalpel.core.module_graph import MNode, ModuleGraph, UnitWalker
+from scalpel.core.util import  UnitWalker
 from scalpel.core.vars_visitor import get_vars
+
 
 
 class Rewriter:
@@ -47,14 +48,25 @@ class Rewriter:
         new_src = astor.to_source(new_ast)
         return new_src 
 
-    def random_var_renaming(self, new_name = None):
+    def random_var_renaming(self, new_name_candidates = [], K = 2):
         
         all_vars = get_vars(self.ast, skip_call_name=True)
 
         var_name_set = [var["name"] for var in all_vars if "." not in var["name"] ]
-        selected_name = random.sample(var_name_set, 1)[0]
-     
-        renamer = VarRenamer(selected_name, new_name)
+        if K>len(var_name_set):
+            raise("K is too large for given input")   
+             
+        if K>len(new_name_candidates):
+            raise("K is too large for given new name candidates")   
+            
+        chosen_vars = random.sample(var_name_set, K)
+        chosen_new_names = random.sample(new_name_candidates, K)
+        renaming_pairs = zip(chosen_vars, chosen_new_names)
+        
+        
+        renaming_dict = dict(renaming_pairs)
+        
+        renamer = VarRenamer(renaming_dict)
         
         self.ast = renamer.visit(self.ast)
         
@@ -98,7 +110,8 @@ class Rewriter:
             
             new_body = node.body+[counter_inc_stmt]
             while_node = ast.While(test_node, new_body, node.orelse)
-            renamer = VarRenamer(node.target.id, iter_object.id,  inserted_node=new_target_var)
+            renaming_dict = {node.target.id: new_target_var}
+            renamer = VarRenamer(renaming_dict)
             while_node = renamer.visit(while_node)
 
             return [iter_save_stmt, counter_init_stmt, max_counter_init_stmt, while_node]
@@ -123,30 +136,26 @@ class VarRenamer(ast.NodeTransformer):
     Here is the implementation of code rewriter at AST node level.
     """
   
-    def __init__(self, old_name, new_name, inserted_node =None):
-  
-        self.old_name = old_name
-        self.new_name = new_name
-        self.inserted_node = inserted_node
-        assert self.old_name is not None 
+    def __init__(self, renaming_dict, inserted_node =None):
+        self.renaming_dict = renaming_dict
+        self.inserted_node = inserted_node 
     
     def visit_Name(self, node):
-        if node.id == self.old_name:
-            if self.inserted_node is not None:
-                return self.inserted_node 
-            if self.new_name is not None:
-                node.id = self.new_name
-            else:
-                node.id = "_renamed_" + node.id
-        self.generic_visit(node)
-        return node
+        if node.id in self.renaming_dict:
+            #if type(self.renaming_dict[node.id]) == ast.expr:
+            #    print("testing")
+            
+            target = self.renaming_dict[node.id]
+            if type(target) == str:
+                node.id = target 
+                return node 
+            return target 
 
+        return node 
+        
     def visit_arg(self, node):
-        if node.arg == self.old_name:
-            if self.new_name is not None:
-                node.arg = self.new_name
-            else:
-                node.arg = "_renamed_" + node.id
+        if node.arg in self.renaming_dict:
+            node.arg = self.renaming_dict[node.arg]
         self.generic_visit(node)
         return node
         

@@ -109,7 +109,8 @@ class CFGBuilder(ast.NodeVisitor):
         self.cfg.entryblock = self.current_block
         # Actual building of the CFG is done here.
         self.visit(tree)
-        self.clean_cfg(self.cfg.entryblock)
+        visited = []
+        self.clean_cfg(self.cfg.entryblock,visited)
         return self.cfg
 
     def build_from_src(self, name, src):
@@ -247,7 +248,7 @@ class CFGBuilder(ast.NodeVisitor):
                                                             self.current_id)
         self.current_id = func_builder.current_id + 1
 
-    def clean_cfg(self, block, visited=[]):
+    def clean_cfg(self, block, visited):
         """
         Remove the useless (empty) blocks from a CFG.
 
@@ -258,9 +259,9 @@ class CFGBuilder(ast.NodeVisitor):
                      clean_cfg (recursive function).
         """
         # Don't visit blocks twice.
-        if block in visited:
+        if block.id in visited:
             return
-        visited.append(block)
+        visited.append(block.id)
 
         # Empty blocks are removed from the CFG.
         if block.is_empty():

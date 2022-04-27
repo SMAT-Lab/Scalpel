@@ -808,12 +808,10 @@ class ReturnStmtVisitor(ast.NodeVisitor):
 
         ssa_analyzer = SSA()
         ssa_results, ident_const_dict = ssa_analyzer.compute_SSA(cfg)
-
         def get_return_value(block):
             for idx, stmt in enumerate(block.statements):
                 if isinstance(stmt, (ast.Return, ast.Yield)):
                     # when possible assignment can be found.
-
                     if isinstance(stmt.value, ast.Name):
                         stmt_loaded_rec = ssa_results[block.id][idx]
                         # use the first value

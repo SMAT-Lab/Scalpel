@@ -61,13 +61,9 @@ class ImportGraph:
         else:
             if node.name.endswith('.py'):
                 with open(node.name, 'r') as f:
-                    print(node.name)
                     source = f.read()
                     node.source = source
-                    res, tree, pair = self.extract_class_from_source(node.source)
-                    node.cargo = res
-                    node.ast = tree
-                    node.class_pair = pair
+                    node.ast = ast.parse(source)
                     node.prefix = self.leaf2root(node)
                     node.full_name = node.prefix + '.' + node.name
 
