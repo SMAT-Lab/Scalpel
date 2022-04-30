@@ -1,13 +1,3 @@
-"""
-Neron, P., Tolmach, A., Visser, E., Wachsmuth, G. (2015). A Theory of Name Resolution. In: Vitek, J. (eds) Programming Languages and Systems. 
-ESOP 2015. Lecture Notes in Computer Science(), vol 9032. Springer, Berlin, Heidelberg. https://doi.org/10.1007/978-3-662-46669-8_9
-
-https://link.springer.com/content/pdf/10.1007/978-3-662-46669-8_9.pdf
-
-"It can be illuminating to depict a scope graph graphically. In a scope graph diagram, a scope is depicted as a circle, a reference as a
-box with an arrow pointing into the scope that contains it, and a declaration as"
-
-"""
 import networkx as nx
 
 """
@@ -16,28 +6,37 @@ there are two types of edges between any two scopes : visiable and reachable
 
 class ScopeGraph:
     def __init__(self) -> None:
+        """
+        The central concepts in the framework are declarations, references, and scopes
+        """
         self.sg = nx.DiGraph()
+        self.parent_relations = {} 
+        self.references = {}   
+        self.declarations = {}
         pass
 
     def resolve(name, working_scope):
         """
         Find the name in given working scope
+        That is, a path with fewer parent transitions is more specific than a path with
+        more parent transitions. 
         """
         pass 
     def add_scope(self, scope_name, parent_name):
         self._add_scope_name(scope_name, parent_name)
         
-    def add_reference(self, scope, name, ctx):
+    def add_reference(self, scope_name, name, ctx):
         if ctx == "load":
-            self._add_contained()
-            pass
+            self.references[scope_name] = name 
+
         elif ctx == "del":
             # deletion operation is deemed as using the reference
-            self._add_declared()
-            pass 
+            self.references[scope_name] = name 
+ 
         elif ctx == "store":
             self._add_declared()
-            pass
+            self.declarations[scope_name] = name 
+
         else:
             raise "Unknown context for given name reference"
 
@@ -47,6 +46,11 @@ class ScopeGraph:
     def _add_declared(self):
         pass
 
-    def get_parent(self):
+    def get_parent(self, scope_name):
         #map scope to its parent scope 
-        pass 
+        if scope_name in self.parent_relations:
+            return self.parent_relations[scope_name]
+        raise "Failed to locate parent scope!"
+
+
+
