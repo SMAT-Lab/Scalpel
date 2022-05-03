@@ -322,3 +322,21 @@ LIST_ICONS = [r"[{i}]".format(i=_other_symbols)]
 
 CONCAT_QUOTES = group_chars(_quotes)
 CONCAT_ICONS = _other_symbols
+'''
+def fun():
+    x = 0
+    y = 0
+    if x>0:
+        return 1
+    else:
+        return 0
+    return 0
+def fun():
+    x = 0
+    y = 0
+    if x>0:
+        return 1
+    else:
+        return 0
+    return 0
+'''
