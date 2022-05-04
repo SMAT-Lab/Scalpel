@@ -136,6 +136,8 @@ class VarsVisitor(ast.NodeVisitor):
 
     def slicev(self, node):
 
+        if isinstance(node, ast.Constant):
+            return 
         if isinstance(node, ast.Slice):
             if node.lower:
                 self.visit(node.lower)
@@ -152,7 +154,10 @@ class VarsVisitor(ast.NodeVisitor):
                 self.visit(elt)
         elif isinstance(node, ast.UnaryOp):
             self.visit(node.operand)
-        else:
+        elif isinstance(node, ast.Name):
+            self.visit(node)
+        # this is due to syntax change 
+        elif hasattr(node, "value"):
             self.visit(node.value)
 
     def visit_Subscript(self, node):
