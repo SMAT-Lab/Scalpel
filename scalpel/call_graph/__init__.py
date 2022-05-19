@@ -8,5 +8,4 @@ It aims to construct the call graphs for given Python projects.
 The basic node can be either a function, a class or a module. 
 The edges represent calling relationships between program nodes.
 """
-from pycg.pycg import CallGraphGenerator
-from pycg import formats
+
