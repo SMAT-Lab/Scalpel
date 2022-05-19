@@ -235,7 +235,11 @@ class SSA:
             if hasattr(stmt.target, "id"):   
                 left_name = stmt.target.id
                 iter_value = stmt.iter
-                const_dict[left_name] = None
+                # make a iter call
+                iter_node = ast.Call(ast.Name("iter", ast.Load()), [stmt.iter], [])
+                # make a next call 
+                next_call_node = ast.Call(ast.Name("next", ast.Load()), [iter_node], [])
+                const_dict[left_name] = next_call_node
 
             elif isinstance(stmt.target, ast.Tuple):
                 # to handle for-loop uch as:
