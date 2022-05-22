@@ -19,7 +19,7 @@ class ScopeGraph(ast.NodeVisitor):
         self.parent_relations = {} 
         self.references = {}   
         self.declarations = {}
-        self.current_scope_name = "Mod"
+        self.current_scope_name = None
         pass
 
     def build(self, ast_tree):
@@ -27,30 +27,50 @@ class ScopeGraph(ast.NodeVisitor):
         pass 
 
     def visit_FunctionDef(self, node):
+        self.declarations[self.current_scope_name].append(node.name)
+        
         save_scope_name = self.current_scope_name
         self.current_scope_name = node.name
-        if node.name not in self.references:
-            self.references[node.name] = []
 
-        if node.name not in self.declarations:
-            self.declarations[node.name] = []
+        if self.current_scope_name not in self.references:
+            self.references[self.current_scope_name] = []
+
+        if self.current_scope_name not in self.declarations:
+            self.declarations[self.current_scope_name] = []
 
         self.generic_visit(node)
         self.current_scope_name = save_scope_name
         return node 
 
     def visit_ClassDef(self, node):
+        self.declarations[self.current_scope_name].append(node.name)
+        
         save_scope_name = self.current_scope_name
         self.current_scope_name = node.name
-        if node.name not in self.references:
-            self.references[node.name] = []
 
-        if node.name not in self.declarations:
-            self.declarations[node.name] = []
+        if self.current_scope_name not in self.references:
+            self.references[self.current_scope_name] = []
+
+        if self.current_scope_name not in self.declarations:
+            self.declarations[self.current_scope_name] = []
+
         self.generic_visit(node)
         self.current_scope_name = save_scope_name
         return node
 
+    def visit_Module(self, node):
+        save_scope_name = self.current_scope_name
+        self.current_scope_name = "Mod"
+
+        if self.current_scope_name not in self.references:
+            self.references[self.current_scope_name] = []
+
+        if self.current_scope_name not in self.declarations:
+            self.declarations[self.current_scope_name] = []
+
+        self.generic_visit(node)
+        self.current_scope_name = save_scope_name
+        return node
     def visit_Name(self, node):
         if isinstance(node.ctx, (ast.Load, ast.Del)):
             # this is 
@@ -95,5 +115,10 @@ class ScopeGraph(ast.NodeVisitor):
             return self.parent_relations[scope_name]
         raise "Failed to locate parent scope!"
 
+    def print_out(self):
+        for k, v in self.references.items():
+            print(k, v )
+        for k, v in self.declarations.items():
+            print(k, v )
 
 
