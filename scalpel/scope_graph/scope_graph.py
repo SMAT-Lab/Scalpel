@@ -1,10 +1,16 @@
 import networkx as nx
-
+import ast 
 """
 there are two types of edges between any two scopes : visiable and reachable 
 """
 
-class ScopeGraph:
+# set an current scope for scope information records,
+
+# when entering the scope, parent scope relationship is formed.
+# now for each of names 
+
+
+class ScopeGraph(ast.NodeVisitor):
     def __init__(self) -> None:
         """
         The central concepts in the framework are declarations, references, and scopes
@@ -13,7 +19,44 @@ class ScopeGraph:
         self.parent_relations = {} 
         self.references = {}   
         self.declarations = {}
+        self.current_scope_name = "Mod"
         pass
+
+    def build(self, ast_tree):
+        self.visit(ast_tree)
+        pass 
+
+    def visit_FunctionDef(self, node):
+        save_scope_name = self.current_scope_name
+        self.current_scope_name = node.name
+        if node.name not in self.references:
+            self.references[node.name] = []
+
+        if node.name not in self.declarations:
+            self.declarations[node.name] = []
+
+        self.generic_visit(node)
+        self.current_scope_name = save_scope_name
+        return node 
+
+    def visit_ClassDef(self, node):
+        save_scope_name = self.current_scope_name
+        self.current_scope_name = node.name
+        if node.name not in self.references:
+            self.references[node.name] = []
+
+        if node.name not in self.declarations:
+            self.declarations[node.name] = []
+        self.generic_visit(node)
+        self.current_scope_name = save_scope_name
+        return node
+
+    def visit_Name(self, node):
+        if isinstance(node.ctx, (ast.Load, ast.Del)):
+            # this is 
+            self.references[self.current_scope_name].append(node.id)
+        elif isinstance(node.ctx, ast.Store):
+            self.declarations[self.current_scope_name].append(node.id)
 
     def resolve(name, working_scope):
         """
