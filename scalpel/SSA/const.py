@@ -102,12 +102,16 @@ class SSA:
         for block in all_blocks:
             df_nodes = DF[block.id]
             tmp_const_dict = {}
+            
 
-            for stmt in block.statements:
-                stored_idents, loaded_idents, func_names = self.get_stmt_idents_ctx(stmt, const_dict=tmp_const_dict) 
+            for idx, stmt in enumerate(block.statements):
+                stmt_const_dict = {}
+                stored_idents, loaded_idents, func_names = self.get_stmt_idents_ctx(stmt, const_dict=stmt_const_dict) 
+                tmp_const_dict[idx] = stmt_const_dict
                 block_loaded_idents[block.id] += [loaded_idents]
                 block_stored_idents[block.id] += [stored_idents]
                 block_renamed_loaded[block.id] += [{ident:set() for ident in loaded_idents}]
+            
             block_const_dict[block.id]  = tmp_const_dict
         
         for block in all_blocks:
@@ -121,6 +125,7 @@ class SSA:
                 stmt_stored_idents = stored_idents[i]
                 stmt_loaded_idents = loaded_idents[i]
                 stmt_renamed_stored =  {}
+                
                 for ident in stmt_stored_idents:
                     affected_idents.append(ident)
                     if ident in ident_name_counter:
@@ -128,8 +133,10 @@ class SSA:
                     else:
                         ident_name_counter[ident] = 0
                     # rename the var name as the number of assignments
-                    if ident in tmp_const_dict:
-                        ident_const_dict[(ident, ident_name_counter[ident])] = tmp_const_dict[ident]
+                    stmt_const_dict = tmp_const_dict[i]
+                    if ident in stmt_const_dict:
+                        ident_const_dict[(ident, ident_name_counter[ident])] = stmt_const_dict[ident]
+                        
                     stmt_renamed_stored[ident] = ident_name_counter[ident]
                 block_renamed_stored[block.id] += [stmt_renamed_stored]
                 
