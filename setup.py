@@ -10,8 +10,6 @@ setup(
     install_requires = [
         'astor~=0.8.1',
         'graphviz~=0.17',
-        'nbformat',
-        'nbconvert',
         'networkx',
         'astunparse~=1.6.3',
         'typed-ast',
