@@ -94,7 +94,7 @@ class BaseCaseTests(unittest.TestCase):
         m_ssa = SSA()
         ssa_results, const_dict = m_ssa.compute_SSA(cfg) 
         assert ('result',1) in const_dict
-        assert const_dict[('result',1)] is None
+        assert const_dict[('result',1)] is not None
 
     def test_case_7(self):
         filename = "tests/test-cases/ssa_basecase/ssa_case_11.py"
