@@ -31,12 +31,13 @@ class CallTransformer(ast.NodeTransformer):
             elif type(node.func) is ast.Call:
                 mid = get_func(node.func)
             elif isinstance(node.func, ast.Subscript):
-                if isinstance(node.func.value, ast.Name):
-                    mid = node.func.value.id
-                elif isinstance(node.func.value, ast.Attribute):
-                    mid = node.func.value.attr
-                else:
-                    raise Exception(str(type(node.func)))
+                mid = get_func(node.func.value)
+                #if isinstance(node.func.value, ast.Name):
+                #    mid = node.func.value.id
+                #elif isinstance(node.func.value, ast.Attribute):
+                #    mid = node.func.value.attr
+                #else:
+                #    raise Exception(str(type(node.func)))
             else:
                 raise Exception(str(type(node.func)))
             return mid
@@ -133,6 +134,11 @@ class FuncCallVisitor(ast.NodeVisitor):
         self.generic_visit(node)
         return node
 
+
+    def visit_Subscript(self, node):
+        # ingore subscription slice 
+        self.visit(node.value)
+        return node
 
 def get_args(node):
     arg_type = []
