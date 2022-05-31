@@ -243,10 +243,10 @@ class SSA:
                 left_name = stmt.target.id
                 iter_value = stmt.iter
                 # make a iter call
-                iter_node = ast.Call(ast.Name("iter", ast.Load()), [stmt.iter], [])
+                #iter_node = ast.Call(ast.Name("iter", ast.Load()), [stmt.iter], [])
                 # make a next call 
-                next_call_node = ast.Call(ast.Name("next", ast.Load()), [iter_node], [])
-                const_dict[left_name] = next_call_node
+                #next_call_node = ast.Call(ast.Name("next", ast.Load()), [iter_node], [])
+                const_dict[left_name] = iter_value
 
             elif isinstance(stmt.target, ast.Tuple):
                 # to handle for-loop uch as:
