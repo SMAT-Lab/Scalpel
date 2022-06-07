@@ -1,12 +1,16 @@
-import os
 from scalpel.import_graph.import_graph import Tree,ImportGraph
 
 
-path_to_current_file = os.path.realpath(__file__)
-current_directory = os.path.split(path_to_current_file)[0]
-root_node = Tree("import_graph_example_pkg")
-import_graph = ImportGraph(os.path.join(current_directory,"import_graph_example_pkg"))
-import_graph.build_dir_tree()
-module_dict = import_graph.parse_import(root_node)
+def main():
+
+    target_dir = "./import_graph_example_pkg"
+    import_graph = ImportGraph(target_dir)
+    import_graph.build_dir_tree()
+    all_leaf_ndoes = import_graph.get_leaf_nodes()
+    for node in all_leaf_ndoes:
+        module_dict = import_graph.parse_import(node.ast)
+        print(module_dict)
 
 
+if __name__ == "__main__":
+    main() 
