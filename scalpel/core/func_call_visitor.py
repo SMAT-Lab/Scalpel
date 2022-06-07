@@ -23,25 +23,28 @@ class CallTransformer(ast.NodeTransformer):
         return node
 
     def param2str(self, param):
-        def get_func(node):
-            if type(node.func) is ast.Name:
-                mid = node.func.id
-            elif type(node.func) is ast.Attribute:
-                mid = node.func.attr
-            elif type(node.func) is ast.Call:
-                mid = get_func(node.func)
-            elif isinstance(node.func, ast.Subscript):
-                mid = get_func(node.func.value)
-                #if isinstance(node.func.value, ast.Name):
-                #    mid = node.func.value.id
-                #elif isinstance(node.func.value, ast.Attribute):
-                #    mid = node.func.value.attr
-                #else:
-                #    raise Exception(str(type(node.func)))
-            else:
-                raise Exception(str(type(node.func)))
-            return mid
 
+        def get_func(node):
+            if type(node) == ast.Name:
+                return node.id
+            elif type(node) == ast.Constant:
+                # ingore such as  "this is a constant".join()
+                return ""
+            elif type(node) == ast.BinOp:
+                # ingore such as  (a+b+c).fun()
+                return ""
+            elif type(node) == ast.Subscript:
+                # currently, we will ignore the slices because we cannot track the type of the value.
+                # for instance,  a[something].fun() ->  a.fun()
+                # this sacrifice
+                return get_func(node.value)  
+            elif type(node) == ast.Attribute:
+                return get_func(node.value) + "." + node.attr 
+            elif type(node) == ast.Call:
+                return get_func(node.func)
+            else:
+                raise Exception(str(type(node)))
+    
         if isinstance(param, ast.Subscript):
             return self.param2str(param.value)
         if isinstance(param, ast.Call):
