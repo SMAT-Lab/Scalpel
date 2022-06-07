@@ -10,33 +10,17 @@ import os
 import sys
 import glob 
 
-
-#@profile
 def test_all():
     target_dir = "./cfg_robust_cases/"
     all_files =  get_path_by_ext(target_dir)
-    
     print(f"In total, there are {len(all_files)} files to be tested!")
     for fn in all_files:
         builder = CFGBuilder()
         print(os.path.basename(fn), fn)
         cfg = builder.build_from_file(os.path.basename(fn), fn)
-     
-    return 0
-
-    
-    
-         
-    print("Number of py files: "+str(file_no))
-    print("Number of exception: "+str(except_no))
-
 
 def main():
     test_all()
-    #src = open(src_file).read()
-    #builder = CFGBuilder()
-    #cfg = builder.build_from_file("test", src_file)
-
 
 if __name__ == '__main__':
     main() 
