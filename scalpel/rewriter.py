@@ -54,10 +54,10 @@ class Rewriter:
 
         var_name_set = [var["name"] for var in all_vars if "." not in var["name"] ]
         if K>len(var_name_set):
-            raise("K is too large for given input")   
+            raise Exception("K is too large for given input")   
              
         if K>len(new_name_candidates):
-            raise("K is too large for given new name candidates")   
+            raise Exception("K is too large for given new name candidates")   
             
         chosen_vars = random.sample(var_name_set, K)
         chosen_new_names = random.sample(new_name_candidates, K)
@@ -115,7 +115,7 @@ class Rewriter:
             while_node = renamer.visit(while_node)
 
             return [iter_save_stmt, counter_init_stmt, max_counter_init_stmt, while_node]
-        raise "Invalid Input!"
+        raise Exception("Invalid Input!")
         return node
 
     def loop_exchange(self):

@@ -112,9 +112,9 @@ class Unit:
                 pos = self.parent.body.index(self.node)
                 self.parent.body.insert(pos, new_stmt)
             except Exception as e:
-                raise "Insertion Failure"
+                raise Exception("Insertion Failure")
         else:
-            raise "Error!!"
+            raise Exception("Error!!")
 
     def insert_stmts_before(self, new_stmts):
         if self.parent is not None and hasattr(self.parent, "body"):
@@ -123,18 +123,18 @@ class Unit:
                
                 self.parent.body[pos:pos+1] = new_stmts
             except Exception as e:
-                raise "Insertion Failure"
+                raise Exception("Insertion Failure")
         else:
-            raise "Error!!"
+            raise Exception("Error!!")
     def insert_after(self, new_stmt):
         if self.parent is not None and hasattr(self.parent, "body"):
             try:
                 pos = self.parent.body.index(self.node)
                 self.parent.body.insert(pos+1, new_stmt)
             except Exception as e:
-                raise "Insertion Failure"
+                raise Exception("Insertion Failure")
         else:
-            raise "Error!!"
+            raise Exception("Error!!")
 
     def remove():
         return None
@@ -177,7 +177,7 @@ class StmtIterator:
         # needs to return statement with the block information to allow
         # insertion and removal
         current_loc = 0
-        raise "StopIteration"
+        raise Exception("StopIteration")
 
     def insert_before(self, new_stmt):
         pass

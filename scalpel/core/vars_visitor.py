@@ -12,7 +12,7 @@ class VarsVisitor(ast.NodeVisitor):
         elif isinstance(ctx, ast.Del):
             return "del"
         else:
-            raise "unknown variable context"
+            raise Exception("unknown variable context")
 
     def visit_Name(self, node):
         var_info = {
