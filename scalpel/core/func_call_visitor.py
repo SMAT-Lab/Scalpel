@@ -38,11 +38,25 @@ class CallTransformer(ast.NodeTransformer):
                 # for instance,  a[something].fun() ->  a.fun()
                 # this sacrifice
                 return get_func(node.value)  
+            #elif type(node) == ast.JoinedStr:
+            #    return ""
             elif type(node) == ast.Attribute:
-                return get_func(node.value) + "." + node.attr 
+                if type(node.value) in [ast.JoinedStr, ast.Constant]:
+                    return node.attr
+                else:
+                    return get_func(node.value) + "." + node.attr 
             elif type(node) == ast.Call:
                 return get_func(node.func)
+            elif type(node) == ast.IfExp:
+                return ""
+            elif type(node) == ast.Compare:
+                return ""
+            elif type(node) == ast.UnaryOp:
+                return ""
+            #ast.UnaryOp
             else:
+                import astor
+                print(astor.to_source(node))
                 raise Exception(str(type(node)))
     
         if isinstance(param, ast.Subscript):
