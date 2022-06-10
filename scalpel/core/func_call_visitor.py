@@ -55,8 +55,8 @@ class CallTransformer(ast.NodeTransformer):
                 return ""
             #ast.UnaryOp
             else:
-                import astor
-                print(astor.to_source(node))
+                #import astor
+                #print(astor.to_source(node))
                 raise Exception(str(type(node)))
     
         if isinstance(param, ast.Subscript):
