@@ -13,14 +13,17 @@ import glob
 
 #@profile
 def test_all():
-    target_dir = "./cfg_robust_cases/"
+    target_dir = "./tests/test-cases/cfg-tests"
     all_files =  get_path_by_ext(target_dir)
     
     print(f"In total, there are {len(all_files)} files to be tested!")
-    for fn in all_files:
+    for idx, fn in enumerate(all_files):
         builder = CFGBuilder()
-        print(os.path.basename(fn), fn)
-        cfg = builder.build_from_file(os.path.basename(fn), fn)
+        print(os.path.basename(fn), idx)
+        try:
+            cfg = builder.build_from_file(os.path.basename(fn), fn)
+        except SyntaxError as e:
+            pass
      
     return 0
 

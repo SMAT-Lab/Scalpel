@@ -139,7 +139,7 @@ class CFGBuilder(ast.NodeVisitor):
         Returns:
             The CFG produced from the source file.
         """
-        with open(filepath, 'r') as src_file:
+        with open(filepath, 'r',encoding="utf8") as src_file:
             src = src_file.read()
             return self.build_from_src(name, src)
 
@@ -244,6 +244,8 @@ class CFGBuilder(ast.NodeVisitor):
         func_builder = CFGBuilder()
         base_names = []
         for base in node.bases:
+            if not isinstance(base, ast.Name):
+                continue
             base_names.append(base.id)
         if node.name in self.cfg.class_cfgs and node.name in base_names:
             existing_class_cfg = self.cfg.class_cfgs[node.name]
