@@ -20,10 +20,7 @@ def test_all():
     for idx, fn in enumerate(all_files):
         builder = CFGBuilder()
         print(os.path.basename(fn), idx)
-        try:
-            cfg = builder.build_from_file(os.path.basename(fn), fn)
-        except SyntaxError as e:
-            pass
+        cfg = builder.build_from_file(os.path.basename(fn), fn)
      
     return 0
 
