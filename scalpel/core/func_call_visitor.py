@@ -42,6 +42,11 @@ class CallTransformer(ast.NodeTransformer):
             elif type(node) == ast.Bytes:
                 # ingore such as  "xxx".fun()
                 return ""
+            elif type(node) == ast.Compare:
+                # example "(x.matrix_exp() == torch.eye(20, 20, dtype=dtype, device=device)).all().item()"
+                # tests/test-cases/cfg-tests/pytorch-test-test_linalg.py
+                # ignore for now
+                return ""
             elif type(node) == ast.Subscript:
                 # currently, we will ignore the slices because we cannot track the type of the value.
                 # for instance,  a[something].fun() ->  a.fun()
