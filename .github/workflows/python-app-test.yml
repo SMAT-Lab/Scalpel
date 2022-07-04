@@ -29,6 +29,8 @@ jobs:
         python -m pip install --upgrade pip
         pip install pytest
         pip install -e .
+    - name: Setup Graphviz
+      uses: ts-graphviz/setup-graphviz@v1
     - name: Test with pytest
       run: |
         pytest 
