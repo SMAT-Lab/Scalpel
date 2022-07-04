@@ -1,5 +1,7 @@
+from select import select
 import networkx as nx
 import ast 
+import queue
 """
 there are two types of edges between any two scopes : visiable and reachable 
 """
@@ -16,6 +18,8 @@ class ScopeGraph(ast.NodeVisitor):
         The central concepts in the framework are declarations, references, and scopes
         """
         self.sg = nx.DiGraph()
+        self.ig = nx.DiGraph()
+        self.MRO_graph = {}
         self.parent_relations = {} 
         self.references = {}   
         self.declarations = {}
@@ -43,6 +47,16 @@ class ScopeGraph(ast.NodeVisitor):
         return node 
 
     def visit_ClassDef(self, node):
+        # let's ignore basename is in the form of X.B.C which is annolying 
+        for bc in node.bases:
+            if hasattr(bc, "id"):
+                self.ig.add_edge(node.name, bc.id)
+                if node.name in self.MRO_graph:
+                    self.MRO_graph[node.name].append(bc.id)
+                else:
+                    self.MRO_graph[node.name] = [bc.id]
+
+
         self.declarations[self.current_scope_name].append(node.name)
         
         save_scope_name = self.current_scope_name
@@ -116,9 +130,96 @@ class ScopeGraph(ast.NodeVisitor):
         raise "Failed to locate parent scope!"
 
     def print_out(self):
-        for k, v in self.references.items():
-            print(k, v )
-        for k, v in self.declarations.items():
-            print(k, v )
 
+        print(self.MRO_graph)
+
+        #for k, v in self.references.items():
+        #    print(k, v )
+        #for k, v in self.declarations.items():
+        #    print(k, v )
+
+
+    def MRO_resolve(self, start_name):
+        if start_name not in self.MRO_graph:
+            raise "Cannot locate the given name"
+
+        init_names = self.MRO_graph[start_name] 
+        
+        cls_name_order = []
+        is_visited = set() 
+        dfs_queue = queue.Queue()
+
+        for name in init_names:
+            dfs_queue.put(name)
+      
+        while not dfs_queue.empty():
+            cur_name = dfs_queue.get()
+            if cur_name not in is_visited:
+                is_visited.add(cur_name)
+            else:
+                continue 
+            cls_name_order.append(cur_name)
+            if cur_name in self.MRO_graph:
+                tmp_names = self.MRO_graph[cur_name]
+                for name in tmp_names:
+                    dfs_queue.put(name) 
+                
+        #print(cls_name_order)
+         
+    
+    def MRO_resolve_method(self, cls_name, method_name):
+        """
+        given current class name and method name;
+        using method resolution order to locate which class the method name is defined 
+        """
+        if cls_name not in self.MRO_graph: 
+            #raise Exception("Cannot locate the given name", cls_name)
+            return None
+
+        init_names = self.MRO_graph[cls_name]
+        
+        cls_name_order = []
+        is_visited = set() 
+        dfs_queue = queue.Queue()
+        
+        target_cls_name = None 
+
+        for name in init_names:
+            dfs_queue.put(name)
+      
+        while not dfs_queue.empty():
+            cur_name = dfs_queue.get() 
+            if cur_name not in is_visited:
+                is_visited.add(cur_name)
+            else:
+                continue 
+            cls_name_order.append(cur_name)
+            if cur_name not in self.declarations:
+                continue 
+            if method_name in self.declarations[cur_name]:
+                target_cls_name = cur_name
+                break 
+
+            if cur_name in self.MRO_graph:
+                tmp_names = self.MRO_graph[cur_name]
+                for name in tmp_names:
+                    dfs_queue.put(name) 
+        return target_cls_name
+
+    def test(self):
+        #print(self.MRO_garph 
+        pass 
+
+    def test_MRO_resolve(self, start_name):
+        #self.MRO_resolve(start_name)
+        target_cls_name = self.MRO_resolve_method("D", "rk")
+        
+        print(target_cls_name)
+        pass 
+
+
+# need to write resolve a method name 
+
+def create_MRO():
+    pass 
 

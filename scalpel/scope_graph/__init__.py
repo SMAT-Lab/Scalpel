@@ -5,7 +5,6 @@ In a scope graph diagram：
 1. a scope is depicted as a circle,
 2. a reference as a box with an arrow pointing into the scope that contains it, and a declaration as"
 
-
 A scope is an abstraction over a group of nodes in the abstract syntax tree
 that behave uniformly with respect to name resolution.
 
