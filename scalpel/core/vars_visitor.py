@@ -1,25 +1,29 @@
 import ast
 
-
 class VarsVisitor(ast.NodeVisitor):
-    def __init__(self, skip_call_name =False):
+    def __init__(self):
         self.result = list()
-        self.skip_call_name = skip_call_name
 
-    def visit_Name(self, node):
-        var_info = {"name": node.id, "lineno": node.lineno, "col_offset":
-                node.col_offset}
-        if isinstance(node.ctx, ast.Load):
-            var_info["usage"] = "load"
-            #self.result += [(node.id, "load")]
-        elif isinstance(node.ctx, ast.Store):
-            var_info["usage"] = "store"
-            #self.result += [(node.id, "store")]
-        elif isinstance(node.ctx, ast.Del):
-            var_info["usage"] = "del"
+    def _ctx2str(self, ctx):
+        if isinstance(ctx, ast.Load):
+            return "load"
+        elif isinstance(ctx, ast.Store):
+            return "store"
+        elif isinstance(ctx, ast.Del):
+            return "del"
         else:
             raise "unknown variable context"
+
+    def visit_Name(self, node):
+        var_info = {
+                      "name": node.id, 
+                      "lineno": node.lineno, 
+                      "col_offset": node.col_offset,
+                      "usage" : self._ctx2str(node.ctx)
+                  }
+
         self.result.append(var_info)
+
 
     def visit_BoolOp(self, node):
         for v in node.values:
@@ -73,6 +77,7 @@ class VarsVisitor(ast.NodeVisitor):
         self.visit(node.key)
         self.visit(node.value)
 
+
     def visit_GeneratorComp(self, node):
         self.visit(node.elt)
         for gen in node.generators:
@@ -91,24 +96,24 @@ class VarsVisitor(ast.NodeVisitor):
             self.visit(c)
 
     def visit_Call(self, node):
-        if self.skip_call_name == False:
-            self.visit(node.func)
-        if self.skip_call_name is True and not isinstance(node.func, ast.Name):
-            self.visit(node.func)
-
+        self.visit(node.func)
         for arg in node.args:
             self.visit(arg)
         for keyword in node.keywords:
-            if keyword.arg is not None:
-                self.visit(keyword)
+            self.visit(keyword)
 
     def visit_keyword(self, node):
         self.visit(node.value)
 
     def visit_Attribute(self, node):
         full_name = self.get_attr_name(node)
-        var_info = {"name": full_name, "lineno": node.lineno, "col_offset":
-                node.col_offset}
+
+        var_info = {  
+                    "name": full_name, 
+                    "lineno": node.lineno, 
+                    "col_offset": node.col_offset,
+                    "usage" : self._ctx2str(node.ctx)
+                }
         self.result.append(var_info)
         self.visit(node.value)
 
@@ -130,6 +135,7 @@ class VarsVisitor(ast.NodeVisitor):
             return None
 
     def slicev(self, node):
+
         if isinstance(node, ast.Slice):
             if node.lower:
                 self.visit(node.lower)
@@ -141,6 +147,9 @@ class VarsVisitor(ast.NodeVisitor):
             if node.dims:
                 for d in node.dims:
                     self.visit(d)
+        elif isinstance(node,ast.Tuple):
+            for elt in node.elts:
+                self.visit(elt)
         else:
             self.visit(node.value)
 
@@ -183,7 +192,7 @@ class VarsVisitor(ast.NodeVisitor):
         #    self.visit(target)
 
 
-def get_vars(node, skip_call_name=False):
-    visitor = VarsVisitor(skip_call_name=skip_call_name)
+def get_vars(node):
+    visitor = VarsVisitor()
     visitor.visit(node)
     return visitor.result
