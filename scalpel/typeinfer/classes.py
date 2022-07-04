@@ -3,7 +3,7 @@ This module contains a set of data classes.
 """
 import ast
 from dataclasses import dataclass, field
-from typing import List, Dict
+from typing import List, Dict, Optional,Any
 
 
 @dataclass
@@ -28,12 +28,12 @@ class ScalpelVariable:
     name: str  # The name of the variable
     function: str  # The name of the function where the variable is defined
     line: int  # The line number that the variable is defined at
-    type: str = None  # The type of the variable as a string
+    type: Optional[str] = None  # The type of the variable as a string
     in_conditional: bool = False  # Whether the variable is involved in any conditional statements
     in_equality: bool = False  # Whether the variable is involved in an equality statement
     is_callable: bool = False  # Whether the variable has been called as a function
-    called_methods: List[str] = None  # List of methods called from the variable
-    binary_operation: ast.BinOp = None  # Binary operation assignment
+    called_methods: Optional[List[str]] = None  # List of methods called from the variable
+    binary_operation: Optional[ast.BinOp] = None  # Binary operation assignment
     is_arg: bool = None  # Whether the variable is an argument in a function
 
 @dataclass
@@ -65,8 +65,8 @@ class BinaryOperation:
     left_ast_type: any  # The AST type of the left variable
     right: str  # The right variable
     right_ast_type: any  # The AST type of the right variable
-    operator: any  # The binary operator used between the two variables
-    shared_type: str = None  # Stores shared type between the variables in the operation
+    operator: Any  # The binary operator used between the two variables
+    shared_type: Optional[str] = None  # Stores shared type between the variables in the operation
 
 
 @dataclass
