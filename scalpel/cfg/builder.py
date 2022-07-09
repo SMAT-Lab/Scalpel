@@ -163,6 +163,7 @@ class CFGBuilder(ast.NodeVisitor):
         """
         # remove function def nodes
         block.statements.append(statement)
+        print(f'{statement=}')
 
     def add_exit(self, block, nextblock, exitcase=None):
         """
@@ -464,6 +465,63 @@ class CFGBuilder(ast.NodeVisitor):
         # Continue building the CFG in the after-if block.
         self.current_block = afterif_block
 
+    def visit_Match(self, node):
+        print("YAY made it here")
+
+        # Add the Match statement at the end of the current block
+        self.add_statement(self.current_block, node)
+
+        # Create a new block for the body of the match.
+        match_block = self.new_block()
+        self.add_exit(self.current_block, match_block)
+
+        # Create a block for the code after the case.
+        after_match_block = self.new_block()
+
+        # Dealing with each of the cases
+        self.current_block = match_block
+        for child in node.cases:
+            self.visit(child)
+        if not self.current_block.exits:
+            self.add_exit(self.current_block, after_match_block)
+
+        # Dealing with each of the cases
+        # if len(node.cases) != 0:
+        #     for child in node.cases:
+        #         print(f"child {child=}")
+        #         self.visit(child)
+
+        # Continue building the CFG in the after-case block.
+        self.current_block = after_match_block
+
+    def visit_match_case2(self, node):
+        self.add_statement(self.current_block, node)
+        self.goto_new_block(node)
+
+    def visit_match_case(self, node):
+        print('matching cases')
+
+        # Add the match_case statement at the end of the current block
+        self.add_statement(self.current_block, node)
+
+        # Create a new block for the body of the match_case.
+        match_case_block = self.new_block()
+        self.add_exit(self.current_block, match_case_block)
+        self.add_statement(match_case_block, node)
+
+        # Create a block for the code after the case.
+        after_case_block = self.new_block()
+
+        # Visit children to populate the case block.
+        self.current_block = match_case_block
+        for child in node.body:
+            self.visit(child)
+
+        if not self.current_block.exits:
+            self.add_exit(self.current_block, after_case_block)
+
+        # Continue building the CFG in the after-match-case block.
+        self.current_block = after_case_block
 
     def visit_While(self, node):
         loop_guard = self.new_loopguard()
