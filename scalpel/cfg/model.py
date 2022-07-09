@@ -110,18 +110,18 @@ class Block(object):
         src = "#" + str(self.id)+'\n'
         for statement in self.statements:
             if type(statement) in [ast.If, ast.For, ast.While, ast.With]:
-                src += (astor.to_source(statement)).split('\n')[0] + "\n"
+                src += (astor.to_source(statement, source_generator_class=SourceGenerator)).split('\n')[0] + "\n"
             elif type(statement) == ast.Try:
-                src += (astor.to_source(statement)).split('\n')[0] + "\n"
+                src += (astor.to_source(statement, source_generator_class=SourceGenerator)).split('\n')[0] + "\n"
             #elif type(statement) == ast.If:
             #    src += (astor.to_source(statement)).split('\n')[0] + "\n"
             elif type(statement) in [ast.FunctionDef,ast.AsyncFunctionDef,
                     ast.ClassDef]:
-                src += (astor.to_source(statement)).split('\n')[0] + "...\n"
+                src += (astor.to_source(statement, source_generator_class=SourceGenerator)).split('\n')[0] + "...\n"
             elif type(statement) == ast.ClassDef:
-                src += (astor.to_source(statement)).split('\n')[0] + "...\n"
+                src += (astor.to_source(statement, source_generator_class=SourceGenerator)).split('\n')[0] + "...\n"
             else:
-                src += astor.to_source(statement)
+                src += astor.to_source(statement, source_generator_class=SourceGenerator)
         return src
 
     def get_calls(self):
@@ -322,3 +322,24 @@ class CFG(object):
         graph = self._build_visual(format, calls)
         return graph
 
+# New source generator
+# based on fix from https://github.com/berkerpeksag/astor/issues/147
+class SourceGenerator(astor.SourceGenerator):
+    def visit_Match(self, node):
+        self.statement(node, 'match ', node.subject)
+
+    def visit_match_case(self, node):
+        self.statement(node, 'case ', node.pattern)
+
+    def visit_MatchValue(self, node):
+        self.write(node.value)
+
+    def visit_MatchAs(self, node):
+        if node.name == None:
+            self.write("_")
+        else:
+            self.write(node.name)
+
+    def visit_MatchSequence(self, node):
+        for node in node.patterns:
+            self.visit(node)
