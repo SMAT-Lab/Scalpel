@@ -465,58 +465,113 @@ class CFGBuilder(ast.NodeVisitor):
         # Continue building the CFG in the after-if block.
         self.current_block = afterif_block
 
+    # def visit_Match(self, node):
+    #     print("Yay matching")
+    #
+    #     # Add the Match statement at the end of the current block
+    #     self.add_statement(self.current_block, node)
+    #
+    #     # Store the current block as match_block
+    #     match_block = self.current_block
+    #
+    #     # Create a new block for the body of the match. (match does not have a body)
+    #     match_block_body = self.new_block()
+    #
+    #     # Add an exit to the match body (current block to match body)
+    #     self.add_exit(self.current_block, match_block_body)
+    #
+    #     # Create a block for the code after the match.
+    #     after_match_block = self.new_block()
+    #
+    #     # Deal with the cases
+    #     if len(node.cases) != 0:
+    #         for case in node.cases:
+    #             # Create a new block for the case
+    #             case_block = self.new_block()
+    #
+    #             # Add case to the current block
+    #             self.add_statement(case_block, case)
+    #
+    #             # add exit from match block to current case
+    #             self.add_exit(match_block, case_block)
+    #
+    #             # Create a new block for the body of the case
+    #             case_block_body = self.new_block()
+    #
+    #             # Connect case block to it's body and to after it's body
+    #             self.add_exit(case_block, case_block_body)
+    #             self.add_exit(case_block, after_match_block)
+    #
+    #             # Add to the body of case
+    #             self.current_block = case_block_body
+    #             for child in case.body:
+    #                 self.visit(child)
+    #
+    #             # Add an exit to the case body (case body to after match)
+    #             self.add_exit(case_block_body, after_match_block)
+    #
+    #     # Add exit to match block (match block to after match block)
+    #     self.add_exit(match_block, after_match_block)
+    #
+    #     # (At the end) Set the current block to the block after the match
+    #     self.current_block = after_match_block
+
     def visit_Match(self, node):
-        print("YAY made it here")
+        print("Yay matching switch type")
 
         # Add the Match statement at the end of the current block
         self.add_statement(self.current_block, node)
 
-        # Create a new block for the body of the match.
-        match_block = self.new_block()
-        self.add_exit(self.current_block, match_block)
+        # Store the current block as match_block
+        match_block = self.current_block
 
-        # Create a block for the code after the case.
+        # Create a new block for the body of the match. (match does not have a body)
+        match_block_body = self.new_block()
+
+        # Add an exit to the match body (current block to match body)
+        self.add_exit(self.current_block, match_block_body)
+
+        # Create a block for the code after the match.
         after_match_block = self.new_block()
 
-        # Dealing with each of the cases
-        self.current_block = match_block
-        for child in node.cases:
-            self.visit(child)
-        if not self.current_block.exits:
-            self.add_exit(self.current_block, after_match_block)
+        # Deal with the cases
+        if len(node.cases) != 0:
+            # Create a new block for the case
+            case_block = self.new_block()
 
-        # Dealing with each of the cases
-        # if len(node.cases) != 0:
-        #     for child in node.cases:
-        #         print(f"child {child=}")
-        #         self.visit(child)
+            # add exit from match block to case block
+            self.add_exit(match_block, case_block)
 
-        # Continue building the CFG in the after-case block.
+            for case in node.cases:
+                # Add case to the current case block
+                self.add_statement(case_block, case)
+
+                # Create a new block for after the case block body
+                after_case_block = self.new_block()
+
+                # Create a new block for the body of the case
+                case_block_body = self.new_block()
+
+                # Connect case block to it's body and to after it's body
+                self.add_exit(case_block, case_block_body)
+                self.add_exit(case_block, after_case_block)
+
+                # Add to the body of case
+                self.current_block = case_block_body
+                for child in case.body:
+                    self.visit(child)
+
+                # Add an exit to the case body (case body to after match)
+                self.add_exit(case_block_body, after_match_block)
+
+                # Create a new block for the next case
+                case_block = after_case_block
+
+        # Add exit to match block (match block to after match block)
+        self.add_exit(match_block, after_match_block)
+
+        # (At the end) Set the current block to the block after the match
         self.current_block = after_match_block
-
-    def visit_match_case(self, node):
-        print('matching cases')
-
-        # Add the match_case statement at the end of the current block
-        self.add_statement(self.current_block, node)
-
-        # Create a new block for the body of the match_case.
-        match_case_block = self.new_block()
-        self.add_exit(self.current_block, match_case_block)
-
-        # Create a block for the code after the case.
-        after_case_block = self.new_block()
-
-        # Visit children to populate the case block.
-        self.current_block = match_case_block
-        for child in node.body:
-            self.visit(child)
-
-        if not self.current_block.exits:
-            self.add_exit(self.current_block, after_case_block)
-
-        # Continue building the CFG in the after-match-case block.
-        self.current_block = after_case_block
 
     def visit_While(self, node):
         loop_guard = self.new_loopguard()
