@@ -163,7 +163,6 @@ class CFGBuilder(ast.NodeVisitor):
         """
         # remove function def nodes
         block.statements.append(statement)
-        print(f'{statement=}')
 
     def add_exit(self, block, nextblock, exitcase=None):
         """
@@ -466,8 +465,6 @@ class CFGBuilder(ast.NodeVisitor):
         self.current_block = afterif_block
 
     # def visit_Match(self, node):
-    #     print("Yay matching")
-    #
     #     # Add the Match statement at the end of the current block
     #     self.add_statement(self.current_block, node)
     #
@@ -517,8 +514,6 @@ class CFGBuilder(ast.NodeVisitor):
     #     self.current_block = after_match_block
 
     def visit_Match(self, node):
-        print("Yay matching switch type")
-
         # Add the Match statement at the end of the current block
         self.add_statement(self.current_block, node)
 
