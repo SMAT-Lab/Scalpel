@@ -1,6 +1,6 @@
 """ 
 In this module, the single static assignment forms are  implemented to allow
-futher anaysis. The module contain a single class named SSA.
+further analysis. The module contain a single class named SSA.
 """
 import ast
 import astor
