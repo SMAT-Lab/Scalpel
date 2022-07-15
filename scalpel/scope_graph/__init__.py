@@ -31,4 +31,4 @@ https://link.springer.com/content/pdf/10.1007/978-3-662-46669-8_9.pdf
 2. Hendrik van Antwerpen, Casper Bach Poulsen, Arjen Rouvoet, and Eelco Visser. 2018. Scopes as types. Proc. ACM Program. Lang. 2, OOPSLA, Article 114 (November 2018), 30 pages. https://doi.org/10.1145/3276484
 
 """
-from scope_graph import ScopeGraph 
+from .scope_graph import ScopeGraph 
