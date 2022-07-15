@@ -4,3 +4,4 @@ ESOP 2015. Lecture Notes in Computer Science(), vol 9032. Springer, Berlin, Heid
 
 https://link.springer.com/content/pdf/10.1007/978-3-662-46669-8_9.pdf
 """
+from scope_graph import ScopeGraph 
