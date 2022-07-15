@@ -1,9 +1,6 @@
 import networkx as nx
 import ast 
 import queue
-"""
-there are two types of edges between any two scopes : visiable and reachable 
-"""
 
 # set an current scope for scope information records,
 # when entering the scope, parent scope relationship is formed.
@@ -15,12 +12,12 @@ class ScopeGraph(ast.NodeVisitor):
         """
         The central concepts in the framework are declarations, references, and scopes
         """
-        self.sg = nx.DiGraph()
-        self.ig = nx.DiGraph()
-        self.MRO_graph = {}
-        self.parent_relations = {} 
-        self.references = {}   
-        self.declarations = {}
+        self.sg = nx.DiGraph()  # scope graph
+        self.ig = nx.DiGraph()  # inheritance graph
+        self.MRO_graph = {}  # method resolution order
+        self.parent_relations = {} # parent relations among scopes
+        self.references = {}   # dictionary for refereced names 
+        self.declarations = {} # dictionary for declared names 
         self.current_scope_name = None
         pass
 
@@ -89,6 +86,11 @@ class ScopeGraph(ast.NodeVisitor):
             self.references[self.current_scope_name].append(node.id)
         elif isinstance(node.ctx, ast.Store):
             self.declarations[self.current_scope_name].append(node.id)
+
+    def visit_Global(self, node):
+        pass
+    def visit_Nonlocal(self, node):
+        pass 
 
     def resolve(name, working_scope):
         """
