@@ -1,4 +1,3 @@
-from select import select
 import networkx as nx
 import ast 
 import queue
