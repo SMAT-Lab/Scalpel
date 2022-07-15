@@ -6,7 +6,6 @@ there are two types of edges between any two scopes : visiable and reachable
 """
 
 # set an current scope for scope information records,
-
 # when entering the scope, parent scope relationship is formed.
 # now for each of names 
 

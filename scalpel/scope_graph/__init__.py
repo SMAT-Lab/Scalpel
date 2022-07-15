@@ -1,9 +1,8 @@
 """
+In this sub-module, we implement the scope graph for Python programs. 
+The overall idea is borrowed from the scope graph theory, please see references.
+For name binding and resolution, we follow the Local, Enclosing, Global and Built-in(LEGB) rule instead of the resolution calculus in the scope graph theory.
 
-"It can be illuminating to depict a scope graph graphically.
-In a scope graph diagram：
-1. a scope is depicted as a circle,
-2. a reference as a box with an arrow pointing into the scope that contains it, and a declaration as"
 
 A scope is an abstraction over a group of nodes in the abstract syntax tree
 that behave uniformly with respect to name resolution.
