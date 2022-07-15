@@ -2,11 +2,6 @@ import networkx as nx
 import ast 
 import queue
 
-# set an current scope for scope information records,
-# when entering the scope, parent scope relationship is formed.
-# now for each of names 
-
-
 class ScopeGraph(ast.NodeVisitor):
     def __init__(self) -> None:
         """
