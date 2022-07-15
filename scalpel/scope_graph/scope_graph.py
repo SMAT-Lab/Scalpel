@@ -9,6 +9,7 @@ class ScopeGraph(ast.NodeVisitor):
         """
         self.sg = nx.DiGraph()  # scope graph
         self.ig = nx.DiGraph()  # inheritance graph
+        self.imports = {}  # save information about imported names and scopes 
         self.MRO_graph = {}  # method resolution order
         self.parent_relations = {} # parent relations among scopes
         self.references = {}   # dictionary for refereced names 
@@ -85,6 +86,23 @@ class ScopeGraph(ast.NodeVisitor):
     def visit_Global(self, node):
         pass
     def visit_Nonlocal(self, node):
+        pass 
+
+    def visit_Import(self, node):
+        for alias in node.names:
+            if alias.asname is not None:
+                name = alias.asname
+            else:
+                name = alias.name
+            self.imports[current_scope_name].append(alias.name)
+
+    def visit_ImportFrom(self, node):
+        for alias in node.names:
+            if alias.asname is not None:
+                name = alias.asname
+            else:
+                name = alias.name
+            self.imports[current_scope_name].append(alias.name)
         pass 
 
     def resolve(name, working_scope):
@@ -181,7 +199,7 @@ class ScopeGraph(ast.NodeVisitor):
 
         for name in init_names:
             dfs_queue.put(name)
-      
+
         while not dfs_queue.empty():
             cur_name = dfs_queue.get() 
             if cur_name not in is_visited:
