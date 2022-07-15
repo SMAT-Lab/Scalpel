@@ -60,6 +60,13 @@ def test_get_vars():
     var_names = [r['name'] for r in var_results if r['name'] is not None]
     assert "lcs"  in var_names
 
+    code_str = """X = dataset.iloc[:, [3, 4]].values"""
+    ast_node = ast.parse(code_str)
+    var_results = get_vars(ast_node)
+    var_names = [r['name'] for r in var_results if r['name'] is not None]
+    assert "X" in var_names and "dataset" in var_names
+
+
 
 def main():
     test_function_calls()
