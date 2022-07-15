@@ -1,6 +1,6 @@
 """
 In this module, Scalplel provides the interface to users. Each of Python source
-files are fed into this module to generate an frontend object for both parsing
+files are fed into this module to generate a frontend object for both parsing
 and code instrumentation. In addition, scope information can also be given for
 fine-grained operations. 
 """
@@ -35,7 +35,7 @@ class ImportRelation:
 
 class MNode:
     """
-    Build a Module node  of the given input source file with publicaly APIs to
+    Build a Module node  of the given input source file with publicly APIs to
     manipulate for parsing and  code instrumentation
     file.
 
@@ -94,7 +94,7 @@ class MNode:
         Returns a list of function calls ranking by their line numbers
         Args:
             scope: a dotted string to provide name space. For instance, A.fun
-            means to retreive the function named fun in the class A
+            means to retrieve the function named fun in the class A
         """
         wanted_ast = self._retrieve_by_scope(self.ast, scope)
         results =  get_func_calls(wanted_ast)
@@ -153,7 +153,7 @@ class MNode:
             given scope.
             function/class definition.
             scope: a dotted string to provide name space. For instance, A.fun
-            means to retreive the function named fun in the class A
+            means to retrieve the function named fun in the class A
 
         """
         if scope == "":

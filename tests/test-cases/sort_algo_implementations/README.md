@@ -1,17 +1,3 @@
-# py-sorting
+Please note all the source files under this folder are from https://github.com/gwtw/py-sorting
 
-[![Build Status](https://travis-ci.org/gwtw/py-sorting.svg?branch=master)](http://travis-ci.org/gwtw/py-sorting)
-
-A collection of sorting algorithms written in Python.
-
-
-
-## License
-
-MIT © [Daniel Imms](http://www.growingwiththeweb.com)
-
-
-
-## See also
-
-* [js-sorting](https://github.com/gwtw/js-sorting)
+The scripts are collected for testing Scalpel framework. 

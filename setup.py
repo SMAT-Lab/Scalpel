@@ -18,7 +18,6 @@ setup(
         'setuptools',
         'dataclasses',
         'pycg',
-        'networkx'
     ]
     )
 
