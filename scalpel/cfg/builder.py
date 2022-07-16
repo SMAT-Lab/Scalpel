@@ -464,6 +464,7 @@ class CFGBuilder(ast.NodeVisitor):
         # Continue building the CFG in the after-if block.
         self.current_block = afterif_block
 
+    # match statement in the other format
     # def visit_Match(self, node):
     #     # Add the Match statement at the end of the current block
     #     self.add_statement(self.current_block, node)
@@ -535,7 +536,7 @@ class CFGBuilder(ast.NodeVisitor):
             case_block = self.new_block()
 
             # add exit from match block to case block
-            self.add_exit(match_block, case_block)
+            self.add_exit(match_block, case_block, ast.Constant(True))
 
             for case in node.cases:
                 # Add case to the current case block
@@ -548,8 +549,15 @@ class CFGBuilder(ast.NodeVisitor):
                 case_block_body = self.new_block()
 
                 # Connect case block to it's body and to after it's body
-                self.add_exit(case_block, case_block_body)
-                self.add_exit(case_block, after_case_block)
+                self.add_exit(case_block, case_block_body, ast.Constant(True))
+
+                # If an 'if' statement exists in the case line
+                if case.guard is not None:
+                    self.add_statement(case_block, case.guard)
+                    self.add_exit(case_block, after_case_block, case.guard)
+                else:
+                    self.add_exit(case_block, after_case_block, ast.Constant(False))
+
 
                 # Add to the body of case
                 self.current_block = case_block_body
@@ -563,7 +571,7 @@ class CFGBuilder(ast.NodeVisitor):
                 case_block = after_case_block
 
         # Add exit to match block (match block to after match block)
-        self.add_exit(match_block, after_match_block)
+        self.add_exit(match_block, after_match_block, ast.Constant(False))
 
         # (At the end) Set the current block to the block after the match
         self.current_block = after_match_block
