@@ -22,7 +22,7 @@ class SetEncoder(json.JSONEncoder):
 target_dir = "./"
 all_files = get_path_by_ext(target_dir)
 for idx, fn in enumerate(all_files):
-    if fn.endswith(".py") and fn != "__init__.py":
+    if fn.endswith(".py") and fn != "./__init__.py":
         # Initialize the dict for ground truth
         ground_truth_dict = {"Call Graph": "", "Type Information": "", "SSA": "", "Alias": ""}
         m_ssa = SSA()
