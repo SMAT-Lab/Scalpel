@@ -325,6 +325,13 @@ class CFG(object):
 # New source generator
 # based on fix from https://github.com/berkerpeksag/astor/issues/147
 class SourceGenerator(astor.SourceGenerator):
+    def visit_MatchSingleton(self, node):
+        value = node.value
+        if value:
+            self.write('True')
+        elif not value:
+            self.write('False')
+
     def visit_Match(self, node):
         self.statement(node, 'match ', node.subject)
 
@@ -341,5 +348,24 @@ class SourceGenerator(astor.SourceGenerator):
             self.write(node.name)
 
     def visit_MatchSequence(self, node):
+        self.write("[")
+        num_commas = len(node.patterns)
+        counter = 0
         for node in node.patterns:
             self.visit(node)
+            counter += 1
+            if counter != num_commas:
+                self.write(', ')
+        self.write("]")
+
+    def visit_MatchStar(self, node):
+        self.write(f"*{node.name}")
+
+    def visit_MatchOr(self, node):
+        num_ORs = len(node.patterns)
+        counter = 0
+        for node in node.patterns:
+            self.visit(node)
+            counter += 1
+            if counter != num_ORs:
+                self.write(' | ')
