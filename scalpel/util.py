@@ -1,6 +1,5 @@
 import os
 
-
 # scan a folder recurisively and return all files ending with the flag
 def get_path_by_ext(root_dir, flag='.py'):
     paths = []

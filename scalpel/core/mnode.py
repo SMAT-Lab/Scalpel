@@ -1,6 +1,6 @@
 """
 In this module, Scalplel provides the interface to users. Each of Python source
-files are fed into this module to generate an frontend object for both parsing
+files are fed into this module to generate a frontend object for both parsing
 and code instrumentation. In addition, scope information can also be given for
 fine-grained operations. 
 """
@@ -35,7 +35,7 @@ class ImportRelation:
 
 class MNode:
     """
-    Build a Module node  of the given input source file with publicaly APIs to
+    Build a Module node  of the given input source file with publicly APIs to
     manipulate for parsing and  code instrumentation
     file.
 
@@ -94,7 +94,7 @@ class MNode:
         Returns a list of function calls ranking by their line numbers
         Args:
             scope: a dotted string to provide name space. For instance, A.fun
-            means to retreive the function named fun in the class A
+            means to retrieve the function named fun in the class A
         """
         wanted_ast = self._retrieve_by_scope(self.ast, scope)
         results =  get_func_calls(wanted_ast)
@@ -153,7 +153,7 @@ class MNode:
             given scope.
             function/class definition.
             scope: a dotted string to provide name space. For instance, A.fun
-            means to retreive the function named fun in the class A
+            means to retrieve the function named fun in the class A
 
         """
         if scope == "":
@@ -265,21 +265,6 @@ class MNode:
                 base_names.append(get_attr_name(b_node))
         return base_names
 
-    #def parse_function_body(self):
-    #    """
-    #    Prase all function/class definitions
-    #    """
-    #    func_records = {}
-    #    base_records = {}
-    #    for stmt in self.ast.body:
-    #        if isinstance(stmt, ast.FunctionDef):
-    #            func_records[stmt.name] = self.retrieve_meta(stmt)
-    #        if isinstance(stmt, ast.ClassDef):
-    #            base_records[stmt.name] = self._process_base_names(stmt.bases)
-    #            for c_stmt in stmt.body:
-    #                if isinstance(c_stmt, ast.FunctionDef):
-    #                    func_records[stmt.name+'.' + c_stmt.name] = self.retrieve_meta(c_stmt)
-    #    return func_records, base_records
 
     def gen_cfg(self):
         cfg = CFGBuilder().build("", self.ast)

@@ -1,6 +1,6 @@
 """ 
 In this module, the single static assignment forms are implemented to allow
-futher anaysis. The module contain a single class named SSA.
+further analysis. The module contain a single class named SSA.
 """
 import ast
 import astor
@@ -73,7 +73,7 @@ class SSA:
         During the computing, constant value and alias pairs are generated. The following steps are used to compute SSA representations:
         step 1a: compute the dominance frontier
         step 1b: use dominance frontier to place phi node
-        if node X contains assignment to a, put phi node for a in dominance frontier of X
+        if node X contains assignment to a, put phi node for an in dominance frontier of X
         adding phi function may require introducing additional phi function 
         start from the entry node 
         step2: rename variables so only one definition per name
@@ -169,7 +169,7 @@ class SSA:
 
     def get_stmt_idents_ctx(self, stmt, del_set=[], const_dict = {}):
         """
-        Extract the contexual information of each of identifiers. 
+        Extract the contextual information of each of identifiers. 
         For assignment statements, the assigned values for each of variables will be stored.
         In addition, the del_set will store all deleted variables. 
         Args:
@@ -340,7 +340,7 @@ class SSA:
     # compute the dominators 
     def compute_idom(self, ssa_blocks):
         """
-        Compute immediate immediate dominators for each of blocks
+        Compute immediate dominators for each of blocks
         Args:
             ssa_blocks: blocks from a control flow graph.
         """
