@@ -2,10 +2,9 @@ from setuptools import setup, find_packages
 setup( 
     name = "Scalpel",
     version = "1.0beta",
-    description = "Scalpel: A Python Program Analysis Framework",
+    description = "The Python Static Analysis Framework",
     author = "Jiawei Wang and Li Li",
-    author_email = "jiawei.wang1@monash.edu, li.li@monash.edu",
-    url = "https://www.monash.edu",
+    url = "https://github.com/SMAT-Lab/Scalpel",
     packages= find_packages(include=['scalpel', 'scalpel.*']),
     install_requires = [
         'astor~=0.8.1',
