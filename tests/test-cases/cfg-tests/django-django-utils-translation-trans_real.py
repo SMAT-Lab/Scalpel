@@ -481,8 +481,8 @@ def get_supported_language_variant(lang_code, strict=False):
             possible_lang_codes.extend(LANG_INFO[lang_code]['fallback'])
         except KeyError:
             pass
-        i = None
-        while (i := lang_code.rfind('-', 0, i)) > -1:
+        i = lang_code.rfind('-', 0, None)
+        while i > -1:
             possible_lang_codes.append(lang_code[:i])
         generic_lang_code = possible_lang_codes[-1]
         supported_lang_codes = get_languages()
