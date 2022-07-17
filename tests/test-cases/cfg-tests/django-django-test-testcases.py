@@ -1615,7 +1615,7 @@ class SerializeMixin:
     """
     lockfile = None
 
-    def __init_subclass__(cls, /, **kwargs):
+    def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
         if cls.lockfile is None:
             raise ValueError(
