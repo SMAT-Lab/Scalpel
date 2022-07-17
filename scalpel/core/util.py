@@ -5,6 +5,8 @@ import astor
 import os
 import sys
 
+# some functions are from ast.py 
+# https://github.com/python/cpython/blob/main/Lib/ast.py
 
 def iter_fields(node):
     """
