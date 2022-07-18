@@ -3,15 +3,13 @@
 
 Scalpel is a Python Static Analysis Framework. It provides essential program analysis functions for facilitating the implementation of client applications focusing on statically resolving dedicated problems.
 
-# News
-
-* Scalpel is invited to be presented at EuroPython 2022. EuroPython is the oldest and longest running volunteer-led Python programming conference on the planet!
+Scalpel is invited to be presented at EuroPython 2022. EuroPython is the oldest and longest running volunteer-led Python programming conference on the planet!
 
 ![Scalpel EuroPython](resources/europython.png)
 
 # Contributing
 
-* Feel free to [submit your issues](https://github.com/SMAT-Lab/Scalpel/issues), we are happy to see any issues including new feature requirements, new ideas, bug reports or other code quality issues. 
+* We will be highly appreciated it if you can contribute to this project. Please feel free to do so by [adding pull requests](https://github.com/SMAT-Lab/Scalpel/pulls) or [submiting issue reports](https://github.com/SMAT-Lab/Scalpel/issues).
 
 ## Setting up Scalpel
 Clone the repository of Scalpel and in the root directory simply run:
