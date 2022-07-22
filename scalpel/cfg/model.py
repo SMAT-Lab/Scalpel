@@ -177,7 +177,7 @@ class Link(object):
             A string containing the source code.
         """
         if self.exitcase:
-            return astor.to_source(self.exitcase)
+            return astor.to_source(self.exitcase, source_generator_class=SourceGenerator)
         return ""
     def __del__(self):
         self.source = None

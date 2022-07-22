@@ -464,6 +464,55 @@ class CFGBuilder(ast.NodeVisitor):
         # Continue building the CFG in the after-if block.
         self.current_block = afterif_block
 
+    # match statement connected directly case
+    def visit_Match(self, node):
+        # Add the Match statement at the end of the current block
+        self.add_statement(self.current_block, node)
+
+        # Store the current block as match_block
+        match_block = self.current_block
+
+        # Create a new block for the body of the match. (match does not have a body)
+        match_block_body = self.new_block()
+
+        # Add an exit to the match body (current block to match body)
+        self.add_exit(self.current_block, match_block_body)
+
+        # Create a block for the code after the match.
+        after_match_block = self.new_block()
+
+        # Deal with the cases
+        if len(node.cases) != 0:
+            for case in node.cases:
+                # Create a new block for the case
+                # case_block = self.new_block()
+                #
+                # # Add case to the current block
+                # self.add_statement(case_block, case)
+
+                # add exit from match block to current case
+                # self.add_exit(match_block, case_block, case)
+
+                # Create a new block for the body of the case
+                case_block_body = self.new_block()
+
+                # Connect case block to it's body and to after it's body
+                self.add_exit(match_block, case_block_body, case)
+
+                # Add to the body of case
+                self.current_block = case_block_body
+                for child in case.body:
+                    self.visit(child)
+
+                # Add an exit to the case body (case body to after match)
+                self.add_exit(case_block_body, after_match_block)
+
+        # Add exit to match block (match block to after match block)
+        self.add_exit(match_block, after_match_block)
+
+        # (At the end) Set the current block to the block after the match
+        self.current_block = after_match_block
+
     # match statement in the other format
     # def visit_Match(self, node):
     #     # Add the Match statement at the end of the current block
@@ -514,67 +563,67 @@ class CFGBuilder(ast.NodeVisitor):
     #     # (At the end) Set the current block to the block after the match
     #     self.current_block = after_match_block
 
-    def visit_Match(self, node):
-        # Add the Match statement at the end of the current block
-        self.add_statement(self.current_block, node)
-
-        # Store the current block as match_block
-        match_block = self.current_block
-
-        # Create a new block for the body of the match. (match does not have a body)
-        match_block_body = self.new_block()
-
-        # Add an exit to the match body (current block to match body)
-        self.add_exit(self.current_block, match_block_body)
-
-        # Create a block for the code after the match.
-        after_match_block = self.new_block()
-
-        # Deal with the cases
-        if len(node.cases) != 0:
-            # Create a new block for the case
-            case_block = self.new_block()
-
-            # add exit from match block to case block
-            self.add_exit(match_block, case_block, ast.Constant(True))
-
-            for case in node.cases:
-                # Add case to the current case block
-                self.add_statement(case_block, case)
-
-                # Create a new block for after the case block body
-                after_case_block = self.new_block()
-
-                # Create a new block for the body of the case
-                case_block_body = self.new_block()
-
-                # Connect case block to it's body and to after it's body
-                self.add_exit(case_block, case_block_body, ast.Constant(True))
-
-                # If an 'if' statement exists in the case line
-                if case.guard is not None:
-                    self.add_statement(case_block, case.guard)
-                    self.add_exit(case_block, after_case_block, case.guard)
-                else:
-                    self.add_exit(case_block, after_case_block, ast.Constant(False))
-
-
-                # Add to the body of case
-                self.current_block = case_block_body
-                for child in case.body:
-                    self.visit(child)
-
-                # Add an exit to the case body (case body to after match)
-                self.add_exit(case_block_body, after_match_block)
-
-                # Create a new block for the next case
-                case_block = after_case_block
-
-        # Add exit to match block (match block to after match block)
-        self.add_exit(match_block, after_match_block, ast.Constant(False))
-
-        # (At the end) Set the current block to the block after the match
-        self.current_block = after_match_block
+    # def visit_Match(self, node):
+    #     # Add the Match statement at the end of the current block
+    #     self.add_statement(self.current_block, node)
+    #
+    #     # Store the current block as match_block
+    #     match_block = self.current_block
+    #
+    #     # Create a new block for the body of the match. (match does not have a body)
+    #     match_block_body = self.new_block()
+    #
+    #     # Add an exit to the match body (current block to match body)
+    #     self.add_exit(self.current_block, match_block_body)
+    #
+    #     # Create a block for the code after the match.
+    #     after_match_block = self.new_block()
+    #
+    #     # Deal with the cases
+    #     if len(node.cases) != 0:
+    #         # Create a new block for the case
+    #         case_block = self.new_block()
+    #
+    #         # add exit from match block to case block
+    #         self.add_exit(match_block, case_block, ast.Constant(True))
+    #
+    #         for case in node.cases:
+    #             # Add case to the current case block
+    #             self.add_statement(case_block, case)
+    #
+    #             # Create a new block for after the case block body
+    #             after_case_block = self.new_block()
+    #
+    #             # Create a new block for the body of the case
+    #             case_block_body = self.new_block()
+    #
+    #             # Connect case block to it's body and to after it's body
+    #             self.add_exit(case_block, case_block_body, ast.Constant(True))
+    #
+    #             # If an 'if' statement exists in the case line
+    #             if case.guard is not None:
+    #                 self.add_statement(case_block, case.guard)
+    #                 self.add_exit(case_block, after_case_block, case.guard)
+    #             else:
+    #                 self.add_exit(case_block, after_case_block, ast.Constant(False))
+    #
+    #
+    #             # Add to the body of case
+    #             self.current_block = case_block_body
+    #             for child in case.body:
+    #                 self.visit(child)
+    #
+    #             # Add an exit to the case body (case body to after match)
+    #             self.add_exit(case_block_body, after_match_block)
+    #
+    #             # Create a new block for the next case
+    #             case_block = after_case_block
+    #
+    #     # Add exit to match block (match block to after match block)
+    #     self.add_exit(match_block, after_match_block, ast.Constant(False))
+    #
+    #     # (At the end) Set the current block to the block after the match
+    #     self.current_block = after_match_block
 
     def visit_While(self, node):
         loop_guard = self.new_loopguard()
