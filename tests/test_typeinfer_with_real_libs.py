@@ -53,7 +53,10 @@ def format_type_annot(annot):
     elif isinstance(annot, ast.Index):
         return format_type_annot(annot.value)
     elif isinstance(annot, ast.NameConstant):
-        return annot.value
+        if annot.value is None:
+            return "empty"
+        else:
+            return annot.value
     else:
         # return ast.dump(annot)
         # print(ast.dump(annot), 'testing')
