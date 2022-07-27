@@ -3,7 +3,7 @@
 GREEN='\033[0;32m'
 NC='\033[0m' # No Color
 # Creating environments for different python versions
-for ((c=5; c<=10; c++)) # From python 3.5 to 3.10
+for ((c=6; c<=10; c++)) # From python 3.6 to 3.10
 do
   printf "${GREEN}Creating environment for python3.%s ${NC}\n" "$c"
   conda create --name scalpel-python3."$c" python=3."$c"
