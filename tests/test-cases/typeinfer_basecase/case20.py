@@ -1,6 +1,9 @@
-def add(x, y):
-    return x + y
+from os import getcwd
 
+def my_function():
+    x = "Current working directory: "
+    return x + getcwd()
 
-add("Hello", "World")
-add(5, 6)
+def main():
+    y = my_function()
+
