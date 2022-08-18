@@ -260,7 +260,7 @@ class SSA:
 
         if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef)):
             stored_idents.append(stmt.name)
-            const_dict[stmt.name] = None
+            const_dict[stmt.name] = stmt
             func_names.append(stmt.name)
             new_stmt = stmt
             new_stmt.body = []
