@@ -1,10 +1,11 @@
+# Call Graph
 
-### Overview
+## Overview
 A call graph depicts calling relationships between subroutines in a computer program. It is an essential component in most static analysis and can be leveraged to build more sophisicated applications such as profiling, vunerability propagation and refactoring.
 `scalpel.call_graph.pycg` module is a wrapper of `PyCG`[3]. It aims to construct the call graphs for given Python projects. The basic node can be either a function, a class or a module. The edges represent calling relationships between program nodes. 
 
   
-### How to use Call Graph
+## How to use Call Graph
 We use */example_pkg* package as an example and below is the folder structure of it.
 
 ```
@@ -52,11 +53,11 @@ The tutorial code can be found here:\
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Call Graph Example](../examples/cg_tutorial.py)
 
 
-### APIs
+## APIs
 [Please refer to the API documentation](https://smat-lab.github.io/Scalpel/scalpel/call_graph.html)
 
 
-### Reference
+## Reference
 1. [Call Graph Concepts](https://en.wikipedia.org/wiki/Call_graph)
 2. [PyCG: Practical Call Graph Generation in Python. In 43rd International Conference on Software Engineering, 2021](https://vitsalis.com/papers/pycg.pdf). 
 3. [The pycg library ](https://pypi.org/project/pycg/)

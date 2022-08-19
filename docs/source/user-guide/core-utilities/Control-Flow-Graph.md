@@ -1,9 +1,10 @@
+# Control Flow Graph
 
 `scalpel.cfg` module is used to construct the control flow graph for given python programs. The basic unit in the CFG, `Block`, contains a list of sequential statements that can be executed in a program without any control jumps. The `Block`s are linked by `Link` objects, which represent control flow jumps between two blocks and contain the jump conditions in the form of an expression. The two components are the fundemental data structures in the control flow graph module (`scalpel.cfg`).
 
 
 
-### How to use Control Flow Graph
+## How to use Control Flow Graph
 Below is the demo input python program we will be using. The piece of code generates the Fibonacci sequence.
 ```python
 code_str="""
@@ -32,7 +33,7 @@ cfg.build_visual('pdf')
 ```
 Below is the produced *exampleCFG.pdf*.
 
-| ![Fibonacci CFG](../resources/cfg_example.png) |
+| ![Fibonacci CFG](../_static/resources/cfg_example.png) |
 |:--:|
 | <b>Fig.1 The control flow graph for the given source files </b>|
 
@@ -44,7 +45,7 @@ for block in cfg:
     calls = block.get_calls()
 ```
 
-### Visualizations of CFG objects
+## Visualizations of CFG objects
 
 Scalpel offeres some functionalities to render the CFG diagrams into PDF, PNG, JPG or SVGs. Please notice this requires the graphviz package installed in your computer. Please refer to [graphviz](https://graphviz.readthedocs.io/en/stable/manual.html) get it installed. 
 
@@ -55,7 +56,7 @@ dot = fun_cfg.build_visual('png')
 dot.render("cfg_diagram", view=False)
 ```
 
-### Visiting Function CFGs
+## Visiting Function CFGs
 
 In thoery, there is no control flow constaints between subprocedures such as functions. Therefore, Scalpel generates control flow graphs for every functions in the given source files. Considering the the nested structure of Python class and function definition, we integrate recursive data data sturcture for storing control flow graphs.
 
@@ -87,7 +88,7 @@ for (block_id, fun_name), fun_cfg in cfg.functioncfgs.items():
         graph.render("fig_cfg", view=False) 
 ```
 
-| ![Fib CFG](../resources/function_fib_cfg.png) |
+| ![Fib CFG](../_static/resources/function_fib_cfg.png) |
 |:--:|
 | Fig.2 The control flow graph for the function ```fib``` |
 
@@ -102,10 +103,10 @@ The tutorial code can be found here:\
 
 
 
-### APIs
+## APIs
 [Please refer to the API documentation](https://smat-lab.github.io/Scalpel/scalpel/cfg.html)
 
-### Reference
+## Reference
 1. [StaticCFG](https://github.com/coetaur0/staticfg).
 2. [ECE 5775 High-Level Digital Design Automation](https://www.csl.cornell.edu/courses/ece5775/pdf/lecture06.pdf), Cornell University
 3. [CS153: Compilers](https://groups.seas.harvard.edu/courses/cs153/2018fa/lectures/Lec17-CFG-dataflow.pdf), Harvard University

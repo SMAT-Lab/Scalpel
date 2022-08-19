@@ -1,8 +1,16 @@
+# Middle-Level Modules
 
 The middle level modules of Scapel operates on the scope of the whole program (inter-procedural)
 
 
-### API Name Qualifying
+```{toctree}
+Import-Graph
+SSA-&-Constant-Propagation
+Type-Inference
+
+```
+
+## API Name Qualifying
 The known qualified name is a dotted string that represent the path from top-level module down to the object iteself.  The name format is defined in [PEP 3155](https://www.python.org/dev/peps/pep-3155/). Obtainning the qualified API names are very import to API anaysis as the same function calls can appear in different source code with different names. Without qualifying them first,  it is hard to perform even basic statisitcal anaysis. 
 
 In this module, we show examples to use the functionalities of  call name extraction and import statement parsing to restore the call names. We implement the algorithm proposed by [1] that parsing all import statements to obtain a dictionary data structure for mapping the imported aliases and the API occurrents in the source code. 
@@ -59,5 +67,5 @@ As we can see, the function call `np.array`, `pd.read_csv` are recovered to `num
 
 The full code of this example can be found in [API_name_qualifying.py](../examples/API_name_qualifying.py)
 
-### References
+## References
 [Jiawei Wang, Li Li, Kui Liu, Haipeng Cai, Exploring How Deprecated Python Library APIs are (Not) Handled, The 28th ACM Joint Meeting on European Software Engineering Conference and Symposium on the Foundations of Software Engineering (ESEC/FSE 2020)](https://lilicoding.github.io/papers/wang2020exploring.pdf)

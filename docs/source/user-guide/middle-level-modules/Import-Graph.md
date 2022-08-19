@@ -1,10 +1,12 @@
+# Import Graph
 
 `scalpel.import_graph` creates data structure for describing import relationships of a python project. 
 An import graph represents the dependency relationship of  module files  in the given project. 
 This information can be important to understand the import flow, hierarchy, encapsulation as well as software architecture.
 Each node in the import graph datastructure is a module file that can be manipulated to extract statements, function calls.
 All the leaf nodes in the import graph can be processed future. 
-### How to use Import Graph
+
+## How to use Import Graph
 
 Given three example python modules in the following example folder where three Python module files are defined. 
 
@@ -60,9 +62,9 @@ For each of leaf notes, we can future to extract its type information, function 
 The tutorial code can be found here:\
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Import Graph Example](../examples/import_graph_tutorial.py)
 
-### APIs
+## APIs
 [Please refer to the API documenation](https://smat-lab.github.io/Scalpel/scalpel/import_graph.html)
 
 
-### Reference
+## Reference
 

@@ -1,5 +1,5 @@
 
-## SSA & Constant Propagation
+# SSA & Constant Propagation
 
 Static Single Assignment (SSA) is a technique of IR in the compiling thoery, it also shows great benefits to static anaysis tasks such as constant propagation, dead code elimination and etc.
 
@@ -10,7 +10,7 @@ Alias anaysis is to locate the variable pairs in the source code that point to t
  
 In scalpel, we implement constant propagation along with the SSA for execution efficiency.
 
-### How to use the SSA and Constant Propagation module 
+## How to use the SSA and Constant Propagation module 
 
 The demo input python program we will be using is as follows.
 ```python
@@ -54,7 +54,7 @@ Please note that the funciton `compute_SSA` returns two dictionaries. For the fi
 This is due to that the variable `a` can take values from two assignments. This is can be easily observed from the following diagram. 
 
 
-![Fibonacci CFG](../resources/ssa_diagram.svg)
+![Fibonacci CFG](../_static/resources/ssa_diagram.svg)
 
 
 The second one named `const_dict` is the global constant values for the numbered identifiers. For instance, `const_dict["(a,0)"]` is the constant value after the first assignment to variable `a`. The constant values in this module are instances of Python ```ast.expr```. In this participular case `(a,0)` is an `ast.BinOp` type and `(a,1)` is an `ast.Num` type.
@@ -62,7 +62,7 @@ The tutorial code can be found here:
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[SSA_example.py](example.com)
 
 
-### How to implement alias anaysis.
+## How to implement alias anaysis.
 
 As stated above, the `const_dict` stores the all values that are assigned to given variable (renamed in this situation), therefore, alias pairs can be implemented in an simple way. The idea is to scan all the values for a particular variable and see if the value assgined to the variable is an `ast.Name` object. The following code snippet shows how to find out the alias pair in the above.
 
@@ -83,13 +83,13 @@ for name, value in const_dict.items():
     alias_name_pairs.append((name, value.id))
 ```
 
-### APIs
+## APIs
 [Please refer to the API documenation](https://smat-lab.github.io/Scalpel/scalpel/SSA.html)
 
 
 
 
-### Reference
+## Reference
 1. [A Simple, Fast Dominance Algorithm](https://www.cs.rice.edu/~keith/EMBED/dom.pdf) Keith D. Cooper, Timothy J. Harvey, and Ken Kennedy
 2. [COS598C Advanced Compilers](https://www.cs.princeton.edu/courses/archive/spr04/cos598C/lectures/02-ControlFlow.pdf), Princeton University
 3. [CMU 15-411 Compiler Design](https://www.cs.cmu.edu/~fp/courses/15411-f08/lectures/09-ssa.pdf)
