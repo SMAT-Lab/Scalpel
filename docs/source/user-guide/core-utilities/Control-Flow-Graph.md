@@ -33,7 +33,7 @@ cfg.build_visual('pdf')
 ```
 Below is the produced *exampleCFG.pdf*.
 
-| ![Fibonacci CFG](../_static/resources/cfg_example.png) |
+| ![Fibonacci CFG](../../_static/resources/cfg_example.png) |
 |:--:|
 | <b>Fig.1 The control flow graph for the given source files </b>|
 
@@ -88,7 +88,7 @@ for (block_id, fun_name), fun_cfg in cfg.functioncfgs.items():
         graph.render("fig_cfg", view=False) 
 ```
 
-| ![Fib CFG](../_static/resources/function_fib_cfg.png) |
+| ![Fib CFG](../../_static/resources/function_fib_cfg.png) |
 |:--:|
 | Fig.2 The control flow graph for the function ```fib``` |
 
@@ -104,7 +104,7 @@ The tutorial code can be found here:\
 
 
 ## APIs
-[Please refer to the API documentation](https://smat-lab.github.io/Scalpel/scalpel/cfg.html)
+Please refer to the API documentation: {any}`scalpel.cfg`
 
 ## Reference
 1. [StaticCFG](https://github.com/coetaur0/staticfg).

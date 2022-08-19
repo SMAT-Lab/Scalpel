@@ -33,8 +33,13 @@ release = '1.0beta'
 extensions = [
     'myst_parser', 
     'sphinx.ext.doctest',
-    "sphinx_rtd_theme",
-    "sphinxcontrib.spelling",
+    'sphinx_rtd_theme',
+    'sphinxcontrib.spelling',
+    'autoapi.extension',
+    'sphinx.ext.autodoc', 
+    'sphinx.ext.napoleon',
+    'sphinx.ext.intersphinx',
+
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -57,3 +62,20 @@ html_theme = "sphinx_rtd_theme"
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+# interpshinx
+
+intersphinx_mapping = {'python': ('https://docs.python.org/3', None),}
+
+# API docs configuration
+
+autoapi_dirs = ['../../scalpel']
+autoapi_root = 'api'
+autoapi_member_order = 'groupwise'
+autodoc_typehints = 'description'
+napoleon_use_admonition_for_examples = True
+napoleon_use_admonition_for_notes = True
+napoleon_use_admonition_for_references = True
+napoleon_use_ivar = True
+napoleon_preprocess_types = True
+napoleon_attr_annotations = True

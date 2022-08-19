@@ -63,7 +63,9 @@ The tutorial code can be found here:\
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Import Graph Example](../examples/import_graph_tutorial.py)
 
 ## APIs
-[Please refer to the API documenation](https://smat-lab.github.io/Scalpel/scalpel/import_graph.html)
+
+Please refer to the API documentation: {any}`scalpel.import_graph`
+
 
 
 ## Reference

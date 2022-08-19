@@ -54,7 +54,7 @@ The tutorial code can be found here:\
 
 
 ## APIs
-[Please refer to the API documentation](https://smat-lab.github.io/Scalpel/scalpel/call_graph.html)
+Please refer to the API documentation: {any}`scalpel.call_graph`
 
 
 ## Reference

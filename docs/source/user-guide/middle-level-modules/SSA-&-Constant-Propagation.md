@@ -54,7 +54,7 @@ Please note that the funciton `compute_SSA` returns two dictionaries. For the fi
 This is due to that the variable `a` can take values from two assignments. This is can be easily observed from the following diagram. 
 
 
-![Fibonacci CFG](../_static/resources/ssa_diagram.svg)
+![Fibonacci CFG](../../_static/resources/ssa_diagram.svg)
 
 
 The second one named `const_dict` is the global constant values for the numbered identifiers. For instance, `const_dict["(a,0)"]` is the constant value after the first assignment to variable `a`. The constant values in this module are instances of Python ```ast.expr```. In this participular case `(a,0)` is an `ast.BinOp` type and `(a,1)` is an `ast.Num` type.
@@ -84,7 +84,8 @@ for name, value in const_dict.items():
 ```
 
 ## APIs
-[Please refer to the API documenation](https://smat-lab.github.io/Scalpel/scalpel/SSA.html)
+
+Please refer to the API documentation: {any}`scalpel.SSA`
 
 
 

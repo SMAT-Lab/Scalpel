@@ -35,7 +35,9 @@ The tutorial code can be found here:\
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Type Inference Example](../examples/type_infer_tutorial.py)
 
 ## APIs
-[Please refer to the API documentation](https://smat-lab.github.io/Scalpel/scalpel/typeinfer.html)
+
+Please refer to the API documentation: {any}`scalpel.typeinfer`
+
 
 ## Reference
 1. [typegen4py](https://github.com/typegen4py/typegen4py).

@@ -11,6 +11,7 @@ Welcome to Scalpel's documentation!
    :caption: Contents:
 
    user-guide/index
+   api/index
 
 Indices and tables
 ==================
