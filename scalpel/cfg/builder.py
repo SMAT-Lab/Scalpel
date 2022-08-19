@@ -139,7 +139,7 @@ class CFGBuilder(ast.NodeVisitor):
         Returns:
             The CFG produced from the source file.
         """
-        with open(filepath, 'r') as src_file:
+        with open(filepath, 'r',encoding="utf8") as src_file:
             src = src_file.read()
             return self.build_from_src(name, src)
 
@@ -242,10 +242,27 @@ class CFGBuilder(ast.NodeVisitor):
         # added to the function CFGs of the current CFG.
         func_body = ast.Module(body=node.body)
         func_builder = CFGBuilder()
-        self.cfg.class_cfgs[node.name] = func_builder.build(node.name,
-                                                            func_body,
-                                                            asynchr,
-                                                            self.current_id)
+        base_names = []
+        for base in node.bases:
+            if not isinstance(base, ast.Name):
+                continue
+            base_names.append(base.id)
+        if node.name in self.cfg.class_cfgs and node.name in base_names:
+            existing_class_cfg = self.cfg.class_cfgs[node.name]
+            new_class_cfg = func_builder.build(node.name,
+                                               func_body,
+                                               asynchr,
+                                               self.current_id)
+            new_class_cfg.entryblock.statements = new_class_cfg.entryblock.statements+existing_class_cfg.entryblock.statements
+            new_class_cfg.functioncfgs.update(existing_class_cfg.functioncfgs)
+            new_class_cfg.function_args.update(existing_class_cfg.function_args)
+            self.cfg.class_cfgs[node.name]=new_class_cfg
+        else:
+            self.cfg.class_cfgs[node.name] = func_builder.build(node.name,
+                                                                func_body,
+                                                                asynchr,
+                                                                self.current_id)
+
         self.current_id = func_builder.current_id + 1
 
     def clean_cfg(self, block, visited):
