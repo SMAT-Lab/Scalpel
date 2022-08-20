@@ -184,7 +184,6 @@ class SSA:
         # assignment with only one target
         
         if isinstance(stmt, ast.Assign):
-            #print(stmt.targets)
             targets = stmt.targets
             value = stmt.value
             if len(targets) == 1:
