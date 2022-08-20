@@ -191,8 +191,8 @@ class SSA:
                     left_name = stmt.targets[0].id
                     const_dict[left_name] = stmt.value
                 elif isinstance(targets[0], ast.Attribute):
-                    #TODO: resolve attributes
-                    pass
+                    left_name = ast.unparse(stmt.targets[0])
+                    const_dict[left_name] = value
                 # multiple targets are represented as tuple 
                 elif isinstance(targets[0], ast.Tuple):
                     # value is also represented as tuple
@@ -331,7 +331,7 @@ class SSA:
 
         ident_info = get_vars(visit_node)
         for r in ident_info:
-            if r['name'] is None or "." in r['name'] or "_hidden_" in r['name']:
+            if r['name'] is None or "_hidden_" in r['name']:
                 continue
             if r['usage'] == 'store':
                 stored_idents.append(r['name'])
