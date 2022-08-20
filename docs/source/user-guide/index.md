@@ -1,24 +1,27 @@
-
-## Introduction
-
-
+# User Guide
 
 Scalpel is a Python module integrating classical program anaysis algorithms
 with tailored features for Python language. It aims to provide simple and
 efficient solutions to software engineering researchers that are accessible to
 everybody and reusable in various contexts.
 
-### Setting up Scalpel
-You can download the source code of Scalpel to install mannuly or use `pip` to install automatically.
+## Setting up Scalpel
+
+You can download the source code of Scalpel to install mannualy or use `pip` to install automatically.
+The framework has not been uploaded to PyPI repository yet since it's still in beta.
+
 ```python
-python setup.py
+python3 -m pip install git+https://github.com/SMAT-Lab/Scalpel.git
 ```
 
-### Roadmap
+## Roadmap
 As a general purpose framework, Scalpel is a layered structure and designed to support tasks at different granularity. You can know more from this user guide about different modules.
 ![title](https://lucid.app/publicSegments/view/079f413f-8fd5-4c4f-9ad2-1a3cad30583d/image.png)
 
-
+```{toctree}
+core-utilities/index
+middle-level-modules/index
+```
 
 ## Acknowledgement
 This project has been inspired and supported by many existing work. Some implementation of functionalities are taken from published work. If you think your work appear in this project, but not mentioned yet, please let us know by any means. 

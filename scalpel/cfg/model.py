@@ -5,7 +5,10 @@ Control flow graph for Python programs.
 import ast
 import sys 
 import re
+import token
+import tokenize 
 import astor
+
 import graphviz as gv
 
 
@@ -67,7 +70,7 @@ class Block(object):
             A boolean indicating if the block is empty (True) or not (False).
         """
         return len(self.statements) == 0
-
+    '''
     def strip_comment(self, src):
         clean_src = ""
 
@@ -99,7 +102,7 @@ class Block(object):
             prev_toktype = toktype
             last_col = ecol
             last_lineno = elineno
-
+        '''
     def get_source(self):
         """
         Get a string containing the Python source code corresponding to the
