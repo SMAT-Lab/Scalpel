@@ -184,8 +184,8 @@ class SSA:
         # assignment with only one target
         
         if isinstance(stmt, ast.Assign):
-            #print(stmt.targets)
             targets = stmt.targets
+            value = stmt.value
             if len(targets) == 1:
                 if hasattr(targets[0], "id"):
                     left_name = stmt.targets[0].id
@@ -195,13 +195,24 @@ class SSA:
                     pass
                 # multiple targets are represented as tuple 
                 elif isinstance(targets[0], ast.Tuple):
-                    for elt in targets[0].elts:
-                        if hasattr(elt, "id"):
-                            left_name = elt.id
-                            const_dict[left_name] = None
-                        elif isinstance(targets[0], ast.Attribute):
-                            #TODO: resolve attributes
-                            pass
+                    # value is also represented as tuple
+                    if isinstance(value, ast.Tuple):
+                        for elt, val in zip(targets[0].elts, value.elts):
+                            if hasattr(elt, "id"):
+                                left_name = elt.id
+                                const_dict[left_name] = val
+                            elif isinstance(targets[0], ast.Attribute):
+                                #TODO: resolve attributes
+                                pass
+                    # value is represented as call
+                    if isinstance(value, ast.Call):
+                        for elt in targets[0].elts:
+                            if hasattr(elt, "id"):
+                                left_name = elt.id
+                                const_dict[left_name] = value
+                            elif isinstance(targets[0], ast.Attribute):
+                                #TODO: resolve attributes
+                                pass
             else:
                 # Note  in some python versions, there are more than one target for an assignment 
                 # while in some other python versions, multiple targets are deemed as ast.Tuple type in assignment statement
