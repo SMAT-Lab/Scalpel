@@ -265,7 +265,7 @@ class SSA:
                 # for x, y in fun():
                 for elt in stmt.target.elts:
                     if hasattr(elt, "id"):
-                        const_dict[elt.id] = None
+                        const_dict[elt.id] = stmt.iter
             elif isinstance(stmt.target, ast.Attribute):
                 #TODO: resolve attributes
                 pass
