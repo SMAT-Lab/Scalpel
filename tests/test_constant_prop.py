@@ -7,22 +7,12 @@ from scalpel.SSA.const import SSA
 import ast
 
 
-def test_callable():
-    target_file = "tests/test-cases/constant_propagation/callable.py"
-
 def test_tuples():
     target_file = "tests/test-cases/constant_propagation/tuples.py"
-
-    cfg = CFGBuilder().build_from_file(name="callable", filepath=target_file)
+    cfg = CFGBuilder().build_from_file(name="tuples", filepath=target_file)
     ssa = SSA()
     
     _, const_dict = ssa.compute_SSA(cfg)
-
-
-    callable_var = next(filter(lambda x: "preprocessing" in x[0][0], const_dict.items()))
-
-    assert callable_var[1]
-    assert isinstance(callable_var[1], ast.FunctionDef)
 
     tuple_var_a = next(filter(lambda x: "a" in x[0][0], const_dict.items()))
     tuple_var_b = next(filter(lambda x: "b" in x[0][0], const_dict.items()))
@@ -42,7 +32,6 @@ def test_tuples():
 
 def test_enumerate():
     target_file = "tests/test-cases/constant_propagation/enumerate.py"
-
     cfg = CFGBuilder().build_from_file(name="enumerate", filepath=target_file)
     ssa = SSA()
 
