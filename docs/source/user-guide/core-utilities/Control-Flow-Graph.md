@@ -104,7 +104,7 @@ The tutorial code can be found here:\
 
 
 ## APIs
-Please refer to the API documentation: {any}`scalpel.cfg`
+Please refer to the API documentation: {py:mod}`scalpel.cfg`
 
 ## Reference
 1. [StaticCFG](https://github.com/coetaur0/staticfg).

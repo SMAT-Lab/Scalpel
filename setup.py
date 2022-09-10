@@ -26,7 +26,7 @@ setup(
             'myst_parser', 
             'sphinx_rtd_theme', 
             'sphinxcontrib-spelling', 
-            'sphinx-autoapi', 
+            'pydoctor', 
             ]
         },
     )

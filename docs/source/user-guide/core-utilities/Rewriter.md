@@ -50,6 +50,6 @@ The tutorial code can be found here:\
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Rewriter Example](https://github.com/SMAT-Lab/Scalpel/blob/scalpel-dev/examples/rewriter_example.py)
 
 ## APIs
-Please refer to the API documentation: {any}`scalpel.rewriter`
+Please refer to the API documentation: {py:mod}`scalpel.rewriter`
 
 ## Reference
