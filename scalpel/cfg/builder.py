@@ -77,6 +77,8 @@ class CFGBuilder(ast.NodeVisitor):
     a program's AST and iteratively build the corresponding CFG.
     """
 
+    __all__ = ["build", "build_from_src", "build_from_file"]
+
     def __init__(self, separate=False):
         super().__init__()
         self.after_loop_block_stack = []
@@ -117,6 +119,7 @@ class CFGBuilder(ast.NodeVisitor):
             self.cfg = self._flatten_cfg(self.cfg)
             pass 
         return self.cfg
+
     def _flatten_cfg(self, mod_cfg):
         flattend_cfg = {}
 
@@ -128,10 +131,8 @@ class CFGBuilder(ast.NodeVisitor):
                 
             for cls_name, cls_cfg in cfg.class_cfgs.items():
                 process_cfg(cls_cfg, dotted_name = dotted_name +[cls_name], name_type = "cls")
-                
-        
+    
         process_cfg(mod_cfg)
-
 
         return flattend_cfg
     def build_from_src(self, name, src, flattened=False):
