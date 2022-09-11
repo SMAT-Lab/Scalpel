@@ -85,7 +85,7 @@ for name, value in const_dict.items():
 
 ## APIs
 
-Please refer to the API documentation: {any}`scalpel.SSA`
+Please refer to the API documentation: {py:mod}`scalpel.SSA`
 
 
 

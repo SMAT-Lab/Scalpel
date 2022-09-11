@@ -64,7 +64,7 @@ The tutorial code can be found here:\
 
 ## APIs
 
-Please refer to the API documentation: {any}`scalpel.import_graph`
+Please refer to the API documentation: {py:mod}`scalpel.import_graph`
 
 
 
