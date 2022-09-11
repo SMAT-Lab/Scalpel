@@ -36,7 +36,7 @@ The tutorial code can be found here:\
 
 ## APIs
 
-Please refer to the API documentation: {any}`scalpel.typeinfer`
+Please refer to the API documentation: {py:mod}`scalpel.typeinfer`
 
 
 ## Reference

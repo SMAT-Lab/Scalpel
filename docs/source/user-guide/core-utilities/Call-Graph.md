@@ -54,7 +54,7 @@ The tutorial code can be found here:\
 
 
 ## APIs
-Please refer to the API documentation: {any}`scalpel.call_graph`
+Please refer to the API documentation: {py:mod}`scalpel.call_graph`
 
 
 ## Reference
