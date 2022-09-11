@@ -11,6 +11,7 @@ import astor
 
 import graphviz as gv
 
+__all__ = ["Block", "Link", "CFG"]
 
 class Block(object):
     """
