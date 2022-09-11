@@ -322,19 +322,19 @@ class SSA:
             #visit_node.orlse=[]
             visit_node = stmt.test
 
-        if isinstance(visit_node,(ast.With)):
+        elif isinstance(visit_node,(ast.With)):
             visit_node.body = []
             visit_node.orlse=[]
 
-        if isinstance(visit_node,(ast.While)):
+        elif isinstance(visit_node,(ast.While)):
             visit_node.body = []
-        if isinstance(visit_node,(ast.For)):
+        elif isinstance(visit_node,(ast.For)):
             visit_node.body = []
-        if isinstance(visit_node, ast.Return):
+        elif isinstance(visit_node, ast.Return):
             # imaginary variable
             stored_idents.append("<ret>")
             const_dict["<ret>"] = visit_node.value
-        if isinstance(visit_node, ast.Yield):
+        elif isinstance(visit_node, ast.Yield):
             # imaginary variable
             stored_idents.append("<ret>")
             const_dict["<ret>"] = visit_node.value
