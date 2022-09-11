@@ -11,3 +11,10 @@ def get_path_by_ext(root_dir, flag='.py'):
             if f.endswith(flag):
                 paths.append(os.path.join(root, f))
     return paths
+
+def ast_node_eval(node):
+    """"
+    This is an implementation of expression node evaluation. The function serves as an alternative to ast.literal_eval()
+    """
+    ##TODO
+    pass 
