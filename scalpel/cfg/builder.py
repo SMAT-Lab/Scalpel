@@ -86,7 +86,7 @@ class CFGBuilder(ast.NodeVisitor):
         self.enter_func_def = False
 
     # ---------- CFG building methods ---------- #
-    def build(self, name, tree, asynchr=False, entry_id=0):
+    def build(self, name, tree, asynchr=False, entry_id=0, flattened=False):
         """
         Build a CFG from an AST.
 
@@ -98,6 +98,7 @@ class CFGBuilder(ast.NodeVisitor):
                    program is being built, it is considered like a synchronous
                    'main' function.
             entry_id: Value for the id of the entry block of the CFG.
+            flattened:  if use k-v format for all CFGs while hiding its nested information. Key will be fully-qualified names. 
 
         Returns:
             The CFG produced from the AST.
@@ -111,37 +112,46 @@ class CFGBuilder(ast.NodeVisitor):
         self.visit(tree)
         visited = []
         self.clean_cfg(self.cfg.entryblock,visited)
-        return self.cfg
 
-    def build_from_src(self, name, src):
+        if flattened:
+            self.cfg = self._flatten_cfg(self.cfg)
+            pass 
+        return self.cfg
+    def _flatten_cfg(self, cfg):
+        flattend_cfg = {}
+        return flattend_cfg
+    def build_from_src(self, name, src, flattened=False):
         """
         Build a CFG from some Python source code.
 
         Args:
             name: The name of the CFG being built.
             src: A string containing the source code to build the CFG from.
+            flattened:  if use k-v format for all CFGs while hiding its nested information. Key will be fully-qualified names. 
+
 
         Returns:
             The CFG produced from the source code.
         """
         tree = ast.parse(src, mode='exec')
-        return self.build(name, tree)
+        return self.build(name, tree, flattened=flattened)
 
-    def build_from_file(self, name, filepath):
+    def build_from_file(self, name, filepath, flattened=False):
         """
         Build a CFG from some Python source file.
 
         Args:
             name: The name of the CFG being built.
-            filepath: The path to the file containing the Python source code
-                      to build the CFG from.
+            filepath: The path to the file containing the Python source code to build the CFG from.
+            flattened:  if use k-v format for all CFGs while hiding its nested information. Key will be fully-qualified names. 
+
 
         Returns:
             The CFG produced from the source file.
         """
         with open(filepath, 'r',encoding="utf8") as src_file:
             src = src_file.read()
-            return self.build_from_src(name, src)
+            return self.build_from_src(name, src, flattened=flattened)
 
     # ---------- Graph management methods ---------- #
     def new_block(self):
