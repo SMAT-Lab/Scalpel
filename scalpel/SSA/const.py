@@ -191,7 +191,7 @@ class SSA:
                     left_name = stmt.targets[0].id
                     const_dict[left_name] = stmt.value
                 elif isinstance(targets[0], ast.Attribute):
-                    left_name = ast.unparse(stmt.targets[0])
+                    left_name = astor.to_source(stmt.targets[0]).strip()
                     const_dict[left_name] = value
                 # multiple targets are represented as tuple 
                 elif isinstance(targets[0], ast.Tuple):
@@ -268,6 +268,8 @@ class SSA:
             elif isinstance(stmt.target, ast.Attribute):
                 #TODO: resolve attributes
                 pass
+      
+            
 
         if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef)):
             stored_idents.append(stmt.name)
@@ -328,6 +330,14 @@ class SSA:
             visit_node.body = []
         if isinstance(visit_node,(ast.For)):
             visit_node.body = []
+        if isinstance(visit_node, ast.Return):
+            # imaginary variable
+            stored_idents.append("<ret>")
+            const_dict["<ret>"] = visit_node.value
+        if isinstance(visit_node, ast.Yield):
+            # imaginary variable
+            stored_idents.append("<ret>")
+            const_dict["<ret>"] = visit_node.value
 
         ident_info = get_vars(visit_node)
         for r in ident_info:
