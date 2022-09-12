@@ -8,9 +8,6 @@ from functools import reduce
 from collections import OrderedDict
 import networkx as nx
 from ..core.vars_visitor import get_vars
-from ..cfg.builder import CFGBuilder, Block, invert
-from ..core.mnode import MNode
-from ..core.vars_visitor  import get_vars
 
 def parse_val(node):
     # does not return anything
