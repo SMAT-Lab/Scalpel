@@ -103,7 +103,7 @@ pydoctor_args = [
     '--docformat=google', 
     '--theme=readthedocs',
     '--intersphinx=https://docs.python.org/3/objects.inv',
-    f'--html-viewsource-base=https://github.com/SMAT-Lab/Scalpel/{_git_reference}/',
+    f'--html-viewsource-base=https://github.com/SMAT-Lab/Scalpel/tree/{_git_reference}/',
     '--html-output={outdir}/api',
     f'--project-base-dir={_project_root}',
     f'{_project_root}/scalpel'
