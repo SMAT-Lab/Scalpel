@@ -1,6 +1,8 @@
 
 # Scalpel: The Python Static Analysis Framework
 
+[![Documentation Status](https://readthedocs.org/projects/python-scalpel/badge/?version=latest)](https://python-scalpel.readthedocs.io/en/latest/?badge=latest)
+
 Scalpel is a Python Static Analysis Framework. It provides essential program analysis functions for facilitating the implementation of client applications focusing on statically resolving dedicated problems.
 
 # Contributing
