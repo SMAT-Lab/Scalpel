@@ -279,7 +279,7 @@ class SSA:
             new_stmt.body = []
             ident_info = get_vars(new_stmt)
             for r in ident_info:
-                if r['name'] is None or "." in r['name'] or "_hidden_" in r['name']:
+                if r['name'] is None:
                     continue
                 if r['usage'] == "load":
                     loaded_idents.append(r['name']) 
