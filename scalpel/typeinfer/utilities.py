@@ -122,11 +122,8 @@ def get_built_in_types() -> Dict:
     :return: Python built in types in a dictionary
     """
     builtin_types = [getattr(builtins, d).__name__ for d in dir(builtins) if isinstance(getattr(builtins, d), type)]
-    builtin_types_dict = {}
-    for b in builtin_types:
-        builtin_types_dict[b.lower()] = b
-    return builtin_types_dict
-
+    return { b.lower():b  for b in builtin_types}
+    
 
 def get_type(node, imports=None) -> str:
     """
