@@ -11,6 +11,27 @@ from collections import deque
 from typing import Dict, Union, List
 
 
+func_ret_types  = {
+                "dict": "dict",
+                "list": "list",
+                "tuple": "tuple",
+                "set": "set",
+                "str": "str",
+                "id": "int",
+                "sum": "num",
+                "float": "float",
+                "len": "int",
+                "ceil": "int",
+                "floor": "int",
+                "max": "num",
+                "min": "min",
+                "all":  "bool",
+                "any": "bool",
+                "assert": "bool",
+                "isinstance": "bool",
+                "bytes":"bytes"
+            }
+
 def get_func_calls_type(tree):
     node = deepcopy(tree)
     transformer = TypeInferCallTransformer()
@@ -144,17 +165,12 @@ def get_type(node, imports=None) -> str:
                                        ast.Set, ast.SetComp, ast.Dict, ast.DictComp)):
                 return get_type(node.right)
 
-    if isinstance(node, ast.Name):
-        if node.id == 'self':
-            return "self"
-        return 'ID'
-
+    if isinstance(node, ast.Name) and node.id == "self":
+        return "self"
+        
     if isinstance(node, ast.Num):
-        if isinstance(node.n, int):
-            return "int"
-        elif isinstance(node.n, float):
-            return "float"
-        return "num"
+        return type(node.n).__name__
+        
     elif isinstance(node, ast.List) or isinstance(node, ast.Tuple):
         value_type = check_consistent_list_types(node.elts)
         return f"{type(node).__name__}[{value_type}]"
@@ -173,7 +189,7 @@ def get_type(node, imports=None) -> str:
     elif isinstance(node, ast.JoinedStr):
         return "str"
     elif isinstance(node, ast.Constant):
-        return get_type(node.value)
+        return type(node.value).__name__
     elif isinstance(node, ast.NameConstant):
         return any.__name__
     elif isinstance(node, ast.Lambda):
@@ -193,26 +209,8 @@ def get_type(node, imports=None) -> str:
             if imported_type:
                 return imported_type
         if isinstance(node.func, ast.Name):
-            if node.func.id == "dict":
-                return "dict"
-            elif node.func.id == "list":
-                return "list"
-            elif node.func.id == "tuple":
-                return "tuple"
-            elif node.func.id == "set":
-                return "set"
-            elif node.func.id == "str":
-                return "str"
-            elif node.func.id in ["id", "sum", "len", "int", "float", "ceil", "floor", "max", "min"]:
-                return "num"
-            elif node.func.id in ["all", "any", "assert", "bool"]:
-                return any.__name__
-            elif node.func.id in ["iter"]:
-                return "iterator"
-            elif node.func.id in ["isinstance"]:
-                return any.__name__
-            elif node.func.id in ['bytes']:
-                return "bytes"
+            if node.func.id in func_ret_types:
+                return func_ret_types[node.func.id] 
             elif is_camel_case(func_name):
                 return func_name
             else:
@@ -228,7 +226,7 @@ def get_type(node, imports=None) -> str:
     elif isinstance(node, bool):
         return bool.__name__
     else:
-        return "unknown"
+        return any.__name__
 
 
 def check_consistent_list_types(values) -> str:
@@ -404,10 +402,10 @@ def is_done(t_vals: List[str]) -> bool:
 
 
 def find_class_by_attr(module_records, attrs):
+
     if len(attrs) < 5:
         return None
     class_names = [item.split('.')[0] for item in module_records if len(item.split('.')) == 2]
-    class_names = list(set(class_names))
     for c_name in class_names:
         if all([(c_name + '.' + x) in module_records for x in attrs]):
             return c_name
@@ -416,6 +414,7 @@ def find_class_by_attr(module_records, attrs):
 
 
 def get_attr_name(node):
+    #TODO  to remove this ufunction 
     if isinstance(node, ast.Call):
         return get_attr_name(node.func)
     if isinstance(node, ast.Name):
