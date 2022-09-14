@@ -8,7 +8,7 @@ import sys
 import builtins
 from copy import deepcopy
 from collections import deque
-from typing import Dict, Union, List
+from typing import Dict, Optional, Union, List
 
 
 # typeshed can be imported here 
@@ -330,7 +330,7 @@ def get_api_ref_id(import_nodes):
     return id2fullname
 
 
-def is_imported_fun(func_name: str, import_dict: dict) -> Union[str, None]:
+def is_imported_fun(func_name: str, import_dict: dict) -> Optional[str]:
     """
     Determines whether a function is imported from another library
 
