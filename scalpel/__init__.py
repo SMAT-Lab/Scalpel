@@ -7,5 +7,5 @@ efficient solutions to software engineering researchers that are accessible to
 everybody and reusable in various contexts.
 """
 
-__all__ = ["cfg", "call_graph", "SSA", "core", "typeinfer", "import_graph", "rewriter"]
+__all__ = ["cfg", "call_graph", "scope_graph", "SSA", "core", "typeinfer", "import_graph", "rewriter"]
 __version__ = '1.0dev'

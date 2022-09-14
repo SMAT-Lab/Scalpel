@@ -265,21 +265,6 @@ class MNode:
                 base_names.append(get_attr_name(b_node))
         return base_names
 
-    #def parse_function_body(self):
-    #    """
-    #    Prase all function/class definitions
-    #    """
-    #    func_records = {}
-    #    base_records = {}
-    #    for stmt in self.ast.body:
-    #        if isinstance(stmt, ast.FunctionDef):
-    #            func_records[stmt.name] = self.retrieve_meta(stmt)
-    #        if isinstance(stmt, ast.ClassDef):
-    #            base_records[stmt.name] = self._process_base_names(stmt.bases)
-    #            for c_stmt in stmt.body:
-    #                if isinstance(c_stmt, ast.FunctionDef):
-    #                    func_records[stmt.name+'.' + c_stmt.name] = self.retrieve_meta(c_stmt)
-    #    return func_records, base_records
 
     def gen_cfg(self):
         cfg = CFGBuilder().build("", self.ast)

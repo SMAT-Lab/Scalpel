@@ -14,9 +14,7 @@ class ClassVisitor(ast.NodeVisitor):
     def __init__(self):
         self.result = {}
 
-    def visit_FunctionDef(self, node): 
-        kw_names = get_keywords(node)
-        self.result[node.name] = kw_names
+    def visit_ClassDef(self, node): 
         return node
 
 
