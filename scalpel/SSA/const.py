@@ -252,7 +252,7 @@ class SSA:
                 iter_value = stmt.iter
                 # make a iter call
                 #iter_node = ast.Call(ast.Name("iter", ast.Load()), [stmt.iter], [])
-                # make a next call 
+                # make a next call
                 #next_call_node = ast.Call(ast.Name("next", ast.Load()), [iter_node], [])
                 const_dict[left_name] = iter_value
 
@@ -281,7 +281,7 @@ class SSA:
                 if r['usage'] == "load":
                     loaded_idents.append(r['name']) 
             return stored_idents, loaded_idents, func_names
-        
+ 
         if isinstance(stmt, ast.ClassDef):
             stored_idents.append(stmt.name)
             const_dict[stmt.name] = None
@@ -303,9 +303,9 @@ class SSA:
                 if handler.name is not None:
                     stored_idents.append(handler.name)
                     
-                if isinstance( handler.type, ast.Name):
+                if isinstance(handler.type, ast.Name):
                     loaded_idents.append(handler.type.id)
-                elif isinstance( handler.type, ast.Attribute) and isinstance(handler.type.value, ast.Name):
+                elif isinstance(handler.type, ast.Attribute) and isinstance(handler.type.value, ast.Name):
                     loaded_idents.append(handler.type.value.id)
             return stored_idents, loaded_idents, []
         if isinstance(stmt, ast.Global):
@@ -314,19 +314,22 @@ class SSA:
             return stored_idents, loaded_idents, []
 
         visit_node = stmt
+
         if isinstance(visit_node,(ast.If, ast.IfExp)):
-            #visit_node.body = []
-            #visit_node.orlse=[]
+            # visit_node.body = []
+            # visit_node.orlse=[]
             visit_node = stmt.test
 
-        elif isinstance(visit_node,(ast.With)):
+        elif isinstance(visit_node, (ast.With)):
             visit_node.body = []
             visit_node.orlse=[]
 
-        elif isinstance(visit_node,(ast.While)):
+        elif isinstance(visit_node, (ast.While)):
             visit_node.body = []
-        elif isinstance(visit_node,(ast.For)):
+
+        elif isinstance(visit_node, (ast.For)):
             visit_node.body = []
+
         elif isinstance(visit_node, ast.Return):
             # imaginary variable
             stored_idents.append("<ret>")
@@ -348,14 +351,13 @@ class SSA:
                 del_set.append(r['name'])
         return stored_idents, loaded_idents, []
 
-
     def to_json(self):
         pass
 
     def print_block(self, block):
         return block.get_source()
 
-    # compute the dominators 
+    # compute the dominators
     def compute_idom(self, ssa_blocks):
         """
         Compute immediate dominators for each of blocks
@@ -371,7 +373,7 @@ class SSA:
             preds =  block.predecessors
             for link in preds+exits:
                 G.add_edge(link.source.id, link.target.id)
-        #DF = nx.dominance_frontiers(G, entry_block.id)
+        # DF = nx.dominance_frontiers(G, entry_block.id)
         idom = nx.immediate_dominators(G, entry_block.id)
         return idom
 
@@ -388,7 +390,7 @@ class SSA:
         for block in ssa_blocks: 
             G.add_node(block.id)
             exits = block.exits
-            preds =  block.predecessors
+            preds = block.predecessors
             for link in preds+exits:
                 G.add_edge(link.source.id, link.target.id)
         DF = nx.dominance_frontiers(G, entry_block.id)
