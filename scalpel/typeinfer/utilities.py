@@ -11,6 +11,7 @@ from collections import deque
 from typing import Dict, Union, List
 
 
+# typeshed can be imported here 
 func_ret_types  = {
                 "dict": "dict",
                 "list": "list",
@@ -29,7 +30,8 @@ func_ret_types  = {
                 "any": "bool",
                 "assert": "bool",
                 "isinstance": "bool",
-                "bytes":"bytes"
+                "bytes":"bytes",       
+                "default_dict": "dict"
             }
 
 def get_func_calls_type(tree):
