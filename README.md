@@ -1,11 +1,13 @@
 
 # Scalpel: The Python Static Analysis Framework
 
+[![Documentation Status](https://readthedocs.org/projects/python-scalpel/badge/?version=latest)](https://python-scalpel.readthedocs.io/en/latest/?badge=latest)
+
 Scalpel is a Python Static Analysis Framework. It provides essential program analysis functions for facilitating the implementation of client applications focusing on statically resolving dedicated problems.
 
 # Contributing
 
-* Feel free to [submit your issues](https://github.com/SMAT-Lab/Scalpel/issues), we are happy to see any issues including new feature requirements, new ideas, bug reports or other code quality issues. 
+* We will be highly appreciated it if you can contribute to this project. Please feel free to do so by [submiting issue reports](https://github.com/SMAT-Lab/Scalpel/issues) or directly [adding pull requests](https://github.com/SMAT-Lab/Scalpel/pulls).
 
 ## Setting up Scalpel
 Clone the repository of Scalpel and in the root directory simply run:
@@ -15,11 +17,11 @@ python -m pip install .
 
 ## Brief Introduction
 
-Detailed user guides can be found [Here](user-guide/user-guide-main.md).
+Detailed user guides can be found at [python-scalpel.readthedocs.io](http://python-scalpel.readthedocs.io/).
 
 We aim to provide Scalpel as a generic Python static analysis framework that includes as many functions as possible (e.g., to easily build inter-function control-flow graph, to interpret the import relationship of different Python modules, etc.) towards facilitating developers to implement their dedicated problem-focused static analyzers. The following figure depicts the current architecture of its design.
 
-![Scalpel Design](resources/scalpel_design.png)
+![Scalpel Design](/docs/source/_static/resources//scalpel_design.png)
 
 * Function 1: Code Rewriter. The code rewriter module is designed as a fundamental function for supporting systematic changes of existing Python programs. Two preliminary usages of this function are to (1) simplify the programs for better static analysis and (2) optimize or repair problematic programs. For supporting the first usage, we integrate into the framework a database including a set of rules indicating how matched code snippets should be transformed. This database should be continuously extended to fulfill the complicated simplification requirements for achieving effective static analysis of Python programs. For supporting the second usage, inspired by the optimization mechanism provided by Soot (one of the most famous static Java program analysis frameworks), we also set up a transformation process with dedicated callback methods to be rewritten by users to optimize Python code based on their customized needs.
 
@@ -41,7 +43,7 @@ We aim to provide Scalpel as a generic Python static analysis framework that inc
 
 ## API Documentation
 
-The Scalpel's API documentation is available at [Here](https://smat-lab.github.io/Scalpel/)
+The Scalpel's API documentation is available at [python-scalpel.readthedocs.io](http://python-scalpel.readthedocs.io/en/latest/api/).
 
 <br />
 <p>We release Scalpel source code in the hope of benefiting others. You are kindly asked to acknowledge usage of the tool by citing the following article: </p>
@@ -55,13 +57,18 @@ year={2022}
 }
 ```
 
+Scalpel is invited to be presented at EuroPython 2022. EuroPython is the oldest and longest running volunteer-led Python programming conference on the planet!
+
+![Scalpel EuroPython](/docs/source/_static/resources//europython.png)
+
+
 ## Acknowledgement
 This project has been inspired and supported by many existing works. If you think your work appears in this project but has not been mentioned yet, please let us know by any means.
 
-1. [Fuzzyingbook](https://www.fuzzingbook.org/).
-2. [Debugging book](https://www.debuggingbook.org/).
+1. [Fuzzyingbook](https://www.fuzzingbook.org/) by Andreas Zeller, Rahul Gopinath, Marcel Böhme, Gordon Fraser, and Christian Holler.
+2. [Debugging book](https://www.debuggingbook.org/) by Andreas Zeller.
 3. [StaticCFG](https://github.com/coetaur0/staticfg).
-4. [PyCG: Practical Call Graph Generation in Python. In 43rd International Conference on Software Engineering, 2021](https://vitsalis.com/papers/pycg.pdf). 
+4. [PyCG: Practical Call Graph Generation in Python](https://vitsalis.com/papers/pycg.pdf), ICSE 2021. 
 5. [A Simple, Fast Dominance Algorithm](https://www.cs.rice.edu/~keith/EMBED/dom.pdf) Keith D. Cooper, Timothy J. Harvey, and Ken Kennedy
 6. [COS598C Advanced Compilers](https://www.cs.princeton.edu/courses/archive/spr04/cos598C/lectures/02-ControlFlow.pdf), Princeton University
 7. [Restoring Execution Environments of Jupyter Notebooks](https://arxiv.org/ftp/arxiv/papers/2103/2103.02959.pdf)

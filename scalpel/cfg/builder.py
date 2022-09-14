@@ -77,6 +77,8 @@ class CFGBuilder(ast.NodeVisitor):
     a program's AST and iteratively build the corresponding CFG.
     """
 
+    __all__ = ["build", "build_from_src", "build_from_file"]
+
     def __init__(self, separate=False):
         super().__init__()
         self.after_loop_block_stack = []
@@ -86,7 +88,7 @@ class CFGBuilder(ast.NodeVisitor):
         self.enter_func_def = False
 
     # ---------- CFG building methods ---------- #
-    def build(self, name, tree, asynchr=False, entry_id=0):
+    def build(self, name, tree, asynchr=False, entry_id=0, flattened=False):
         """
         Build a CFG from an AST.
 
@@ -98,6 +100,7 @@ class CFGBuilder(ast.NodeVisitor):
                    program is being built, it is considered like a synchronous
                    'main' function.
             entry_id: Value for the id of the entry block of the CFG.
+            flattened:  if use k-v format for all CFGs while hiding its nested information. Key will be fully-qualified names. 
 
         Returns:
             The CFG produced from the AST.
@@ -111,37 +114,59 @@ class CFGBuilder(ast.NodeVisitor):
         self.visit(tree)
         visited = []
         self.clean_cfg(self.cfg.entryblock,visited)
+
+        if flattened:
+            self.cfg = self._flatten_cfg(self.cfg)
+            pass 
         return self.cfg
 
-    def build_from_src(self, name, src):
+    def _flatten_cfg(self, mod_cfg):
+        flattend_cfg = {}
+
+        def process_cfg(cfg, dotted_name=["mod"], name_type="mod"):
+            fully_qualified_name = ".".join(dotted_name)
+            flattend_cfg[fully_qualified_name] = cfg 
+            for fun_name_tup, fun_cfg in  cfg.functioncfgs.items():
+                process_cfg(fun_cfg, dotted_name = dotted_name +[fun_name_tup[1]], name_type= "func")
+                
+            for cls_name, cls_cfg in cfg.class_cfgs.items():
+                process_cfg(cls_cfg, dotted_name = dotted_name +[cls_name], name_type = "cls")
+    
+        process_cfg(mod_cfg)
+
+        return flattend_cfg
+    def build_from_src(self, name, src, flattened=False):
         """
         Build a CFG from some Python source code.
 
         Args:
             name: The name of the CFG being built.
             src: A string containing the source code to build the CFG from.
+            flattened:  if use k-v format for all CFGs while hiding its nested information. Key will be fully-qualified names. 
+
 
         Returns:
             The CFG produced from the source code.
         """
         tree = ast.parse(src, mode='exec')
-        return self.build(name, tree)
+        return self.build(name, tree, flattened=flattened)
 
-    def build_from_file(self, name, filepath):
+    def build_from_file(self, name, filepath, flattened=False):
         """
         Build a CFG from some Python source file.
 
         Args:
             name: The name of the CFG being built.
-            filepath: The path to the file containing the Python source code
-                      to build the CFG from.
+            filepath: The path to the file containing the Python source code to build the CFG from.
+            flattened:  if use k-v format for all CFGs while hiding its nested information. Key will be fully-qualified names. 
+
 
         Returns:
             The CFG produced from the source file.
         """
         with open(filepath, 'r',encoding="utf8") as src_file:
             src = src_file.read()
-            return self.build_from_src(name, src)
+            return self.build_from_src(name, src, flattened=flattened)
 
     # ---------- Graph management methods ---------- #
     def new_block(self):

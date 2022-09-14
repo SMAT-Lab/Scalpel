@@ -18,7 +18,16 @@ setup(
         'setuptools',
         'dataclasses',
         'pycg',
-        'networkx'
-    ]
+        ],
+    extras_require = {
+        'docs':
+            [
+            'sphinx', 
+            'myst_parser', 
+            'sphinx_rtd_theme', 
+            'sphinxcontrib-spelling', 
+            'pydoctor', 
+            ]
+        },
     )
 

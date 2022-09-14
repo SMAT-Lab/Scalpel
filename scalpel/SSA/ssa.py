@@ -1,6 +1,6 @@
 """ 
 In this module, the single static assignment forms are  implemented to allow
-futher anaysis. The module contain a single class named SSA.
+further analysis. The module contain a single class named SSA.
 """
 import ast
 import astor
@@ -11,38 +11,6 @@ from ..core.vars_visitor import get_vars
 from ..cfg.builder import CFGBuilder, Block, invert
 from ..core.mnode import MNode
 from ..core.vars_visitor  import get_vars
-
-BUILT_IN_FUNCTIONS = { 
-         ### built-in functions
-         "iteritems",
-        "abs","delattr", "print", "str", "bin", "int", "xrange", "eval", "all", "exit", "basestring"
-        "float", "open", "unicode", "exec", "breakpoint", "cmp",
-        "hash","memoryview","set", "tuple", "range", "self" "all","dict","help","min","setattr","any","dir","hex","next","slice", "self",
-        "ascii","divmod","enumerate","id", "isinstance", "object","sorted","bin","enumerate","input",
-        "staticmethod","bool", "eval" "int", "len", "self", "open" "str" "breakpoint" "exec" "isinstance" "ord",
-        "sum", "bytearray", "filter", "issubclass", "pow", "super", "bytes", "float", "iter", "print"
-        "tuple", "callable", "format", "len", "property", "type", "chr","frozenset", "list", "range", "vars", 
-        "classmethod", "getattr", "locals", "repr", "repr", "zip", "compile", "globals", "map", "reversed",  "__import__", "complex", "hasattr", "max", "round", "get_ipython",
-        "ord",
-        ###  built-in exceptions
-        "BaseException", "SystemExit", "KeyboardInterrupt", "GeneratorExit", "Exception",
-        "StopIteration", "StopAsyncIteration","ArithmeticError", "FloatingPointError", "OverflowError",
-        "ZeroDivisionError","AssertionError", "AttributeError", "BufferError", "EOFError",
-        "ImportError", "ModuleNotFoundError", "LookupError", "IndexError" , "KeyError", "MemoryError", "NameError",
-        "UnboundLocalError", "OSError", "IOError", "BlockingIOError", "ChildProcessError", "ConnectionError",
-        "BrokenPipeError", "ConnectionAbortedError", "ConnectionRefusedError","ConnectionResetError",
-        "FileExistsError", "FileNotFoundError", "InterruptedError","IsADirectoryError", "NotADirectoryError",
-        "PermissionError","ProcessLookupError", "TimeoutError", "ReferenceError", "RuntimeError",
-        "NotImplementedError","RecursionError", "SyntaxError", "IndentationError", "TabError", "EnvironmentError",
-        "SystemError", "TypeError", "ValueError","UnicodeError","UnicodeDecodeError","UnicodeEncodeError","UnicodeTranslateError",
-        # built-in warnings
-        "Warning","DeprecationWarning","PendingDeprecationWarning","RuntimeWarning","SyntaxWarning",
-        "UserWarning", "FutureWarning","ImportWarning","UnicodeWarning","BytesWarning","ResourceWarning",
-        # Others
-        "NotImplemented", "__main__", "__doc__", "__file__", "__name__", "__debug__", "__class__", "__name__"
-        "__version__", "__all__",  "__docformat__", "__package__"
-        }
-
 
 def parse_val(node):
     # does not return anything

@@ -1,6 +1,6 @@
 """ 
 In this module, the single static assignment forms are implemented to allow
-futher anaysis. The module contain a single class named SSA.
+further analysis. The module contain a single class named SSA.
 """
 import ast
 import astor
@@ -8,9 +8,6 @@ from functools import reduce
 from collections import OrderedDict
 import networkx as nx
 from ..core.vars_visitor import get_vars
-from ..cfg.builder import CFGBuilder, Block, invert
-from ..core.mnode import MNode
-from ..core.vars_visitor  import get_vars
 
 def parse_val(node):
     # does not return anything
@@ -73,7 +70,7 @@ class SSA:
         During the computing, constant value and alias pairs are generated. The following steps are used to compute SSA representations:
         step 1a: compute the dominance frontier
         step 1b: use dominance frontier to place phi node
-        if node X contains assignment to a, put phi node for a in dominance frontier of X
+        if node X contains assignment to a, put phi node for an in dominance frontier of X
         adding phi function may require introducing additional phi function 
         start from the entry node 
         step2: rename variables so only one definition per name
@@ -169,7 +166,7 @@ class SSA:
 
     def get_stmt_idents_ctx(self, stmt, del_set=[], const_dict = {}):
         """
-        Extract the contexual information of each of identifiers. 
+        Extract the contextual information of each of identifiers. 
         For assignment statements, the assigned values for each of variables will be stored.
         In addition, the del_set will store all deleted variables. 
         Args:
@@ -184,24 +181,35 @@ class SSA:
         # assignment with only one target
         
         if isinstance(stmt, ast.Assign):
-            #print(stmt.targets)
             targets = stmt.targets
+            value = stmt.value
             if len(targets) == 1:
                 if hasattr(targets[0], "id"):
                     left_name = stmt.targets[0].id
                     const_dict[left_name] = stmt.value
                 elif isinstance(targets[0], ast.Attribute):
-                    #TODO: resolve attributes
-                    pass
+                    left_name = astor.to_source(stmt.targets[0]).strip()
+                    const_dict[left_name] = value
                 # multiple targets are represented as tuple 
                 elif isinstance(targets[0], ast.Tuple):
-                    for elt in targets[0].elts:
-                        if hasattr(elt, "id"):
-                            left_name = elt.id
-                            const_dict[left_name] = None
-                        elif isinstance(targets[0], ast.Attribute):
-                            #TODO: resolve attributes
-                            pass
+                    # value is also represented as tuple
+                    if isinstance(value, ast.Tuple):
+                        for elt, val in zip(targets[0].elts, value.elts):
+                            if hasattr(elt, "id"):
+                                left_name = elt.id
+                                const_dict[left_name] = val
+                            elif isinstance(targets[0], ast.Attribute):
+                                #TODO: resolve attributes
+                                pass
+                    # value is represented as call
+                    if isinstance(value, ast.Call):
+                        for elt in targets[0].elts:
+                            if hasattr(elt, "id"):
+                                left_name = elt.id
+                                const_dict[left_name] = value
+                            elif isinstance(targets[0], ast.Attribute):
+                                #TODO: resolve attributes
+                                pass
             else:
                 # Note  in some python versions, there are more than one target for an assignment 
                 # while in some other python versions, multiple targets are deemed as ast.Tuple type in assignment statement
@@ -244,7 +252,7 @@ class SSA:
                 iter_value = stmt.iter
                 # make a iter call
                 #iter_node = ast.Call(ast.Name("iter", ast.Load()), [stmt.iter], [])
-                # make a next call 
+                # make a next call
                 #next_call_node = ast.Call(ast.Name("next", ast.Load()), [iter_node], [])
                 const_dict[left_name] = iter_value
 
@@ -253,25 +261,27 @@ class SSA:
                 # for x, y in fun():
                 for elt in stmt.target.elts:
                     if hasattr(elt, "id"):
-                        const_dict[elt.id] = None
+                        const_dict[elt.id] = stmt.iter
             elif isinstance(stmt.target, ast.Attribute):
                 #TODO: resolve attributes
                 pass
+      
+            
 
         if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef)):
             stored_idents.append(stmt.name)
-            const_dict[stmt.name] = None
+            const_dict[stmt.name] = stmt
             func_names.append(stmt.name)
             new_stmt = stmt
             new_stmt.body = []
             ident_info = get_vars(new_stmt)
             for r in ident_info:
-                if r['name'] is None or "." in r['name'] or "_hidden_" in r['name']:
+                if r['name'] is None:
                     continue
                 if r['usage'] == "load":
                     loaded_idents.append(r['name']) 
             return stored_idents, loaded_idents, func_names
-        
+ 
         if isinstance(stmt, ast.ClassDef):
             stored_idents.append(stmt.name)
             const_dict[stmt.name] = None
@@ -293,9 +303,9 @@ class SSA:
                 if handler.name is not None:
                     stored_idents.append(handler.name)
                     
-                if isinstance( handler.type, ast.Name):
+                if isinstance(handler.type, ast.Name):
                     loaded_idents.append(handler.type.id)
-                elif isinstance( handler.type, ast.Attribute) and isinstance(handler.type.value, ast.Name):
+                elif isinstance(handler.type, ast.Attribute) and isinstance(handler.type.value, ast.Name):
                     loaded_idents.append(handler.type.value.id)
             return stored_idents, loaded_idents, []
         if isinstance(stmt, ast.Global):
@@ -304,23 +314,34 @@ class SSA:
             return stored_idents, loaded_idents, []
 
         visit_node = stmt
+
         if isinstance(visit_node,(ast.If, ast.IfExp)):
-            #visit_node.body = []
-            #visit_node.orlse=[]
+            # visit_node.body = []
+            # visit_node.orlse=[]
             visit_node = stmt.test
 
-        if isinstance(visit_node,(ast.With)):
+        elif isinstance(visit_node, (ast.With)):
             visit_node.body = []
             visit_node.orlse=[]
 
-        if isinstance(visit_node,(ast.While)):
+        elif isinstance(visit_node, (ast.While)):
             visit_node.body = []
-        if isinstance(visit_node,(ast.For)):
+
+        elif isinstance(visit_node, (ast.For)):
             visit_node.body = []
+
+        elif isinstance(visit_node, ast.Return):
+            # imaginary variable
+            stored_idents.append("<ret>")
+            const_dict["<ret>"] = visit_node.value
+        elif isinstance(visit_node, ast.Yield):
+            # imaginary variable
+            stored_idents.append("<ret>")
+            const_dict["<ret>"] = visit_node.value
 
         ident_info = get_vars(visit_node)
         for r in ident_info:
-            if r['name'] is None or "." in r['name'] or "_hidden_" in r['name']:
+            if r['name'] is None or "_hidden_" in r['name']:
                 continue
             if r['usage'] == 'store':
                 stored_idents.append(r['name'])
@@ -330,17 +351,16 @@ class SSA:
                 del_set.append(r['name'])
         return stored_idents, loaded_idents, []
 
-
     def to_json(self):
         pass
 
     def print_block(self, block):
         return block.get_source()
 
-    # compute the dominators 
+    # compute the dominators
     def compute_idom(self, ssa_blocks):
         """
-        Compute immediate immediate dominators for each of blocks
+        Compute immediate dominators for each of blocks
         Args:
             ssa_blocks: blocks from a control flow graph.
         """
@@ -353,7 +373,7 @@ class SSA:
             preds =  block.predecessors
             for link in preds+exits:
                 G.add_edge(link.source.id, link.target.id)
-        #DF = nx.dominance_frontiers(G, entry_block.id)
+        # DF = nx.dominance_frontiers(G, entry_block.id)
         idom = nx.immediate_dominators(G, entry_block.id)
         return idom
 
@@ -370,7 +390,7 @@ class SSA:
         for block in ssa_blocks: 
             G.add_node(block.id)
             exits = block.exits
-            preds =  block.predecessors
+            preds = block.predecessors
             for link in preds+exits:
                 G.add_edge(link.source.id, link.target.id)
         DF = nx.dominance_frontiers(G, entry_block.id)

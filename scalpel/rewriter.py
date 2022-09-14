@@ -273,13 +273,6 @@ class ASTRewriter(ast.NodeTransformer):
 
     def visit_Call(self, node):
         func_name = self.get_func_name(node.func)
-        #if func_name in self.pattern["Call"]:
-        #    new_func_name = self.pattern["Call"][func_name]
-        #    if new_func_name is None:
-        #        return None
-        #    node.func.id = new_func_name
-
-
         self.generic_visit(node)
         return node
 
@@ -358,14 +351,9 @@ class ASTRewriter(ast.NodeTransformer):
 
 
     def visit_If(self, node): 
-        #if "if" in self.pattern["Stmt"]:
-        #    alt_stmt = self.pattern["Stmt"]["if"]
-        #    if alt_stmt is None:
-        #        return None
-
         self.generic_visit(node)
-
         return node
+
     def visit_IfExp(self, node): 
         #if "if" in self.pattern["Stmt"]:
         #    alt_stmt = self.pattern["Stmt"]["if"]
@@ -373,6 +361,7 @@ class ASTRewriter(ast.NodeTransformer):
         #        return None
         self.generic_visit(node)
         return node
+
     def visit_With(self, node):
         self.generic_visit(node)
         return node
@@ -388,30 +377,38 @@ class ASTRewriter(ast.NodeTransformer):
     def visit_Try(self, node):
         self.generic_visit(node)
         return node
+
     def visit_Assert(self, node):
         self.generic_visit(node)
         return node
+
     def visit_Import(self, node):
         self.generic_visit(node)
         return node
+
     def visit_ImportFrom(self, node):
         self.generic_visit(node)
         return node
+
     def visit_Global(self, node):
         self.generic_visit(node)
         return node
+
     def visit_Nonlocal(self, node):
         self.generic_visit(node)
         return node
+
     def visit_Expr(self, node):
         self.generic_visit(node)
         return node
     def visit_Pass(self, node):
         self.generic_visit(node)
         return node
+
     def visit_Break(self, node):
         self.generic_visit(node)
         return node
+
     def visit_Continue(self, node):
         self.generic_visit(node)
         return node
