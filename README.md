@@ -61,7 +61,9 @@ year={2022}
 
 Scalpel is invited to be presented at EuroPython 2022. EuroPython is the oldest and longest running volunteer-led Python programming conference on the planet!
 
-![Scalpel EuroPython](/docs/source/_static/resources//europython.png)
+
+<img src="https://github.com/SMAT-Lab/Scalpel/blob/main/docs/source/_static/resources//europython.png" width="400">
+
 
 
 ## Acknowledgement
