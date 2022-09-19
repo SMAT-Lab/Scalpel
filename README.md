@@ -5,6 +5,9 @@
 
 Scalpel is a Python Static Analysis Framework. It provides essential program analysis functions for facilitating the implementation of client applications focusing on statically resolving dedicated problems.
 
+
+ [![Scalpel Logo](https://github.com/SMAT-Lab/Scalpel/blob/main/docs/source/_static/resources/Scalpel-logo.png)]()
+
 # Contributing
 
 * We will be highly appreciated it if you can contribute to this project. Please feel free to do so by [submiting issue reports](https://github.com/SMAT-Lab/Scalpel/issues) or directly [adding pull requests](https://github.com/SMAT-Lab/Scalpel/pulls).
