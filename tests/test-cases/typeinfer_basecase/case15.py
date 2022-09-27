@@ -3,7 +3,7 @@
 # EXPECTED OUTPUT:
 # case14.py: x -> str
 # case15.py: my_function -> str
-
+# case15.py: getcwd -> str
 
 from os import getcwd
 
