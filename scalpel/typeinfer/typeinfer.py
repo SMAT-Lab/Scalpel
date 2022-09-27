@@ -33,6 +33,8 @@ from scalpel.typeinfer.utilities import (
     find_class_by_attr,
 )
 
+from scalpel.typeinfer.typeinfer_jedi import TypeInferenceJedi
+
 def process_code_with_heuristics(node):
     def pick_type(type_lst):
         base_type_names = ["Num", "Set", "List", "Tuple", "Dict", "Str", "NameConstant"]
