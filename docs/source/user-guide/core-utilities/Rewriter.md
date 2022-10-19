@@ -38,7 +38,7 @@ def rewrite_rules(node)->list:
               new_stmt = ast.Assign(node.targets, new_assign_value)
               return [new_stmt]   
 ```
-Please note that the in the rule function, you will need to create new statements for each of your rule (see how the `new_stmt` variable is formed). Finally, we can pass the rule funciton to the rewrite engine:
+Please note that the in the rule function, you will need to create new statements for each of your rule (see how the `new_stmt` variable is formed). Finally, we can pass the rule function to the rewrite engine:
 
 ```python
 rewriter = Rewriter()
