@@ -1,11 +1,11 @@
 # Rewriter
 
-The objective of  rewriting module of Scalple is to provide APIs that allow users to rewrite their code implenmentation. This can be
+The objective of  rewriting module of Scalpel is to provide APIs that allow users to rewrite their code implenmentation. This can be
 for code desugaring (removing code sugar usages), testing and code instrumentation for various purpose. Code rewriting can bring great benefits such as API extraction and dynamic testing.
 
 
 ## How to use Rewriter
-Right now, Scalple offers code rewriting at statement level. Users can implement their own rewrite rules and pass it to the Rewriter API. We will use the following example to show the usages. 
+Right now, Scalpel offers code rewriting at statement level. Users can implement their own rewrite rules and pass it to the Rewriter API. We will use the following example to show the usages. 
 
 The demo input python program we will be using is as follows.
 ```python
@@ -38,7 +38,7 @@ def rewrite_rules(node)->list:
               new_stmt = ast.Assign(node.targets, new_assign_value)
               return [new_stmt]   
 ```
-Please note that the in the rule function, you will need to create new statements for each of your rule (see how the `new_stmt` variable is formed). Finally, we can pass the rule funciton to the rewrite engine:
+Please note that the in the rule function, you will need to create new statements for each of your rule (see how the `new_stmt` variable is formed). Finally, we can pass the rule function to the rewrite engine:
 
 ```python
 rewriter = Rewriter()
