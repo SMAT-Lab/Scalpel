@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 setup( 
-    name = "Scalpel",
+    name = "python-scalpel",
     version = "1.0beta",
     description = "Scalpel: The Python Program Analysis Framework",
     author = "Jiawei Wang and Li Li and Haowei Quan",
