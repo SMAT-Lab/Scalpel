@@ -1,5 +1,7 @@
 """
-FileSystem module for Scalpel
+FileSystem module for Scalpel. The original import graph will be removed while
+import graph interface is implemented in this module. This component is still
+under development.
 """
 
 import os
@@ -9,31 +11,31 @@ import ast
 from scalpel.core.source_visitor import SourceVisitor
 
 
-"""
-This module provides a decorator and functions for automatically adding generated special methods such as __init__() and __repr__() to user-defined classes. 
-It was originally described in PEP 557.
-"""
 @dataclass
 class Node:
     # a data structure that contain information for a module node 
     def __init__(self, name):
-        self.name = name
-        self.full_name = ""
-        self.children = []
-        self.parent = None
-        self.cargo = {}
-        self.source = ''
+        self.name:str = name
+        self.full_name:str = ""
+        self.children:list = []
+        self.parent:str = None
+        self.cargo:dict = {}
+        self.source:str = ''
         self.ast = None
         self.class_pair = None
         self.node_type_dict = None
         self.node_type_gt = None
-        self.line_numbers = {}
+        self.line_numbers:dict = {}
         self.static_assignments = None
         self.call_links = None
         self.imports = {}
+        self.abs_path = None 
 
     def __str__(self):
         return str(self.name)
+
+    def __repr__(self):
+        return self.__str__()
 
 
 class FileSystem:
