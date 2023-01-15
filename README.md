@@ -12,7 +12,7 @@ Scalpel is a Python Static Analysis Framework. It provides essential program ana
 We will be highly appreciated it if you can contribute to this project. Please feel free to do so by [submiting issue reports](https://github.com/SMAT-Lab/Scalpel/issues) or directly [adding pull requests](https://github.com/SMAT-Lab/Scalpel/pulls). We hope to obtain help for:
 1. New features. If you believe your publication/open-source project can be part of our framework, please contact us.
 2. Bug reports. 
-3. Docuemntation. 
+3. Documentation. 
 4. Code refactoring 
 
 ## Setting up Scalpel
