@@ -18,7 +18,7 @@ We will be highly appreciated it if you can contribute to this project. Please f
 ## Setting up Scalpel
 Clone the repository of Scalpel and in the root directory simply run:
 ```python
-python -m pip install .
+pip install python-scalpel
 ```
 
 ## Brief Introduction
