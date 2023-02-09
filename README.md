@@ -1,21 +1,29 @@
 
 # Scalpel: The Python Static Analysis Framework
 
+[![Documentation Status](https://readthedocs.org/projects/python-scalpel/badge/?version=latest)](https://python-scalpel.readthedocs.io/en/latest/?badge=latest)
+
 Scalpel is a Python Static Analysis Framework. It provides essential program analysis functions for facilitating the implementation of client applications focusing on statically resolving dedicated problems.
+
+<img src="https://github.com/SMAT-Lab/Scalpel/blob/main/docs/source/_static/resources/Scalpel.svg" width="550">
 
 # Contributing
 
-* We will be highly appreciated it if you can contribute to this project. Please feel free to do so by [submiting issue reports](https://github.com/SMAT-Lab/Scalpel/issues) or directly [adding pull requests](https://github.com/SMAT-Lab/Scalpel/pulls).
+We will be highly appreciated it if you can contribute to this project. Please feel free to do so by [submiting issue reports](https://github.com/SMAT-Lab/Scalpel/issues) or directly [adding pull requests](https://github.com/SMAT-Lab/Scalpel/pulls). We hope to obtain help for:
+1. New features. If you believe your publication/open-source project can be part of our framework, please contact us.
+2. Bug reports. 
+3. Documentation. 
+4. Code refactoring 
 
 ## Setting up Scalpel
 Clone the repository of Scalpel and in the root directory simply run:
 ```python
-python -m pip install .
+pip install python-scalpel
 ```
 
 ## Brief Introduction
 
-Detailed user guides can be found [Here](user-guide/user-guide-main.md).
+Detailed user guides can be found at [python-scalpel.readthedocs.io](http://python-scalpel.readthedocs.io/).
 
 We aim to provide Scalpel as a generic Python static analysis framework that includes as many functions as possible (e.g., to easily build inter-function control-flow graph, to interpret the import relationship of different Python modules, etc.) towards facilitating developers to implement their dedicated problem-focused static analyzers. The following figure depicts the current architecture of its design.
 
@@ -41,7 +49,7 @@ We aim to provide Scalpel as a generic Python static analysis framework that inc
 
 ## API Documentation
 
-The Scalpel's API documentation is available at [Here](https://smat-lab.github.io/Scalpel/)
+The Scalpel's API documentation is available at [python-scalpel.readthedocs.io](http://python-scalpel.readthedocs.io/en/latest/api/).
 
 <br />
 <p>We release Scalpel source code in the hope of benefiting others. You are kindly asked to acknowledge usage of the tool by citing the following article: </p>
@@ -57,7 +65,9 @@ year={2022}
 
 Scalpel is invited to be presented at EuroPython 2022. EuroPython is the oldest and longest running volunteer-led Python programming conference on the planet!
 
-![Scalpel EuroPython](/docs/source/_static/resources//europython.png)
+
+<img src="https://github.com/SMAT-Lab/Scalpel/blob/main/docs/source/_static/resources//europython.png" width="400">
+
 
 
 ## Acknowledgement

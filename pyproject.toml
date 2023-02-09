@@ -1,0 +1,51 @@
+[build-system]
+# Minimum requirements for the build system to execute.
+requires = [
+        "astor~=0.8.1",
+        "graphviz~=0.17",
+        "networkx",
+        "astunparse"~=1.6.3',
+        "typed-ast",
+        "typeshed-client",
+        "regex",
+        "setuptools",
+        "dataclasses",
+        "pycg",
+]
+
+[tool.black]
+line-length = 88
+target_version = ['py38', 'py39', 'py310']
+preview = true
+exclude = '''
+/(
+    \.eggs         # exclude a few common directories in the
+  | \.git          # root of the project
+  | \.mypy_cache
+  | \.vscode
+  | build
+  | dist
+  | doc/tutorial
+  | doc/_build
+  | doc/auto_examples
+  | sklearn/externals
+  | asv_benchmarks/env
+)/
+'''
+
+[project]
+name = "Scalpel"
+version = "0.0.1"
+
+description = "Scalpel: The Python Static Analysis Framework"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: Apache License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/SMAT-Lab/Scalpel"
+"Bug Tracker" = "https://github.com/SMAT-Lab/Scalpel/issues"

@@ -17,6 +17,11 @@
 
 # -- Project information -----------------------------------------------------
 
+import os
+import pathlib
+import subprocess
+
+
 project = 'Scalpel'
 copyright = '2022, Jiawei Wang and Li Li'
 author = 'Jiawei Wang and Li Li'
@@ -35,11 +40,10 @@ extensions = [
     'sphinx.ext.doctest',
     'sphinx_rtd_theme',
     'sphinxcontrib.spelling',
-    'autoapi.extension',
-    'sphinx.ext.autodoc', 
     'sphinx.ext.napoleon',
     'sphinx.ext.intersphinx',
     'sphinx.ext.viewcode',
+    'pydoctor.sphinx_ext.build_apidocs',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -65,17 +69,47 @@ html_static_path = ['_static']
 
 # interpshinx
 
-intersphinx_mapping = {'python': ('https://docs.python.org/3', None),}
+intersphinx_mapping = {'python': ('https://docs.python.org/3', None)}
 
 # API docs configuration
 
-autoapi_dirs = ['../../scalpel']
-autoapi_root = 'api'
-autoapi_member_order = 'groupwise'
-autodoc_typehints = 'description'
-napoleon_use_admonition_for_examples = True
-napoleon_use_admonition_for_notes = True
-napoleon_use_admonition_for_references = True
-napoleon_use_ivar = True
-napoleon_preprocess_types = True
-napoleon_attr_annotations = True
+_project_root = pathlib.Path(__file__).parent.parent.parent
+
+# -- Extension configuration ----------------------------------------------
+_git_reference = subprocess.run(
+    ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+    text=True,
+    encoding="utf8",
+    capture_output=True,
+    check=True,
+).stdout.strip()
+
+# See Read The Docs environment variables
+# https://docs.readthedocs.io/en/stable/builds.html#build-environment
+on_rtd = os.environ.get("READTHEDOCS", None) == "True"
+
+# Try to find URL fragment for the GitHub source page based on current
+# branch or tag.
+
+if _git_reference == "HEAD":
+    # It looks like the branch has no name.
+    # Fallback to commit ID.
+    _git_reference = subprocess.getoutput("git rev-parse HEAD").strip()
+
+pydoctor_args = [
+    '--project-name=Scalpel',
+    f'--project-version={release}',
+    '--project-url=../',
+    '--docformat=google', 
+    '--theme=readthedocs',
+    '--intersphinx=https://docs.python.org/3/objects.inv',
+    f'--html-viewsource-base=https://github.com/SMAT-Lab/Scalpel/tree/{_git_reference}/',
+    '--html-output={outdir}/api',
+    f'--project-base-dir={_project_root}',
+    f'{_project_root}/scalpel'
+    ]
+
+if on_rtd:
+    pydoctor_url_path = '/en/{rtd_version}/api/'
+else:
+    pydoctor_url_path = '/api/'

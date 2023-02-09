@@ -226,7 +226,6 @@ class ScopeGraph(ast.NodeVisitor):
     def test_MRO_resolve(self, start_name):
         #self.MRO_resolve(start_name)
         target_cls_name = self.MRO_resolve_method("D", "rk")
-        
         print(target_cls_name)
         pass 
 

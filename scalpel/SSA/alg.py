@@ -7,6 +7,7 @@ TODO: implement a datastructure such as G from networkx for control flow graph. 
 import networkx as nx
 from functools import reduce
 
+__docformat__ = 'numpy'
 
 def immediate_dominators(G, start):
     """Returns the immediate dominators of all nodes of a directed graph.
