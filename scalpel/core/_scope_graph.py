@@ -235,3 +235,11 @@ class ScopeGraph(ast.NodeVisitor):
 def create_MRO():
     pass 
 
+def test_this_module():
+    pass
+
+
+if __name__ == "__main__":
+    test_this_module()
+
+
