@@ -57,6 +57,7 @@ class FileSystem:
         self.root = Node(os.path.basename(self.entry_point))
       
         self.file_ext = file_ext  # can be used to parse pyi files in the future 
+        assert(os.path.exists(entry_point) == True)
        
     def _build_dir_tree(self, node):
         if os.path.isdir(node.name) is True:
