@@ -4,7 +4,7 @@ requires = [
         "astor~=0.8.1",
         "graphviz~=0.17",
         "networkx",
-        "astunparse"~=1.6.3',
+        "astunparse~=1.6.3",
         "typed-ast",
         "typeshed-client",
         "regex",
@@ -42,7 +42,7 @@ readme = "README.md"
 requires-python = ">=3.7"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: Apache License",
+    "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
 ]
 
