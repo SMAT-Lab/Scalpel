@@ -4,10 +4,12 @@ Please see the original one at https://networkx.org/documentation/stable/_module
 TODO: implement a datastructure such as G from networkx for control flow graph. so that networkx is not required in this library.
 """
 
-import networkx as nx
 from functools import reduce
 
-__docformat__ = 'numpy'
+import networkx as nx
+
+__docformat__ = "numpy"
+
 
 def immediate_dominators(G, start):
     """Returns the immediate dominators of all nodes of a directed graph.
@@ -118,7 +120,7 @@ def dominance_frontiers(G, start):
            A simple, fast dominance algorithm.
            Software Practice & Experience, 4:110, 2001.
     """
-    
+
     idom = immediate_dominators(G, start)
 
     df = {u: set() for u in idom}
@@ -135,7 +137,7 @@ def dominance_frontiers(G, start):
 def main():
     G = nx.DiGraph([(1, 2), (1, 3), (2, 5), (3, 4), (4, 5)])
     res = sorted((u, sorted(df)) for u, df in dominance_frontiers(G, 1).items())
-    
+
     assert res == [(1, []), (2, [5]), (3, [5]), (4, [5]), (5, [])]
 
 

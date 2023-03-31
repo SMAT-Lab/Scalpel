@@ -1,6 +1,6 @@
-from scalpel.call_graph.pycg import CallGraphGenerator
-from scalpel.call_graph.pycg import formats
 import json
+
+from scalpel.call_graph.pycg import CallGraphGenerator, formats
 
 cg_generator = CallGraphGenerator(["./cg_example_pkg/main.py"], "cg_example_pkg")
 cg_generator.analyze()

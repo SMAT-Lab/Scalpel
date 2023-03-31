@@ -4,9 +4,10 @@ https://github.com/coetaur0/staticfg
 """
 
 import ast
-from .model import Block, Link, CFG
 import sys
+
 from ..core.func_call_visitor import get_func_calls
+from .model import CFG, Block, Link
 
 
 def is_py38_or_higher():
@@ -26,21 +27,24 @@ def invert(node):
     Returns:
         An ast node object containing the inverse (negation) of the input node.
     """
-    inverse = {ast.Eq: ast.NotEq,
-               ast.NotEq: ast.Eq,
-               ast.Lt: ast.GtE,
-               ast.LtE: ast.Gt,
-               ast.Gt: ast.LtE,
-               ast.GtE: ast.Lt,
-               ast.Is: ast.IsNot,
-               ast.IsNot: ast.Is,
-               ast.In: ast.NotIn,
-               ast.NotIn: ast.In}
+    inverse = {
+        ast.Eq: ast.NotEq,
+        ast.NotEq: ast.Eq,
+        ast.Lt: ast.GtE,
+        ast.LtE: ast.Gt,
+        ast.Gt: ast.LtE,
+        ast.GtE: ast.Lt,
+        ast.Is: ast.IsNot,
+        ast.IsNot: ast.Is,
+        ast.In: ast.NotIn,
+        ast.NotIn: ast.In,
+    }
 
     if type(node) == ast.Compare:
         op = type(node.ops[0])
-        inverse_node = ast.Compare(left=node.left, ops=[inverse[op]()],
-                                   comparators=node.comparators)
+        inverse_node = ast.Compare(
+            left=node.left, ops=[inverse[op]()], comparators=node.comparators
+        )
     elif isinstance(node, ast.BinOp) and type(node.op) in inverse:
         op = type(node.op)
         inverse_node = ast.BinOp(node.left, inverse[op](), node.right)
@@ -100,7 +104,7 @@ class CFGBuilder(ast.NodeVisitor):
                    program is being built, it is considered like a synchronous
                    'main' function.
             entry_id: Value for the id of the entry block of the CFG.
-            flattened:  if use k-v format for all CFGs while hiding its nested information. Key will be fully-qualified names. 
+            flattened:  if use k-v format for all CFGs while hiding its nested information. Key will be fully-qualified names.
 
         Returns:
             The CFG produced from the AST.
@@ -113,11 +117,11 @@ class CFGBuilder(ast.NodeVisitor):
         # Actual building of the CFG is done here.
         self.visit(tree)
         visited = []
-        self.clean_cfg(self.cfg.entryblock,visited)
+        self.clean_cfg(self.cfg.entryblock, visited)
 
         if flattened:
             self.cfg = self._flatten_cfg(self.cfg)
-            pass 
+            pass
         return self.cfg
 
     def _flatten_cfg(self, mod_cfg):
@@ -125,16 +129,23 @@ class CFGBuilder(ast.NodeVisitor):
 
         def process_cfg(cfg, dotted_name=["mod"], name_type="mod"):
             fully_qualified_name = ".".join(dotted_name)
-            flattend_cfg[fully_qualified_name] = cfg 
-            for fun_name_tup, fun_cfg in  cfg.functioncfgs.items():
-                process_cfg(fun_cfg, dotted_name = dotted_name +[fun_name_tup[1]], name_type= "func")
-                
+            flattend_cfg[fully_qualified_name] = cfg
+            for fun_name_tup, fun_cfg in cfg.functioncfgs.items():
+                process_cfg(
+                    fun_cfg,
+                    dotted_name=dotted_name + [fun_name_tup[1]],
+                    name_type="func",
+                )
+
             for cls_name, cls_cfg in cfg.class_cfgs.items():
-                process_cfg(cls_cfg, dotted_name = dotted_name +[cls_name], name_type = "cls")
-    
+                process_cfg(
+                    cls_cfg, dotted_name=dotted_name + [cls_name], name_type="cls"
+                )
+
         process_cfg(mod_cfg)
 
         return flattend_cfg
+
     def build_from_src(self, name, src, flattened=False):
         """
         Build a CFG from some Python source code.
@@ -142,13 +153,13 @@ class CFGBuilder(ast.NodeVisitor):
         Args:
             name: The name of the CFG being built.
             src: A string containing the source code to build the CFG from.
-            flattened:  if use k-v format for all CFGs while hiding its nested information. Key will be fully-qualified names. 
+            flattened:  if use k-v format for all CFGs while hiding its nested information. Key will be fully-qualified names.
 
 
         Returns:
             The CFG produced from the source code.
         """
-        tree = ast.parse(src, mode='exec')
+        tree = ast.parse(src, mode="exec")
         return self.build(name, tree, flattened=flattened)
 
     def build_from_file(self, name, filepath, flattened=False):
@@ -158,13 +169,13 @@ class CFGBuilder(ast.NodeVisitor):
         Args:
             name: The name of the CFG being built.
             filepath: The path to the file containing the Python source code to build the CFG from.
-            flattened:  if use k-v format for all CFGs while hiding its nested information. Key will be fully-qualified names. 
+            flattened:  if use k-v format for all CFGs while hiding its nested information. Key will be fully-qualified names.
 
 
         Returns:
             The CFG produced from the source file.
         """
-        with open(filepath, 'r',encoding="utf8") as src_file:
+        with open(filepath, "r", encoding="utf8") as src_file:
             src = src_file.read()
             return self.build_from_src(name, src, flattened=flattened)
 
@@ -210,8 +221,7 @@ class CFGBuilder(ast.NodeVisitor):
         Returns:
             The block to be used as new loop guard.
         """
-        if (self.current_block.is_empty() and
-                len(self.current_block.exits) == 0):
+        if self.current_block.is_empty() and len(self.current_block.exits) == 0:
             # If the current block is empty and has no exits, it is used as
             # entry block (condition test) for the loop.
             loopguard = self.current_block
@@ -237,19 +247,20 @@ class CFGBuilder(ast.NodeVisitor):
         # added to the function CFGs of the current CFG.
         func_body = ast.Module(body=node.body)
         func_builder = CFGBuilder()
-        self.cfg.functioncfgs[(enclosing_block_id,node.name)] = func_builder.build(node.name,
-                                                                                   func_body,
-                                                                                   asynchr,
-                                                                                   self.current_id)
+        self.cfg.functioncfgs[(enclosing_block_id, node.name)] = func_builder.build(
+            node.name, func_body, asynchr, self.current_id
+        )
 
         def get_arg_names(argument_node):
             arg_names = []
             for node in ast.walk(argument_node):
                 if isinstance(node, ast.arg):
-                    arg_names.append( node.arg)
+                    arg_names.append(node.arg)
             return arg_names
 
-        self.cfg.function_args[(enclosing_block_id, node.name)] = get_arg_names(node.args)
+        self.cfg.function_args[(enclosing_block_id, node.name)] = get_arg_names(
+            node.args
+        )
         self.current_id = func_builder.current_id + 1
 
     def new_ClassCFG(self, node, asynchr=False):
@@ -274,19 +285,20 @@ class CFGBuilder(ast.NodeVisitor):
             base_names.append(base.id)
         if node.name in self.cfg.class_cfgs and node.name in base_names:
             existing_class_cfg = self.cfg.class_cfgs[node.name]
-            new_class_cfg = func_builder.build(node.name,
-                                               func_body,
-                                               asynchr,
-                                               self.current_id)
-            new_class_cfg.entryblock.statements = new_class_cfg.entryblock.statements+existing_class_cfg.entryblock.statements
+            new_class_cfg = func_builder.build(
+                node.name, func_body, asynchr, self.current_id
+            )
+            new_class_cfg.entryblock.statements = (
+                new_class_cfg.entryblock.statements
+                + existing_class_cfg.entryblock.statements
+            )
             new_class_cfg.functioncfgs.update(existing_class_cfg.functioncfgs)
             new_class_cfg.function_args.update(existing_class_cfg.function_args)
-            self.cfg.class_cfgs[node.name]=new_class_cfg
+            self.cfg.class_cfgs[node.name] = new_class_cfg
         else:
-            self.cfg.class_cfgs[node.name] = func_builder.build(node.name,
-                                                                func_body,
-                                                                asynchr,
-                                                                self.current_id)
+            self.cfg.class_cfgs[node.name] = func_builder.build(
+                node.name, func_body, asynchr, self.current_id
+            )
 
         self.current_id = func_builder.current_id + 1
 
@@ -309,9 +321,11 @@ class CFGBuilder(ast.NodeVisitor):
         if block.is_empty():
             for pred in block.predecessors:
                 for exit in block.exits:
-                    self.add_exit(pred.source, exit.target,
-                                  merge_exitcases(pred.exitcase,
-                                                  exit.exitcase))
+                    self.add_exit(
+                        pred.source,
+                        exit.target,
+                        merge_exitcases(pred.exitcase, exit.exitcase),
+                    )
                     # Check if the exit hasn't yet been removed from
                     # the predecessors of the target block.
                     if exit in exit.target.predecessors:
@@ -357,8 +371,8 @@ class CFGBuilder(ast.NodeVisitor):
             elif type(node) == ast.Subscript:
                 return node.value.id
 
-        #func = node.func
-        #func_name = visit_func(func)
+        # func = node.func
+        # func_name = visit_func(func)
         func_name = get_func_calls(node)[0]
         self.current_block.func_calls.append(func_name)
 
@@ -417,8 +431,8 @@ class CFGBuilder(ast.NodeVisitor):
         try_block = self.new_block()
         self.add_exit(self.current_block, try_block, ast.Constant(True))
         n_else_stmts = len(node.orelse)
-        #else_block = self.new_block()
-        #self.add_exit(self.current_block, try_block, ast.Constant(True))
+        # else_block = self.new_block()
+        # self.add_exit(self.current_block, try_block, ast.Constant(True))
 
         # Create blocks for handlers
         n_handlers = len(node.handlers)
@@ -427,16 +441,16 @@ class CFGBuilder(ast.NodeVisitor):
             h_block = self.new_block()
             handler_blocks += [h_block]
         after_try_block = self.new_block()
-        #self.add_exit(self.current_block, after_try_block, ast.Constant(False))
+        # self.add_exit(self.current_block, after_try_block, ast.Constant(False))
         # keep the original block
-        current_block = self.current_block 
+        current_block = self.current_block
         #
         self.current_block = try_block
 
         for child in node.body:
             self.visit(child)
 
-        if n_else_stmts>0:
+        if n_else_stmts > 0:
             else_block = self.new_block()
             self.add_exit(self.current_block, else_block)
             self.current_block = else_block
@@ -444,7 +458,6 @@ class CFGBuilder(ast.NodeVisitor):
             for child in node.orelse:
                 self.visit(child)
         self.add_exit(self.current_block, after_try_block)
-
 
         for i in range(n_handlers):
             self.current_block = current_block
@@ -455,21 +468,21 @@ class CFGBuilder(ast.NodeVisitor):
             # If encountered a break, exit will have already been added
             if not self.current_block.exits:
                 self.add_exit(self.current_block, after_try_block)
-            #self.add_exit(self.current_block, after_try_block)
+            # self.add_exit(self.current_block, after_try_block)
 
-        #if not self.current_block.exits:
+        # if not self.current_block.exits:
         #    self.add_exit(self.current_block, after_try_block)
         # Continue building the CFG in the after-if block.
 
         self.current_block = after_try_block
 
-        #populate the block in the try
-        #self.current_block = try_block
-        #for child in node.body:
+        # populate the block in the try
+        # self.current_block = try_block
+        # for child in node.body:
         #    self.visit(child)
-        #if not self.current_block.exits:
+        # if not self.current_block.exits:
         #   self.add_exit(self.current_block, after_try_block)
-        #self.current_block = after_try_block
+        # self.current_block = after_try_block
 
     def visit_If(self, node):
         # Add the If statement at the end of the current block.
@@ -506,7 +519,6 @@ class CFGBuilder(ast.NodeVisitor):
         # Continue building the CFG in the after-if block.
         self.current_block = afterif_block
 
-
     def visit_While(self, node):
         loop_guard = self.new_loopguard()
         self.current_block = loop_guard
@@ -521,8 +533,10 @@ class CFGBuilder(ast.NodeVisitor):
         self.after_loop_block_stack.append(afterwhile_block)
         inverted_test = invert(node.test)
         # Skip shortcut loop edge if while True:
-        if not (isinstance(inverted_test, NAMECONSTANT_TYPE) and
-                inverted_test.value is False):
+        if not (
+            isinstance(inverted_test, NAMECONSTANT_TYPE)
+            and inverted_test.value is False
+        ):
             self.add_exit(self.current_block, afterwhile_block, inverted_test)
         # Populate the while block.
         self.current_block = while_block
@@ -565,8 +579,8 @@ class CFGBuilder(ast.NodeVisitor):
         self.after_loop_block_stack.pop()
         self.curr_loop_guard_stack.pop()
 
-    # Async for loops and async with context managers. 
-    # They have the same fields as For and With, respectively. 
+    # Async for loops and async with context managers.
+    # They have the same fields as For and With, respectively.
     # Only valid in the body of an AsyncFunctionDef.
     # https://docs.python.org/3/library/ast.html
     def visit_AsyncFor(self, node):
@@ -596,6 +610,7 @@ class CFGBuilder(ast.NodeVisitor):
         # Popping the current after loop stack,taking care of errors in case of nested for loops
         self.after_loop_block_stack.pop()
         self.curr_loop_guard_stack.pop()
+
     def visit_Break(self, node):
         assert len(self.after_loop_block_stack), "Found break not inside loop"
         self.add_exit(self.current_block, self.after_loop_block_stack[-1])
@@ -612,11 +627,15 @@ class CFGBuilder(ast.NodeVisitor):
 
     def visit_FunctionDef(self, node):
         self.add_statement(self.current_block, node)
-        self.new_functionCFG(node, asynchr=False, enclosing_block_id=self.current_block.id)
+        self.new_functionCFG(
+            node, asynchr=False, enclosing_block_id=self.current_block.id
+        )
 
     def visit_AsyncFunctionDef(self, node):
         self.add_statement(self.current_block, node)
-        self.new_functionCFG(node, asynchr=True,enclosing_block_id=self.current_block.id)
+        self.new_functionCFG(
+            node, asynchr=True, enclosing_block_id=self.current_block.id
+        )
 
     def visit_ClassDef(self, node):
         self.add_statement(self.current_block, node)
@@ -654,9 +673,9 @@ class CFGBuilder(ast.NodeVisitor):
         afterwith_block = self.new_block()
         # no branch here
         # link with block and body of with
-        #print(with_block, afterwith_block)
-        #self.add_exit(with_block, afterwith_block)
-        # go to with block and create more 
+        # print(with_block, afterwith_block)
+        # self.add_exit(with_block, afterwith_block)
+        # go to with block and create more
         self.current_block = with_block
 
         # Populate the body of the with loop.
@@ -668,8 +687,8 @@ class CFGBuilder(ast.NodeVisitor):
         # Continue building the CFG in the after-with block.
         self.current_block = afterwith_block
 
-    # Async for loops and async with context managers. 
-    # They have the same fields as For and With, respectively. 
+    # Async for loops and async with context managers.
+    # They have the same fields as For and With, respectively.
     # Only valid in the body of an AsyncFunctionDef.
     # https://docs.python.org/3/library/ast.html
     def visit_AsyncWith(self, node):
@@ -684,9 +703,9 @@ class CFGBuilder(ast.NodeVisitor):
         afterwith_block = self.new_block()
         # no branch here
         # link with block and body of with
-        #print(with_block, afterwith_block)
-        #self.add_exit(with_block, afterwith_block)
-        # go to with block and create more 
+        # print(with_block, afterwith_block)
+        # self.add_exit(with_block, afterwith_block)
+        # go to with block and create more
         self.current_block = with_block
 
         # Populate the body of the with loop.
@@ -697,4 +716,3 @@ class CFGBuilder(ast.NodeVisitor):
             self.add_exit(self.current_block, afterwith_block)
         # Continue building the CFG in the after-with block.
         self.current_block = afterwith_block
-

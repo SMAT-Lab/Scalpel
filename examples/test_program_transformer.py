@@ -1,9 +1,10 @@
+import ast
 import os
 import sys
-import ast
-import astor
-from scalpel.rewriter import Rewriter
 
+import astor
+
+from scalpel.rewriter import Rewriter
 
 src1 = '''
 def get_vid_from_url(url):
@@ -157,12 +158,12 @@ def sina_download_by_vkey(vkey, title=None, output_dir='.', merge=True, info_onl
 
 '''
 
-src10 = '''
+src10 = """
 def sina_download_by_vkey(vkey, title=None, output_dir='.', merge=True, info_only=False):
     if not info_only:
         download_urls([url], title, 'flv', size, output_dir=output_dir, merge=merge)
 
-'''
+"""
 
 src11 = """
 def func(x,y):
@@ -172,15 +173,16 @@ def func(x,y):
     return z
 """
 
+
 def main():
     rewriter = Rewriter(src11)
     print(src11)
-    rewriter.random_var_renaming(new_name = "_renamed_one")
+    rewriter.random_var_renaming(new_name="_renamed_one")
     rewriter.unused_stmt_insertion()
     rewriter.loop_exchange()
     new_src = rewriter.get_src()
     print(new_src)
 
-if __name__ == '__main__':
-    main()
 
+if __name__ == "__main__":
+    main()

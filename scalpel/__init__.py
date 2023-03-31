@@ -8,4 +8,4 @@ everybody and reusable in various contexts.
 """
 
 __all__ = ["cfg", "call_graph", "SSA", "core", "typeinfer", "import_graph", "rewriter"]
-__version__ = '1.0dev'
+__version__ = "1.0dev"

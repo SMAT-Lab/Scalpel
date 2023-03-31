@@ -1,4 +1,5 @@
 import ast
+
 from .class_visitor import ClassVisitor
 from .fun_def_visitor import FunDefVisitor
 
@@ -25,8 +26,8 @@ class SourceVisitor(ast.NodeVisitor):
     def visit_ClassDef(self, node):
         visitor = ClassVisitor()
         visitor.visit(node)
-        if len(node.bases)>0:
-            if hasattr(node.bases[0],"id"):
+        if len(node.bases) > 0:
+            if hasattr(node.bases[0], "id"):
                 self.pair[node.name] = node.bases[0].id
         else:
             self.pair[node.name] = None

@@ -2,37 +2,37 @@
 Utilities for type inference module
 """
 
-import re
 import ast
-import sys
 import builtins
-from copy import deepcopy
+import re
+import sys
 from collections import deque
-from typing import Dict, Optional, Union, List
+from copy import deepcopy
+from typing import Dict, List, Optional, Union
 
+# typeshed can be imported here
+func_ret_types = {
+    "dict": "dict",
+    "list": "list",
+    "tuple": "tuple",
+    "set": "set",
+    "str": "str",
+    "id": "int",
+    "sum": "num",
+    "float": "float",
+    "len": "int",
+    "ceil": "int",
+    "floor": "int",
+    "max": "num",
+    "min": "min",
+    "all": "bool",
+    "any": "bool",
+    "assert": "bool",
+    "isinstance": "bool",
+    "bytes": "bytes",
+    "default_dict": "dict",
+}
 
-# typeshed can be imported here 
-func_ret_types  = {
-                "dict": "dict",
-                "list": "list",
-                "tuple": "tuple",
-                "set": "set",
-                "str": "str",
-                "id": "int",
-                "sum": "num",
-                "float": "float",
-                "len": "int",
-                "ceil": "int",
-                "floor": "int",
-                "max": "num",
-                "min": "min",
-                "all":  "bool",
-                "any": "bool",
-                "assert": "bool",
-                "isinstance": "bool",
-                "bytes":"bytes",       
-                "default_dict": "dict"
-            }
 
 def get_func_calls_type(tree):
     node = deepcopy(tree)
@@ -45,6 +45,7 @@ class TypeInferCallTransformer(ast.NodeTransformer):
     """
     A NodeTransformer class for getting function call information
     """
+
     def __init__(self):
         self.call_names = []
 
@@ -58,7 +59,6 @@ class TypeInferCallTransformer(ast.NodeTransformer):
         return node
 
     def visit_Call(self, node):
-
         tmp_fun_node = deepcopy(node)
         tmp_fun_node.args = []
         tmp_fun_node.keywords = []
@@ -81,6 +81,7 @@ class FuncCallVisitor(ast.NodeVisitor):
     """
     A NodeVisitor class for getting function call information
     """
+
     def __init__(self):
         self._name = deque()
         self.call_names = []
@@ -91,7 +92,7 @@ class FuncCallVisitor(ast.NodeVisitor):
 
     @property
     def name(self):
-        return '.'.join(self._name)
+        return ".".join(self._name)
 
     @name.deleter
     def name(self):
@@ -101,7 +102,6 @@ class FuncCallVisitor(ast.NodeVisitor):
         self._name.appendleft(node.id)
 
     def visit_Attribute(self, node):
-
         try:
             self._name.appendleft(node.attr)
             self._name.appendleft(node.value.id)
@@ -121,9 +121,13 @@ def get_built_in_types() -> Dict:
 
     :return: Python built in types in a dictionary
     """
-    builtin_types = [getattr(builtins, d).__name__ for d in dir(builtins) if isinstance(getattr(builtins, d), type)]
-    return { b.lower():b  for b in builtin_types}
-    
+    builtin_types = [
+        getattr(builtins, d).__name__
+        for d in dir(builtins)
+        if isinstance(getattr(builtins, d), type)
+    ]
+    return {b.lower(): b for b in builtin_types}
+
 
 def get_type(node, imports=None) -> str:
     """
@@ -151,25 +155,55 @@ def get_type(node, imports=None) -> str:
     elif isinstance(node, ast.BinOp):
         if isinstance(node.op, (ast.Div, ast.Mult)):
             return "float"
-        elif isinstance(node.op, ast.Mod) and isinstance(node.left, ast.Constant) and isinstance(node.left, ast.Str):
+        elif (
+            isinstance(node.op, ast.Mod)
+            and isinstance(node.left, ast.Constant)
+            and isinstance(node.left, ast.Str)
+        ):
             return "str"
-        elif isinstance(node.op, ast.Mod) and isinstance(node.left, ast.Name) and isinstance(node.right, ast.Dict):
+        elif (
+            isinstance(node.op, ast.Mod)
+            and isinstance(node.left, ast.Name)
+            and isinstance(node.right, ast.Dict)
+        ):
             return "str"
         elif isinstance(node.op, ast.Add):
-            if isinstance(node.left, (ast.Constant, ast.Num, ast.List, ast.ListComp,
-                                      ast.Set, ast.SetComp, ast.Dict, ast.DictComp)):
+            if isinstance(
+                node.left,
+                (
+                    ast.Constant,
+                    ast.Num,
+                    ast.List,
+                    ast.ListComp,
+                    ast.Set,
+                    ast.SetComp,
+                    ast.Dict,
+                    ast.DictComp,
+                ),
+            ):
                 return get_type(node.left)
 
-            if isinstance(node.right, (ast.Constant, ast.Num, ast.List, ast.ListComp,
-                                       ast.Set, ast.SetComp, ast.Dict, ast.DictComp)):
+            if isinstance(
+                node.right,
+                (
+                    ast.Constant,
+                    ast.Num,
+                    ast.List,
+                    ast.ListComp,
+                    ast.Set,
+                    ast.SetComp,
+                    ast.Dict,
+                    ast.DictComp,
+                ),
+            ):
                 return get_type(node.right)
 
     if isinstance(node, ast.Name) and node.id == "self":
         return "self"
-        
+
     if isinstance(node, ast.Num):
         return type(node.n).__name__
-        
+
     elif isinstance(node, ast.List) or isinstance(node, ast.Tuple):
         value_type = check_consistent_list_types(node.elts)
         return f"{type(node).__name__}[{value_type}]"
@@ -209,14 +243,14 @@ def get_type(node, imports=None) -> str:
                 return imported_type
         if isinstance(node.func, ast.Name):
             if node.func.id in func_ret_types:
-                return func_ret_types[node.func.id] 
+                return func_ret_types[node.func.id]
             elif is_camel_case(func_name):
                 return func_name
             else:
                 return "call"
         elif is_camel_case(func_name.split(".")[-1]):
             return func_name
-        elif func_name in ['join', 'format']:
+        elif func_name in ["join", "format"]:
             return "str"
         else:
             return "call"
@@ -242,7 +276,7 @@ def check_consistent_list_types(values) -> str:
         builtin_types_dict = get_built_in_types()
         builtin_first_type = builtin_types_dict.get(first_type.__name__.lower())
         # Not an AST constant so we can just compare AST types
-        for n in values[1:len(values)]:
+        for n in values[1 : len(values)]:
             # Compare type to first items type
             if not isinstance(n, first_type):
                 # No constant type, assign any
@@ -254,7 +288,7 @@ def check_consistent_list_types(values) -> str:
         # We have an AST constant so we will need to compare their types
         first_constant_type = type(values[0].value)
         assignment_type = first_constant_type.__name__
-        for n in values[1:len(values)]:
+        for n in values[1 : len(values)]:
             # Compare type to first items type
             if not isinstance(n, ast.Constant):
                 # Not a constant type, assign any
@@ -276,7 +310,7 @@ def is_camel_case(s: str) -> bool:
     Returns:
         True if the string is camel case, False otherwise
     """
-    pattern = '([A-Z][a-z]*)+'
+    pattern = "([A-Z][a-z]*)+"
     if re.search(pattern, s):
         return True
     return False
@@ -311,19 +345,19 @@ def get_api_ref_id(import_nodes):
         if isinstance(node, ast.Import):
             items = [nn.__dict__ for nn in node.names]
             for d in items:
-                if d['asname'] is None:  # alias name not found, use its imported name
-                    id2fullname[d['name']] = d['name']
+                if d["asname"] is None:  # alias name not found, use its imported name
+                    id2fullname[d["name"]] = d["name"]
                 else:
-                    id2fullname[d['asname']] = d['name']  # otherwise , use alias name
+                    id2fullname[d["asname"]] = d["name"]  # otherwise , use alias name
         if isinstance(node, ast.ImportFrom) and node.module is not None:
             # for import from statements
             # module names are the head of a API name
             items = [nn.__dict__ for nn in node.names]
             for d in items:
-                if d['asname'] is None:  # alias name not found
-                    id2fullname[d['name']] = node.module + '.' + d['name']
+                if d["asname"] is None:  # alias name not found
+                    id2fullname[d["name"]] = node.module + "." + d["name"]
                 else:
-                    id2fullname[d['asname']] = node.module + '.' + d['name']
+                    id2fullname[d["asname"]] = node.module + "." + d["name"]
     return id2fullname
 
 
@@ -337,23 +371,23 @@ def is_imported_fun(func_name: str, import_dict: dict) -> Optional[str]:
     Returns:
         The module that the function was import from or None if it was not imported
     """
-    name_parts = func_name.split('.')
+    name_parts = func_name.split(".")
     if name_parts[0] in import_dict:
         return import_dict[name_parts[0]]
     return None
 
 
 def rename_from_name(from_where, from_name, fun_name):
-    if from_where == 'self':
-        class_name = fun_name.split('.')[0]
-        from_name = class_name + "." + ".".join(from_name.split('.')[1:])
+    if from_where == "self":
+        class_name = fun_name.split(".")[0]
+        from_name = class_name + "." + ".".join(from_name.split(".")[1:])
         return from_name
-    elif from_where == 'local' or from_where == 'base':
+    elif from_where == "local" or from_where == "base":
         return from_name
 
 
 def is_valid_call_link(t_vals):
-    return all(x not in ['ID', 'call', 'unknown'] for x in t_vals)
+    return all(x not in ["ID", "call", "unknown"] for x in t_vals)
 
 
 def generate_ast(source: str):
@@ -361,13 +395,13 @@ def generate_ast(source: str):
     Generates ast from the source string
     """
     try:
-        if sys.version_info >= (3,8):
-            tree = ast.parse(source, mode='exec', type_comments=True)
-        elif sys.version_info >= (3,5) and sys.version_info < (3,8):
-            tree = ast.parse(source, mode='exec')
+        if sys.version_info >= (3, 8):
+            tree = ast.parse(source, mode="exec", type_comments=True)
+        elif sys.version_info >= (3, 5) and sys.version_info < (3, 8):
+            tree = ast.parse(source, mode="exec")
         else:
             raise Exception("Must use Python 3.5+ ")
-        #tree = ast.parse(source, mode='exec')
+        # tree = ast.parse(source, mode='exec')
         return tree
     except Exception as e:
         print(e)
@@ -397,23 +431,24 @@ def is_done(t_vals: List[str]) -> bool:
     Returns:
         True if in a finished state, False otherwise
     """
-    return all(x not in ['ID', 'call', 'unknown', 'input', '3call'] for x in t_vals)
+    return all(x not in ["ID", "call", "unknown", "input", "3call"] for x in t_vals)
 
 
 def find_class_by_attr(module_records, attrs):
-
     if len(attrs) < 5:
         return None
-    class_names = [item.split('.')[0] for item in module_records if len(item.split('.')) == 2]
+    class_names = [
+        item.split(".")[0] for item in module_records if len(item.split(".")) == 2
+    ]
     for c_name in class_names:
-        if all([(c_name + '.' + x) in module_records for x in attrs]):
+        if all([(c_name + "." + x) in module_records for x in attrs]):
             return c_name
 
     return None
 
 
 def get_attr_name(node):
-    #TODO  to remove this ufunction 
+    # TODO  to remove this ufunction
     if isinstance(node, ast.Call):
         return get_attr_name(node.func)
     if isinstance(node, ast.Name):

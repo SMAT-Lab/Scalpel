@@ -7,7 +7,8 @@ class FunDefVisitor(ast.NodeVisitor):
 
     def visit(self, node):
         print(ast.dump(node))
-        self.result['name'] = node.name
+        self.result["name"] = node.name
         return node
+
     def visit_Args(self, node):
-        print('1111')
+        print("1111")
