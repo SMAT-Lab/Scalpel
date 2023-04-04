@@ -7,4 +7,4 @@ are linked by Link objects, which represent control flow jumps between two block
 the form of an expression. Please see the example diagram a control flow graph ![Fibonacci CFG](https://raw.githubusercontent.com/SMAT-Lab/Scalpel/main/docs/_static/resources/cfg_example.png)
 """
 from .builder import CFGBuilder
-from .model import Block, Link, CFG
+from .model import CFG, Block, Link

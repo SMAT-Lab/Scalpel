@@ -1,3 +1,7 @@
+import ast
+import builtins
+import math
+import operator
 import os
 
 
@@ -26,7 +30,7 @@ ops = {
     ast.Div: operator.truediv,
     ast.Mod: operator.mod,
     ast.Pow: operator.pow,
-    ast.Call: checkfun,  # check all built-in functions
+    # ast.Call: checkfun, # check all built-in functions #APSV: Not implemented? commenting
     ast.BinOp: ast.BinOp,
     #  unary
     ast.USub: operator.neg,
