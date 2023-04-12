@@ -114,22 +114,34 @@ class Block(object):
         Returns:
             A string containing the source code of the statements.
         """
-        src = "#" + str(self.id) + "\n"
+        src = "#" + str(self.id)+'\n'
+        def getSourceHelper(source):
+            idx, p = 0, 0
+            while p != 0 or idx == 0 or source[idx] != ':':
+                if source[idx] in "\"'":
+                    ridx = source[idx + 1:].index(source[idx]) + idx + 1
+                    while True:
+                        try:
+                            eval(source[idx : ridx + 1].replace("\n", ''))
+                            break
+                        except:
+                            ridx += 1
+                    idx = ridx + 1
+                    continue
+                if source[idx] in '([{':
+                    p += 1
+                elif source[idx] in ')]}':
+                    p -= 1
+                idx += 1
+            source = source[: idx + 1].split('\n')
+            source = ''.join(map(lambda s : s.strip(), source))
+            return source + "\n"
         for statement in self.statements:
-            if type(statement) in [ast.If, ast.For, ast.While, ast.With]:
-                src += (astor.to_source(statement)).split("\n")[0] + "\n"
+            source = astor.to_source(statement)
+            if type(statement) in [ast.If, ast.For, ast.While, ast.With, ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef]:
+                src += getSourceHelper(source)
             elif type(statement) == ast.Try:
-                src += (astor.to_source(statement)).split("\n")[0] + "\n"
-            # elif type(statement) == ast.If:
-            #    src += (astor.to_source(statement)).split('\n')[0] + "\n"
-            elif type(statement) in [
-                ast.FunctionDef,
-                ast.AsyncFunctionDef,
-                ast.ClassDef,
-            ]:
-                src += (astor.to_source(statement)).split("\n")[0] + "...\n"
-            elif type(statement) == ast.ClassDef:
-                src += (astor.to_source(statement)).split("\n")[0] + "...\n"
+                src += (astor.to_source(statement)).split('\n')[0] + "\n"
             else:
                 src += astor.to_source(statement)
         return src
