@@ -6,22 +6,28 @@ functions, etc.
 import ast
 import re
 import tokenize
-from typed_ast import ast3
+from typing import Dict, List
+
 import typeshed_client
-from typing import List, Dict
+from typed_ast import ast3
 
 from scalpel.cfg import CFGBuilder
-from scalpel.typeinfer.classes import BinaryOperation, ScalpelVariable, ScalpelFunction, ScalpelClass
-from scalpel.typeinfer.visitors import get_func_calls_type as get_func_calls, get_call_type
+from scalpel.SSA.const import SSA
+from scalpel.typeinfer.classes import (
+    BinaryOperation,
+    ScalpelClass,
+    ScalpelFunction,
+    ScalpelVariable,
+)
 from scalpel.typeinfer.utilities import (
-    get_type,
+    check_consistent_list_types,
     get_attr_name,
     get_built_in_types,
+    get_type,
     resolve_name,
-    check_consistent_list_types
 )
-
-from scalpel.SSA.const import SSA
+from scalpel.typeinfer.visitors import get_call_type
+from scalpel.typeinfer.visitors import get_func_calls_type as get_func_calls
 
 
 class BinaryOperatorMap:
@@ -57,8 +63,7 @@ class BinaryOperatorMap:
         return None
 
     def chain_types(self):
-
-        #TODO: Chain together types of variables involved in binary operations to determine types
+        # TODO: Chain together types of variables involved in binary operations to determine types
         for variable, operation_list in self.hash.items():
             if isinstance(self._type_hash.get(variable), ast.Constant):
                 pass
@@ -68,6 +73,7 @@ class _StaticAnalyzer(ast.NodeVisitor):
     """
     The base class of analyzer, provides functions that read and parse a python program file
     """
+
     def __init__(self):
         self.file_name = None
 
@@ -118,13 +124,13 @@ class ImportTypeMap(_StaticAnalyzer):
                 module = []
             elif isinstance(node, ast.ImportFrom):
                 if node.module is not None:
-                    module = node.module.split('.')
+                    module = node.module.split(".")
             else:
                 continue
 
             for names in node.names:
                 if module:
-                    for name in names.name.split('.'):
+                    for name in names.name.split("."):
                         import_name = ".".join(module + [name])
                         if module:
                             # Importing from module
@@ -144,7 +150,9 @@ class ImportTypeMap(_StaticAnalyzer):
             import_name: a fully qualified name of the function, the variable, etc.
 
         """
-        fully_qualified_name = self.typeshed_resolver.get_fully_qualified_name(import_name)
+        fully_qualified_name = self.typeshed_resolver.get_fully_qualified_name(
+            import_name
+        )
         if isinstance(fully_qualified_name, typeshed_client.parser.NameInfo):
             node = fully_qualified_name.ast
             if isinstance(node, ast.FunctionDef):
@@ -190,15 +198,10 @@ class ClassDefinitionMap(_StaticAnalyzer):
                 for n in node.body:
                     if isinstance(n, ast.FunctionDef):
                         # We don't pass return type into function def since we will figure it out later
-                        methods.append(ScalpelFunction(
-                            name=n.name,
-                            line=n.lineno
-                        ))
-                class_definitions.append(ScalpelClass(
-                    name=class_name,
-                    methods=methods,
-                    inherits=inheritance
-                ))
+                        methods.append(ScalpelFunction(name=n.name, line=n.lineno))
+                class_definitions.append(
+                    ScalpelClass(name=class_name, methods=methods, inherits=inheritance)
+                )
 
         return class_definitions
 
@@ -225,10 +228,9 @@ class FunctionDefinitionMap(_StaticAnalyzer):
             if isinstance(node, ast.FunctionDef):
                 # We don't pass return type into function def since we will figure it out later
                 # Also worth noting that this won't pick up on methods defined in classes
-                function_definitions.append(ScalpelFunction(
-                    name=node.name,
-                    line=node.lineno
-                ))
+                function_definitions.append(
+                    ScalpelFunction(name=node.name, line=node.lineno)
+                )
 
         return function_definitions
 
@@ -261,13 +263,13 @@ class VariableAssignmentMap(_StaticAnalyzer):
             if isinstance(node, ast.FunctionDef):
                 # Function arguments
                 for arg in node.args.args:
-                    if arg.arg != 'self':
+                    if arg.arg != "self":
                         variable = ScalpelVariable(
                             name=arg.arg,
                             function=node.name,
                             line=node.lineno,
                             type=any.__name__,
-                            is_arg=True
+                            is_arg=True,
                         )
                         variables.append(variable)
             elif isinstance(node, ast.Assign) and isinstance(node.targets[0], ast.Name):
@@ -279,11 +281,12 @@ class VariableAssignmentMap(_StaticAnalyzer):
                     name=variable_name,
                     function="",
                     line=node.lineno,
-                    type=assignment_type
+                    type=assignment_type,
                 )
-                variable_type = 'any'
-                if isinstance(node.value, ast.Call) and not isinstance(node.value.func, ast.Attribute):
-
+                variable_type = "any"
+                if isinstance(node.value, ast.Call) and not isinstance(
+                    node.value.func, ast.Attribute
+                ):
                     # Assignment is to a callable
                     if isinstance(node.value.func, ast.Name):
                         called = node.value.func.id  # Name of callable
@@ -294,20 +297,26 @@ class VariableAssignmentMap(_StaticAnalyzer):
 
                 elif isinstance(node.value, ast.Constant):
                     # String, int, float, boolean
-                    variable_type = type(node.value.value).__name__  # Determine specific type
+                    variable_type = type(
+                        node.value.value
+                    ).__name__  # Determine specific type
                 elif isinstance(node.value, ast.Dict):
                     # Dictionary
                     key_type = check_consistent_list_types(node.value.keys)
                     value_type = check_consistent_list_types(node.value.values)
                     variable_type = f"Dict[{key_type}, {value_type}]"
-                elif isinstance(node.value, ast.List) or isinstance(node.value, ast.Tuple):
+                elif isinstance(node.value, ast.List) or isinstance(
+                    node.value, ast.Tuple
+                ):
                     # List or tuple, check to see if types in list are constant
                     values = node.value.elts
                     value_type = check_consistent_list_types(values)
                     variable_type = f"{type(node.value).__name__}[{value_type}]"
                 elif isinstance(node.value, ast.ListComp):
                     variable_type = list.__name__
-                elif isinstance(node.value, ast.IfExp) or isinstance(node.value, ast.Compare):
+                elif isinstance(node.value, ast.IfExp) or isinstance(
+                    node.value, ast.Compare
+                ):
                     # Boolean, see heuristic 4
                     variable_type = bool.__name__
                 elif isinstance(node.value, ast.BinOp):
@@ -347,7 +356,6 @@ class BinaryOperationMap(_StaticAnalyzer):
 
         binary_operator_map = BinaryOperatorMap()
         for node in ast.walk(self.root):
-
             if isinstance(node, ast.BinOp):
                 # Check to see if we have an easily resolvable variable type since this will allow
                 # us to determine the type of all variables involved in the binary operation
@@ -383,7 +391,7 @@ class BinaryOperationMap(_StaticAnalyzer):
                         right=resolve_name(node.right),
                         right_ast_type=type(node.right),
                         operator=type(node.op),
-                        shared_type=assignment_type
+                        shared_type=assignment_type,
                     )
                 else:
                     # Not between two binary operations
@@ -393,7 +401,7 @@ class BinaryOperationMap(_StaticAnalyzer):
                         right=resolve_name(node.right),
                         right_ast_type=type(node.right),
                         operator=type(node.op),
-                        shared_type=assignment_type
+                        shared_type=assignment_type,
                     )
                 binary_operator_map.append(binary_operation)
 
@@ -404,6 +412,7 @@ class HeuristicParser(ast.NodeVisitor):
     """
     A heuristic NodeVisitor for assisting type inference
     """
+
     def __init__(self, node):
         self.node = node
         self.assign_nodes = []
@@ -469,14 +478,19 @@ class HeuristicParser(ast.NodeVisitor):
         right = node.comparators[0]
         left_type = get_type(left)
         right_type = get_type(right)
-        if left_type not in ["unknown", "ID", "subscript", "attr"] and right_type == "call":
+        if (
+            left_type not in ["unknown", "ID", "subscript", "attr"]
+            and right_type == "call"
+        ):
             self.type_hint_pairs += [(get_func_calls(right)[0], left_type)]
 
-        if right_type not in ["unknown", "ID", "subscript", "attr"] and left_type == "call":
+        if (
+            right_type not in ["unknown", "ID", "subscript", "attr"]
+            and left_type == "call"
+        ):
             self.type_hint_pairs += [(get_func_calls(left)[0], right_type)]
         if left_type == "call" and right_type == "call":
-            self.call_links = [(get_func_calls(left)[0],
-                                get_func_calls(right)[0])]
+            self.call_links = [(get_func_calls(left)[0], get_func_calls(right)[0])]
 
         self.generic_visit(node)
         return node
@@ -487,10 +501,16 @@ class HeuristicParser(ast.NodeVisitor):
         right = node.right
         left_type = get_type(left)
         right_type = get_type(right)
-        if left_type not in ["unknown", "ID", "subscript", "attr"] and right_type == "call":
+        if (
+            left_type not in ["unknown", "ID", "subscript", "attr"]
+            and right_type == "call"
+        ):
             self.type_hint_pairs += [(get_func_calls(right)[0], left_type)]
 
-        if right_type not in ["unknown", "ID", "subscript", "attr"] and left_type == "call":
+        if (
+            right_type not in ["unknown", "ID", "subscript", "attr"]
+            and left_type == "call"
+        ):
             self.type_hint_pairs += [(get_func_calls(left)[0], right_type)]
 
         if left_type == "call" and right_type == "call":
@@ -523,6 +543,7 @@ class SourceSplitVisitor(ast.NodeVisitor):
     """
     ast NodeVisitor class for retrieving assignments
     """
+
     def __init__(self):
         self.assign_dict = {}
 
@@ -557,6 +578,7 @@ class ClassSplitVisitor(ast.NodeVisitor):
     """
     ast NodeVisitor class for retrieving compositions of a class: function nodes, bases and assignment records
     """
+
     def __init__(self):
         self.fun_nodes = []
         self.class_assign_records = {"init_arg_name_lst": []}
@@ -564,11 +586,13 @@ class ClassSplitVisitor(ast.NodeVisitor):
 
     def visit_FunctionDef(self, node):
         self.fun_nodes.append(node)
-        if node.name == '__init__':
+        if node.name == "__init__":
             for arg in node.args.args:
                 self.class_assign_records["init_arg_name_lst"] += [arg.arg]
             for stmt in ast.walk(node):
-                if isinstance(stmt, ast.Assign) and isinstance(stmt.targets[0], ast.Attribute):
+                if isinstance(stmt, ast.Assign) and isinstance(
+                    stmt.targets[0], ast.Attribute
+                ):
                     left = get_attr_name(stmt.targets[0])
                     if left not in self.class_assign_records:
                         self.class_assign_records[left] = [stmt.value]
@@ -578,7 +602,7 @@ class ClassSplitVisitor(ast.NodeVisitor):
         self.bases = []
         for n in node.bases:
             if not isinstance(n, ast.Attribute) and not isinstance(n, ast.Subscript):
-                if hasattr(n, 'id'):
+                if hasattr(n, "id"):
                     self.bases.append(n.id)
 
         for tmp_node in node.body:
@@ -602,6 +626,7 @@ class ReturnStmtVisitor(ast.NodeVisitor):
     """
     Class for inferring function return types
     """
+
     def __init__(self, imports=None, assignments=None):
         self.ast_nodes = []
         self.assign_records = {}
@@ -672,7 +697,7 @@ class ReturnStmtVisitor(ast.NodeVisitor):
 
     def visit_Yield(self, node):
         self.n_returns += 1
-        self.r_types += ['generator']
+        self.r_types += ["generator"]
         return node
 
     def infer_actual_return_value(self, actual_return_value):
@@ -696,14 +721,14 @@ class ReturnStmtVisitor(ast.NodeVisitor):
                 self.r_types += ["callable"]
                 return
 
-        init_val = actual_return_value #
+        init_val = actual_return_value  #
         type_val = get_type(init_val, imports=self.imports)
 
         if init_val is None and isinstance(actual_return_value, ast.Name):
             if return_value.id in self.args:
-                self.r_types += ['input']
+                self.r_types += ["input"]
             if return_value.id in self.args:
-                self.r_types += ['input']
+                self.r_types += ["input"]
                 return
 
         if isinstance(actual_return_value, ast.Name):
@@ -716,8 +741,7 @@ class ReturnStmtVisitor(ast.NodeVisitor):
         if isinstance(actual_return_value, ast.BinOp):
             heuristics = Heuristics()
             return_type = heuristics.heuristic_five_return(
-                assignments=self.assignments,
-                return_node=actual_return_value
+                assignments=self.assignments, return_node=actual_return_value
             )
             if isinstance(return_type, list):
                 for type in return_type:
@@ -728,10 +752,10 @@ class ReturnStmtVisitor(ast.NodeVisitor):
 
         if type_val in ["ID", "attr"]:
             # TODO: Is block.id correct here?
-            if type_val == 'attr' and isinstance(init_val.value, ast.Call):
+            if type_val == "attr" and isinstance(init_val.value, ast.Call):
                 # Check for super class call
                 if not isinstance(init_val.value.func, ast.Attribute):
-                    if init_val.value.func.id == 'super':
+                    if init_val.value.func.id == "super":
                         # Check super class attributes
                         attribute_name = f"super.{init_val.attr}"
                         super_assign = self.class_assign_records.get(attribute_name)
@@ -759,21 +783,27 @@ class ReturnStmtVisitor(ast.NodeVisitor):
         elif type_val == "call":
             func_name = get_func_calls(actual_return_value)
             func_name = func_name[0]
-            first_part = func_name.split('.')[0]
+            first_part = func_name.split(".")[0]
             if func_name == "self.__class__":
                 # same as class itself
-                self.r_types += ['self']
-            elif first_part != 'self' and first_part in self.args:
-                self.r_types += ['input']
-            elif first_part != 'self' and first_part in self.class_assign_records["init_arg_name_lst"]:
-                self.r_types += ['input']
+                self.r_types += ["self"]
+            elif first_part != "self" and first_part in self.args:
+                self.r_types += ["input"]
+            elif (
+                first_part != "self"
+                and first_part in self.class_assign_records["init_arg_name_lst"]
+            ):
+                self.r_types += ["input"]
             else:
                 self.stem_from.append(func_name)
 
         elif type_val == "subscript":
             if isinstance(init_val, ast.Name):
-                if init_val.id in self.args or init_val.id in self.class_assign_records["init_arg_name_lst"]:
-                    self.r_types += ['input']
+                if (
+                    init_val.id in self.args
+                    or init_val.id in self.class_assign_records["init_arg_name_lst"]
+                ):
+                    self.r_types += ["input"]
             else:
                 # Can't deduce type, return Any
                 self.r_types += [any.__name__]
@@ -808,6 +838,7 @@ class ReturnStmtVisitor(ast.NodeVisitor):
 
         ssa_analyzer = SSA()
         ssa_results, ident_const_dict = ssa_analyzer.compute_SSA(cfg)
+
         def get_return_value(block):
             for idx, stmt in enumerate(block.statements):
                 if isinstance(stmt, (ast.Return, ast.Yield)):
@@ -817,10 +848,12 @@ class ReturnStmtVisitor(ast.NodeVisitor):
                         # use the first value
                         # TODO: consider multiple return values
                         ident_all_numbers = set(stmt_loaded_rec[stmt.value.id])
-                        if len(ident_all_numbers)>0:
+                        if len(ident_all_numbers) > 0:
                             const_values = []
                             for ident_no in ident_all_numbers:
-                                const_values.append(ident_const_dict[stmt.value.id, ident_no])
+                                const_values.append(
+                                    ident_const_dict[stmt.value.id, ident_no]
+                                )
                             return const_values
                     # this includes the case when the return identifier cannot be traced to a definition
                     return [stmt.value]
@@ -831,17 +864,14 @@ class ReturnStmtVisitor(ast.NodeVisitor):
             if return_values:
                 for return_value in return_values:
                     self.infer_actual_return_value(return_value)
-                    #print(block.statements[0].lineno)
-                    #print(self.r_types)
+                    # print(block.statements[0].lineno)
+                    # print(self.r_types)
 
-
-
-
-            #if isinstance(return_value, ast.IfExp):
+            # if isinstance(return_value, ast.IfExp):
 
             #    self.backward(cfg, block, return_value.body)
             #    self.backward(cfg, block, return_value.orelse)
-            #else:
+            # else:
             #    self.backward(cfg, block, return_value)
 
     def query_assign_records(self, var_id):
@@ -863,31 +893,36 @@ class ReturnStmtVisitor(ast.NodeVisitor):
     def type_infer(self, node):
         # if node is None, return None??
         type_val = get_type(node)
-        if type_val == 'ID':
+        if type_val == "ID":
             right = self.query_assign_records(node.id)
             if right is not None:
                 self.type_infer(right)
             else:
                 pass
-        elif type_val == 'call':
+        elif type_val == "call":
             # Returns a function call
             func_name = get_func_calls(node)
             func_name = func_name[0]
-            first_part_name = func_name.split('.')[0]
+            first_part_name = func_name.split(".")[0]
 
-            if first_part_name in self.args or first_part_name in self.class_assign_records["init_arg_name_lst"]:
-                self.r_types += ['input']
+            if (
+                first_part_name in self.args
+                or first_part_name in self.class_assign_records["init_arg_name_lst"]
+            ):
+                self.r_types += ["input"]
             elif func_name in self.args:
-                self.r_types += ['input']
+                self.r_types += ["input"]
             elif func_name in self.class_assign_records["init_arg_name_lst"]:
-                self.r_types += ['input']
-            elif func_name in ['copy', 'deepcopy', 'copy.copy', 'copy.deepcopy']:
+                self.r_types += ["input"]
+            elif func_name in ["copy", "deepcopy", "copy.copy", "copy.deepcopy"]:
                 pass
             else:
-                self.stem_from.append(func_name)  # if this is a function call # self.r_types += [type_val]
+                self.stem_from.append(
+                    func_name
+                )  # if this is a function call # self.r_types += [type_val]
         elif type_val == "subscript":
             if isinstance(node.value, ast.Name) and node.value.id in self.args:
-                self.r_types += ['input']
+                self.r_types += ["input"]
         else:
             # Known type
             self.r_types += [type_val]
@@ -910,6 +945,7 @@ class Heuristics:
     """
     A set of heuristic function for assisting type inference
     """
+
     @staticmethod
     def heuristic_two(ast_tree, processed_file, assignments):
         """
@@ -923,30 +959,37 @@ class Heuristics:
             if isinstance(node, ast.FunctionDef):
                 func_args = node.args.args
                 func_name = node.name
-                function_param_types[func_name] = [{
-                    "possible_arg_types": [],
-                    "funcs": [],
-                    "type": "",
-                    "param_name": x.arg
-                } for x in func_args
+                function_param_types[func_name] = [
+                    {
+                        "possible_arg_types": [],
+                        "funcs": [],
+                        "type": "",
+                        "param_name": x.arg,
+                    }
+                    for x in func_args
                 ]
 
             elif hasattr(node, "value") and isinstance(node.value, ast.Call):
-
-                if isinstance(node.value.func, ast.Attribute) or isinstance(node.value.func, ast.Name):
+                if isinstance(node.value.func, ast.Attribute) or isinstance(
+                    node.value.func, ast.Name
+                ):
                     continue
 
-                if hasattr(node.value.func, 'id'):
+                if hasattr(node.value.func, "id"):
                     func_name = node.value.func.id
                     args = node.value.args
                     for i in range(len(args)):
                         arg = args[i]
                         if isinstance(arg, ast.Call):
-                            function_param_types[func_name][i]["funcs"].append(arg.func.id)
+                            function_param_types[func_name][i]["funcs"].append(
+                                arg.func.id
+                            )
                         elif isinstance(arg, ast.Name):
                             pass
                         else:
-                            function_param_types[func_name][i]["possible_arg_types"].append(type(arg.value).__name__)
+                            function_param_types[func_name][i][
+                                "possible_arg_types"
+                            ].append(type(arg.value).__name__)
 
         for function in function_param_types.values():
             for arg in function:
@@ -982,13 +1025,16 @@ class Heuristics:
                 right_operation = variable.binary_operation.right
                 operation = variable.binary_operation.op
                 # Check for involved parameters
-                involved_params = [i for i in param_list if self.in_bin_op(i, variable.binary_operation)]
+                involved_params = [
+                    i
+                    for i in param_list
+                    if self.in_bin_op(i, variable.binary_operation)
+                ]
 
                 if isinstance(left_operation, ast.BinOp):
                     # Greater than two values in the operation
                     bin_op_types = {}
                     while isinstance(left_operation, ast.BinOp):
-
                         if isinstance(right_operation, ast.Name):
                             # Named variable
                             if isinstance(left_operation.right, ast.Name):
@@ -997,7 +1043,9 @@ class Heuristics:
                                 if right_variable:
                                     bin_op_types[right_variable.type] = True
                             elif isinstance(left_operation.right, ast.Constant):
-                                bin_op_types[type(left_operation.right.value).__name__] = True
+                                bin_op_types[
+                                    type(left_operation.right.value).__name__
+                                ] = True
                         elif isinstance(right_operation, ast.Constant):
                             # Constant value, e.g. 25 as an integer of 'Hello World!' as a string
                             bin_op_types[type(right_operation.value).__name__] = True
@@ -1031,8 +1079,10 @@ class Heuristics:
                         right_name = right_operation.id
                         right_variable = assignment_dict.get(right_name)
                         if right_variable:
-                            if right_variable.type == "any" \
-                                    and (isinstance(operation, ast.Pow) or isinstance(operation, ast.Mod)):
+                            if right_variable.type == "any" and (
+                                isinstance(operation, ast.Pow)
+                                or isinstance(operation, ast.Mod)
+                            ):
                                 variable.type = "float"
                             else:
                                 variable.type = right_variable.type
@@ -1050,7 +1100,7 @@ class Heuristics:
                 assignment_dict = {v.name: v for v in assignments}
                 assignment = assignment_dict.get(i.id)
                 if assignment:
-                    if assignment.type != 'any':
+                    if assignment.type != "any":
                         return assignment.type
             elif isinstance(i, ast.Constant):
                 # Constant, check its type
@@ -1080,7 +1130,9 @@ class Heuristics:
                     function_calls.append(node.func.id)
 
         # Get variables that are called
-        involved = [v for v in processed_file.static_assignments if v.name in function_calls]
+        involved = [
+            v for v in processed_file.static_assignments if v.name in function_calls
+        ]
         for variable in involved:
             variable.type = callable.__name__
 
@@ -1096,10 +1148,12 @@ class Heuristics:
         for node in ast.walk(function_node):
             if isinstance(node, ast.Call):
                 if isinstance(node.func, ast.Name):
-                    if node.func.id == 'isinstance':
+                    if node.func.id == "isinstance":
                         # Check to see what the value being compared to is
                         variable, type_compared = node.args[0], node.args[1]
-                        if isinstance(variable, ast.Name) and isinstance(type_compared, ast.Name):
+                        if isinstance(variable, ast.Name) and isinstance(
+                            type_compared, ast.Name
+                        ):
                             type_list = is_instance_type_map.get(variable.id)
                             if type_list:
                                 if type_compared.id not in type_list:
@@ -1108,12 +1162,16 @@ class Heuristics:
                                 is_instance_type_map[variable.id] = [type_compared.id]
 
         # Check static assignments for the variables involved in calls to isinstance
-        involved = [s for s in processed_file.static_assignments if s.name in is_instance_type_map]
+        involved = [
+            s
+            for s in processed_file.static_assignments
+            if s.name in is_instance_type_map
+        ]
         for variable in involved:
             is_instance_types = is_instance_type_map[variable.name]
 
             # Variable hasn't been resolved by any other heuristics
-            if variable.type == 'any':
+            if variable.type == "any":
                 if len(is_instance_types) > 1:
                     variable.type = is_instance_types
                 else:
@@ -1142,7 +1200,9 @@ class Heuristics:
                         inputs = [n.value for n in node.args if hasattr(n, "value")]
                         if len(inputs) == len(function_params):
                             for index, param in enumerate(function_params):
-                                param_type_map[param.name][type(inputs[index]).__name__] = True
+                                param_type_map[param.name][
+                                    type(inputs[index]).__name__
+                                ] = True
 
         # Assign parameter input types to parameters
         for param_name, param_types in param_type_map.items():
@@ -1150,7 +1210,7 @@ class Heuristics:
             type_values = list(param_types.keys())
             if len(type_values) == 1:
                 # Validate
-                if parameter.type == 'any':
+                if parameter.type == "any":
                     parameter.type = type_values[0]
                 elif not param_types.get(parameter.type):
                     # Mismatched inferred types
@@ -1159,7 +1219,7 @@ class Heuristics:
 
             else:
                 # See if we already inferred type from another heuristic, and check against the input type
-                if parameter.type != 'any':
+                if parameter.type != "any":
                     if parameter.type not in type_values:
                         # Bad input to function
                         # TODO: Raise a warning here?
@@ -1178,11 +1238,13 @@ class Heuristics:
             function_node: The function node being checked
         """
         # work through params
-        for variable in [v for v in processed_file.static_assignments if v.type == 'any']:
-            regex_query = r'\b^(.{0,12}_{0,1}(count|counter|sum)_{0,1}.{0,12}|(int|num|sum|count|counter))$\b'
+        for variable in [
+            v for v in processed_file.static_assignments if v.type == "any"
+        ]:
+            regex_query = r"\b^(.{0,12}_{0,1}(count|counter|sum)_{0,1}.{0,12}|(int|num|sum|count|counter))$\b"
             regex = re.search(regex_query, variable.name)
             if regex:
-                variable.type = 'int'
+                variable.type = "int"
 
     def heuristic_eleven(self, processed_file, function_node):
         # Find what variables are in comparison operations and resolve types
@@ -1206,16 +1268,18 @@ class Heuristics:
         # Collect parameter input types
         args = function_node.args
         kwarg = args.kwarg
-        kw_defaults=args.kw_defaults
+        kw_defaults = args.kw_defaults
         defaults = args.defaults
         position = 0
-        if len(defaults)>0 :
-            for arg in list(param_type_map.keys())[-len(defaults):]:
+        if len(defaults) > 0:
+            for arg in list(param_type_map.keys())[-len(defaults) :]:
                 # None is not helpful, not providing any hint
                 if hasattr(defaults[position], "value"):
                     if defaults[position].value is not None:
-                        param_type_map[arg][type(defaults[position].value).__name__] = True
-                        position+=1
+                        param_type_map[arg][
+                            type(defaults[position].value).__name__
+                        ] = True
+                        position += 1
 
         # Assign parameter input types to parameters
         for param_name, param_types in param_type_map.items():
@@ -1223,7 +1287,7 @@ class Heuristics:
             type_values = list(param_types.keys())
             if len(type_values) == 1:
                 # Validate
-                if parameter.type == 'any':
+                if parameter.type == "any":
                     parameter.type = type_values[0]
                 elif not param_types.get(parameter.type):
                     # Mismatched inferred types
@@ -1232,7 +1296,7 @@ class Heuristics:
 
             else:
                 # See if we already inferred type from another heuristic, and check against the input type
-                if parameter.type != 'any':
+                if parameter.type != "any":
                     if parameter.type not in type_values:
                         # Bad input to function
                         # TODO: Raise a warning here?

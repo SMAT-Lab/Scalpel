@@ -2,34 +2,35 @@
 In this module, Scalplel provides the interface to users. Each of Python source
 files are fed into this module to generate a frontend object for both parsing
 and code instrumentation. In addition, scope information can also be given for
-fine-grained operations. 
+fine-grained operations.
 """
 import ast
-from ..core.vars_visitor import get_vars
-from ..core.func_call_visitor import get_func_calls
+
 from scalpel.core.util import UnitWalker
+
 from ..cfg.builder import CFGBuilder
+from ..core.func_call_visitor import get_func_calls
+from ..core.vars_visitor import get_vars
 
 
-def get_attr_name (node):
+def get_attr_name(node):
     if isinstance(node, ast.Call):
         # to be test
         return get_attr_name(node.func)
     if isinstance(node, ast.Name):
         return node.id
     elif isinstance(node, ast.Attribute):
-        return get_attr_name(node.value)+"."+node.attr
+        return get_attr_name(node.value) + "." + node.attr
     elif isinstance(node, ast.Subscript):
         return get_attr_name(node.value)
 
 
 class ImportRelation:
-
     def __init__(self):
         self.path = []
-        self.src : MNode
-        self.dest:MNode
-        self.payload = [] 
+        self.src: MNode
+        self.dest: MNode
+        self.payload = []
         self.stmts = []
 
 
@@ -40,6 +41,7 @@ class MNode:
     file.
 
     """
+
     def __init__(self, name):
         """
         Args:
@@ -49,12 +51,12 @@ class MNode:
         self.full_name = ""
         self.children = []
         self.parent = None
-        self.source = ''
+        self.source = ""
         self.ast = None
         self.class_pair = None
         self.node_type_dict = None
         self.node_type_gt = None
-        self.call_links = None 
+        self.call_links = None
 
     def __str__(self):
         """
@@ -62,7 +64,7 @@ class MNode:
         """
         return str(self.name)
 
-    def rewrite(self, scope = "mod"):
+    def rewrite(self, scope="mod"):
         """
         rewrite code
         """
@@ -71,7 +73,7 @@ class MNode:
     def _read_scope(self, scope):
         pass
 
-    def parse_vars(self, scope = ""):
+    def parse_vars(self, scope=""):
         """
         Returns a list of variable records ranking by their line numbers
         Args:
@@ -85,11 +87,11 @@ class MNode:
         wanted_ast = self._retrieve_by_scope(self.ast, scope)
         results = get_vars(wanted_ast)
         return results
+
     def gen_import_relations():
         pass
 
-    def parse_func_calls(self, scope = ""):
-
+    def parse_func_calls(self, scope=""):
         """
         Returns a list of function calls ranking by their line numbers
         Args:
@@ -97,19 +99,19 @@ class MNode:
             means to retrieve the function named fun in the class A
         """
         wanted_ast = self._retrieve_by_scope(self.ast, scope)
-        results =  get_func_calls(wanted_ast)
+        results = get_func_calls(wanted_ast)
         return results
 
     def gen_ast(self):
         """
-        Build AST tree for th source 
+        Build AST tree for th source
         """
         try:
             self.ast = ast.parse(self.source)
         except Exception as e:
             self.ast = None
 
-    def _parse_func_defs(self, ast_node_lst, def_records, scope = "mod"):
+    def _parse_func_defs(self, ast_node_lst, def_records, scope="mod"):
         """
         Parse the function and class definitions in this module
         Args:
@@ -124,16 +126,28 @@ class MNode:
         for node in ast_node_lst:
             def_info = {}
             if isinstance(node, ast.FunctionDef):
-                def_info = {"scope":scope, "name": node.name, "arg": [], "kws": [],
-                        "lineno":node.lineno, "col_offset":node.col_offset}
+                def_info = {
+                    "scope": scope,
+                    "name": node.name,
+                    "arg": [],
+                    "kws": [],
+                    "lineno": node.lineno,
+                    "col_offset": node.col_offset,
+                }
                 def_records.append(def_info)
                 self._parse_func_defs(node.body, def_records, scope=node.name)
 
             elif isinstance(node, ast.ClassDef):
-                #visit class body
+                # visit class body
                 # to consider class records
-                def_info = {"scope":scope, "name": node.name, "arg": [], "kws": [],
-                        "lineno":node.lineno, "col_offset":node.col_offset}
+                def_info = {
+                    "scope": scope,
+                    "name": node.name,
+                    "arg": [],
+                    "kws": [],
+                    "lineno": node.lineno,
+                    "col_offset": node.col_offset,
+                }
                 def_records.append(def_info)
                 self._parse_func_defs(node.body, def_records, scope=node.name)
                 pass
@@ -147,7 +161,7 @@ class MNode:
 
     def _retrieve_by_scope(self, target_search_node, scope):
         """
-        retrieve an AST node by the scope directive. 
+        retrieve an AST node by the scope directive.
         Args:
             target_search_node: the AST node to be examined for entries in the
             given scope.
@@ -165,18 +179,18 @@ class MNode:
             if isinstance(node, ast.FunctionDef):
                 if node.name == scope:
                     return node
-                if scope.split('.')[0] == node.name:
-                    return self._retrieve_by_scope(node, scope.lstrip(node.name+'.')) 
+                if scope.split(".")[0] == node.name:
+                    return self._retrieve_by_scope(node, scope.lstrip(node.name + "."))
 
             elif isinstance(node, ast.ClassDef):
-                #visit class body
+                # visit class body
                 # to consider class records
                 if node.name == scope:
                     return node
-                if scope.split('.')[0] == node.name:
-                    return self._retrieve_by_scope(node, scope.lstrip(node.name+'.'))
-        #cfg = CFGBuilder().build("toy", self.module_ast)
-        #cfg.build_visual('cfg', 'pdf')
+                if scope.split(".")[0] == node.name:
+                    return self._retrieve_by_scope(node, scope.lstrip(node.name + "."))
+            # cfg = CFGBuilder().build("toy", self.module_ast)
+            # cfg.build_visual('cfg', 'pdf')
             # assignment statements are useful for assignment graph
             elif isinstance(node, ast.Assign):
                 pass
@@ -190,10 +204,10 @@ class MNode:
         Return a list of dictionaries, each of its item is a dictionary of
         function/class definition information.
         """
-        # mod : module 
+        # mod : module
         # func: function
         def_records = []
-        self._parse_func_defs(self.ast.body, def_records, scope = "mod")
+        self._parse_func_defs(self.ast.body, def_records, scope="mod")
         return def_records
 
     def parse_import_stmts(self):
@@ -211,50 +225,54 @@ class MNode:
             if isinstance(stmt, ast.Import):
                 items = [nn.__dict__ for nn in stmt.names]
                 for d in items:
-                    if d['asname'] is None:  # alias name not found, use its imported name
-                        import_dict[d['name']] = d['name']
+                    if (
+                        d["asname"] is None
+                    ):  # alias name not found, use its imported name
+                        import_dict[d["name"]] = d["name"]
                     else:
-                        import_dict[d['asname']] = d['name'] # otherwise , use alias name
+                        import_dict[d["asname"]] = d[
+                            "name"
+                        ]  # otherwise , use alias name
             if isinstance(stmt, ast.ImportFrom):
                 m_name = stmt.module
-                if m_name is None and stmt.level== 1:
-                    m_name = '.'
-                if m_name is None and stmt.level== 2:
-                    m_name = '..' 
+                if m_name is None and stmt.level == 1:
+                    m_name = "."
+                if m_name is None and stmt.level == 2:
+                    m_name = ".."
                 items = [nn.__dict__ for nn in stmt.names]
                 for d in items:
-                    if d['asname'] is None: # alias name not found
-                        import_dict[d['name']] = m_name +'.'+d['name']
+                    if d["asname"] is None:  # alias name not found
+                        import_dict[d["name"]] = m_name + "." + d["name"]
                     else:
-                        import_dict[d['asname']] = m_name +'.'+d['name']
+                        import_dict[d["asname"]] = m_name + "." + d["name"]
         return import_dict
 
     def retrieve_meta(self, node):
-        results = {"assign_pairs":[], "other_calls":[]}
+        results = {"assign_pairs": [], "other_calls": []}
         assign_pairs = []
-        other_calls  = []
+        other_calls = []
         for node in ast.walk(node):
             if isinstance(node, ast.Assign):
                 call_lst = get_func_calls(node.value)
                 for target in node.targets:
                     var_info = get_vars(target)[0]
-                    assign_pairs += [{"var":var_info, "calls":call_lst}]
+                    assign_pairs += [{"var": var_info, "calls": call_lst}]
             elif isinstance(node, ast.AnnAssign):
                 call_lst = get_func_calls(node.value)
                 var_name = get_vars(node.target)[0]
-                assign_pairs += [{"var":var_info, "calls":call_lst}]
+                assign_pairs += [{"var": var_info, "calls": call_lst}]
             elif isinstance(node, ast.AugAssign):
                 call_lst = get_func_calls(node.value)
                 var_name = get_vars(node.target)[0]
-                assign_pairs += [{"var":var_info, "calls":call_lst}]
+                assign_pairs += [{"var": var_info, "calls": call_lst}]
             else:
                 call_lst = get_func_calls(node)
                 if call_lst not in other_calls:
                     other_calls.append(call_lst)
 
-        results["assign_pairs"]  = assign_pairs
-        results["other_calls"]  = other_calls
-        return results 
+        results["assign_pairs"] = assign_pairs
+        results["other_calls"] = other_calls
+        return results
 
     def _process_base_names(self, bases):
         base_names = []
@@ -265,7 +283,7 @@ class MNode:
                 base_names.append(get_attr_name(b_node))
         return base_names
 
-    #def parse_function_body(self):
+    # def parse_function_body(self):
     #    """
     #    Prase all function/class definitions
     #    """

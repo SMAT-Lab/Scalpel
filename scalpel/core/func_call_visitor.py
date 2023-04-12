@@ -1,7 +1,7 @@
-import sys
 import ast
-from collections import deque
+import sys
 from ast import NodeVisitor
+from collections import deque
 from copy import deepcopy
 
 
@@ -23,7 +23,6 @@ class CallTransformer(ast.NodeTransformer):
         return node
 
     def param2str(self, param):
-
         def get_func(node):
             if type(node) == ast.Name:
                 return node.id
@@ -51,14 +50,14 @@ class CallTransformer(ast.NodeTransformer):
                 # currently, we will ignore the slices because we cannot track the type of the value.
                 # for instance,  a[something].fun() ->  a.fun()
                 # this sacrifice
-                return get_func(node.value)  
-            #elif type(node) == ast.JoinedStr:
+                return get_func(node.value)
+            # elif type(node) == ast.JoinedStr:
             #    return ""
             elif type(node) == ast.Attribute:
                 if type(node.value) in [ast.JoinedStr, ast.Constant]:
                     return node.attr
                 else:
-                    return get_func(node.value) + "." + node.attr 
+                    return get_func(node.value) + "." + node.attr
             elif type(node) == ast.Call:
                 return get_func(node.func)
             elif type(node) == ast.IfExp:
@@ -67,12 +66,12 @@ class CallTransformer(ast.NodeTransformer):
                 return ""
             elif type(node) == ast.UnaryOp:
                 return ""
-            #ast.UnaryOp
+            # ast.UnaryOp
             else:
-                #import astor
-                #print(astor.to_source(node))
+                # import astor
+                # print(astor.to_source(node))
                 raise Exception(str(type(node)))
-    
+
         if isinstance(param, ast.Subscript):
             return self.param2str(param.value)
         if isinstance(param, ast.Call):
@@ -80,9 +79,9 @@ class CallTransformer(ast.NodeTransformer):
         elif isinstance(param, ast.Name):
             return param.id
         elif isinstance(param, ast.Num):
-            # python 3.6  
+            # python 3.6
             return param.n
-            #return param.value
+            # return param.value
         elif isinstance(param, ast.List):
             return "List"
         elif isinstance(param, ast.ListComp):
@@ -105,7 +104,6 @@ class CallTransformer(ast.NodeTransformer):
             return "unknown"
 
     def visit_Call(self, node):
-
         tmp_fun_node = deepcopy(node)
         tmp_fun_node.args = []
         tmp_fun_node.keywords = []
@@ -113,11 +111,12 @@ class CallTransformer(ast.NodeTransformer):
         callvisitor = FuncCallVisitor()
         callvisitor.visit(tmp_fun_node)
 
-        call_info = {"name": callvisitor.name,
-                     "lineno": tmp_fun_node.lineno,
-                     "col_offset": tmp_fun_node.col_offset,
-                     "params": []
-                     }
+        call_info = {
+            "name": callvisitor.name,
+            "lineno": tmp_fun_node.lineno,
+            "col_offset": tmp_fun_node.col_offset,
+            "params": [],
+        }
         self.call_names += [call_info]
         for arg in node.args:
             call_info["params"] += [self.param2str(arg)]
@@ -142,7 +141,7 @@ class FuncCallVisitor(ast.NodeVisitor):
 
     @property
     def name(self):
-        return '.'.join(self._name)
+        return ".".join(self._name)
 
     @name.deleter
     def name(self):
@@ -152,7 +151,6 @@ class FuncCallVisitor(ast.NodeVisitor):
         self._name.appendleft(node.id)
 
     def visit_Attribute(self, node):
-
         try:
             self._name.appendleft(node.attr)
             self._name.appendleft(node.value.id)
@@ -165,11 +163,11 @@ class FuncCallVisitor(ast.NodeVisitor):
         self.generic_visit(node)
         return node
 
-
     def visit_Subscript(self, node):
-        # ingore subscription slice 
+        # ingore subscription slice
         self.visit(node.value)
         return node
+
 
 def get_args(node):
     arg_type = []
@@ -206,7 +204,7 @@ def get_args(node):
 
 
 def get_call_type(tree):
-    # how to remove 
+    # how to remove
     func_calls = []
     for node in ast.walk(tree):
         if isinstance(node, ast.Call):
@@ -217,7 +215,7 @@ def get_call_type(tree):
 
 
 def get_call_type(tree):
-    # how to remove 
+    # how to remove
     func_calls = []
     for node in ast.walk(tree):
         if isinstance(node, ast.Call):

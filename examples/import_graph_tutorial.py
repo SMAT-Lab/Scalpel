@@ -1,8 +1,7 @@
-from scalpel.import_graph.import_graph import Tree,ImportGraph
+from scalpel.import_graph.import_graph import ImportGraph, Tree
 
 
 def main():
-
     target_dir = "./import_graph_example_pkg"
     import_graph = ImportGraph(target_dir)
     import_graph.build_dir_tree()
@@ -13,4 +12,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main() 
+    main()

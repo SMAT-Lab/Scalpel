@@ -1,9 +1,10 @@
 import ast
-from  _ast import *
-import pkgutil
-import astor
 import os
+import pkgutil
 import sys
+from _ast import *
+
+import astor
 
 
 def iter_fields(node):
@@ -49,22 +50,36 @@ def iter_stmt_children(node):
 
 def find_local_modules(import_smts):
     smts = "\n".join(import_smts)
-    tree = ast.parse(smts, mode='exec')
-    search_path = ['.']
+    tree = ast.parse(smts, mode="exec")
+    search_path = ["."]
     module_names = set()
     for node in ast.walk(tree):
-        if isinstance(node, ast.Import) :
+        if isinstance(node, ast.Import):
             for nn in node.names:
-                module_names.add(nn.name.split('.')[0])
+                module_names.add(nn.name.split(".")[0])
         if isinstance(node, ast.ImportFrom):
-            if node.level==2:
-                search_path += ['..']
+            if node.level == 2:
+                search_path += [".."]
             if node.module is not None:
-                module_names.add(node.module.split('.')[0])
+                module_names.add(node.module.split(".")[0])
             else:
                 for nn in node.names:
                     module_names.add(nn.name)
-    module_name_plus = ['random', 'unittest', 'warning', 'os', 'pandas', 'IPython', 'seaborn', 'matplotlib', 'sklearn', 'numpy', 'scipy', 'math', 'matplotlib']
+    module_name_plus = [
+        "random",
+        "unittest",
+        "warning",
+        "os",
+        "pandas",
+        "IPython",
+        "seaborn",
+        "matplotlib",
+        "sklearn",
+        "numpy",
+        "scipy",
+        "math",
+        "matplotlib",
+    ]
     search_path = list(set(search_path))
     all_modules = [x[1] for x in pkgutil.iter_modules(path=search_path)]
     all_modules += list(sys.builtin_module_names) + module_name_plus
@@ -75,11 +90,11 @@ def find_local_modules(import_smts):
     return result
 
 
-def get_path_by_extension(root_dir, num_of_required_paths, flag='.ipynb'):
+def get_path_by_extension(root_dir, num_of_required_paths, flag=".ipynb"):
     paths = []
     for root, dirs, files in os.walk(root_dir):
-        files = [f for f in files if not f[0] == '.'] 
-        dirs[:] = [d for d in dirs if not d[0] == '.']
+        files = [f for f in files if not f[0] == "."]
+        dirs[:] = [d for d in dirs if not d[0] == "."]
         for file in files:
             if file.endswith(flag):
                 paths.append(os.path.join(root, file))
@@ -101,7 +116,7 @@ class Unit:
 
     def search_for_pos(self, stmt_lst, current_stmt):
         for i, stmt in enumerate(stmt_lst):
-    #        print(astor.to_source(stmt), astor.to_source(current_stmt))
+            #        print(astor.to_source(stmt), astor.to_source(current_stmt))
             if stmt == current_stmt:
                 return i
         return -1
@@ -120,17 +135,18 @@ class Unit:
         if self.parent is not None and hasattr(self.parent, "body"):
             try:
                 pos = self.parent.body.index(self.node)
-               
-                self.parent.body[pos:pos+1] = new_stmts
+
+                self.parent.body[pos : pos + 1] = new_stmts
             except Exception as e:
                 raise Exception("Insertion Failure")
         else:
             raise Exception("Error!!")
+
     def insert_after(self, new_stmt):
         if self.parent is not None and hasattr(self.parent, "body"):
             try:
                 pos = self.parent.body.index(self.node)
-                self.parent.body.insert(pos+1, new_stmt)
+                self.parent.body.insert(pos + 1, new_stmt)
             except Exception as e:
                 raise Exception("Insertion Failure")
         else:
@@ -142,11 +158,13 @@ class Unit:
     def replace():
         return 0
 
+
 def UnitWalker(module_node):
     # this code is adapted from the implementation of ast.walk
     # it does only handle statement level
     # offset to the first
     from collections import deque
+
     init_stmts = []
     for node in module_node.body:
         node.parent = module_node
@@ -157,13 +175,12 @@ def UnitWalker(module_node):
         node = todo.popleft()
         yield Unit(node, node.parent)
         if hasattr(node, "body"):
-            for ch_node in  node.body:
+            for ch_node in node.body:
                 ch_node.parent = node
                 todo.append(ch_node)
 
 
 class StmtIterator:
-
     def __init__(self, src):
         self.src = src
         self.ast = ast.parse(src)
@@ -173,7 +190,7 @@ class StmtIterator:
     def __iter__(self):
         return self
 
-    def __next__(self): 
+    def __next__(self):
         # needs to return statement with the block information to allow
         # insertion and removal
         current_loc = 0
@@ -190,4 +207,3 @@ class StmtIterator:
 
     def replace(self, new_stmt):
         pass
-

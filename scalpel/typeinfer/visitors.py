@@ -3,14 +3,15 @@ Node visitors used for Type Inference
 """
 
 import ast
-from copy import deepcopy
 from collections import deque
+from copy import deepcopy
 
 
 class FuncCallVisitor(ast.NodeVisitor):
     """
     A NodeVisitor class for getting function call information
     """
+
     def __init__(self):
         self._name = deque()
         self.call_names = []
@@ -21,7 +22,7 @@ class FuncCallVisitor(ast.NodeVisitor):
 
     @property
     def name(self):
-        return '.'.join(self._name)
+        return ".".join(self._name)
 
     @name.deleter
     def name(self):
@@ -31,7 +32,6 @@ class FuncCallVisitor(ast.NodeVisitor):
         self._name.appendleft(node.id)
 
     def visit_Attribute(self, node):
-
         try:
             self._name.appendleft(node.attr)
             self._name.appendleft(node.value.id)
@@ -49,6 +49,7 @@ class TypeInferCallTransformer(ast.NodeTransformer):
     """
     A NodeTransformer class for getting function call information
     """
+
     def __init__(self):
         self.call_names = []
 
