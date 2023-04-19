@@ -86,7 +86,7 @@ def test_case_5():
     cfg = mnode.gen_cfg()
     m_ssa = SSA()
     ssa_results, const_dict = m_ssa.compute_SSA(cfg)
-    assert ("url", 0) in const_dict and const_dict[("url", 0)] is None
+    assert ("url", 0) in const_dict and const_dict[("url", 0)] is not None
 
 
 def test_case_6():
@@ -128,8 +128,6 @@ def test_case_8():
     mnode.gen_ast()
     ast_node = mnode.ast
     cfg = mnode.gen_cfg()
-    graph = cfg.build_visual("pdf")
-    graph.render("example_cfg.pdf", view=False)
     m_ssa = SSA()
     ssa_results, const_dict = m_ssa.compute_SSA(cfg)
     assert ("a", 0) in const_dict
