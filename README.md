@@ -15,15 +15,6 @@ Install Scalpel using pip with the following command
 pip install python-scalpel
 ```
 
-
-You can also set up the project by clone the repository of Scalpel and in the root directory simply run:
-```sh
-./setup.sh -i
-```
-
-The setup script will create a virtual environment for you and install all dependencies. Scalpel will be installed in editable mode using `pip -e`.
-The setup script also installs pre-commit hooks that must be kept and followed during the development lifecycle.
-
 # Contributing
 
 We will be highly appreciated it if you can contribute to this project. Please feel free to do so by [submiting issue reports](https://github.com/SMAT-Lab/Scalpel/issues) or directly [adding pull requests](https://github.com/SMAT-Lab/Scalpel/pulls). We hope to obtain help for:
