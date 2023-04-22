@@ -1,35 +1,33 @@
 """
-FileSystem module for Scalpel. The original import graph will be removed while
-import graph interface is implemented in this module. This component is still
-under development.
+FileSystem module for Scalpel. The original import graph will be removed while the similar functionalities are implemented in this module. 
+The purpose of this componement is to support modelling large Python project structure in a simplified way. 
+This component is still under development.
+
+Author: Jiawei Wang
 """
 
-import ast
 import os
 from dataclasses import dataclass
+import ast
 
 from scalpel.core.source_visitor import SourceVisitor
 
 
 @dataclass
 class Node:
-    # a data structure that contain information for a module node
+    # a data structure that contain information for a module node 
     def __init__(self, name):
-        self.name: str = name
-        self.full_name: str = ""
-        self.children: list = []
-        self.parent: str = None
-        self.cargo: dict = {}
-        self.source: str = ""
+        self.name:str = name
+        self.full_name:str = ""
+        self.children:list = []
+        self.parent:str = None
+        self.cargo:dict = {}
+        self.source:str = ''
         self.ast = None
-        self.class_pair = None
-        self.node_type_dict = None
-        self.node_type_gt = None
-        self.line_numbers: dict = {}
         self.static_assignments = None
         self.call_links = None
         self.imports = {}
-        self.abs_path = None
+        self.abs_path = None 
 
     def __str__(self):
         return str(self.name)
@@ -40,9 +38,9 @@ class Node:
 
 class FileSystem:
     """
-    This class is an upgraded implementation of import graph which will be removed in to later releases.
-    It is a data structure that allows users to manipulate different files under a Python project.
-    It leverage import relations in each of source files along with their absolute import name.
+    This class is an upgraded implementation of import graph which will be removed in to later releases. 
+    It is a data structure that allows users to manipulate different files under a Python project. 
+    It leverage import relations in each of source files along with their absolute import name. 
     """
 
     def __init__(self, entry_point, file_ext=".py"):
@@ -51,42 +49,44 @@ class FileSystem:
         Args:
         entry_point: the top level folder path such as "my-python-projects/homework1". The argument must not endswith slash!
         """
-        # entry_point is the top level module folder
+        # entry_point is the top level module folder 
         self.entry_point = entry_point
         # note that the entry_point must not ends with slash. The recommended one is "a/b/c.py"
-        self.root = Node(os.path.basename(self.entry_point))
-
-        self.file_ext = file_ext  # can be used to parse pyi files in the future
-
+       # self.root = Node(os.path.basename(self.entry_point))
+      
+        self.file_ext = file_ext  # can be used to parse pyi files in the future 
+    
+    
     def _build_dir_tree(self, node):
         if os.path.isdir(node.name) is True:
             os.chdir(node.name)
-
-            items = os.listdir(".")
+            
+            items = os.listdir('.')
             for item in items:
                 child_node = Tree(item)
                 child_node.parent = node
                 self._build_dir_tree(child_node)
                 node.children.append(child_node)
-            os.chdir("..")
+            os.chdir('..')
         else:
             if node.name.endswith(self.file_ext):
-                with open(node.name, "r") as f:
-                    try:
+            
+                with open(node.name, 'r') as f:     
+                    try:  
                         source = f.read()
-
+                          
                     except:
                         source = ""
 
-                    node.source = source
+                    node.source = source      
                     try:
                         node.ast = ast.parse(source)
                     except:
-                        node.ast = None
-
-                    # node.class_pair = pair
+                        node.ast = None 
+                        
+                    #node.class_pair = pair
                     node.prefix = self.leaf2root(node)
-                    node.full_name = node.prefix  # + '.' + node.name
+                    node.full_name = node.prefix # + '.' + node.name
 
     def build_dir_tree(self):
         """
@@ -97,75 +97,46 @@ class FileSystem:
         os.chdir(working_dir)
         self._build_dir_tree(self.root)
         os.chdir(cwd)
+    
 
-    def get_leaf_nodes(self):
+    def get_leaf_nodes(self) -> list[Node]:
         """
         To return all the leaf nodes in this tree. Each of leaf nodes represents a single Python script.
+        During the transversal, full path names to the top level module for each leaf node are generated.
+        We will support the intermediate subfolders next.
+ 
+        Returns:  a list of Nodes  
         """
-        leaf_nodes = []
-        working_queue = [self.root]
 
-        while len(working_queue) > 0:
-            cur_node = working_queue.pop(0)
-            # skip the git folder
-            if str(cur_node) == ".git":
-                continue
-            if cur_node.name.endswith(self.file_ext):
-                leaf_nodes.append(cur_node)
-            working_queue.extend(cur_node.children)
-        return leaf_nodes
+        all_leaf_nodes = []
+        for root, dirs, files in os.walk(self.entry_point):
+            files = [
+                f for f in files if not f[0] == "."
+            ]  # skip hidden files such as git files
+            dirs[:] = [d for d in dirs if not d[0] == "."]
+            for f in files:
+                if f.endswith(self.file_ext):    
+                    abs_path = os.path.join(root, f)
+                    mod_node = Node(f)
+                    mod_node.abs_path = abs_path
+                    all_leaf_nodes.append(mod_node)
+
 
     def format_all_imports(self, import_statement):
-        """
+        '''
         TODO:
         To convert all import path such as from ..X import fun as  its abs import path.
-
-        """
-        pass
-
-        """
-        for key, val in self.module_name_imports.items():
-            #print(key, val)
-            imported_to = key  # this is where from import statement is invoked
-            imported_from = val[1] # from X import y  : here is X
-
-            imported_from_scope = val[0]
-            level = int(val[2])
-            newly_introduced_name = val[-1]
-            imported_to_parts = imported_to.split(".")
-            n_parts = len(imported_to_parts)
-            # if level is 0 this is absolute import no efforts needed
-            # print(ast.dump(ast.parse('from ..foo.bar import a as b, c'), indent=4))
-
-            if level == 0:
-                # this is absolute import
-                foreign_imported_module = imported_from
-                prefix_str = None
-
-            elif level >0:     # if this is an init node
-                #print(imported_to_parts)
-                #imported_to =
-                prefix_parts = imported_to_parts[0:(n_parts-level)]
-                prefix_str = ".".join(prefix_parts)
-                foreign_imported_module =  prefix_str+ "." + imported_from
-
-                #rename to its full name
-            if foreign_imported_module not in self.module_name_to_id:
-                foreign_imported_module =  foreign_imported_module + ".__init__"
-
-            if foreign_imported_module in self.module_name_to_id:
-
-                foreign_scope_id = self.module_name_to_id[foreign_imported_module]
-                #dest_node = self.scope_summaries[imported_from_scope]
-                #src_node = self.scope_summaries[foreign_scope_id]
-
-            """
-
+        
+        '''
+        pass 
+        
+       
+        
     def go_to_that_node(self, cur_node, visit_path):
         """
-        To locate a particular node from the tree from the current node given a visit path from import statement.
-        For instance,  a visit path of [example, module_a, func] means, if we can locate the function definition `func` from module_a under example folder.
-        The function tries to locate the given path using both relative and absolute import path.
+        To locate a particular node from the tree from the current node given a visit path from import statement. 
+        For instance,  a visit path of [example, module_a, func] means, if we can locate the function definition `func` from module_a under example folder. 
+        The function tries to locate the given path using both relative and absolute import path. 
         Args:
         visit_path: a list of names that represent different level python modules.
         """
@@ -200,8 +171,8 @@ class FileSystem:
                 if tmp_node is None:
                     break
         # we are still in the directory
-        if tmp_node is not None and tmp_node.name.endswith(".py") is not True:
-            tmp_node = self.find_node_by_name(tmp_node.children, "__init__.py")
+        if tmp_node is not None and tmp_node.name.endswith('.py') is not True:
+            tmp_node = self.find_node_by_name(tmp_node.children, '__init__.py')
         return tmp_node
 
     @staticmethod
@@ -223,9 +194,9 @@ class FileSystem:
                     items = [nn.__dict__ for nn in node.names]
                     for d in items:
                         if node.module is None:
-                            module_item_dict[node.level].append(d["name"])
+                            module_item_dict[node.level].append(d['name'])
                         else:
-                            module_item_dict[node.module].append(d["name"])
+                            module_item_dict[node.module].append(d['name'])
 
             return module_item_dict
         except AttributeError:
@@ -237,39 +208,15 @@ class FileSystem:
         To parse import statements from the AST tree
         Args:
         source: source code text
-        Returns: class/function definitions, ast tree and alias pairs
+        Returns: class/function definitions, ast tree and alias pairs 
         """
-        tree = ast.parse(source, mode="exec")
+        tree = ast.parse(source, mode='exec')
         visitor = SourceVisitor()
         visitor.visit(tree)
-
+     
         return visitor.result, tree, visitor.pair
-
-    @staticmethod
-    def leaf2root(node):
-        """
-        To generate the full path to the top level module from the given node.
-        Args:
-        node: the tree node
-        Returns: the full path name in the form of dotted string.
-        """
-
-        tmp_node = node
-        path_to_root = []
-        # not init.py
-        while tmp_node is not None:
-            path_to_root.append(tmp_node.name)
-            tmp_node = tmp_node.parent
-        #
-        if node.name == "__init__.py":
-            # path_to_root = path_to_root[1:]
-            path_to_root[0] = path_to_root[0].split(".")[0]
-            path_name = ".".join(reversed(path_to_root))
-            return path_name
-        else:
-            path_name = ".".join(reversed(path_to_root[1:]))
-            path_name = "{}.{}".format(path_name, node.name.split(".")[0])
-            return path_name
+    
+   
 
     @staticmethod
     def find_child_by_name(node, name):
@@ -287,6 +234,7 @@ class FileSystem:
         To locate a  node using node name
         """
         for node in nodes:
-            if node.name == name or node.name.rstrip(".py") == name:
+            if node.name == name or node.name.rstrip('.py') == name:
                 return node
         return None
+
