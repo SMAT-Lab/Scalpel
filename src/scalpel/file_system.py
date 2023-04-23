@@ -7,28 +7,26 @@ Author: Jiawei Wang
 """
 
 import os
-from dataclasses import dataclass
+import sys 
 import ast
-
-from scalpel.core.source_visitor import SourceVisitor
-
+from typing import List
+from dataclasses import dataclass
 
 @dataclass
 class Node:
-    # a data structure that contain information for a module node 
-    def __init__(self, name):
-        self.name:str = name
-        self.full_name:str = ""
-        self.children:list = []
-        self.parent:str = None
-        self.cargo:dict = {}
-        self.source:str = ''
-        self.ast = None
-        self.static_assignments = None
-        self.call_links = None
-        self.imports = {}
-        self.abs_path = None 
-
+    """
+    This is the basic unit in the FS. Each node represents a single Python module files.
+    Module name, absolute path name, AST and source string are recorded in this dataclass.
+    In addition, fields of its parent and childs are recorded. 
+    """
+    def __init__(self, name, abs_path, parent, mod_src, mod_ast):
+        self.name:str = name   # module name 
+       
+        self.parent = parent # it can be optional as the top level modules have no parents 
+        self.abs_path = abs_path
+        self.mod_src = mod_src
+        self.mod_ast = mod_ast
+        
     def __str__(self):
         return str(self.name)
 
@@ -48,12 +46,10 @@ class FileSystem:
         To constuct a the filesystem.
         Args:
         entry_point: the top level folder path such as "my-python-projects/homework1". The argument must not endswith slash!
+        file_ext: the file extension type. 
         """
         # entry_point is the top level module folder 
-        self.entry_point = entry_point
-        # note that the entry_point must not ends with slash. The recommended one is "a/b/c.py"
-       # self.root = Node(os.path.basename(self.entry_point))
-      
+        self.entry_point = entry_point  
         self.file_ext = file_ext  # can be used to parse pyi files in the future 
     
     
@@ -92,14 +88,22 @@ class FileSystem:
         """
         To build enhanced directory tree for further analysis
         """
-        cwd = os.getcwd()
-        working_dir = os.path.dirname(self.entry_point)
-        os.chdir(working_dir)
-        self._build_dir_tree(self.root)
-        os.chdir(cwd)
+
+        for root, dirs, files in os.walk(self.entry_point):
+            files = [
+                f for f in files if not f[0] == "."
+            ]  # skip hidden files such as git files
+            dirs[:] = [d for d in dirs if not d[0] == "."]
+            for f in files:
+                if f.endswith(self.file_ext):    
+                    abs_path = os.path.join(root, f)
+                    mod_node = Node(f)
+                    mod_node.abs_path = abs_path
+               
+    
     
 
-    def get_leaf_nodes(self) -> list[Node]:
+    def get_leaf_nodes(self) -> List[Node]:
         """
         To return all the leaf nodes in this tree. Each of leaf nodes represents a single Python script.
         During the transversal, full path names to the top level module for each leaf node are generated.
@@ -121,7 +125,8 @@ class FileSystem:
                     mod_node.abs_path = abs_path
                     all_leaf_nodes.append(mod_node)
 
-
+        return all_leaf_nodes
+    
     def format_all_imports(self, import_statement):
         '''
         TODO:
@@ -238,3 +243,13 @@ class FileSystem:
                 return node
         return None
 
+def main():
+    ep  = sys.argv[1]
+
+    fs = FileSystem(ep)
+
+    all_leaf_node = fs.get_leaf_nodes()
+
+    print(len(all_leaf_node))
+if __name__ == "__main__":
+    main()
