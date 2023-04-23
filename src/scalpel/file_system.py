@@ -9,7 +9,7 @@ Author: Jiawei Wang
 import os
 import sys 
 import ast
-from typing import List
+from typing import List, Optional
 from dataclasses import dataclass
 
 @dataclass
@@ -19,13 +19,12 @@ class Node:
     Module name, absolute path name, AST and source string are recorded in this dataclass.
     In addition, fields of its parent and childs are recorded. 
     """
-    def __init__(self, name, abs_path, parent, mod_src, mod_ast):
+    def __init__(self, name, abs_path, mod_src, mod_ast, mode_type="module"):
         self.name:str = name   # module name 
-       
-        self.parent = parent # it can be optional as the top level modules have no parents 
         self.abs_path = abs_path
         self.mod_src = mod_src
         self.mod_ast = mod_ast
+        self.mod_type =  mode_type  #   there are two different node:  module and package
         
     def __str__(self):
         return str(self.name)
@@ -51,57 +50,46 @@ class FileSystem:
         # entry_point is the top level module folder 
         self.entry_point = entry_point  
         self.file_ext = file_ext  # can be used to parse pyi files in the future 
+        self.all_mod_nodes:List[Node] = []
     
     
-    def _build_dir_tree(self, node):
-        if os.path.isdir(node.name) is True:
-            os.chdir(node.name)
-            
-            items = os.listdir('.')
-            for item in items:
-                child_node = Tree(item)
-                child_node.parent = node
-                self._build_dir_tree(child_node)
-                node.children.append(child_node)
-            os.chdir('..')
-        else:
-            if node.name.endswith(self.file_ext):
-            
-                with open(node.name, 'r') as f:     
-                    try:  
-                        source = f.read()
-                          
-                    except:
-                        source = ""
-
-                    node.source = source      
-                    try:
-                        node.ast = ast.parse(source)
-                    except:
-                        node.ast = None 
-                        
-                    #node.class_pair = pair
-                    node.prefix = self.leaf2root(node)
-                    node.full_name = node.prefix # + '.' + node.name
-
     def build_dir_tree(self):
         """
         To build enhanced directory tree for further analysis
         """
-
-        for root, dirs, files in os.walk(self.entry_point):
-            files = [
-                f for f in files if not f[0] == "."
-            ]  # skip hidden files such as git files
-            dirs[:] = [d for d in dirs if not d[0] == "."]
-            for f in files:
-                if f.endswith(self.file_ext):    
-                    abs_path = os.path.join(root, f)
-                    mod_node = Node(f)
-                    mod_node.abs_path = abs_path
-               
-    
-    
+        if os.path.isfile(self.entry_point):
+            fn = os.path.basename(self.entry_point)
+            abs_path = self.entry_point
+            mod_name = fn 
+            mod_src = open(abs_path).read()
+            mod_ast = ast.parse(mod_src)
+            mod_node = Node(mod_name, abs_path, mod_src, mod_ast)
+            self.all_mod_nodes.append(mod_node)
+        else:
+            for root, dirs, files in os.walk(self.entry_point):
+                files = [
+                    f for f in files if not f[0] == "."
+                ]  # skip hidden files such as git files
+                dirs[:] = [d for d in dirs if not d[0] == "."]
+                for f in files:
+                    if f.endswith(self.file_ext):    
+                        abs_path = os.path.join(root, f)
+                        mod_name = f 
+                        mod_src = open(abs_path).read()
+                        mod_ast = ast.parse(mod_src)
+                        mod_node = Node(mod_name, abs_path, mod_src, mod_ast)
+                        self.all_mod_nodes.append(mod_node)
+                #return 0
+                
+                for d in dirs:
+                    
+                    abs_path = os.path.join(root, d)
+                    mod_name = d 
+                    mod_src = None
+                    mod_ast = None 
+                    mod_node = Node(mod_name,abs_path, mod_src, mod_ast)
+                    self.all_mod_nodes.append(mod_node)
+                    
 
     def get_leaf_nodes(self) -> List[Node]:
         """
@@ -112,20 +100,7 @@ class FileSystem:
         Returns:  a list of Nodes  
         """
 
-        all_leaf_nodes = []
-        for root, dirs, files in os.walk(self.entry_point):
-            files = [
-                f for f in files if not f[0] == "."
-            ]  # skip hidden files such as git files
-            dirs[:] = [d for d in dirs if not d[0] == "."]
-            for f in files:
-                if f.endswith(self.file_ext):    
-                    abs_path = os.path.join(root, f)
-                    mod_node = Node(f)
-                    mod_node.abs_path = abs_path
-                    all_leaf_nodes.append(mod_node)
-
-        return all_leaf_nodes
+        return self.all_mod_nodes
     
     def format_all_imports(self, import_statement):
         '''
@@ -135,8 +110,8 @@ class FileSystem:
         '''
         pass 
         
-       
-        
+    '''
+
     def go_to_that_node(self, cur_node, visit_path):
         """
         To locate a particular node from the tree from the current node given a visit path from import statement. 
@@ -179,7 +154,8 @@ class FileSystem:
         if tmp_node is not None and tmp_node.name.endswith('.py') is not True:
             tmp_node = self.find_node_by_name(tmp_node.children, '__init__.py')
         return tmp_node
-
+        
+    '''
     @staticmethod
     def parse_import(tree):
         """
@@ -248,7 +224,9 @@ def main():
 
     fs = FileSystem(ep)
 
+    fs.build_dir_tree()
     all_leaf_node = fs.get_leaf_nodes()
+
 
     print(len(all_leaf_node))
 if __name__ == "__main__":
