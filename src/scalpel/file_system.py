@@ -44,13 +44,15 @@ class FileSystem:
         """
         To constuct a the filesystem.
         Args:
-        entry_point: the top level folder path such as "my-python-projects/homework1". The argument must not endswith slash!
-        file_ext: the file extension type. 
+        entry_point: the top level folder (packaage) path such as "my-python-projects/homework1". 
+        file_ext: the file extension type of building this class. It is intended to be either Python source files or stub files. 
         """
         # entry_point is the top level module folder 
         self.entry_point = entry_point  
         self.file_ext = file_ext  # can be used to parse pyi files in the future 
         self.all_mod_nodes:List[Node] = []
+
+        assert (self.file_ext in [".py", ".pyi"])  # the guard the inputs
     
     
     def build_dir_tree(self):
