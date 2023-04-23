@@ -22,22 +22,26 @@ def get_path_by_ext(root_dir, flag=".py"):
 MATH_FUNCTIONS = [x for x in dir(math) if not "__" in x]
 BUILT_IN_FUNCTIONS = [x for x in dir(builtins) if not "__" in x]
 
-ops = {
-    # binary
-    ast.Add: operator.add,
-    ast.Sub: operator.sub,
-    ast.Mult: operator.mul,
-    ast.Div: operator.truediv,
-    ast.Mod: operator.mod,
-    ast.Pow: operator.pow,
-    # ast.Call: checkfun, # check all built-in functions #APSV: Not implemented? commenting
-    ast.BinOp: ast.BinOp,
-    #  unary
-    ast.USub: operator.neg,
-    ast.UAdd: operator.pos,
-    ast.UnaryOp: ast.UnaryOp,
-    ast.Not: operator.__not__,
-}
+
+BinOps = {
+        ast.Add: operator.add,
+        ast.Sub: operator.sub,
+        ast.Mult: operator.mul,
+        ast.Div: operator.truediv,
+        ast.Mod: operator.mod,
+        ast.Pow: operator.pow,
+        ast.Call: checkmath,  # check all built-in functions
+        ast.BinOp: ast.BinOp,
+    }
+
+UnaryOps = {
+        ast.USub: operator.neg,
+        ast.UAdd: operator.pos,
+        ast.UnaryOp: ast.UnaryOp,
+        ast.Not: operator.__not__
+    }
+
+ops = tuple(BinOps) + tuple(UnaryOps)
 
 
 def ast_node_eval(node):
