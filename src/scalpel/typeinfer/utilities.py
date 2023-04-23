@@ -34,6 +34,82 @@ func_ret_types = {
 }
 
 
+def get_attr_name (node):
+    if isinstance(node, ast.Call):
+        # to be test
+        return get_attr_name(node.func)
+    if isinstance(node, ast.Name):
+        return node.id
+    elif isinstance(node, ast.Attribute):
+        attr_name = get_attr_name(node.value)
+
+        return attr_name +"."+node.attr
+    elif isinstance(node, ast.Subscript):
+        return get_attr_name(node.value)
+    else:
+        # such as (a**2).sum()
+        return ""
+
+built_in_func_type = {
+
+    "abs": float,
+    "bytearray":bytearray,
+    "bytes":bytes,
+    "complex":complex,
+
+
+    "divmod": tuple,
+    "enumerate":enumerate,
+    "filter":filter,
+    "float":float,
+    "frozenset":frozenset,
+
+    "hasattr":bool,
+    "all": bool,
+    "any": bool,
+    "bool":bool,
+    "isinstance":bool,
+    "issubclass":bool,
+    "callable":bool,
+
+    "id":int,
+    "int":int,
+    "len":int,
+    "round":int,
+
+    "list":list,
+    "sorted":list,
+    "dir":list,
+
+    "locals":dict,
+    "vars":dict,
+    "globals":dict,
+    "dict":dict,
+
+    "map": "Iterator",
+    "memoryview":memoryview,
+    "object":object,
+
+    "range":range,
+    "str":str,
+    "repr":str,
+    "oct":str,
+    "ord":str,
+    "hash":int,
+    "hex":str,
+    "repr":str,
+    "chr":str,
+    "ascii": str,
+    "bin":str,
+    "set":set,
+    "slice":slice,
+    "tuple":tuple,
+    "zip":"Iterator",
+    "iter":"Iterator",
+    "reversed":"Iterator"
+}
+
+
 def get_func_calls_type(tree):
     node = deepcopy(tree)
     transformer = TypeInferCallTransformer()
