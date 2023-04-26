@@ -30,7 +30,7 @@ BinOps = {
         ast.Div: operator.truediv,
         ast.Mod: operator.mod,
         ast.Pow: operator.pow,
-        ast.Call: checkmath,  # check all built-in functions
+        #ast.Call: checkmath,  # check all built-in functions
         ast.BinOp: ast.BinOp,
     }
 
