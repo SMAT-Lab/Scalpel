@@ -19,6 +19,7 @@ def is_py38_or_higher():
 NAMECONSTANT_TYPE = ast.Constant if is_py38_or_higher() else ast.NameConstant
 
 
+
 def invert(node):
     """
     Invert the operation in an ast node object (get its negation).
@@ -430,6 +431,7 @@ class CFGBuilder(ast.NodeVisitor):
         # Create a new block for the body of try.
         try_block = self.new_block()
         self.add_exit(self.current_block, try_block, ast.Constant(True))
+        print(node.orelse)
         n_else_stmts = len(node.orelse)
         # else_block = self.new_block()
         # self.add_exit(self.current_block, try_block, ast.Constant(True))
@@ -441,6 +443,12 @@ class CFGBuilder(ast.NodeVisitor):
             h_block = self.new_block()
             handler_blocks += [h_block]
         after_try_block = self.new_block()
+        after_handlers_and_else = after_try_block
+
+        if len(node.finalbody) > 0:
+            finally_block = self.new_block()
+            after_handlers_and_else = finally_block
+
         # self.add_exit(self.current_block, after_try_block, ast.Constant(False))
         # keep the original block
         current_block = self.current_block
@@ -457,7 +465,7 @@ class CFGBuilder(ast.NodeVisitor):
             # create else block
             for child in node.orelse:
                 self.visit(child)
-        self.add_exit(self.current_block, after_try_block)
+        self.add_exit(self.current_block, after_handlers_and_else)
 
         for i in range(n_handlers):
             self.current_block = current_block
@@ -467,8 +475,14 @@ class CFGBuilder(ast.NodeVisitor):
             self.visit(handler)
             # If encountered a break, exit will have already been added
             if not self.current_block.exits:
-                self.add_exit(self.current_block, after_try_block)
+                self.add_exit(self.current_block, after_handlers_and_else)
             # self.add_exit(self.current_block, after_try_block)
+
+        if len(node.finalbody) > 0:
+            self.current_block = finally_block
+            for child in node.finalbody:
+                self.visit(child)
+            self.add_exit(self.current_block, after_try_block)
 
         # if not self.current_block.exits:
         #    self.add_exit(self.current_block, after_try_block)
