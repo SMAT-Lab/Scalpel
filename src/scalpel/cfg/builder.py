@@ -431,7 +431,6 @@ class CFGBuilder(ast.NodeVisitor):
         # Create a new block for the body of try.
         try_block = self.new_block()
         self.add_exit(self.current_block, try_block, ast.Constant(True))
-        print(node.orelse)
         n_else_stmts = len(node.orelse)
         # else_block = self.new_block()
         # self.add_exit(self.current_block, try_block, ast.Constant(True))
