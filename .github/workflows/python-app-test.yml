@@ -4,9 +4,9 @@
 name: Test
 on:
   push:
-    branches: [ master, scalpel-dev ]
+    branches: [ main, scalpel-dev ]
   pull_request:
-    branches: [ master, scalpel-dev ]
+    branches: [ main, scalpel-dev ]
 
 jobs:
   build:

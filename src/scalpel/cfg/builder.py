@@ -19,6 +19,7 @@ def is_py38_or_higher():
 NAMECONSTANT_TYPE = ast.Constant if is_py38_or_higher() else ast.NameConstant
 
 
+
 def invert(node):
     """
     Invert the operation in an ast node object (get its negation).
@@ -450,38 +451,56 @@ class CFGBuilder(ast.NodeVisitor):
 
         # create blocks for all handlers 
         n_handlers = len(node.handlers)
-        handler_blocks = [self.new_block() for i in range(n_handlers)]
-        _  = [self.add_exit(self.current_block, handler_blocks[i], node.handlers[i].type) for i in range(n_handlers)]
-        # all handlers to final block
-        _ = [self.add_exit(handler_blocks[i], final_block) for i in range(n_handlers)]
-     
-      
-
-      
         
+        handler_blocks = []
+        for i in range(n_handlers):
+            h_block = self.new_block()
+            handler_blocks += [h_block]
+        after_try_block = self.new_block()
+        after_handlers_and_else = after_try_block
 
-        # from here, we populate all the blocks
-        # save the current block, do try block first
-        #current_block = self.current_block
+        if len(node.finalbody) > 0:
+            finally_block = self.new_block()
+            after_handlers_and_else = finally_block
+
+        # self.add_exit(self.current_block, after_try_block, ast.Constant(False))
+        # keep the original block
+        current_block = self.current_block
+
         self.current_block = try_block
         for child in node.body:
             self.visit(child)
-        
-        # if there is no any exception, we let else statements go
-        self.current_block = else_block
-        for child in node.orelse:
-            self.visit(child)
-        if not self.current_block.exits:
-            self.add_exit(self.current_block, after_try_block)
-        
-        # recover, and then do all handlers
+
+
+        if n_else_stmts > 0:
+            else_block = self.new_block()
+            self.add_exit(self.current_block, else_block)
+            self.current_block = else_block
+            # create else block
+            for child in node.orelse:
+                self.visit(child)
+        self.add_exit(self.current_block, after_handlers_and_else)
+
+
         for i in range(n_handlers):
             # recover current block 
             self.current_block = handler_blocks[i]
             self.visit(node.handlers[i])
             # If encountered a break, exit will have already been added
             if not self.current_block.exits:
-                self.add_exit(self.current_block, after_try_block)
+                self.add_exit(self.current_block, after_handlers_and_else)
+            # self.add_exit(self.current_block, after_try_block)
+
+        if len(node.finalbody) > 0:
+            self.current_block = finally_block
+            for child in node.finalbody:
+                self.visit(child)
+            self.add_exit(self.current_block, after_try_block)
+
+        # if not self.current_block.exits:
+        #    self.add_exit(self.current_block, after_try_block)
+        # Continue building the CFG in the after-if block.
+
 
         self.current_block = final_block
         for child in node.finalbody:
