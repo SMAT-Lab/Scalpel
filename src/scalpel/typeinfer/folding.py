@@ -50,27 +50,34 @@ def ast_node_eval(node):
 def _eval(expr):
     if isinstance(expr, ast.Constant):
         return expr.value 
-    if isinstance(expr, ast.Num):
+    elif isinstance(expr, ast.Num):
         return expr.n 
-    if isinstance(expr, ast.Str):
+    elif isinstance(expr, ast.Str):
         return expr.s 
-    if isinstance(expr, ast.Bytes):
+    elif isinstance(expr, ast.Bytes):
         return expr.s 
-    if isinstance(expr, ast.NameConstant):
+    elif isinstance(expr, ast.NameConstant):
         return expr.value 
-    if isinstance(expr, ast.BinOp):
+    elif isinstance(expr, ast.BinOp):
         op_func = BinOps[type(expr.op)]
         left_val = _eval(expr.left)
         right_val = _eval(expr.right)
         if left_val and right_val:
             return op_func(left_val, right_val)
         return None 
-    if isinstance(expr, ast.UnaryOp):
+    elif isinstance(expr, ast.UnaryOp):
         op_func = UnaryOps[type(expr.op)]
         oprand_val = _eval(expr.operand)
         if oprand_val:
             return op_func(oprand_val)
         return None 
+    elif isinstance(expr, ast.Call):
+        if isinstance(expr.func, ast.Name):
+            #check for std functions
+            pass 
+        return None 
+    # get arg list 
+    # eval args 
     
 
 def constant_folding(ast_expr):
