@@ -429,7 +429,7 @@ class CFGBuilder(ast.NodeVisitor):
         self.add_statement(self.current_block, node)
 
         
-        # We have  after try block anyway
+        # We have after_try block anyway
         after_try_block = self.new_block()
 
         # create a block for finally body, let the program flow continue regardless.
@@ -447,15 +447,14 @@ class CFGBuilder(ast.NodeVisitor):
         # from orlse to finally 
         self.add_exit(else_block, final_block)
         
-            
 
         # create blocks for all handlers 
         n_handlers = len(node.handlers)
+        handler_blocks = [self.new_block() for i in range(n_handlers)]
+        _ = [self.add_exit(self.current_block, h_block) for h_block in handler_blocks]
+        _ = [self.add_exit(h_block, final_block) for h_block in handler_blocks]
         
-        handler_blocks = []
-        for i in range(n_handlers):
-            h_block = self.new_block()
-            handler_blocks += [h_block]
+     
         after_try_block = self.new_block()
         after_handlers_and_else = after_try_block
 
@@ -465,22 +464,20 @@ class CFGBuilder(ast.NodeVisitor):
 
         # self.add_exit(self.current_block, after_try_block, ast.Constant(False))
         # keep the original block
-        current_block = self.current_block
-
+     
         self.current_block = try_block
         for child in node.body:
             self.visit(child)
 
 
-        if n_else_stmts > 0:
-            else_block = self.new_block()
-            self.add_exit(self.current_block, else_block)
-            self.current_block = else_block
-            # create else block
-            for child in node.orelse:
-                self.visit(child)
+        
+        else_block = self.new_block()
+        self.add_exit(self.current_block, else_block)
+        self.current_block = else_block
+        # create else block
+        for child in node.orelse:
+            self.visit(child)
         self.add_exit(self.current_block, after_handlers_and_else)
-
 
         for i in range(n_handlers):
             # recover current block 
@@ -489,19 +486,13 @@ class CFGBuilder(ast.NodeVisitor):
             # If encountered a break, exit will have already been added
             if not self.current_block.exits:
                 self.add_exit(self.current_block, after_handlers_and_else)
-            # self.add_exit(self.current_block, after_try_block)
 
-        if len(node.finalbody) > 0:
-            self.current_block = finally_block
-            for child in node.finalbody:
-                self.visit(child)
-            self.add_exit(self.current_block, after_try_block)
+        self.current_block = finally_block
+        for child in node.finalbody:
+            self.visit(child)
+        self.add_exit(self.current_block, after_try_block)
 
-        # if not self.current_block.exits:
-        #    self.add_exit(self.current_block, after_try_block)
-        # Continue building the CFG in the after-if block.
-
-
+        # Continue building the CFG in the after-try block.
         self.current_block = final_block
         for child in node.finalbody:
             self.visit(child)
