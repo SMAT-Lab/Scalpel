@@ -9,15 +9,8 @@ import sys
 from ..core.func_call_visitor import get_func_calls
 from .model import CFG, Block, Link
 
-
-def is_py38_or_higher():
-    if sys.version_info.major == 3 and sys.version_info.minor >= 8:
-        return True
-    return False
-
-
+is_py38_or_higher = lambda: sys.version_info.major == 3 and sys.version_info.minor >= 8
 NAMECONSTANT_TYPE = ast.Constant if is_py38_or_higher() else ast.NameConstant
-
 
 
 def invert(node):
