@@ -14,18 +14,6 @@ from ..core.mnode import MNode
 from ..core.vars_visitor import get_vars
 
 
-def parse_val(node):
-    # does not return anything
-    if isinstance(node, ast.Constant):
-        return node.value
-    if isinstance(node, ast.Str):
-        if hasattr(node, "value"):
-            return node.value
-        else:
-            return node.s
-    return "other"
-
-
 class SSA:
     """
     Build SSA graph from a given AST node based on the CFG.

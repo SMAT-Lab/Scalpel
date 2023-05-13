@@ -12,18 +12,6 @@ import networkx as nx
 from ..core.vars_visitor import get_vars
 
 
-def parse_val(node):
-    # does not return anything
-    if isinstance(node, ast.Constant):
-        return node.value
-    if isinstance(node, ast.Str):
-        if hasattr(node, "value"):
-            return node.value
-        else:
-            return node.s
-    return "other"
-
-
 class SSA:
     """
     Build SSA graph from a given AST node based on the CFG.
@@ -45,7 +33,7 @@ class SSA:
         self.block_ident_gen = {}
         self.block_ident_use = {}
         self.reachable_table = {}
-        id2block = {}
+       
         self.unreachable_names = {}
         self.undefined_names_from = {}
         self.global_names = []
