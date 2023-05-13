@@ -1,7 +1,7 @@
 import ast
 import builtins
-import math
 import operator
+import sys 
 import os
 
 
@@ -17,4 +17,10 @@ def get_path_by_ext(root_dir, flag=".py"):
             if f.endswith(flag):
                 paths.append(os.path.join(root, f))
     return paths
+
+def check_python_version():
+    """check Python version"""
+    # Check for known bad Python versions.
+    if sys.version_info[:2] < (3, 8):
+        sys.exit("Running Scalpel with Python 3.8 or lower is not supported; ")
 
