@@ -27,6 +27,8 @@ class Node:
         self.mod_ast = mod_ast
         self.node_type =  node_type  #   there are two different node:  module and package
         self.parent = parent
+        self.is_cur_package_init_file:bool = self.name=="__init__"
+        self.is_stub_file:bool = self.name.endswith(".pyi")
         
     def __str__(self):
         return str(self.name)
@@ -178,6 +180,22 @@ class FileSystem:
             if node.name == name or node.name.rstrip('.py') == name:
                 return node
         return None
+    
+def correct_relative_import(stmt, is_cur_package_init_file):
+    assert isinstance(stmt, (ast.Import, ast.ImportFrom))_
+    cur_mod_id = stmt.module
+    target = ""
+    relative = 0 
+    if relative == 0:
+        return target, True
+    parts = cur_mod_id.split(".")
+    rel = relative
+    if is_cur_package_init_file:
+        rel -= 1
+    ok = len(parts) >= rel
+    if rel != 0:
+        cur_mod_id = ".".join(parts[:-rel])
+    return cur_mod_id + (("." + target) if target else ""), ok
 
 def main():
     ep  = sys.argv[1]  # entry point 
