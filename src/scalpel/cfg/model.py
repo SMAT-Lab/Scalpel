@@ -115,7 +115,7 @@ class Block(object):
             A string containing the source code of the statements.
         """
         src = "#" + str(self.id)+'\n'
-        def getSourceHelper(source):
+        def get_source_helper(source):
             idx, p = 0, 0
             while p != 0 or idx == 0 or source[idx] != ':':
                 if source[idx] in "\"'":
@@ -139,7 +139,7 @@ class Block(object):
         for statement in self.statements:
             source = astor.to_source(statement)
             if type(statement) in [ast.If, ast.For, ast.While, ast.With, ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef]:
-                src += getSourceHelper(source)
+                src += get_source_helper(source)
             elif type(statement) == ast.Try:
                 src += (astor.to_source(statement)).split('\n')[0] + "\n"
             else:
