@@ -3,11 +3,6 @@ Control flow graph for Python programs.
 """
 
 import ast
-import re
-import sys
-import token
-import tokenize
-
 import astor
 import graphviz as gv
 
@@ -154,11 +149,9 @@ class Block(object):
             A string containing the names of the functions called inside the
             block.
         """
-        txt = ""
-        for func_call_entry in self.func_calls:
-            txt += func_call_entry["name"] + "\n"
-        return txt
 
+        return "\n".join([entry["name"] for entry in self.func_calls])
+    
 
 class Link(object):
     """
@@ -172,14 +165,15 @@ class Link(object):
     __slots__ = ["source", "target", "exitcase"]
 
     def __init__(self, source, target, exitcase=None):
-        assert type(source) == Block, "Source of a link must be a block"
-        assert type(target) == Block, "Target of a link must be a block"
+        assert (type(source) == Block)
+        assert (type(target) == Block)
         # Block from which the control flow jump was made.
         self.source = source
         # Target block of the control flow jump.
         self.target = target
         # 'Case' leading to a control flow jump through this link.
         self.exitcase = exitcase
+    
 
     def __str__(self):
         return "link from {} to {}".format(str(self.source), str(self.target))
@@ -223,8 +217,8 @@ class CFG(object):
         """
         The constructor of CFG class. Only name of this graph is required.
         """
-        assert type(name) == str, "Name of a CFG must be a string"
-        assert type(asynchr) == bool, "Async must be a boolean value"
+        assert(type(name) == str)
+        assert(type(asynchr) == bool)
         # Name of the function or module being represented.
         self.name = name
         # Type of function represented by the CFG (sync or async). A Python
@@ -276,9 +270,7 @@ class CFG(object):
                 if suc_link.target.id not in visited:
                     working_queue.put(suc_link.target)
         return all_blocks
-        # def dfs(start_block):
-        #    # non-recurisve implementation of DFS search
-
+    
     def __iter__(self):
         """
         Generator that yields all the blocks in the current graph, then
