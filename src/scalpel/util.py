@@ -1,7 +1,7 @@
 import ast
 import builtins
-import math
 import operator
+import sys 
 import os
 
 
@@ -18,35 +18,9 @@ def get_path_by_ext(root_dir, flag=".py"):
                 paths.append(os.path.join(root, f))
     return paths
 
+def check_python_version():
+    """check Python version"""
+    # Check for known bad Python versions.
+    if sys.version_info[:2] < (3, 8):
+        sys.exit("Running Scalpel with Python 3.8 or lower is not supported; ")
 
-MATH_FUNCTIONS = [x for x in dir(math) if not "__" in x]
-BUILT_IN_FUNCTIONS = [x for x in dir(builtins) if not "__" in x]
-
-
-BinOps = {
-        ast.Add: operator.add,
-        ast.Sub: operator.sub,
-        ast.Mult: operator.mul,
-        ast.Div: operator.truediv,
-        ast.Mod: operator.mod,
-        ast.Pow: operator.pow,
-        #ast.Call: checkmath,  # check all built-in functions
-        ast.BinOp: ast.BinOp,
-    }
-
-UnaryOps = {
-        ast.USub: operator.neg,
-        ast.UAdd: operator.pos,
-        ast.UnaryOp: ast.UnaryOp,
-        ast.Not: operator.__not__
-    }
-
-ops = tuple(BinOps) + tuple(UnaryOps)
-
-
-def ast_node_eval(node):
-    """ "
-    This is an implementation of expression node evaluation. The function serves as an alternative to ast.literal_eval()
-    """
-    ##TODO
-    pass
