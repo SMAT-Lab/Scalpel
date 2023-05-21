@@ -87,7 +87,6 @@ class FileSystem:
                         self.parse_import(mod_ast)
                         mod_node = Node(mod_name, abs_path, mod_src, mod_ast, parent=root, node_type="module")
                         self.all_mod_nodes.append(mod_node)
-                #return 0
 
                 for d in dirs:
                     abs_path = os.path.join(root, d)
@@ -182,7 +181,7 @@ class FileSystem:
         return None
     
 def correct_relative_import(stmt, is_cur_package_init_file):
-    assert isinstance(stmt, (ast.Import, ast.ImportFrom))_
+    assert isinstance(stmt, (ast.Import, ast.ImportFrom))
     cur_mod_id = stmt.module
     target = ""
     relative = 0 

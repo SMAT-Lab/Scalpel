@@ -32,8 +32,7 @@ from scalpel.typeinfer.utilities import (
     parse_module,
     rename_from_name,
 )
-from scalpel.typeinfer.visitors import get_call_type
-
+from scalpel.core.visitors import get_call_type
 
 def process_code_with_heuristics(node):
     def pick_type(type_lst):
