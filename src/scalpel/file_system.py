@@ -10,8 +10,46 @@ Author: Jiawei Wang
 import os
 import sys 
 import ast
-from typing import List, Optional
+from typing import List, Optional,Dict
 from dataclasses import dataclass
+
+
+def format_import_path(import_stmt, abs_path):
+    abs_import_path = []
+    if isinstance(import_stmt, ast.Import):
+        for alias in import_stmt.names:
+            abs_import_path.append(alias.name)
+        pass 
+    elif isinstance(import_stmt, ast.ImportFrom):
+        import_path_parts = abs_path.split(".")
+        abs_import_path + [import_path_parts[:-import_stmt.level] + "." + import_stmt.module]
+        pass 
+    else:
+        raise ("unknown input argument")
+    
+def parse_import(tree:ast.Module)->Dict:
+    """
+    To parse import statements from the AST tree
+    Args:
+    tree: Python import statement
+    Returns: mport path
+    """
+    module_item_dict = {}
+    
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.ImportFrom, ast.Import)):
+            format_import_path(node)
+            if node.module is None and node.level not in module_item_dict:
+                module_item_dict[node.level] = []
+            elif node.module not in module_item_dict:
+                module_item_dict[node.module] = []
+            items = [nn.__dict__ for nn in node.names]
+            for d in items:
+                if node.module is None:
+                    module_item_dict[node.level].append(d['name'])
+                else:
+                    module_item_dict[node.module].append(d['name'])
+        return module_item_dict
 
 @dataclass
 class Node:
@@ -59,7 +97,7 @@ class FileSystem:
         assert (self.file_ext in [".py", ".pyi"])  # the guard the inputs
     
     
-    def build_dir_tree(self):
+    def build(self):
         """
         To build enhanced directory tree for further analysis
         """
@@ -84,7 +122,6 @@ class FileSystem:
                         mod_name = f 
                         mod_src = open(abs_path).read()
                         mod_ast = ast.parse(mod_src)
-                        self.parse_import(mod_ast)
                         mod_node = Node(mod_name, abs_path, mod_src, mod_ast, parent=root, node_type="module")
                         self.all_mod_nodes.append(mod_node)
 
@@ -118,67 +155,6 @@ class FileSystem:
         """
         pass 
    
-    
-    def format_import_path(self, import_stmt, abs_path):
-        abs_import_path = []
-        if isinstance(import_stmt, ast.Import):
-            for alias in import_stmt.names:
-                abs_import_path.append(alias.name)
-            pass 
-        elif isinstance(import_stmt, ast.ImportFrom):
-            import_path_parts = abs_path.split(".")
-            abs_import_path + [import_path_parts[:-import_stmt.level] + "." + import_stmt.module]
-            pass 
-        else:
-            raise ("unknown input argument")
-    
-   
-    def parse_import(self, tree)->dict:
-        """
-        To parse import statements from the AST tree
-        Args:
-        tree: Python import statement
-        Returns: mport path
-        """
-        module_item_dict = {}
-        try:
-            for node in ast.walk(tree):
-                if isinstance(node, (ast.ImportFrom, ast.Import)):
-                    self.format_import_path(node)
-                    if node.module is None and node.level not in module_item_dict:
-                        module_item_dict[node.level] = []
-                    elif node.module not in module_item_dict:
-                        module_item_dict[node.module] = []
-                    items = [nn.__dict__ for nn in node.names]
-                    for d in items:
-                        if node.module is None:
-                            module_item_dict[node.level].append(d['name'])
-                        else:
-                            module_item_dict[node.module].append(d['name'])
-
-            return module_item_dict
-        except AttributeError:
-            return None
-
-    @staticmethod
-    def find_child_by_name(node, name):
-        """
-        To locate a child node using node name
-        """
-        for ch in node.children:
-            if ch.name == name:
-                return ch
-        return None
-
-    @staticmethod
-    def find_node_by_name(nodes, name):
-        """
-        To locate a  node using node name
-        """
-        for node in nodes:
-            if node.name == name or node.name.rstrip('.py') == name:
-                return node
-        return None
     
 def correct_relative_import(stmt, is_cur_package_init_file):
     assert isinstance(stmt, (ast.Import, ast.ImportFrom))

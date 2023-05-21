@@ -118,6 +118,14 @@ class SSA:
             for i in range(n_stmts):
                 stmt_stored_idents = stored_idents[i]
                 stmt_loaded_idents = loaded_idents[i]
+
+                # same block, number used identifiers
+                for ident in stmt_loaded_idents:
+                    # a list of dictions for each of idents used in this statement
+                    phi_loaded_idents = block_renamed_loaded[block.id][i]
+                    if ident in ident_name_counter:
+                        phi_loaded_idents[ident].add(ident_name_counter[ident])
+
                 stmt_renamed_stored = {}
 
                 for ident in stmt_stored_idents:
@@ -135,13 +143,6 @@ class SSA:
 
                     stmt_renamed_stored[ident] = ident_name_counter[ident]
                 block_renamed_stored[block.id] += [stmt_renamed_stored]
-
-                # same block, number used identifiers
-                for ident in stmt_loaded_idents:
-                    # a list of dictions for each of idents used in this statement
-                    phi_loaded_idents = block_renamed_loaded[block.id][i]
-                    if ident in ident_name_counter:
-                        phi_loaded_idents[ident].add(ident_name_counter[ident])
 
             df_block_ids = DF[block.id]
             for df_block_id in df_block_ids:
