@@ -1,5 +1,5 @@
 """
-Import Graph module
+The module provides  data structure to build import graph of a python project which represents the import relationships between different modules in the project, which can be used for program analysis.
 """
 
 import ast

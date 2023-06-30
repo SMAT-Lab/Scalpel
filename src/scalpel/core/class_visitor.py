@@ -1,3 +1,6 @@
+""" This module extends Generic Node Visitor to visit all the Class defined within the m´node and also function definitions of the class.
+    """
+
 import ast
 
 from .fun_def_visitor import FunDefVisitor

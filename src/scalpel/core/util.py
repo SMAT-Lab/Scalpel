@@ -1,3 +1,7 @@
+""" 
+This module provides implementation of various Utilities functions and classes for finding local modules nad iterating over different objects(i.e., statements, child nodes and fields) within the provided node.
+"""
+
 import ast
 import os
 import pkgutil

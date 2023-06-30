@@ -1,3 +1,6 @@
+""" This module implements a Visitor Object that collects information about the keywords used in functions and the classes that classes inherit from. """
+
+
 import ast
 
 from .class_visitor import ClassVisitor
