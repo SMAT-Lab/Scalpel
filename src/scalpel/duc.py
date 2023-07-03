@@ -4,59 +4,32 @@ This module implements a `DUC` class for define-use chain construction.
 
 import ast
 from dataclasses import dataclass
-import sys
-from typing import Iterable, List, NoReturn, Tuple, Union
+from typing import Iterable, List, Set, Tuple
 from scalpel.cfg import CFG
-
-
-@dataclass
-class Location:
-    """
-    A location within a source file.
-    """
-
-    line: int
-    """
-    The line (first line is 1).
-    """
-
-    column: int
-    """
-    The column offset (first character in the line is 0).
-    """
+from scalpel.SSA.const import SSA
 
 
 @dataclass
 class Definition:
     name: str
-    location: Location
-    ast_node: Union[
-        ast.AnnAssign,
-        ast.Assign,
-        ast.AugAssign,
-        ast.AsyncFor,
-        ast.AsyncFunctionDef,
-        ast.ExceptHandler,
-        ast.FunctionDef,
-        ast.ClassDef,
-        ast.For,
-        # imports
-        ast.alias,
-        ast.arg,
-        ast.comprehension,
-        ast.withitem,
-        # walrus operator
-        (ast.NamedExpr if sys.version_info >= (3, 8) else NoReturn),
-        # match patterns
-        (ast.MatchAs if sys.version_info >= (3, 10) else NoReturn),
-    ]
+    ast_node: ast.AST
 
 
 @dataclass
 class Reference:
     name: str
-    location: Location
-    ast_node: ast.Name
+    block_id: int
+    """
+    The id of the CFG block that this reference is in.
+    """
+    stmt_idx: int
+    """
+    The index of the statement in the CFG block that this reference is in.
+    """
+    name_counters: Set[int]
+
+
+GLOBAL_SCOPE = "GLOBAL"
 
 
 class DUC:
@@ -71,14 +44,16 @@ class DUC:
         Args:
             cfg: The control flow graph.
         """
-        pass
+        ssa_results, const_dict = SSA().compute_SSA(cfg)
+        self.ssa_results = ssa_results
+        self.const_dict = const_dict
 
     def get_lexical_scopes(self) -> Iterable[str]:
         """
         Iterates the names of all the lexical scopes.
         Returns: An iterable of the lexical scope names (strings).
         """
-        pass
+        yield GLOBAL_SCOPE
 
     def get_definitions_and_references(
         self, scope_name: str
@@ -93,24 +68,54 @@ class DUC:
             and `references` is a list of all the references (AST nodes) in the
             scope.
         """
-        pass
+        return (
+            (
+                [Definition(name, value) for name, value in self.const_dict.items()],
+                [
+                    Reference(name, block_id, stmt_idx, counters)
+                    for block_id, stmts in self.ssa_results.items()
+                    for stmt_idx, stmt in enumerate(stmts)
+                    for name, counters in stmt.items()
+                ],
+            )
+            if scope_name == GLOBAL_SCOPE
+            else ([], [])
+        )
 
-    def get_definitions(self, scope_name: str, name: str) -> List[Definition]:
+    def get_definitions(self, scope_name: str, var_name: str) -> List[Definition]:
         """
         Retrieves the definitions for a variable in a lexical scope.
         Args:
             scope_name: The name of the lexical scope (string).
             name: The name of the variable (string).
-        Returns: A list of definitions (AST nodes).
+        Returns: A list of definitions.
         """
-        pass
+        return (
+            [
+                Definition(name, value)
+                for name, value in self.const_dict.items()
+                if name[0] == var_name
+            ]
+            if scope_name == GLOBAL_SCOPE
+            else []
+        )
 
-    def get_references(self, scope_name: str, name: str) -> List[Reference]:
+    def get_refs(self, scope_name: str, var_name: str) -> List[Reference]:
         """
         Retrieves the references for a variable in a lexical scope.
         Args:
             scope_name: The name of the lexical scope (string).
             name: The name of the variable (string).
-        Returns: A list of references (AST nodes).
+        Returns: A list of references.
         """
-        pass
+        return (
+            [
+                Reference(name, block_id, stmt_idx, counters)
+                for block_id, stmts in self.ssa_results.items()
+                for stmt_idx, stmt in enumerate(stmts)
+                for name, counters in stmt.items()
+                if name == var_name
+            ]
+            if scope_name == GLOBAL_SCOPE
+            else []
+        )
