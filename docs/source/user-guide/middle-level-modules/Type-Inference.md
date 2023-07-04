@@ -1,12 +1,12 @@
 # Type Inference
 
-Type inference module in Scalpel can identify type information for the usage context. As a dynamically type languages, the variabes' type are unknown until runtime, making it difficult to perform type checking. Though benefiting from the coding flexibility for rapid development, Python programs can miss the opportunity to separate data from behavior and detect bugs and errors at an early stage. 
+Type inference module in Scalpel can identify type information for the usage context. As a dynamically typed language, the variables' types are unknown until runtime, making it difficult to perform type checking. Though benefiting from the coding flexibility for rapid development, Python programs can miss the opportunity to separate data from behavior and detect bugs and errors at an early stage. 
 
 Scalpel provides a module `scalpel.typeinfer` for automatic type inference to facilitate static analysis for Python programs.
-`scalpel.typeinfer` takes a python file or the root folder of a whole package as input, and will output a dictionary of detailed type information for each variable, including function return values and function parameters.
+`scalpel.typeinfer` takes a Python file or the root folder of a whole package as input and will output a dictionary of detailed type information for each variable, including function return values and function parameters.
 
 ## How to use Type Inference
-Below is the demo input python program we will be using. The piece of code returns current working directory and is named "type_infer_example.py".
+Below is the demo input Python program we will be using. The piece of code returns the current working directory and is named "type_infer_example.py".
 ```python
 from os import getcwd
 

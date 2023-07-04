@@ -6,6 +6,27 @@ These functions can be reused by developers to implement client applications tha
 Scalpel is a powerful tool that can help developers to improve the quality of their Python code. It is still under development, but it has the potential to become a valuable resource for the Python community. 
 <img src="https://github.com/SMAT-Lab/Scalpel/blob/main/docs/source/_static/resources/Scalpel.svg" width="550">
 
+# Current Capabilities
+Even though Scalpel is in a development phase, it provides a wide range of fundamental static analysis techniques in Python, including : 
+- Call Graph Construction
+- Control-Flow Graph Construction
+- Type Analysis
+- Import Graph Construction
+- Code Rewriting
+- Static Single Assignment (SSA)
+
+These fundamental functions can be applied to various static analysis applications including:
+- API Name Qualifying
+- Bug and Vulnerability Detection
+- Data Flow Analysis
+- Taint Analysis
+
+
+# Future Directions
+As Scalpel is in the early development stage, it is rapidly growing and aims to extend its scope for static analysis in Python, which has already been developed for other Programming Languages such as :
+- Flow-Sensitive Call Graph Construction
+- Fully Qualified Name Inference
+- Assignment Graph
 
 
 # Setting up Scalpel
@@ -37,9 +58,12 @@ As a general-purpose framework, Scalpel is a layered structure designed to suppo
 * {ref}`search`
 
 
+# Development Team
+Scalpel Framework was first introduced by Li Li,  Jiawei Wang, and  Haowei Quan in the [Paper] (https://arxiv.org/abs/2202.11840). Scalpel is maintained by the SMAT Lab (SMart Software Analysis and Trustworthy Computing Lab) which is part of the Software Engineering group at Monash University, Australia. Scalpel also receives huge support from the Python community.
+
 # Acknowledgement
 
-This project has been inspired and supported by many existing works. Some implementation of functionalities is taken from published work. If you think your work appears in this project, but is not mentioned yet, please let us know by any means. 
+This project has been inspired and supported by many existing works. Some implementation of functionalities is taken from published work. If you think your work appears in this project but is not mentioned yet, please let us know by any means. 
 
 1. [Fuzzyingbook](https://www.fuzzingbook.org/).
 

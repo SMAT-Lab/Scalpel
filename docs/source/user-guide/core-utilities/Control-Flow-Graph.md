@@ -1,11 +1,12 @@
 # Control Flow Graph
+The control-flow graph(CFG) construction module generates intra-procedural CFGs, which are an essential component in static flow analysis with applications such as program optimization and taint analysis. A CFG represents all paths that might be traversed through a program during its execution. The CFGs of a Python project can be combined with the call graph to generate an inter-procedural CFG of the project.
 
-`scalpel.cfg` module is used to construct the control flow graph for given python programs. The basic unit in the CFG, `Block`, contains a list of sequential statements that can be executed in a program without any control jumps. The `Block`s are linked by `Link` objects, which represent control flow jumps between two blocks and contain the jump conditions in the form of an expression. The two components are the fundemental data structures in the control flow graph module (`scalpel.cfg`).
+`scalpel.cfg` module is used to construct the control flow graph for given Python programs. The basic unit in the CFG, `Block`, contains a list of sequential statements that can be executed in a program without any control jumps. The `Block`s are linked by `Link` objects, which represent control flow jumps between two blocks and contain the jump conditions in the form of an expression. The two components are the fundamental data structures in the control flow graph module (`scalpel.cfg`).
 
 
 
 ## How to use Control Flow Graph
-Below is the demo input python program we will be using. The piece of code generates the Fibonacci sequence.
+Below is the demo input Python program we will be using. The piece of code generates the Fibonacci sequence.
 ```python
 code_str="""
 def fib():
@@ -27,7 +28,7 @@ from scalpel.cfg import CFGBuilder
 cfg = CFGBuilder().build_from_file('example.py', './example.py')
 
 ```
-This returns the CFG for the code in *./example.py* in the cfg variable. This built CFG can be visulized with `build_visual`:
+This returns the CFG for the code in *./example.py* in the cfg variable. This built CFG can be visualized with `build_visual`:
 ```python
 cfg.build_visual('pdf')
 ```
@@ -38,7 +39,7 @@ Below is the produced *exampleCFG.pdf*.
 | <b>Fig.1 The control flow graph for the given source files </b>|
 
 
-Apart from generating the visual graph, the CFG can be use for many other static analysis purpose.
+Apart from generating the visual graph, the CFG can be used for many other static analysis purposes.
 For example, `get_calls` can be used to get all function calls in each block.
 ```python
 for block in cfg:
@@ -47,7 +48,7 @@ for block in cfg:
 
 ## Visualizations of CFG objects
 
-Scalpel offeres some functionalities to render the CFG diagrams into PDF, PNG, JPG or SVGs. Please notice this requires the graphviz package installed in your computer. Please refer to [graphviz](https://graphviz.readthedocs.io/en/stable/manual.html) get it installed. 
+Scalpel offerers some functionalities to render the CFG diagrams into PDF, PNG, JPG or SVGs. Please notice this requires the graphviz package installed on your computer. Please refer to [graphviz](https://graphviz.readthedocs.io/en/stable/manual.html) to get it installed. 
 
 Developers can use ```cfg.build_visual()``` to build an ```graphviz.dot.Digraph``` object, then call ```render``` function to generate the image file as shown in the following code snippet.
 
@@ -58,13 +59,13 @@ dot.render("cfg_diagram", view=False)
 
 ## Visiting Function CFGs
 
-In thoery, there is no control flow constaints between subprocedures such as functions. Therefore, Scalpel generates control flow graphs for every functions in the given source files. Considering the the nested structure of Python class and function definition, we integrate recursive data data sturcture for storing control flow graphs.
+In theory, there are no control flow constraints between subprocedures such as functions. Therefore, Scalpel generates control flow graphs for every function in the given source files. Considering the nested structure of Python class and function definition, we integrate recursive data structure for storing control flow graphs.
 
-Take the above source code for example, scalpel will generate two CFGs, one is shown in fig. 1 , the other is for the function ```fib```. 
+Take the above source code for example, scalpel will generate two CFGs, one is shown in fig. 1 , and the other is for the function ```fib```. 
 
 we can use the following way to visit all the function cfgs in the given source. 
 
-Please note that function cfgs can be indexed by both function name and its block id. This is due to Python language allow users to define functions with same names in the same domain such as:
+Please note that function cfgs can be indexed by both the function name and its block id. This is due to Python language allows users to define functions with the same names in the same domain such as:
 
 ```python
 x = 0
@@ -77,7 +78,7 @@ else:
 solve(x)
 ```
 
-The implementation of the function ```solve``` can be different depending the actual condition. Therefore, we need more than function name to index a function CFG. Now, if we take the fig. 1 for example, we can visit all function CFGs in the following way and try to create an pdf file for the diagram of CFG of function ```fib```: 
+The implementation of the function ```solve``` can be different depending the actual condition. Therefore, we need more than function name to index a function CFG. Now, if we take the fig. 1 for example, we can visit all function CFGs in the following way and try to create a pdf file for the diagram of CFG of function ```fib```: 
 
 
 ```python
@@ -92,7 +93,7 @@ for (block_id, fun_name), fun_cfg in cfg.functioncfgs.items():
 |:--:|
 | Fig.2 The control flow graph for the function ```fib``` |
 
-Please note, as their might be functions defined inside a function defintion, you can continue perform the similar operation on the ```fun_cfg``` to retrieve the nested function CFGs. These CFGs can be combined for anaysis. 
+Please note, as there might be functions defined inside a function definition, you can continue to perform a similar operation on the ```fun_cfg``` to retrieve the nested function CFGs. These CFGs can be combined for analysis. 
 
 
 \

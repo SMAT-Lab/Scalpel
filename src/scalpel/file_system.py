@@ -1,6 +1,6 @@
 """
 FileSystem module for Scalpel. The original import graph will be removed while the similar functionalities are implemented in this module. 
-The purpose of this componement is to support modelling large Python project structure in a simplified way. 
+The purpose of this component is to support modelling large Python project structure in a simplified way. 
 This component is still under development.
 
 Author: Jiawei Wang
