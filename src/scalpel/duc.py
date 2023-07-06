@@ -12,6 +12,7 @@ from scalpel.SSA.const import SSA
 @dataclass
 class Definition:
     name: str
+    counter: int
     ast_node: ast.AST
 
 
@@ -70,7 +71,10 @@ class DUC:
         """
         return (
             (
-                [Definition(name, value) for name, value in self.const_dict.items()],
+                [
+                    Definition(name, counter, value)
+                    for (name, counter), value in self.const_dict.items()
+                ],
                 [
                     Reference(name, block_id, stmt_idx, counters)
                     for block_id, stmts in self.ssa_results.items()
@@ -92,9 +96,9 @@ class DUC:
         """
         return (
             [
-                Definition(name, value)
-                for name, value in self.const_dict.items()
-                if name[0] == var_name
+                Definition(name, counter, value)
+                for (name, counter), value in self.const_dict.items()
+                if name == var_name
             ]
             if scope_name == GLOBAL_SCOPE
             else []
