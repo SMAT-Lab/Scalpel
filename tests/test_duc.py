@@ -1,50 +1,48 @@
 import ast
 import textwrap
-from typing import Iterator, List
-from scalpel.duc import Definition, DUC, Reference, Scope, ducs_from_src
+from typing import List
+from scalpel.cfg import CFGBuilder
+from scalpel.duc import Definition, DUC, Reference
 
 
-def make_ducs(name: str, src: str) -> Iterator[DUC]:
-    return ducs_from_src(name, textwrap.dedent(src))
+def make_duc(name: str, src: str) -> DUC:
+    return DUC(CFGBuilder().build_from_src(name, textwrap.dedent(src)))
 
 
-def assert_num_defs_refs(
-    duc: DUC, num_defs: int, num_refs: int, scope: Scope = None
-) -> None:
-    defs, refs = duc.get_definitions_and_references(scope)
+def assert_num_defs_refs(duc: DUC, num_defs: int, num_refs: int, *args) -> None:
+    defs, refs = duc.get_definitions_and_references(*args)
     assert len(defs) == num_defs, f"expected {num_defs} definitions, got {len(defs)}"
     assert len(refs) == num_refs, f"expected {num_refs} references, got {len(refs)}"
 
 
-def get_defs(duc: DUC, num: int, name: str, scope: Scope = None) -> List[Definition]:
-    defs = duc.get_definitions(name, scope)
+def get_defs(duc: DUC, num: int, *args) -> List[Definition]:
+    defs = duc.get_definitions(*args)
     assert len(defs) == num, f"expected {num} definitions, got {len(defs)}"
     return defs
 
 
-def get_def(duc: DUC, name: str, scope: Scope = None) -> Definition:
-    return get_defs(duc, 1, name, scope)[0]
+def get_def(duc: DUC, *args) -> Definition:
+    return get_defs(duc, 1, *args)[0]
 
 
-def get_refs(duc: DUC, num: int, name: str, scope: Scope = None) -> List[Reference]:
-    refs = duc.get_references(name, scope)
+def get_refs(duc: DUC, num: int, *args) -> List[Reference]:
+    refs = duc.get_references(*args)
     assert len(refs) == num, f"expected {num} references, got {len(refs)}"
     return refs
 
 
-def get_ref(duc: DUC, name: str, scope: Scope = None) -> Reference:
-    return get_refs(duc, 1, name, scope)[0]
+def get_ref(duc: DUC, *args) -> Reference:
+    return get_refs(duc, 1, *args)[0]
 
 
 def test_simple() -> None:
-    (duc,) = make_ducs(
+    duc = make_duc(
         "simple",
         """\
         a = 1
         print(a + 1)
         """,
     )
-    assert len(list(duc.get_lexical_scopes())) == 1
 
     assert_num_defs_refs(duc, 1, 2)
     a_def = get_def(duc, "a")
@@ -56,7 +54,7 @@ def test_simple() -> None:
 
 
 def test_reassign() -> None:
-    (duc,) = make_ducs(
+    duc = make_duc(
         "reassign",
         """\
         a = 1
@@ -65,7 +63,6 @@ def test_reassign() -> None:
         print(a)
         """,
     )
-    assert len(list(duc.get_lexical_scopes())) == 1
 
     assert_num_defs_refs(duc, 2, 4)
 
@@ -79,7 +76,7 @@ def test_reassign() -> None:
 
 
 def test_ssa_example() -> None:
-    (duc,) = make_ducs(
+    duc = make_duc(
         "ssa_example",
         """\
         b = 10
@@ -90,7 +87,6 @@ def test_ssa_example() -> None:
         print(a)
         """,
     )
-    assert len(list(duc.get_lexical_scopes())) == 1
 
     assert_num_defs_refs(duc, 3, 5)
 
@@ -106,7 +102,7 @@ def test_ssa_example() -> None:
 
 
 def test_multiple_scopes() -> None:
-    global_duc, f_duc = make_ducs(
+    duc = make_duc(
         "multiple_scopes",
         """\
         a = 1
@@ -115,30 +111,25 @@ def test_multiple_scopes() -> None:
             b = 3
         """,
     )
+    _, f_scope = duc.get_lexical_scopes()
 
-    scopes = list(global_duc.get_lexical_scopes())
-    assert len(scopes) == 2
-    global_scope, f_scope = scopes
-
-    assert_num_defs_refs(global_duc, 2, 0)
-    a_def = get_def(global_duc, "a")
+    assert_num_defs_refs(duc, 2, 0)
+    a_def = get_def(duc, "a")
     assert isinstance(a_def.ast_node, ast.Constant)
     assert a_def.ast_node.lineno == 1
-    f_def = get_def(global_duc, "f")
+    f_def = get_def(duc, "f")
     assert isinstance(f_def.ast_node, ast.FunctionDef)
 
-    assert_num_defs_refs(f_duc, 2, 0)
-    f_a_def = get_def(f_duc, "a")
+    assert_num_defs_refs(duc, 2, 0, f_scope)
+    f_a_def = get_def(duc, "a", f_scope)
     assert isinstance(f_a_def.ast_node, ast.Constant)
     assert f_a_def.ast_node.lineno == 3
-    assert f_a_def == get_def(global_duc, "a", scope=f_scope)
-    f_b_def = get_def(f_duc, "b")
+    f_b_def = get_def(duc, "b", f_scope)
     assert isinstance(f_b_def.ast_node, ast.Constant)
-    assert f_b_def == get_def(global_duc, "b", scope=f_scope)
 
 
 def test_classes() -> None:
-    global_duc, c_duc, c_f_duc = make_ducs(
+    duc = make_duc(
         "classes",
         """\
         a = 1
@@ -150,32 +141,26 @@ def test_classes() -> None:
         print(a)
         """,
     )
+    _, c_scope, c_f_scope = duc.get_lexical_scopes()
 
-    scopes = list(global_duc.get_lexical_scopes())
-    assert len(scopes) == 3
-    global_scope, c_scope, c_f_scope = scopes
+    assert_num_defs_refs(duc, 2, 2)
+    assert get_def(duc, "a").ast_node.lineno == 1
+    global_a_ref = get_ref(duc, "a")
+    assert duc.ast_node_for_reference(global_a_ref).lineno == 7  # print(a)
 
-    assert_num_defs_refs(global_duc, 2, 2)
-    assert get_def(global_duc, "a").ast_node.lineno == 1
-    global_a_ref = get_ref(global_duc, "a")
-    assert global_duc.ast_node_for_reference(global_a_ref).lineno == 7  # print(a)
-
-    assert_num_defs_refs(c_duc, 3, 1)
-    a_def = get_def(c_duc, "a")
+    assert_num_defs_refs(duc, 3, 1, c_scope)
+    a_def = get_def(duc, "a", c_scope)
     assert a_def.ast_node.lineno == 3
-    assert a_def == get_def(global_duc, "a", scope=c_scope)
-    a_ref = get_ref(c_duc, "a")
-    assert c_duc.ast_node_for_reference(a_ref).lineno == 4  # b = a
-    assert a_ref == get_ref(global_duc, "a", scope=c_scope)
+    a_ref = get_ref(duc, "a", c_scope)
+    assert duc.ast_node_for_reference(a_ref, c_scope).lineno == 4  # b = a
 
-    assert_num_defs_refs(c_f_duc, 1, 2)
-    x_def = get_def(c_f_duc, "x")
+    assert_num_defs_refs(duc, 1, 2, c_f_scope)
+    x_def = get_def(duc, "x", c_f_scope)
     assert isinstance(x_def.ast_node, ast.BinOp)
-    assert x_def == get_def(c_duc, "x", scope=c_f_scope)
 
 
 def test_multiple_defs() -> None:
-    global_duc, f_duc = make_ducs(
+    duc = make_duc(
         "multiple_defs",
         """\
         a = 1
@@ -185,26 +170,21 @@ def test_multiple_defs() -> None:
             print(a, b)
         """,
     )
+    _, f_scope = duc.get_lexical_scopes()
 
-    scopes = list(global_duc.get_lexical_scopes())
-    assert len(scopes) == 2
-    global_scope, f_scope = scopes
-
-    assert_num_defs_refs(global_duc, 3, 1)
-    global_a_def1, global_a_def2 = get_defs(global_duc, 2, "a")
+    assert_num_defs_refs(duc, 3, 1)
+    global_a_def1, global_a_def2 = get_defs(duc, 2, "a")
     assert isinstance(global_a_def1.ast_node, ast.Constant)
     assert isinstance(global_a_def2.ast_node, ast.Call)
-    f_def = get_def(global_duc, "f")
+    f_def = get_def(duc, "f")
     assert isinstance(f_def.ast_node, ast.FunctionDef)
-    get_refs(global_duc, 0, "a")
+    get_refs(duc, 0, "a")
 
-    assert_num_defs_refs(f_duc, 0, 3)
+    assert_num_defs_refs(duc, 0, 3, f_scope)
     # a_def = get_def(f_duc, "a")
     # assert isinstance(a_def.ast_node, ast.arg)
-    # assert a_def == get_def(global_duc, "a", scope=f_scope)
     # b_def = get_def(f_duc, "b")
     # assert isinstance(b_def, ast.arg)
-    # assert b_def == get_def(global_duc, "b", scope=f_scope)
 
 
 def main() -> None:

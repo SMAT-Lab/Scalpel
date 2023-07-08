@@ -114,31 +114,11 @@ class CFGBuilder(ast.NodeVisitor):
         self.clean_cfg(self.cfg.entryblock, visited)
 
         if flattened:
-            self.cfg = self._flatten_cfg(self.cfg)
-            pass
+            self.cfg = self.cfg.flatten()
         return self.cfg
 
-    def _flatten_cfg(self, mod_cfg):
-        flattend_cfg = {}
 
-        def process_cfg(cfg, dotted_name=["mod"], name_type="mod"):
-            fully_qualified_name = ".".join(dotted_name)
-            flattend_cfg[fully_qualified_name] = cfg
-            for fun_name_tup, fun_cfg in cfg.functioncfgs.items():
-                process_cfg(
-                    fun_cfg,
-                    dotted_name=dotted_name + [fun_name_tup[1]],
-                    name_type="func",
-                )
 
-            for cls_name, cls_cfg in cfg.class_cfgs.items():
-                process_cfg(
-                    cls_cfg, dotted_name=dotted_name + [cls_name], name_type="cls"
-                )
-
-        process_cfg(mod_cfg)
-
-        return flattend_cfg
 
     def build_from_src(self, name, src, flattened=False):
         """
