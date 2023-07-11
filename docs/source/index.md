@@ -10,7 +10,7 @@ Scalpel is a powerful tool that can help developers to improve the quality of th
 Even though Scalpel is in a development phase, it provides a wide range of fundamental static analysis techniques in Python, including : 
 - Call Graph Construction
 - Control-Flow Graph Construction
-- Type Analysis
+- Type Inference
 - Import Graph Construction
 - Code Rewriting
 - Static Single Assignment (SSA)
@@ -59,7 +59,7 @@ As a general-purpose framework, Scalpel is a layered structure designed to suppo
 
 
 # Development Team
-Scalpel Framework was first introduced by Li Li,  Jiawei Wang, and  Haowei Quan in the [Paper] (https://arxiv.org/abs/2202.11840). Scalpel is maintained by the SMAT Lab (SMart Software Analysis and Trustworthy Computing Lab) which is part of the Software Engineering group at Monash University, Australia. Scalpel also receives huge support from the Python community.
+Scalpel Framework was first introduced by Li Li,  Jiawei Wang, and  Haowei Quan in the paper [Scalpel: The Python Static Analysis Framework](https://arxiv.org/abs/2202.11840). Scalpel is maintained by the SMAT Lab (SMart Software Analysis and Trustworthy Computing Lab) which is part of the Software Engineering group at Monash University, Australia. Scalpel also receives huge support from the Python community.
 
 # Acknowledgement
 

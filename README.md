@@ -21,7 +21,7 @@ We will highly appreciate it if you can contribute to this project. Please feel 
 1. New features. If you believe your publication/open-source project can be part of our framework, please contact us.
 2. Bug reports.
 3. Documentation.
-4. Code refactoring
+4. Code refactoring.
 
 
 ## Brief Introduction
@@ -76,7 +76,7 @@ This project has been inspired and supported by many existing works. If you thin
 
 * Function 2: Control-Flow Graph Construction. The control-flow graph(CFG) construction module generates intra-procedural CFGs, which are an essential component in static flow analysis with applications such as program optimization and taint analysis. A CFG represents all paths that might be traversed through a program during its execution. The CFGs of a Python project can be combined with the call graph to generate an inter-procedural CFG of the project.
 
-* Function 3: Static Single Assignment (SSA) Representation. The static single assignment module provides compiler-level intermediate representations (IR) for code analysis. It can not only be used for symbolic execution but also constant propagation. By renaming each variable assignment with different names,  we can obtain explicit use-def chains, therefore precisely tracking how data flow in the program.
+* Function 3: Static Single Assignment (SSA) Representation. The static single assignment module provides compiler-level intermediate representations (IR) for code analysis. It can not only be used for symbolic execution but also for constant propagation. By renaming each variable assignment with different names,  we can obtain explicit use-def chains, therefore precisely tracking how data flow in the program.
 
 * Function 4: Alias Analysis. Since variables can point to the same memory location or identical values, the alias analysis function is designed to model such usages. This function can be vital to sound constant propagation. In addition, alias analysis will also benefit type checking as well as API name qualifying.
 
