@@ -71,66 +71,79 @@ class DUC:
         """
         yield from self.cfgs
 
-    def get_definitions_and_references(
+    def get_all_definitions(self, scope: str = MODULE_SCOPE) -> Iterator[Definition]:
+        """
+        Retrieves the definitions for a variable in a lexical scope.
+        Args:
+            scope: The name of the scope (defaults to `"mod"`, the scope of the
+            module).
+        Returns: A iterator of definitions.
+        """
+        for (name, counter), value in self.const_dicts[scope].items():
+            yield Definition(name, counter, value)
+
+    def get_all_references(self, scope: str = MODULE_SCOPE) -> Iterator[Reference]:
+        """
+        Retrieves the references for a variable in a lexical scope.
+        Args:
+            scope: The name of the scope (defaults to `"mod"`, the scope of the
+            module).
+        Returns: An iterator of references.
+        """
+        for block_id, stmts in self.ssa_results[scope].items():
+            for stmt_idx, stmt in enumerate(stmts):
+                for name, counters in stmt.items():
+                    yield Reference(name, block_id, stmt_idx, counters)
+
+    def get_all_definitions_and_references(
         self, scope: str = MODULE_SCOPE
-    ) -> Tuple[List[Definition], List[Reference]]:
+    ) -> Tuple[Iterator[Definition], Iterator[Reference]]:
         """
         Retrieves all the definitions and references for a lexical scope.
         Args:
             scope: The name of the scope (defaults to `"mod"`, the scope of the
             module).
         Returns:
-            A tuple of `(definitions, references)`. `definitions` is a list of
-            all the definitions (AST nodes) in the lexical scope `scope`,
-            and `references` is a list of all the references (AST nodes) in the
+            A tuple of `(definitions, references)`. `definitions` is an iterator
+            of all the definitions (AST nodes) in the lexical scope `scope`, and
+            `references` is a iterator of all the references (AST nodes) in the
             scope.
         """
-        return (
-            [
-                Definition(name, counter, value)
-                for (name, counter), value in self.const_dicts[scope].items()
-            ],
-            [
-                Reference(name, block_id, stmt_idx, counters)
-                for block_id, stmts in self.ssa_results[scope].items()
-                for stmt_idx, stmt in enumerate(stmts)
-                for name, counters in stmt.items()
-            ],
-        )
+        return self.get_all_definitions(scope), self.get_all_references(scope)
 
-    def get_definitions(self, var_name: str, scope: str = MODULE_SCOPE) -> List[Definition]:
+    def get_definitions(
+        self, name: str, scope: str = MODULE_SCOPE
+    ) -> Iterator[Definition]:
         """
-        Retrieves the definitions for a variable in a lexical scope.
+        Retrieves all the definitions in a lexical scope.
         Args:
-            var_name: The name of the variable (string).
+            name: The name of the variable (string).
             scope: The name of the scope (defaults to `"mod"`, the scope of the
             module).
-        Returns: A list of definitions.
+        Returns: An iterator of definitions.
         """
-        return [
-            Definition(name, counter, value)
-            for (name, counter), value in self.const_dicts[scope].items()
-            if name == var_name
-        ]
+        for definition in self.get_all_definitions(scope):
+            if definition.name == name:
+                yield definition
 
-    def get_references(self, var_name: str, scope: str = MODULE_SCOPE) -> List[Reference]:
+    def get_references(
+        self, name: str, scope: str = MODULE_SCOPE
+    ) -> Iterator[Reference]:
         """
-        Retrieves the references for a variable in a lexical scope.
+        Retrieves all the references in a lexical scope.
         Args:
-            var_name: The name of the variable (string).
+            name: The name of the variable (string).
             scope: The name of the scope (defaults to `"mod"`, the scope of the
             module).
-        Returns: A list of references.
+        Returns: An iterator of references.
         """
-        return [
-            Reference(name, block_id, stmt_idx, counters)
-            for block_id, stmts in self.ssa_results[scope].items()
-            for stmt_idx, stmt in enumerate(stmts)
-            for name, counters in stmt.items()
-            if name == var_name
-        ]
+        for reference in self.get_all_references(scope):
+            if reference.name == name:
+                yield reference
 
-    def ast_node_for_reference(self, reference: Reference, scope: str = MODULE_SCOPE) -> ast.stmt:
+    def ast_node_for_reference(
+        self, reference: Reference, scope: str = MODULE_SCOPE
+    ) -> ast.stmt:
         """
         Retrieves the AST node for a reference from this DUC.
         Args:

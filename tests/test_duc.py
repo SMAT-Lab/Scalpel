@@ -10,13 +10,13 @@ def make_duc(name: str, src: str) -> DUC:
 
 
 def assert_num_defs_refs(duc: DUC, num_defs: int, num_refs: int, *args) -> None:
-    defs, refs = duc.get_definitions_and_references(*args)
+    defs, refs = map(list, duc.get_all_definitions_and_references(*args))
     assert len(defs) == num_defs, f"expected {num_defs} definitions, got {len(defs)}"
     assert len(refs) == num_refs, f"expected {num_refs} references, got {len(refs)}"
 
 
 def get_defs(duc: DUC, num: int, *args) -> List[Definition]:
-    defs = duc.get_definitions(*args)
+    defs = list(duc.get_definitions(*args))
     assert len(defs) == num, f"expected {num} definitions, got {len(defs)}"
     return defs
 
@@ -26,7 +26,7 @@ def get_def(duc: DUC, *args) -> Definition:
 
 
 def get_refs(duc: DUC, num: int, *args) -> List[Reference]:
-    refs = duc.get_references(*args)
+    refs = list(duc.get_references(*args))
     assert len(refs) == num, f"expected {num} references, got {len(refs)}"
     return refs
 
