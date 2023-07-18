@@ -7,7 +7,7 @@ This repository contains example tutorials that demonstrate how to use Scalpel t
 The tutorials are organized as follows:
 
 * [Static Single Assignment (SSA)](SSA_tutorial.ipynb)
-* [Call Graph Construction](call_graph_tutorial.ipynb.md)
+* [Call Graph Construction](call_graph_tutorial.ipynb)
 * [Control Flow Graph (CFG)](CFG_tutorial.ipynb)
 * [Import Graph Construction](import_graph_tutorial.ipynb)
 * [API Name Qualification](API_name_qualifying_tutorial.ipynb)
