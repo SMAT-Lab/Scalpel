@@ -159,7 +159,7 @@ class FileSystem:
     
 def correct_relative_import(stmt, is_cur_package_init_file):
     # this is adapted from mypy's implementation.
-    assert isinstance(stmt, (ast.Import, ast.ImportFrom))_
+    assert isinstance(stmt, (ast.Import, ast.ImportFrom))
     cur_mod_id = stmt.module
     target = ""
     relative = 0 
