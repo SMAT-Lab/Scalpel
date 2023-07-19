@@ -214,17 +214,6 @@ def get_call_type(tree):
     return func_calls
 
 
-def get_call_type(tree):
-    # how to remove
-    func_calls = []
-    for node in ast.walk(tree):
-        if isinstance(node, ast.Call):
-            callvisitor = FuncCallVisitor()
-            callvisitor.visit(node.func)
-            func_calls += [(callvisitor.name, get_args(node))]
-    return func_calls
-
-
 def get_func_calls(tree):
     node = deepcopy(tree)
     transformer = CallTransformer()
