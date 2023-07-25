@@ -41,10 +41,10 @@ class FullyQualifiedNameInference:
             if dotted_parts[0] in self.import_dict:
                 dotted_parts = [self.import_dict[dotted_parts[0]]] + dotted_parts[1:]
                 call_name = ".".join(dotted_parts)
-            
-                if self.is_dynamic:
-                    call_name = self.__get_dynamic(call_name)
-                print(call_name)
+                if callable(call_name):
+                    if self.is_dynamic:
+                        call_name = self.__get_dynamic(call_name)
+                    print(call_name)
                     
     
     
