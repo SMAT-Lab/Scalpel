@@ -1,3 +1,8 @@
+"""Fully Qualified Name Inference module  in Python static code analysis is the process of determining the fully qualified name of an object or entity from its context. 
+This module provides an option to perform either perform full name inference as implemented in Scalpel or further perform dynamic analysis, which is inherited from HeaderGen
+https://doi.org/10.48550/arXiv.2301.04419."""
+
+
 from scalpel.core.mnode import MNode
 import re
 import inspect
@@ -8,13 +13,14 @@ import pathlib
 
 class FullyQualifiedNameInference:
     def __init__(self, src = None, is_path = False, path = None, dynamic = False):
+        # sourcery skip: raise-specific-error
         self.is_path = is_path
         self.path = path
         self.is_dynamic = dynamic
 
 
         if src is None and self.path is None:
-            print('Either a source code or a path to a source code should be provided')
+            raise Exception('Either a source code or a path to a source code should be provided')
 
         self.src = pathlib.Path(f"src_code/{src}").read_text() if self.is_path else src
             
