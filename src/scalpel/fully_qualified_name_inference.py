@@ -8,6 +8,7 @@ import re
 import inspect
 import importlib
 import pathlib
+import types
 
 
 
@@ -33,18 +34,26 @@ class FullyQualifiedNameInference:
         # obtain the imported name information
         self.import_dict = mnode.parse_import_stmts()
         #print(self.func_calls)
+        qualified_names = []
 
         for call_info in self.func_calls:
-            call_name = call_info["name"]
-            dotted_parts = call_name.split(".")
+            dotted_parts = call_info["name"].split(".")
             # if this function calls is from a imported module
             if dotted_parts[0] in self.import_dict:
                 dotted_parts = [self.import_dict[dotted_parts[0]]] + dotted_parts[1:]
-                call_name = ".".join(dotted_parts)
-                if callable(call_name):
+                full_name = ".".join(dotted_parts)
+                try:
+                    if isinstance(eval(full_name), types.BuiltinFunctionType):
+                        pass
+                except Exception:
+                    current_call = {"call_name": call_info["name"], "line_no": call_info["lineno"]}
                     if self.is_dynamic:
-                        call_name = self.__get_dynamic(call_name)
-                    print(call_name)
+                        full_name = self.__get_dynamic(full_name)
+
+                    current_call['full_name'] = full_name
+                    qualified_names.append(current_call)   
+
+        return qualified_names
                     
     
     
