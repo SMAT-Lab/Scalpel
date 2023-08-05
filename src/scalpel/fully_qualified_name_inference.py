@@ -3,56 +3,64 @@ This module provides an option to perform either perform full name inference as 
 https://doi.org/10.48550/arXiv.2301.04419."""
 
 
-from scalpel.core.mnode import MNode
+from scalpel.call_graph.pycg import CallGraphGenerator
 import re
 import inspect
 import importlib
 import pathlib
 import types
+import os
 
 
 
 class FullyQualifiedNameInference:
-    def __init__(self, src = None, is_path = False, path = None, dynamic = False):
-        # sourcery skip: raise-specific-error
-        self.is_path = is_path
-        self.path = path
+    def __init__(self, src = None, rel_path = None, dynamic = False):
+        
+        
+        cwd = os.getcwd()
+        self.path = os.path.join(cwd, rel_path)
         self.is_dynamic = dynamic
+        self.file_name = rel_path.split("/")[0]
+        self.mod_name = rel_path.split("/")[-1]
+        self.builtin_calls = False
+        self.built_in_calls = []
+        self.external_calls = []
+
 
 
         if src is None and self.path is None:
-            raise Exception('Either a source code or a path to a source code should be provided')
+            print('Either a source code or a path to a source code should be provided')
+        
+            
+    def __separate_func_calls(self, func_calls):
 
-        self.src = pathlib.Path(f"src_code/{src}").read_text() if self.is_path else src
+        for func_call in func_calls:
+            dotted_call_names  = func_call.split(".")
+            if dotted_call_names[0] == '<builtin>':
+                self.built_in_calls.append(dotted_call_names[1])
+            else:
+                self.external_calls.append(".".join(dotted_call_names))
             
     def infer(self):
-        mnode = MNode("local")
-        mnode.source = self.src
-        mnode.gen_ast()
-        # parse all function calls
-        self.func_calls = mnode.parse_func_calls()
-        # obtain the imported name information
-        self.import_dict = mnode.parse_import_stmts()
+        cg_generator = CallGraphGenerator([self.path], self.file_name)
+        cg_generator.analyze()
+        self.cg = cg_generator.output()
+        self. func_calls  = self.cg[self.mod_name[:-3]]
+        self.__separate_func_calls(self. func_calls)
+        
         #print(self.func_calls)
         qualified_names = []
-
-        for call_info in self.func_calls:
-            dotted_parts = call_info["name"].split(".")
-            # if this function calls is from a imported module
-            if dotted_parts[0] in self.import_dict:
-                dotted_parts = [self.import_dict[dotted_parts[0]]] + dotted_parts[1:]
-                full_name = ".".join(dotted_parts)
-                try:
-                    if isinstance(eval(full_name), types.BuiltinFunctionType):
-                        pass
-                except Exception:
-                    current_call = {"call_name": call_info["name"], "line_no": call_info["lineno"]}
-                    if self.is_dynamic:
-                        full_name = self.__get_dynamic(full_name)
-
-                    current_call['full_name'] = full_name
-                    qualified_names.append(current_call)   
-
+        self.infer_func_calls = self.external_calls
+        if self.builtin_calls :
+            self.infer_func_calls.extend(self.built_in_calls)
+            
+        for call_name in self.infer_func_calls:        
+            if self.is_dynamic:
+                full_name = self.__get_dynamic(call_name)
+                qualified_names.append(full_name)   
+            else:
+                qualified_names.append(call_name)
+                    
         return qualified_names
                     
     
