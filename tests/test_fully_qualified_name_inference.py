@@ -2,16 +2,7 @@
 
 from scalpel.fully_qualified_name_inference import FullyQualifiedNameInference
 
-src = """
-import numpy as np
-import pandas as pd
-from random import choices
-
-pd.read_csv("test.csv")
-np.array([1,2,3,4,5,6])
-data = [41, 50, 29]
-means = sorted(mean(choices(data, k=len(data))) for i in range(100))
-"""
+src = source = open("tests/test-cases/fully_qualified_name_inference/basics.py").read()
 
 static_inference_actual = """
 [{'call_name': 'pd.read_csv', 'line_no': 6, 'full_name': 'pandas.read_csv'}, {'call_name': 'np.array', 'line_no': 7, 'full_name': 'numpy.array'}]
