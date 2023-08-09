@@ -106,7 +106,7 @@ pydoctor_args = [
     f'--html-viewsource-base=https://github.com/SMAT-Lab/Scalpel/tree/{_git_reference}/',
     '--html-output={outdir}/api',
     f'--project-base-dir={_project_root}',
-    f'{_project_root}/scalpel'
+    f'{_project_root}/src/scalpel'
     ]
 
 if on_rtd:

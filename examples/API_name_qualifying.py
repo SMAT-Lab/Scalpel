@@ -1,4 +1,5 @@
 import os
+
 from scalpel.core.mnode import MNode
 
 source = """
@@ -13,8 +14,8 @@ means = sorted(mean(choices(data, k=len(data))) for i in range(100))
 
 """
 
-def main():
 
+def main():
     mnode = MNode("local")
     mnode.source = source
     mnode.gen_ast()
@@ -28,9 +29,10 @@ def main():
         dotted_parts = call_name.split(".")
         # if this function calls is from a imported module
         if dotted_parts[0] in import_dict:
-            dotted_parts = [import_dict[dotted_parts[0]]]+dotted_parts[1:]
+            dotted_parts = [import_dict[dotted_parts[0]]] + dotted_parts[1:]
             call_name = ".".join(dotted_parts)
         print(call_name)
 
-if __name__ ==  "__main__":
+
+if __name__ == "__main__":
     main()

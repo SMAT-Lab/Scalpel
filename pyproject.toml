@@ -4,7 +4,7 @@ requires = [
         "astor~=0.8.1",
         "graphviz~=0.17",
         "networkx",
-        "astunparse"~=1.6.3',
+        "astunparse~=1.6.3",
         "typed-ast",
         "typeshed-client",
         "regex",
@@ -42,10 +42,22 @@ readme = "README.md"
 requires-python = ">=3.7"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: Apache License",
+    "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
 ]
 
 [project.urls]
 "Homepage" = "https://github.com/SMAT-Lab/Scalpel"
 "Bug Tracker" = "https://github.com/SMAT-Lab/Scalpel/issues"
+
+[tool.ruff]
+# Never enforce `E501` (line length violations).
+ignore = ["E501"]
+
+# Ignore `E402` (import violations) in all `__init__.py` files
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["E402"]
+"path/to/file.py" = ["E402"]
+
+[tool.isort]
+profile = "black"
