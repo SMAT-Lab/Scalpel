@@ -14,41 +14,71 @@ import os
 
 
 class FullyQualifiedNameInference:
-    def __init__(self, src = None, rel_path = None, dynamic = False):
+    def __init__(self, src = None, rel_path = None, dynamic = False, mod_name = None):
         
         
         cwd = os.getcwd()
         self.path = os.path.join(cwd, rel_path)
         self.is_dynamic = dynamic
         self.file_name = rel_path.split("/")[0]
-        self.mod_name = rel_path.split("/")[-1]
+        self.mod_name = mod_name
         self.builtin_calls = False
         self.built_in_calls = []
         self.external_calls = []
-
-
+        cg_generator = CallGraphGenerator([self.path], self.file_name)
+        cg_generator.analyze()
+        self.cg = cg_generator.output()
 
         if src is None and self.path is None:
             print('Either a source code or a path to a source code should be provided')
-        
-            
-    def __separate_func_calls(self, func_calls):
 
+
+    def process_func_calls(self):
+        processed_calls = []
+        module_name = self.mod_name
+        
+        def _get_leaf_nodes(_call):
+            nonlocal module_name, processed_calls
+
+            if len(self.cg[_call]) > 0:
+                for _c in self.cg[_call]:
+                    if _c not in processed_calls:
+                        processed_calls.append(_c)
+                        _get_leaf_nodes(_c)
+
+        for _src, _dest in self.cg.items():
+            if module_name is not None:
+                # Analyze call-sites only in the main module
+                if _src.split(".")[0] == module_name:
+                    for _call in _dest:
+                        _get_leaf_nodes(_call)
+                        if _call not in processed_calls:
+                            processed_calls.append(_call)
+                        
+            else:
+                for _call in _dest:
+                    _get_leaf_nodes(_call)
+                    if _call not in processed_calls:
+                        processed_calls.append(_call)
+                    
+
+        return processed_calls
+
+    def separate_func_calls(self, func_calls):
         for func_call in func_calls:
             dotted_call_names  = func_call.split(".")
             if dotted_call_names[0] == '<builtin>':
                 self.built_in_calls.append(dotted_call_names[1])
             else:
                 self.external_calls.append(".".join(dotted_call_names))
-            
+
+
+
     def infer(self):
-        cg_generator = CallGraphGenerator([self.path], self.file_name)
-        cg_generator.analyze()
-        self.cg = cg_generator.output()
-        self. func_calls  = self.cg[self.mod_name[:-3]]
-        self.__separate_func_calls(self. func_calls)
         
-        #print(self.func_calls)
+        self. func_calls  = self.process_func_calls()
+        self.separate_func_calls(self. func_calls)
+        
         qualified_names = []
         self.infer_func_calls = self.external_calls
         if self.builtin_calls :
