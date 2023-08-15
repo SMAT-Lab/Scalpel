@@ -7,7 +7,7 @@ everybody and reusable in various contexts.
 For more information, please see Scalpel: [The Python Static Analysis Framework](https://github.com/SMAT-Lab/Scalpel)
 """
 
-__all__ = ["cfg", "call_graph", "SSA", "core", "typeinfer", "import_graph", "rewriter", "file_system"]
+__all__ = ["cfg", "call_graph", "SSA", "core", "typeinfer", "import_graph", "rewriter", "file_system", "fully_qualified_name_inference"]
 __version__ = "1.0dev"
 
 from .util import check_python_version
