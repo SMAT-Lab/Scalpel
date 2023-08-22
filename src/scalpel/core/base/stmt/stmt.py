@@ -74,37 +74,67 @@ class SStmt:
         # return a dictionary:  name, clauses
         # for an assignment stmt can be: target: stmt.target, value: stmt.value 
         raise NotImplemented
-    
+
+
 class AssignStmt(SStmt):
  
     # overriding abstract method
-    def get_clauses():
-        raise NotImplemented
-    
+
     def get_line_number(self):
         return super().get_line_number()
+
+    def get_clauses():
+        return {
+            "targets"       : SStmt.targets,
+            "value"         : SStmt.value,
+            "type_comment"  : SStmt.type_comment,
+        }
+
 
 class AugAssignStmt(SStmt):
  
     # overriding abstract method
+
     def get_line_number(self):
         return super().get_line_number()
     
+    def get_clauses():
+        return {
+            "target"    : SStmt.target,
+            "op"        : SStmt.op,
+            "value"     : SStmt.value,
+        }
+
+
 class AnnStmt(SStmt):
  
     # overriding abstract method   
+
     def get_line_number(self):
         return super().get_line_number()
+    
     def get_clauses():
-        raise NotImplemented
+        return {
+            "target"        : SStmt.target,
+            "annotation"    : SStmt.annotation,
+            "value"         : SStmt.value,
+            "simple"        : SStmt.simple,
+        }
     
     
 class IfStmt(SStmt):
  
+     # overriding abstract method   
+
     def get_line_number(self):
         return super().get_line_number()
+    
     def get_clauses():
-        raise NotImplemented
+        return {
+            "test"      : SStmt.test,
+            "body"      : SStmt.body,
+            "orelse"    : SStmt.orelse,
+        }
     
         
 class ForStmt(SStmt):
@@ -113,53 +143,109 @@ class ForStmt(SStmt):
     
     def get_line_number(self):
         return super().get_line_number()
+    
     def get_clauses():
-        raise NotImplemented
+        return {
+            "target"        : SStmt.target,
+            "iter"          : SStmt.iter,
+            "body"          : SStmt.body,
+            "orelse"        : SStmt.orelse,
+            "type_comment"  : SStmt.type_comment,
+        }
     
     
 class WhileStmt(SStmt):
  
     # overriding abstract method
+
     def get_line_number(self):
         return super().get_line_number()
     
     def get_clauses():
-        raise NotImplemented
+        return {
+            "test"      : SStmt.test,
+            "body"      : SStmt.body,
+            "orelse"    : SStmt.orelse,
+        }
+
+
+class FunctionDedfStmt(SStmt):
     
-class FunctionDedfStmt(SStmt):  # overriding abstract method
-    def get_line_number(self):
-        return super().get_line_number()
-    
-    def get_clauses():
-        raise NotImplemented
-      
-class ClassDefStmt(SStmt):
     # overriding abstract method
+
     def get_line_number(self):
         return super().get_line_number()
+    
     def get_clauses():
-        raise NotImplemented
+        return {
+            "name"              : SStmt.name,
+            "args"              : SStmt.args,
+            "body"              : SStmt.body,
+            "decorator_list"    : SStmt.decorator_list,
+            "returns"           : SStmt.returns,
+            "type_comment"      : SStmt.type_comment,
+        }
+
+
+class ClassDefStmt(SStmt):
+
+    # overriding abstract method
+
+    def get_line_number(self):
+        return super().get_line_number()
+    
+    def get_clauses():
+        return {
+             "name"             : SStmt.name,
+             "bases"            : SStmt.bases,
+             "keywords"         : SStmt.keywords,
+             "body"             : SStmt.body,
+             "decorator_list"   : SStmt.decorator_list,
+        }
+
      
 class MatchDefStmt(SStmt):
+
     # overriding abstract method    
+
     def get_line_number(self):
         return super().get_line_number()
+    
     def get_clauses():
-        raise NotImplemented
+        return {
+            "subject"   : SStmt.subject,
+            "cases"     : SStmt.cases,
+        }
+
 
 class TryStmt(SStmt):
+
     # overriding abstract method    
+
     def get_line_number(self):
         return super().get_line_number()
+    
     def get_clauses():
-        raise NotImplemented
+        return {
+            "body"      : SStmt.body,
+            "handlers"  : SStmt.handlers,
+            "orelse"    : SStmt.orelse,
+            "finalbody" : SStmt.finalbody,
+        }
+
     
 class ReturnStmt(SStmt):
+
     # overriding abstract method   
+
     def get_line_number(self):
         return super().get_line_number()
+    
     def get_clauses():
-        raise NotImplemented
+        return {
+            "value" : SStmt.value,
+        }
+
 
 class StmtVisitor(ast.NodeVisitor):
     
