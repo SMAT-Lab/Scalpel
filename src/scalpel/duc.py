@@ -22,6 +22,33 @@ from scalpel.SSA.const import SSA
 MODULE_SCOPE = "mod"
 
 
+
+
+@dataclass
+class Definition:
+    name: str
+    counter: int
+    ast_node: ast.AST
+
+
+@dataclass
+class ReferencedName:
+    name: str
+    counters: Set[int]
+
+
+@dataclass
+class Reference:
+    name: ReferencedName
+    block_id: int
+    """
+    The id of the CFG block that this reference is in.
+    """
+    stmt_idx: int
+    """
+    The index of the statement in the CFG block that this reference is in.
+    """
+
 class Variable:
     """
     Represents a variable 
@@ -82,23 +109,32 @@ class DUC:
         "cfgs",
         "ssa_results",
         "const_dicts",
+        "variables"
     ]
 
-    def __init__(self, cfg: CFG):
+    def __init__(self, cfg_dict: dict[str:CFG]):
         """
         Constructs a def-use chain.
         Args:
             cfg: The control flow graph.
         """
-        self.cfgs = cfg.flatten()
         self.ssa_results: Dict[str, Dict[int, List[Dict[str, Set[int]]]]] = {}
         self.const_dicts: Dict[str, Dict[Tuple[str, int], ast.AST]] = {}
-        for scope, cfg in self.cfgs.items():
+        self.variables = {}
+        for scope, cfg in cfg_dict.items():
             ssa_results, const_dict = SSA().compute_SSA(cfg)
+            print(ssa_results)
+            print(const_dict)
+            for (var_name, idx), val in const_dict:
+                 # create a new variable. 
+                 # finish construction
+                 # add its references 
+                 # add it to variabe list
+                 
             self.ssa_results[scope] = ssa_results
             self.const_dicts[scope] = const_dict
 
-        self.variables = {}
+        
 
     def get_or_create_variable(self, var_name):
         if var_name in self.variables:
@@ -246,31 +282,6 @@ class DUC:
 #def_use_chain.add_definition("y", "y = x * 2")
 #def_use_chain.add_use("y", "z = y - 3")
 
-
-@dataclass
-class Definition:
-    name: str
-    counter: int
-    ast_node: ast.AST
-
-
-@dataclass
-class ReferencedName:
-    name: str
-    counters: Set[int]
-
-
-@dataclass
-class Reference:
-    name: ReferencedName
-    block_id: int
-    """
-    The id of the CFG block that this reference is in.
-    """
-    stmt_idx: int
-    """
-    The index of the statement in the CFG block that this reference is in.
-    """
 
 ContainerElement = Tuple[Optional[ReferencedName], ReferencedName]
 """
