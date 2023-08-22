@@ -130,9 +130,14 @@ class DUC:
                  # finish construction
                  # add its references 
                  # add it to variabe list
-                 
-            self.ssa_results[scope] = ssa_results
-            self.const_dicts[scope] = const_dict
+                 new_var_obj = Variable(var_name, idx)
+                 new_var_obj.define(val)
+                 new_var_obj.scope_name = scope
+
+            for entry in ssa_results:
+                # locate the variable
+                # add uses
+                print(entry)                 
 
         
 
