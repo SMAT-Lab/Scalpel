@@ -1,42 +1,43 @@
-"""Fully Qualified Name Inference module  in Python static code analysis is the process of determining the fully qualified name of an object or entity from its context. 
+"""Fully Qualified Name Inference module  in Python static code analysis is the process of determining the fully qualified name of an object or entity from its context.
 This module provides an option to perform either perform full name inference as implemented in Scalpel or further perform dynamic analysis, which is inherited from HeaderGen
 https://doi.org/10.48550/arXiv.2301.04419."""
 
 
-from scalpel.call_graph.pycg import CallGraphGenerator
-import re
-import inspect
 import importlib
-import pathlib
-import types
+import inspect
 import os
+import pathlib
+import re
+import sys
+import types
 
+from scalpel.call_graph.pycg import CallGraphGenerator
 
 
 class FullyQualifiedNameInference:
-    def __init__(self, src = None, rel_path = None, dynamic = False, mod_name = None):
-        
-        
-        cwd = os.getcwd()
-        self.path = os.path.join(cwd, rel_path)
+    def __init__(self, file_path=None, dynamic=False, mod_name=None):
+        if not file_path:
+            print("file_path is empty")
+            sys.exit(-1)
+
+        self.file_path = os.path.abspath(file_path)
+        self.file_name = os.path.basename(file_path)
+
         self.is_dynamic = dynamic
-        self.file_name = rel_path.split("/")[0]
         self.mod_name = mod_name
-        self.builtin_calls = False
+        self.builtin_calls = True
+
         self.built_in_calls = []
         self.external_calls = []
-        cg_generator = CallGraphGenerator([self.path], self.file_name)
+
+        cg_generator = CallGraphGenerator([self.file_path], self.file_name)
         cg_generator.analyze()
         self.cg = cg_generator.output()
-
-        if src is None and self.path is None:
-            print('Either a source code or a path to a source code should be provided')
-
 
     def process_func_calls(self):
         processed_calls = []
         module_name = self.mod_name
-        
+
         def _get_leaf_nodes(_call):
             nonlocal module_name, processed_calls
 
@@ -54,47 +55,41 @@ class FullyQualifiedNameInference:
                         _get_leaf_nodes(_call)
                         if _call not in processed_calls:
                             processed_calls.append(_call)
-                        
+
             else:
                 for _call in _dest:
                     _get_leaf_nodes(_call)
                     if _call not in processed_calls:
                         processed_calls.append(_call)
-                    
 
         return processed_calls
 
     def separate_func_calls(self, func_calls):
         for func_call in func_calls:
-            dotted_call_names  = func_call.split(".")
-            if dotted_call_names[0] == '<builtin>':
+            dotted_call_names = func_call.split(".")
+            if dotted_call_names[0] == "<builtin>":
                 self.built_in_calls.append(dotted_call_names[1])
             else:
                 self.external_calls.append(".".join(dotted_call_names))
 
-
-
     def infer(self):
-        
-        self. func_calls  = self.process_func_calls()
-        self.separate_func_calls(self. func_calls)
-        
+        self.func_calls = self.process_func_calls()
+        # self.separate_func_calls(self.func_calls)
+
+        if not self.is_dynamic:
+            return self.func_calls
+
         qualified_names = []
-        self.infer_func_calls = self.external_calls
-        if self.builtin_calls :
-            self.infer_func_calls.extend(self.built_in_calls)
-            
-        for call_name in self.infer_func_calls:        
-            if self.is_dynamic:
-                full_name = self.__get_dynamic(call_name)
-                qualified_names.append(full_name)   
-            else:
+
+        for call_name in self.func_calls:
+            if call_name.startswith("<builtin>"):
                 qualified_names.append(call_name)
-                    
+            else:
+                full_name = self.__get_dynamic(call_name)
+                qualified_names.append(full_name)
+
         return qualified_names
-                    
-    
-    
+
     def __get_dynamic(self, func_name):
         mod_name = func_name.split(".")[0]
         inspect_module_imports = {}
@@ -103,9 +98,8 @@ class FullyQualifiedNameInference:
             regex = f"^({mod_name}?)"
 
             _dynamic_name = eval(
-                        re.sub(regex, f"inspect_module_imports['{mod_name}']", func_name)
-                    )
-
+                re.sub(regex, f"inspect_module_imports['{mod_name}']", func_name)
+            )
 
             info = {}
             if getattr(inspect.unwrap(_dynamic_name), "__module__", None):
@@ -146,18 +140,17 @@ class FullyQualifiedNameInference:
                     info["fullns"] = ".".join(
                         [info["module_name"], info["qualified_name"]]
                     )
-            return info['fullns']
+            return info["fullns"]
 
         except Exception as e:
-            print('module not installed')
+            print("module not installed")
 
     # TODO Rename this here and in `__get_dynamic`
     def __extracted_from___get_dynamic_16(self, _dynamic_name, info):
         info["qualified_name"] = inspect.unwrap(_dynamic_name).__qualname__
         info["fullns"] = ".".join([info["module_name"], info["qualified_name"]])
         info["doc_string"] = inspect.getdoc(_dynamic_name)
-            
-                
+
     def __get_qualname_from_text(self, input_dynamic_name):
         res = {"class": None, "func": None}
         try:
@@ -174,4 +167,3 @@ class FullyQualifiedNameInference:
             return res
         except Exception as e:
             return None
-            

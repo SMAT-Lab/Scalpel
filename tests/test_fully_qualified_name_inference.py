@@ -1,56 +1,65 @@
-""" Script to test static as well as dynamic fully qualified name inference in Scalpel"""
+"""
+Script to test static as well as dynamic fully qualified name inference in Scalpel.
+"""
 
-from scalpel import fully_qualified_name_inference as fni
-import test_name_infer_actual_data as actual
+from pathlib import Path
 
-source_test_basics = open("tests/test-cases/fully_qualified_name_inference/basics.py").read()
-source_test_nested_func_calls = open("tests/test-cases/fully_qualified_name_inference/nested_func_calls.py").read()
-source_test_func_inside_func_calls = open("tests/test-cases/fully_qualified_name_inference/func_inside_func_calls.py").read()
+import test_name_infer_actual_data as actual_data
 
+from scalpel.fqn import FullyQualifiedNameInference as FQNInference
 
-# def assert_list_of_dictionaries_equal(list_1, list_2):
-#     """Asserts that two lists of dictionaries are equal.
+SCRIPT_DIR = Path(__file__).parent
 
-#     Args:
-#     list_1: The first list of dictionaries.
-#     list_2: The second list of dictionaries.
+SOURCE_TEST_BASIC = SCRIPT_DIR / "test-cases/fully_qualified_name_inference/basics.py"
+SOURCE_TEST_NESTED_FUNC_CALLS = (
+    SCRIPT_DIR / "test-cases/fully_qualified_name_inference/nested_func_calls.py"
+)
+SOURCE_TEST_FUNC_INSIDE_FUNC = (
+    SCRIPT_DIR / "test-cases/fully_qualified_name_inference/func_inside_func_calls.py"
+)
 
-#     Raises:
-#     AssertionError: If the two lists are not equal.
-#     """
-
-#     assert len(list_1) == len(list_2), "The lists must be the same length."
-#     for dict_1, dict_2 in zip(list_1, list_2):
-#         assert dict_1 == dict_2, "The dictionaries must be equal."
 
 def test_basics():
-    
-    static_inference_actual = actual.actual_data_test_basics_static()
-    dynamic_inference_actual = actual.actual_data_test_basics_dynamic()
-    
-    static_inference = fni.FullyQualifiedNameInference(src = source_test_basics, is_path= False, dynamic = False )
-    #assert_list_of_dictionaries_equal(static_inference , static_inference_actual)
-    assert static_inference == static_inference_actual
-    
-    dynamic_inference= fni.FullyQualifiedNameInference(src = source_test_basics, is_path= False, dynamic = True )
-    #assert_list_of_dictionaries_equal(dynamic_inference, dynamic_inference_actual)
-    assert dynamic_inference == dynamic_inference_actual
+    """
+    Test basic FQN inference.
+    """
+    static_actual = actual_data.actual_data_test_basics_static()
+    dynamic_actual = actual_data.actual_data_test_basics_dynamic()
+
+    static_inference = FQNInference(file_path=SOURCE_TEST_BASIC, dynamic=False).infer()
+    assert sorted(static_inference) == sorted(static_actual)
+
+    dynamic_inference = FQNInference(file_path=SOURCE_TEST_BASIC, dynamic=True).infer()
+    assert sorted(dynamic_inference) == sorted(dynamic_actual)
+
 
 def test_nested_func_calls():
-    inference_actual = actual.actual_data_test_nested_func_calls_static()
-    inference = fni.FullyQualifiedNameInference(src = source_test_nested_func_calls, is_path= False, dynamic = False)
-    assert inference == inference_actual
-    
+    """
+    Test FQN inference for nested function calls.
+    """
+    actual = actual_data.actual_data_test_nested_func_calls_static()
+    inference = FQNInference(
+        file_path=SOURCE_TEST_NESTED_FUNC_CALLS, dynamic=False
+    ).infer()
+    assert inference == actual
+
+
 def test_func_inside_func_calls():
-    inference_actual = actual.actual_data_test_func_inside_func_calls_static()
-    inference = fni.FullyQualifiedNameInference(src = source_test_func_inside_func_calls, is_path= False, dynamic = False)
-    assert inference == inference_actual
+    actual = actual_data.actual_data_test_func_inside_func_calls_static()
+    inference = FQNInference(
+        file_path=SOURCE_TEST_FUNC_INSIDE_FUNC, dynamic=False
+    ).infer()
+    assert inference == actual
 
 
 def main():
+    """
+    Main test runner.
+    """
     test_basics()
     test_nested_func_calls()
     test_func_inside_func_calls()
-    
-if __name__ == '__main__':
+
+
+if __name__ == "__main__":
     main()
