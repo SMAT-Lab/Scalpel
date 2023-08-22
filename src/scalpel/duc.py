@@ -25,29 +25,30 @@ MODULE_SCOPE = "mod"
 class Variable:
     """
     Represents a variable 
-
     Attributes:
         name (str): The name of the variable.
+        idx (int):  for numbering this variable. 
         definition: The node where the variable is defined.
-        uses (list): List of nodes where the variable is used.
+        uses (list): List of nodes where the variable is used. 
     """
 
-    def __init__(self, name):
+    def __init__(self, name, idx):
         """
         Initialize a Variable instance.
-
         Args:
             name (str): The name of the variable.
         """
-        self.name = name
+        self.name:str = name
+        self.idx:int = idx  # numbers 
         self.definition = None
-        self.uses = []
-        self.value = None  # for context sensitive analysis.
+        self.uses:List[ast.expr] = []  # usages  # experssions  
+        self.value:ast.expr  = None  # for context sensitive analysis.
+        self.type:type = any    # type for this variable 
+        self.scope_name:str = None  # the lexical scope it is defined 
 
     def define(self, definition_node):
         """
         Define the variable at a specific node.
-
         Args:
             definition_node: The node where the variable is defined.
         """
@@ -161,7 +162,7 @@ class DUC:
 
     def get_all_definitions_and_references(
         self, scope: str = MODULE_SCOPE
-    ) -> Tuple[Iterator[Definition], Iterator[Reference]]:
+    ):
         """
         Retrieves all the definitions and references for a lexical scope.
         Args:
@@ -177,7 +178,7 @@ class DUC:
 
     def get_definitions(
         self, name: str, scope: str = MODULE_SCOPE
-    ) -> Iterator[Definition]:
+    ):
         """
         Retrieves all the definitions in a lexical scope.
         Args:
@@ -192,7 +193,7 @@ class DUC:
 
     def get_references(
         self, name: str, scope: str = MODULE_SCOPE
-    ) -> Iterator[Reference]:
+    ):
         """
         Retrieves all the references in a lexical scope.
         Args:
@@ -206,7 +207,7 @@ class DUC:
                 yield reference
 
     def ast_node_for_reference(
-        self, reference: Reference, scope: str = MODULE_SCOPE
+        self, reference, scope: str = MODULE_SCOPE
     ) -> ast.stmt:
         """
         Retrieves the AST node for a reference from this DUC.
@@ -219,9 +220,7 @@ class DUC:
         """
         return self._ast_node(scope, reference.block_id, reference.stmt_idx)
 
-    def container_relationships(
-        self, scope: str = MODULE_SCOPE
-    ) -> Iterator[ContainerRelationship]:
+    def container_relationships(self, scope: str = MODULE_SCOPE):
         for (block_id, stmt_idx), references in groupby(
             self.get_all_references(scope), lambda ref: (ref.block_id, ref.stmt_idx)
         ):
@@ -239,16 +238,15 @@ class DUC:
             if block.id == block_id
         )
 
-# Example usage
+#Example usage
 #def_use_chain = DefUseChain()
-
 #def_use_chain.add_definition("x", "x = 10")
 #def_use_chain.add_use("x", "print(x)")
 #def_use_chain.add_use("x", "y = x + 5")
 #def_use_chain.add_definition("y", "y = x * 2")
 #def_use_chain.add_use("y", "z = y - 3")
 
-'''
+
 @dataclass
 class Definition:
     name: str
@@ -434,10 +432,3 @@ class _ContainerRelationshipVisitor(ast.NodeVisitor):
 
     def _name(self, name: ast.Name) -> ReferencedName:
         return ReferencedName(name.id, self.name_to_counters[name.id])
-
-'''
-
-
-
-class DUC:
- 
