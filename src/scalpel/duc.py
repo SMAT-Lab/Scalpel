@@ -21,34 +21,49 @@ from scalpel.SSA.const import SSA
 
 MODULE_SCOPE = "mod"
 
-
-
-
 @dataclass
 class Definition:
     name: str
-    counter: int
+    counter: int  # counter for SSA forms
     ast_node: ast.AST
+    scope: str # scope name 
+    def add_use(self, use_node):
+        """
+        Add a use of the variable at a specific node.
+
+        Args:
+            use_node: The node where the variable is used.
+        """
+        self.uses.append(use_node)
+
+    def __str__(self):
+        """
+        Return the string representation of the variable.
+
+        Returns:
+            str: The name of the variable.
+        """
+        return self.name
 
 
 @dataclass
 class ReferencedName:
     name: str
-    counters: Set[int]
+    counters: Set[int] # which numbered variable used 
 
 
 @dataclass
 class Reference:
     name: ReferencedName
-    block_id: int
     """
     The id of the CFG block that this reference is in.
     """
-    stmt_idx: int
+    block_id: int
     """
     The index of the statement in the CFG block that this reference is in.
-    """
-
+    """  
+    stmt_idx: int
+  
 class Variable:
     """
     Represents a variable 
@@ -66,7 +81,7 @@ class Variable:
             name (str): The name of the variable.
         """
         self.name:str = name
-        self.idx:int = idx  # numbers 
+        self.counter:int = idx  # numbers 
         self.definition = None
         self.uses:List[ast.expr] = []  # usages  # experssions  
         self.value:ast.expr  = None  # for context sensitive analysis.
@@ -106,33 +121,32 @@ class DUC:
     """
 
     __slots__ = [
-        "cfgs",
-        "ssa_results",
-        "const_dicts",
-        "variables"
+        "variables",
+        "definitions",
+        "references"
     ]
-
     def __init__(self, cfg_dict: dict[str:CFG]):
         """
         Constructs a def-use chain.
         Args:
             cfg: The control flow graph.
         """
-        self.ssa_results: Dict[str, Dict[int, List[Dict[str, Set[int]]]]] = {}
-        self.const_dicts: Dict[str, Dict[Tuple[str, int], ast.AST]] = {}
-        self.variables = {}
+        #self.ssa_results: Dict[str, Dict[int, List[Dict[str, Set[int]]]]] = {}
+        #self.const_dicts: Dict[str, Dict[Tuple[str, int], ast.AST]] = {}
+        self.definitions:List[Definition] = [] 
+        self.references:List[ReferencedName] = []
         for scope, cfg in cfg_dict.items():
             ssa_results, const_dict = SSA().compute_SSA(cfg)
-            print(ssa_results)
-            print(const_dict)
-            for (var_name, idx), val in const_dict:
+            #print(ssa_results)
+            #print(const_dict)
+            for (var_name, idx), val in const_dict.items():
                  # create a new variable. 
                  # finish construction
                  # add its references 
                  # add it to variabe list
-                 new_var_obj = Variable(var_name, idx)
-                 new_var_obj.define(val)
-                 new_var_obj.scope_name = scope
+                 new_def = Definition(var_name, idx, val, scope)
+                 
+                 self.definitions.append(new_def)
 
             for entry in ssa_results:
                 # locate the variable
@@ -140,7 +154,9 @@ class DUC:
                 print(entry)                 
 
         
-
+    def get_all_vars():
+        for k, v in self.variables.items():
+            pass 
     def get_or_create_variable(self, var_name):
         if var_name in self.variables:
             return self.variables[var_name]
@@ -185,8 +201,9 @@ class DUC:
             module).
         Returns: A iterator of definitions.
         """
-        for (name, counter), value in self.const_dicts[scope].items():
-            yield Definition(name, counter, value)
+        #for (name, counter), value in self.const_dicts[scope].items():
+        #    yield Definition(name, counter, value)
+        return self.definitions
 
     def get_all_references(self, scope: str = MODULE_SCOPE) -> Iterator[Reference]:
         """
@@ -196,10 +213,11 @@ class DUC:
             module).
         Returns: An iterator of references.
         """
-        for block_id, stmts in self.ssa_results[scope].items():
-            for stmt_idx, stmt in enumerate(stmts):
-                for name, counters in stmt.items():
-                    yield Reference(ReferencedName(name, counters), block_id, stmt_idx)
+        return self.references
+        #for block_id, stmts in self.ssa_results[scope].items():
+        #    for stmt_idx, stmt in enumerate(stmts):
+        #        for name, counters in stmt.items():
+        #            yield Reference(ReferencedName(name, counters), block_id, stmt_idx)
 
     def get_all_definitions_and_references(
         self, scope: str = MODULE_SCOPE
