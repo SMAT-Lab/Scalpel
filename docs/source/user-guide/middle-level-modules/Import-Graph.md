@@ -1,14 +1,15 @@
 # Import Graph
 
-`scalpel.import_graph` creates data structure for describing import relationships of a python project. 
-An import graph represents the dependency relationship of  module files  in the given project. 
+`scalpel.`import_graph` creates a data structure for describing import relationships of a Python project. 
+An import graph represents the dependency relationship of module files in the given project. 
 This information can be important to understand the import flow, hierarchy, encapsulation as well as software architecture.
-Each node in the import graph datastructure is a module file that can be manipulated to extract statements, function calls.
-All the leaf nodes in the import graph can be processed future. 
+Each node in the import graph data structure is a module file that can be manipulated to extract statements and function calls.
+
+All the leaf nodes in the import graph can be processed future. In Python, import flows and relations have been pointed out to be important for API mapping, and dependency analysis. Our import graph construction aims to provide a data structure to represent these import relationships across the Python module files in the same project. The import graphs of multiple Python projects can be combined to perform inter-library dataflow analysis.
 
 ## How to use Import Graph
 
-Given three example python modules in the following example folder where three Python module files are defined. 
+Given three example Python modules in the following example folder where three Python module files are defined. 
 
 ```
 |-- example

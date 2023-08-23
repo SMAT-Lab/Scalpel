@@ -1,5 +1,6 @@
 """
-This implementation is partly adapted from the static cfg project
+This implementation provides interface to build CFG(Control Flow Graph) of python files using AST (Abstract Syntax Tree). The CFGBuilder class works by walking through an AST and creating a new block for each statement.
+The blocks are then linked together by adding exits from one block to another. This implementation is partly adapted from the static cfg project
 https://github.com/coetaur0/staticfg
 """
 

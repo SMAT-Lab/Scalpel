@@ -1,3 +1,5 @@
+""" The module implements the Visitor class for different keywords within the Node."""
+
 import ast
 
 

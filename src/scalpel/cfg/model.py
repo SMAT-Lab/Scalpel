@@ -1,5 +1,7 @@
 """
-Control flow graph for Python programs.
+The module provides interface for CFG Class, which is a control flow graph (CFG) representation of a Python function or module.
+It is a directed graph with basic blocks as nodes and control flow jumps as edges. The CFG class can be used to analyze the control flow of a Python function or module. 
+It can also be used to build a "graphviz" visualization of the CFG, which can be helpful for understanding the control flow of a complex function or module.
 """
 
 import ast

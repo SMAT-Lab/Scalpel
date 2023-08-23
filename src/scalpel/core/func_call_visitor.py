@@ -1,3 +1,4 @@
+""" The module implements the Visitor class for different Function Calls within the Node. This also provides interfaces for Function Call Transformations."""
 import ast
 import sys
 from ast import NodeVisitor

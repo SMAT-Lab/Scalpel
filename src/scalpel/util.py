@@ -1,3 +1,5 @@
+""" The module provides utility functions such as finding all the files with specified flag (i.e., py files) and checking python extensions. """
+
 import ast
 import builtins
 import operator

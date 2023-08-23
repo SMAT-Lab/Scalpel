@@ -1,3 +1,5 @@
+""" This module extends Generic Node Visitor to visit different Function Definitions within the Node."""
+
 import ast
 
 

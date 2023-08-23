@@ -1,3 +1,5 @@
+""" This module provides a visitor class that can be used to visit all variables in a Python AST."""
+
 import ast
 
 
