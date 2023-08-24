@@ -17,7 +17,7 @@ from typing import (
     Union,
 )
 from scalpel.cfg import CFG
-from scalpel.SSA.const import SSA
+from scalpel.SSA.ssa import SSA
 
 MODULE_SCOPE = "mod"
 
@@ -140,19 +140,19 @@ class DUC:
             #print(ssa_results)
             #print(const_dict)
             for (var_name, idx), val in const_dict.items():
-                 # create a new variable. 
-                 # finish construction
-                 # add its references 
-                 # add it to variabe list
-                 new_def = Definition(var_name, idx, val, scope)
-                 
+              
+                 new_def = Definition(var_name, idx, val, scope) 
+                 # locate all usages
+                 # question: where is this variable accessed.     
                  self.definitions.append(new_def)
+                 for b_id, stmt_rep in ssa_results.items():
+                     for ele in stmt_rep:
+                         # each statement 
+                         print(ele) 
+                         if new_def.name in ele and new_def.counter in ele:
+                             print("xx")
 
-            for entry in ssa_results:
-                # locate the variable
-                # add uses
-                print(entry)                 
-
+           
         
     def get_all_vars():
         for k, v in self.variables.items():

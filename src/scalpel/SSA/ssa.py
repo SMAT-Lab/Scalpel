@@ -1,6 +1,12 @@
 """
-In this module, the single static assignment forms are  implemented to allow
-further analysis. The module contain a single class named SSA.
+This module defines a SSAConverter class that converts a basic piece of code
+into Static Single Assignment (SSA) form. 
+
+Usage:
+1. Create an instance of SSAConverter.
+2. Use the `convert` method to convert a code snippet into SSA form.
+3. Print the resulting SSA blocks.
+
 """
 import ast
 from collections import OrderedDict
@@ -9,29 +15,21 @@ from functools import reduce
 import astor
 import networkx as nx
 
-from ..cfg.builder import Block, CFGBuilder, invert
-from ..core.mnode import MNode
 from ..core.vars_visitor import get_vars
 
-
-class SSA:
+class SSAConverter:
     """
     Build SSA graph from a given AST node based on the CFG.
     """
 
-    def __init__(self, src):
+    def __init__(self):
         """
         Args:
             src: the source code as input.
         """
         # the class SSA takes a module as the input
-        self.src = src  # source code
-        self.module_ast = ast.parse(src)
         self.numbering = {}  # numbering variables
         self.var_values = {}  # numbering variables
-        self.m_node = MNode("tmp")
-        self.m_node.source = self.src
-        self.m_node.gen_ast()
         self.global_live_idents = []
         self.ssa_blocks = []
         self.error_paths = {}
@@ -40,26 +38,10 @@ class SSA:
         self.block_ident_gen = {}
         self.block_ident_use = {}
         self.reachable_table = {}
-        id2block = {}
+       
         self.unreachable_names = {}
         self.undefined_names_from = {}
         self.global_names = []
-
-    def get_global_live_vars(self):
-        # import_dict = self.m_node.parse_import_stmts()
-        # def_records = self.m_node.parse_func_defs()
-        # def_idents = [r['name'] for r in def_records if r['scope'] == 'mod']
-        # self.global_live_idents = def_idents + list(import_dict.keys())
-        self.global_live_idents = []
-
-    def flatten_tuple(ast_tuple):
-        """
-        input: ast tuple object
-        return a list of elements in the given tuple
-        """
-        output = []
-        first = ast_tuple[0]
-        second = ast_tuple[1]
 
     def get_attribute_stmts(self, stmts):
         call_stmts = []
@@ -81,25 +63,229 @@ class SSA:
         ]
         return idents
 
-    def get_stmt_idents_ctx(self, stmt, del_set=[]):
+    def compute_SSA(self, cfg):
+        """
+        Compute single static assignment form representations for a given CFG.
+        During the computing, constant value and alias pairs are generated. The following steps are used to compute SSA representations:
+        
+        step 1a: compute the dominance frontier
+        step 1b: use dominance frontier to place phi node
+        if node X contains assignment to a, put phi node for an in dominance frontier of X
+        adding phi function may require introducing additional phi function
+        start from the entry node
+        step2: rename variables so only one definition per name
+
+        Args:
+            cfg: a control flow graph.
+        """
+        # to count how many times a var is defined
+        ident_name_counter = {}
+        # constant assignment dict
+        ident_const_dict = {}
+        # step 1a: compute the dominance frontier
+        all_blocks = cfg.get_all_blocks()
+        id2blocks = {block.id: block for block in all_blocks}
+
+        block_loaded_idents = {block.id: [] for block in all_blocks}
+        block_stored_idents = {block.id: [] for block in all_blocks}
+
+        block_const_dict = {block.id: [] for block in all_blocks}
+
+        block_renamed_stored = {block.id: [] for block in all_blocks}
+        block_renamed_loaded = {block.id: [] for block in all_blocks}
+
+        DF = self.compute_DF(all_blocks)
+
+        for block in all_blocks:
+            df_nodes = DF[block.id]
+            tmp_const_dict = {}
+
+            for idx, stmt in enumerate(block.statements):
+                stmt_const_dict = {}
+                stored_idents, loaded_idents, func_names = self.get_stmt_idents_ctx(
+                    stmt, const_dict=stmt_const_dict
+                )
+                tmp_const_dict[idx] = stmt_const_dict
+                block_loaded_idents[block.id] += [loaded_idents]
+                block_stored_idents[block.id] += [stored_idents]
+                block_renamed_loaded[block.id] += [
+                    {ident: set() for ident in loaded_idents}
+                ]
+
+            block_const_dict[block.id] = tmp_const_dict
+
+        for block in all_blocks:
+            stored_idents = block_stored_idents[block.id]
+            loaded_idents = block_loaded_idents[block.id]
+            n_stmts = len(stored_idents)
+            assert n_stmts == len(loaded_idents)
+            affected_idents = []
+            tmp_const_dict = block_const_dict[block.id]
+            for i in range(n_stmts):
+                stmt_stored_idents = stored_idents[i]
+                stmt_loaded_idents = loaded_idents[i]
+
+                # same block, number used identifiers
+                for ident in stmt_loaded_idents:
+                    # a list of dictions for each of idents used in this statement
+                    phi_loaded_idents = block_renamed_loaded[block.id][i]
+                    if ident in ident_name_counter:
+                        phi_loaded_idents[ident].add(ident_name_counter[ident])
+
+                stmt_renamed_stored = {}
+
+                for ident in stmt_stored_idents:
+                    affected_idents.append(ident)
+                    if ident in ident_name_counter:
+                        ident_name_counter[ident] += 1
+                    else:
+                        ident_name_counter[ident] = 0
+                    # rename the var name as the number of assignments
+                    stmt_const_dict = tmp_const_dict[i]
+                    if ident in stmt_const_dict:
+                        ident_const_dict[(ident, ident_name_counter[ident])] = (
+                            stmt_const_dict[ident]
+                        )
+
+                    stmt_renamed_stored[ident] = ident_name_counter[ident]
+                block_renamed_stored[block.id] += [stmt_renamed_stored]
+
+            df_block_ids = DF[block.id]
+            for df_block_id in df_block_ids:
+                df_block = id2blocks[df_block_id]
+                block_ident_gen_produced = []
+                df_block_stored_idents = block_stored_idents[df_block_id]
+                for af_ident in affected_idents:
+                    # this for-loop process every statement in the block
+                    for idx, phi_loaded_idents in enumerate(
+                        block_renamed_loaded[df_block_id]
+                    ):
+                        block_ident_gen_produced.extend(df_block_stored_idents[idx])
+                        if af_ident in block_ident_gen_produced:
+                            continue
+                        # place phi function here this var used
+                        # if af_ident has been assigned in this block beforclee this statement, then discard it
+                        # so theck af_ident has been generated in this block
+                        if af_ident in phi_loaded_idents:
+                            phi_loaded_idents[af_ident].add(
+                                ident_name_counter[af_ident]
+                            )
+               
+        return block_renamed_loaded, ident_const_dict
+
+    def get_stmt_idents_ctx(self, stmt, del_set=[], const_dict={}):
+        """
+        Extract the contextual information of each of identifiers.
+        For assignment statements, the assigned values for each of variables will be stored.
+        In addition, the del_set will store all deleted variables.
+        Args:
+            stmt: statement from AST trees.
+            del_set: deleted identifiers
+            const_dict: a mapping relationship between variables and their assigned values in this statement
+        """
         # if this is a definition of class/function, ignore
         stored_idents = []
         loaded_idents = []
         func_names = []
+        # assignment with only one target
+
+        if isinstance(stmt, ast.Assign):
+            targets = stmt.targets
+            value = stmt.value
+            if len(targets) == 1:
+                if hasattr(targets[0], "id"):
+                    left_name = stmt.targets[0].id
+                    const_dict[left_name] = stmt.value
+                elif isinstance(targets[0], ast.Attribute):
+                    left_name = astor.to_source(stmt.targets[0]).strip()
+                    const_dict[left_name] = value
+                # multiple targets are represented as tuple
+                elif isinstance(targets[0], ast.Tuple):
+                    # value is also represented as tuple
+                    if isinstance(value, ast.Tuple):
+                        for elt, val in zip(targets[0].elts, value.elts):
+                            if hasattr(elt, "id"):
+                                left_name = elt.id
+                                const_dict[left_name] = val
+                            elif isinstance(targets[0], ast.Attribute):
+                                # TODO: resolve attributes
+                                pass
+                    # value is represented as call
+                    if isinstance(value, ast.Call):
+                        for elt in targets[0].elts:
+                            if hasattr(elt, "id"):
+                                left_name = elt.id
+                                const_dict[left_name] = value
+                            elif isinstance(targets[0], ast.Attribute):
+                                # TODO: resolve attributes
+                                pass
+            else:
+                # Note  in some python versions, there are more than one target for an assignment
+                # while in some other python versions, multiple targets are deemed as ast.Tuple type in assignment statement
+                for target in stmt.targets:
+                    # this is an assignment to tuple such as a,b = fun()
+                    # then no valid constant value can be recorded for this statement
+                    if hasattr(target, "id"):
+                        left_name = target.id
+                        const_dict[left_name] = (
+                            None  # TODO: design a type for these kind of values
+                        )
+                    elif isinstance(stmt.targets[0], ast.Attribute):
+                        # TODO: resolve attributes
+                        pass
+
+        # one target assignment with type annotations
+        if isinstance(stmt, ast.AnnAssign):
+            if hasattr(stmt.target, "id"):
+                left_name = stmt.target.id
+                const_dict[left_name] = stmt.value
+            elif isinstance(stmt.target, ast.Attribute):
+                # TODO: resolve attributes
+                pass
+        if isinstance(stmt, ast.AugAssign):
+            # note here , we need to rewrite this value to its extended form
+            # if the statement is "a += 1", then the assigned value should be a+1
+            if hasattr(stmt.target, "id"):
+                left_name = stmt.target.id
+                extended_right = ast.BinOp(
+                    ast.Name(left_name, ast.Load()), stmt.op, stmt.value
+                )
+                const_dict[left_name] = extended_right
+            elif isinstance(stmt.target, ast.Attribute):
+                # TODO: resolve attributes
+                pass
+        if isinstance(stmt, ast.For):
+            # there is a variation of assignment in for loop
+            # in the case of :  for i in [1,2,3]
+            # the element of stmt.iter is the value of this assignment
+            if hasattr(stmt.target, "id"):
+                left_name = stmt.target.id
+                iter_value = stmt.iter
+                # make a iter call
+                # iter_node = ast.Call(ast.Name("iter", ast.Load()), [stmt.iter], [])
+                # make a next call
+                # next_call_node = ast.Call(ast.Name("next", ast.Load()), [iter_node], [])
+                const_dict[left_name] = iter_value
+
+            elif isinstance(stmt.target, ast.Tuple):
+                # to handle for-loop uch as:
+                # for x, y in fun():
+                for elt in stmt.target.elts:
+                    if hasattr(elt, "id"):
+                        const_dict[elt.id] = stmt.iter
+            elif isinstance(stmt.target, ast.Attribute):
+                # TODO: resolve attributes
+                pass
+
         if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef)):
             stored_idents.append(stmt.name)
+            const_dict[stmt.name] = stmt
             func_names.append(stmt.name)
-            # for arg in stmt.args.args:
-            #    if isinstance(arg.annotation, ast.Name):
-            #        loaded_idents.append(arg.annotation.id)
-            #    if isinstance(arg.annotation, ast.Attribute):
-            #        if isinstance(arg.annotation.value, ast.Name):
-            #            loaded_idents.append(arg.annotation.value.id)
             new_stmt = stmt
             new_stmt.body = []
             ident_info = get_vars(new_stmt)
             for r in ident_info:
-                if r["name"] is None or "." in r["name"] or "_hidden_" in r["name"]:
+                if r["name"] is None:
                     continue
                 if r["usage"] == "load":
                     loaded_idents.append(r["name"])
@@ -107,12 +293,12 @@ class SSA:
 
         if isinstance(stmt, ast.ClassDef):
             stored_idents.append(stmt.name)
+            const_dict[stmt.name] = None
             func_names.append(stmt.name)
             return stored_idents, loaded_idents, func_names
 
         # if this is control flow statements, we should not visit its body to avoid duplicates
         # as they are already in the next blocks
-
         if isinstance(stmt, (ast.Import, ast.ImportFrom)):
             for alias in stmt.names:
                 if alias.asname is None:
@@ -125,7 +311,7 @@ class SSA:
             for handler in stmt.handlers:
                 if handler.name is not None:
                     stored_idents.append(handler.name)
-                    # print(ast.dump())
+
                 if isinstance(handler.type, ast.Name):
                     loaded_idents.append(handler.type.id)
                 elif isinstance(handler.type, ast.Attribute) and isinstance(
@@ -139,23 +325,34 @@ class SSA:
             return stored_idents, loaded_idents, []
 
         visit_node = stmt
+
         if isinstance(visit_node, (ast.If, ast.IfExp)):
             # visit_node.body = []
             # visit_node.orlse=[]
             visit_node = stmt.test
 
-        if isinstance(visit_node, (ast.With)):
+        elif isinstance(visit_node, (ast.With)):
             visit_node.body = []
             visit_node.orlse = []
 
-        if isinstance(visit_node, (ast.While)):
+        elif isinstance(visit_node, (ast.While)):
             visit_node.body = []
-        if isinstance(visit_node, (ast.For)):
+
+        elif isinstance(visit_node, (ast.For)):
             visit_node.body = []
+
+        elif isinstance(visit_node, ast.Return):
+            # imaginary variable
+            stored_idents.append("<ret>")
+            const_dict["<ret>"] = visit_node.value
+        elif isinstance(visit_node, ast.Yield):
+            # imaginary variable
+            stored_idents.append("<ret>")
+            const_dict["<ret>"] = visit_node.value
 
         ident_info = get_vars(visit_node)
         for r in ident_info:
-            if r["name"] is None or "." in r["name"] or "_hidden_" in r["name"]:
+            if r["name"] is None or "_hidden_" in r["name"]:
                 continue
             if r["usage"] == "store":
                 stored_idents.append(r["name"])
@@ -165,261 +362,17 @@ class SSA:
                 del_set.append(r["name"])
         return stored_idents, loaded_idents, []
 
-    def compute_undefined_names(self, cfg, scope=["mod"]):
-        """
-        generate undefined names from given cfg
-        """
-        all_blocks = cfg.get_all_blocks()
-        reachable_table = {}
-        id2block = {}
-        block_ident_gen = {}
-        block_ident_use = {}
-        block_ident_unorder = {}
-        block_ident_del = {}
-
-        subscope_undefined_names = []
-        undefined_names_table = []
-        undefined_names = []
-        scope_str = ".".join(scope)
-
-        dom = self.compute_dom_old(all_blocks)
-        # idom = self.compute_idom(all_blocks)
-        for block in all_blocks:
-            # assign_records = self.get_assign_raw(block.statements)
-            id2block[block.id] = block
-            block_ident_gen[block.id] = []
-            block_ident_use[block.id] = []
-            block_ident_unorder[block.id] = []
-            block_ident_del[block.id] = []
-            ident_to_be_traced = []
-            del_set = []
-            for stmt in block.statements:
-                stored_idents, loaded_idents, scope_func_names = (
-                    self.get_stmt_idents_ctx(stmt, del_set=del_set)
-                )
-                for ident in loaded_idents:
-                    if ident[0:8] == "_hidden_":
-                        # this is noise
-                        continue
-                    if (
-                        ident not in block_ident_gen[block.id]
-                        and ident not in stored_idents
-                    ):
-                        ident_to_be_traced.append(
-                            {
-                                "name": ident,
-                                "scope": scope_str,
-                                "type": "unresolved",
-                                "path_id": [],
-                                "path_src": [],
-                            }
-                        )
-                block_ident_gen[block.id] += stored_idents
-                block_ident_unorder[block.id] += scope_func_names
-            block_ident_use[block.id] = ident_to_be_traced
-            block_ident_del[block.id] = del_set
-        for block in all_blocks:
-            # number of stmts parsed
-            for stmt in block.statements:
-                if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef)):
-                    fun_undefined_names = self.compute_undefined_names(
-                        cfg.functioncfgs[(block.id, stmt.name)],
-                        scope=scope + [stmt.name],
-                    )
-                    fun_args = cfg.function_args[(block.id, stmt.name)]
-                    # exclude arguments
-                    # fun_undefined_names = [name for name in fun_undefined_names if name not in tmp_avail_names]
-                    fun_idx = block_ident_gen[block.id].index(stmt.name)
-                    part_ident_gen = block_ident_gen[block.id][0:fun_idx]
-                    # arguments its own name + part of gen set and unorder func/class/def names
-                    tmp_avail_names = (
-                        fun_args
-                        + [stmt.name]
-                        + block_ident_unorder[block.id]
-                        + part_ident_gen
-                    )
-                    fun_undefined_names = [
-                        name
-                        for name in fun_undefined_names
-                        if name["name"] not in tmp_avail_names
-                    ]
-                    subscope_undefined_names += fun_undefined_names
-
-                elif isinstance(stmt, ast.ClassDef):
-                    class_cfg = cfg.class_cfgs[stmt.name]
-                    cls_body_undefined_names = self.compute_undefined_names(
-                        class_cfg, scope=scope + [stmt.name]
-                    )
-                    cls_idx = block_ident_gen[block.id].index(stmt.name)
-                    part_ident_gen = block_ident_gen[block.id][0:cls_idx]
-
-                    tmp_avail_names = (
-                        part_ident_gen + [stmt.name] + block_ident_unorder[block.id]
-                    )
-                    cls_body_undefined_names = [
-                        name
-                        for name in cls_body_undefined_names
-                        if name["name"] not in tmp_avail_names
-                    ]
-                    subscope_undefined_names += cls_body_undefined_names
-            # process this block
-            block_id = block.id
-            all_used_idents = block_ident_use[block_id] + subscope_undefined_names
-            # all_used_idents = []
-            idents_non_local = [
-                ident
-                for ident in all_used_idents
-                if ident["name"] not in BUILT_IN_FUNCTIONS
-                and ident["name"] not in self.global_names
-                and ident["type"] == "unresolved"
-            ]
-            idents_non_local = idents_non_local
-            idents_left = []
-            dominators = dom[block_id]
-
-            for ident in idents_non_local:
-                ident_name = ident["name"]
-                is_found = False
-                # look for this var in it dominatores
-                for d_b_id in dominators:
-                    if d_b_id == block_id:
-                        continue
-                    if (
-                        ident_name in block_ident_gen[d_b_id]
-                        and ident_name not in block_ident_del[d_b_id]
-                    ):
-                        is_found = True
-                        break
-                if is_found == False:
-                    idents_left.append(ident)
-                # for those vars that cannot be found in its domiators, backtrace to
-                # test if there is a path along wich the var is not defined.
-            path_constraint = None
-            if len(block.predecessors) == 1:
-                path_constraint = block.predecessors[0].exitcase
-            for ident in idents_left:
-                visited = set()
-                exec_path = []
-                is_not_found = self.backward_query_new(
-                    block,
-                    ident["name"],
-                    visited,
-                    dom=dom,
-                    path=exec_path,
-                    block_ident_gen=block_ident_gen,
-                    condition_cons=path_constraint,
-                    entry_id=cfg.entryblock.id,
-                    block_ident_del=block_ident_del,
-                )
-                if is_not_found:
-                    # ident["path_id"].append(exec_path)
-                    # ident["path_src"].append([self.print_block(id2block[e_id]) for e_id in exec_path])
-                    is_found_here = self.hit_scope(
-                        ident["name"], block_ident_gen, block_ident_unorder
-                    )
-                    if is_found_here:
-                        if scope_str == ident["scope"]:
-                            ident["type"] = "local"
-                        else:
-                            ident["type"] = "foreign"
-                    undefined_names += [ident]
-                    # if  ident[0] == "cell_data":
-                    #    print(self.print_block(block))
-        return undefined_names
-
-    # if there exists one path that ident_name is not reachable
-    # when the entered block is the entry block, it means the variable has not been found in this path.
-    # Otherwise, the algorithm terminates at a previous block.
-    def backward_query_new(
-        self,
-        block,
-        ident_name,
-        visited,
-        path=[],
-        dom={},
-        idom={},
-        dom_stmt_res=[],
-        block_ident_gen={},
-        block_ident_del={},
-        condition_cons=None,
-        entry_id=1,
-    ):
-        # condition constraints:
-        visited.add(block.id)
-        path += [block.id]
-        # all the incoming path
-        # if this is the entry block and ident not in the gen set then return True
-        if block.id == entry_id:
-            return True
-
-        for suc_link in block.predecessors:
-            if condition_cons is not None and suc_link.exitcase is not None:
-                this_condition = invert(condition_cons)
-                this_txt = astor.to_source(this_condition)
-                this_edge_txt = astor.to_source(suc_link.exitcase)
-                # this path contracdict the constraints
-                if this_txt.strip() == this_edge_txt.strip():
-                    continue
-            parent_block = suc_link.source
-            target_block = suc_link.target
-            # deal with cycles, this is back edge
-            if parent_block is None:
-                continue
-            if parent_block.id in visited or parent_block.id == block.id:
-                continue
-            # if the block dominates the parent block, then give it up
-            if parent_block.id in dom and block.id in dom[parent_block.id]:
-                continue
-            ##############
-            if parent_block.id not in block_ident_gen:
-                continue
-            # if the name id found in this gen set. then stop visiting this path
-            if ident_name in block_ident_gen[parent_block.id]:
-                continue
-            if (
-                parent_block.id in block_ident_del
-                and ident_name in block_ident_del[parent_block.id]
-            ):
-                path.append(entry_id)
-                return True
-            # if the name id is not found in the parent block and the parent is entry  return True
-            if parent_block.id == entry_id:
-                path.append(entry_id)
-                return True
-            # if continue to search
-            # not in its parent gen set  then search from this path
-            return self.backward_query_new(
-                parent_block,
-                ident_name,
-                visited,
-                dom=dom,
-                block_ident_gen=block_ident_gen,
-                condition_cons=condition_cons,
-                entry_id=entry_id,
-                path=path,
-            )
-        return False
-
-    def hit_scope(self, ident_name, block_ident_gen, block_ident_unorder):
-        gen_sets = list(block_ident_gen.values()) + list(block_ident_unorder.values())
-        return any(ident_name in g_s for g_s in gen_sets)
-
-    def is_undefined(self, load_idents):
-        ident_phi_fun = {}
-        for item in load_idents:
-            if item[0] in ident_phi_fun:
-                pass
-
-    def to_json(self):
-        pass
 
     def print_block(self, block):
-        # for stmt in block.statements:
-        # print(block.get_source())
         return block.get_source()
 
-    # compute the dominators
-    def compute_idom(self, ssa_blocks):
+    # compute dominance frontiers
+    def compute_DF(self, ssa_blocks):
+        """
+        Compute dominating frontiers for each of blocks
+        Args:
+            ssa_blocks: blocks from a control flow graph.
+        """
         # construct the Graph
         entry_block = ssa_blocks[0]
         G = nx.DiGraph()
@@ -429,68 +382,6 @@ class SSA:
             preds = block.predecessors
             for link in preds + exits:
                 G.add_edge(link.source.id, link.target.id)
-        # DF = nx.dominance_frontiers(G, entry_block.id)
-        idom = nx.immediate_dominators(G, entry_block.id)
-        return idom
-
-    def RD(self, cfg_blocks):
-        # worklist
-        # this is to express the conventional RD anaysis
-        # By using Out and Kill set to compute the latest assignment to a variable
-        entry_block = cfg_blocks[0]
-        Out[entry_block.id] = set()
-        # init the iterative algorithm
-        for block in cfg_blocks:
-            if block.id != entry_block.id:
-                out[block.id] = set()
-        changed = True
-        while changed:
-            for block in cfg_blocks:
-                #
-                pre_links = block.predecessors
-                pre_blocks = [pl.source for pl in pre_links]
-                pre_outs = [out[pb.id] for pb in pre_blocks]
-                In[block.id] = reduce(set.intersection, pre_outs)
-                Out[block.id] = gen(B)(In[block.id] - kill[block.id])
-        # boundry
-        return 0
-
-    def compute_dom_old(self, ssa_blocks):
-        entry_block = ssa_blocks[0]
-        id2blocks = {b.id: b for b in ssa_blocks}
-        block_ids = list(id2blocks.keys())
-        entry_id = entry_block.id
-        N_blocks = len(ssa_blocks)
-        dom = {}
-        # for all other nodes, set all nodes as the dominators
-        for b_id in block_ids:
-            if b_id == entry_id:
-                dom[b_id] = set([entry_id])
-            else:
-                dom[b_id] = set(block_ids)
-        # Iteratively eliminate nodes that are not dominators
-        # Dom(n) = {n} union with intersection over Dom(p) for all p in pred(n)
-        changed = True
-        counter = 0
-        while changed:
-            changed = False
-            for b_id in block_ids:
-                if b_id == entry_id:
-                    continue
-                pre_block_ids = [
-                    pre_link.source.id for pre_link in id2blocks[b_id].predecessors
-                ]
-                pre_dom_set = [
-                    dom[pre_b_id] for pre_b_id in pre_block_ids if pre_b_id in dom
-                ]
-                new_dom_set = set([b_id])
-
-                if len(pre_dom_set) != 0:
-                    new_dom_tmp = reduce(set.intersection, pre_dom_set)
-                    new_dom_set = new_dom_set.union(new_dom_tmp)
-                old_dom_set = dom[b_id]
-
-                if new_dom_set != old_dom_set:
-                    changed = True
-                    dom[b_id] = new_dom_set
-        return dom
+        DF = nx.dominance_frontiers(G, entry_block.id)
+        # idom = nx.immediate_dominators(G, entry_block.id)
+        return DF
