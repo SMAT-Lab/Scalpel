@@ -12,3 +12,8 @@
 
 # Persistent undo
 [._]*.un~
+
+# python cache files
+
+*.pyc
+__pycache__

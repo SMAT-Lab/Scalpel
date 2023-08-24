@@ -12,7 +12,6 @@ setup(
         "astor~=0.8.1",
         "graphviz~=0.17",
         "networkx",
-        "astunparse~=1.6.3",
         "typed-ast~=1.5.4",
         "typeshed-client~=2.2.0",
         "regex",

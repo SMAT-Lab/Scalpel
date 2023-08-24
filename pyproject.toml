@@ -4,7 +4,6 @@ requires = [
         "astor~=0.8.1",
         "graphviz~=0.17",
         "networkx",
-        "astunparse~=1.6.3",
         "typed-ast",
         "typeshed-client",
         "regex",
