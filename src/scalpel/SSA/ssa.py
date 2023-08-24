@@ -63,7 +63,7 @@ class SSAConverter:
         ]
         return idents
 
-    def compute_SSA(self, cfg):
+    def convert(self, cfg):
         """
         Compute single static assignment form representations for a given CFG.
         During the computing, constant value and alias pairs are generated. The following steps are used to compute SSA representations:
@@ -86,14 +86,16 @@ class SSAConverter:
         all_blocks = cfg.get_all_blocks()
         id2blocks = {block.id: block for block in all_blocks}
 
-        block_loaded_idents = {block.id: [] for block in all_blocks}
-        block_stored_idents = {block.id: [] for block in all_blocks}
+        block_loaded_idents:dict[int, list] = {block.id: [] for block in all_blocks}
+        block_stored_idents:dict[int, list] = {block.id: [] for block in all_blocks}
 
-        block_const_dict = {block.id: [] for block in all_blocks}
+        block_const_dict:dict[int, list] = {block.id: [] for block in all_blocks}
 
-        block_renamed_stored = {block.id: [] for block in all_blocks}
-        block_renamed_loaded = {block.id: [] for block in all_blocks}
+        block_renamed_stored:dict[int, list] = {block.id: [] for block in all_blocks}
+        block_renamed_loaded:dict[int, list] = {block.id: [] for block in all_blocks}
+        block_loaded_values:dict[int, list] = {block.id: [] for block in all_blocks} # for each statement, it's value expression is recorded. 
 
+        
         DF = self.compute_DF(all_blocks)
 
         for block in all_blocks:
@@ -101,24 +103,31 @@ class SSAConverter:
             tmp_const_dict = {}
 
             for idx, stmt in enumerate(block.statements):
-                stmt_const_dict = {}
-                stored_idents, loaded_idents, func_names = self.get_stmt_idents_ctx(
+                stmt_const_dict:dict[str, ast.expr] = {}
+                # stmt_value_expr is the value part in this statement
+                stored_idents, loaded_idents, stmt_value_expr = self.get_stmt_idents_ctx(
                     stmt, const_dict=stmt_const_dict
                 )
                 tmp_const_dict[idx] = stmt_const_dict
                 block_loaded_idents[block.id] += [loaded_idents]
                 block_stored_idents[block.id] += [stored_idents]
+
                 block_renamed_loaded[block.id] += [
                     {ident: set() for ident in loaded_idents}
                 ]
+                block_loaded_values[block.id] += [stmt_value_expr]
+        
 
             block_const_dict[block.id] = tmp_const_dict
 
         for block in all_blocks:
             stored_idents = block_stored_idents[block.id]
             loaded_idents = block_loaded_idents[block.id]
+            loaded_value_exprs = block_loaded_values[block.id]
             n_stmts = len(stored_idents)
             assert n_stmts == len(loaded_idents)
+            assert n_stmts == len(loaded_value_exprs)
+
             affected_idents = []
             tmp_const_dict = block_const_dict[block.id]
             for i in range(n_stmts):
@@ -170,8 +179,10 @@ class SSAConverter:
                             phi_loaded_idents[af_ident].add(
                                 ident_name_counter[af_ident]
                             )
-               
-        return block_renamed_loaded, ident_const_dict
+        # TODO: map loaded ident name to expressions in which they referenced 
+        # if loaded ident is  a:0,1  and the experssion should be something like y = a+b
+         
+        return block_renamed_loaded, ident_const_dict, loaded_value_exprs
 
     def get_stmt_idents_ctx(self, stmt, del_set=[], const_dict={}):
         """
@@ -187,11 +198,14 @@ class SSAConverter:
         stored_idents = []
         loaded_idents = []
         func_names = []
+        stmt_value_expr  = None 
+
         # assignment with only one target
 
         if isinstance(stmt, ast.Assign):
             targets = stmt.targets
             value = stmt.value
+            stmt_value_expr = value 
             if len(targets) == 1:
                 if hasattr(targets[0], "id"):
                     left_name = stmt.targets[0].id
@@ -222,6 +236,7 @@ class SSAConverter:
             else:
                 # Note  in some python versions, there are more than one target for an assignment
                 # while in some other python versions, multiple targets are deemed as ast.Tuple type in assignment statement
+                stmt_value_expr = value 
                 for target in stmt.targets:
                     # this is an assignment to tuple such as a,b = fun()
                     # then no valid constant value can be recorded for this statement
@@ -236,6 +251,7 @@ class SSAConverter:
 
         # one target assignment with type annotations
         if isinstance(stmt, ast.AnnAssign):
+            stmt_value_expr = stmt.value 
             if hasattr(stmt.target, "id"):
                 left_name = stmt.target.id
                 const_dict[left_name] = stmt.value
@@ -243,6 +259,7 @@ class SSAConverter:
                 # TODO: resolve attributes
                 pass
         if isinstance(stmt, ast.AugAssign):
+            stmt_value_expr = stmt.value 
             # note here , we need to rewrite this value to its extended form
             # if the statement is "a += 1", then the assigned value should be a+1
             if hasattr(stmt.target, "id"):
@@ -258,6 +275,7 @@ class SSAConverter:
             # there is a variation of assignment in for loop
             # in the case of :  for i in [1,2,3]
             # the element of stmt.iter is the value of this assignment
+            stmt_value_expr = stmt.iter  
             if hasattr(stmt.target, "id"):
                 left_name = stmt.target.id
                 iter_value = stmt.iter
@@ -360,7 +378,7 @@ class SSAConverter:
                 loaded_idents.append(r["name"])
             if r["usage"] == "del":
                 del_set.append(r["name"])
-        return stored_idents, loaded_idents, []
+        return stored_idents, loaded_idents, stmt_value_expr
 
 
     def print_block(self, block):

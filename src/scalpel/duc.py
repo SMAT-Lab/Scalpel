@@ -17,7 +17,7 @@ from typing import (
     Union,
 )
 from scalpel.cfg import CFG
-from scalpel.SSA.ssa import SSA
+from scalpel.SSA.ssa import SSAConverter 
 
 MODULE_SCOPE = "mod"
 
@@ -136,7 +136,7 @@ class DUC:
         self.definitions:List[Definition] = [] 
         self.references:List[ReferencedName] = []
         for scope, cfg in cfg_dict.items():
-            ssa_results, const_dict = SSA().compute_SSA(cfg)
+            ssa_results, const_dict = SSAConverter().convert(cfg)
             #print(ssa_results)
             #print(const_dict)
             for (var_name, idx), val in const_dict.items():

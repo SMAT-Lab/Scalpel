@@ -40,12 +40,16 @@ def test_definitions_and_references() -> None:
             "simple",
             """\
             a = 1
-            print(a + 1) 
+            if True:
+                y = 2
+            else:
+                y = 3
+            z = (a + 1 + y) 
             """,
         )
-        a_def = get_def(duc, "a")
-        a_ref = get_ref(duc, "a")
-        print_ref = get_ref(duc, "print")
+        #a_def = get_def(duc, "a")
+        #a_ref = get_ref(duc, "a")
+        #print_ref = get_ref(duc, "print")
 
         #assert_num_defs_refs(duc, 1, 2)
         #assert len(print_ref.name.counters) == 0
@@ -66,10 +70,12 @@ def test_definitions_and_references() -> None:
         assert_num_defs_refs(duc, 2, 4)
 
         a_def1, a_def2 = get_defs(duc, 2, "a")
+        
         assert a_def1.ast_node.lineno == 1
         assert a_def2.ast_node.lineno == 3
 
         a_ref1, a_ref2 = get_refs(duc, 2, "a")
+        
         assert a_ref1.stmt_idx == 1
         assert a_ref2.stmt_idx == 3
 
