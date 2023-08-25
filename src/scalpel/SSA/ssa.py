@@ -23,24 +23,9 @@ class SSAConverter:
     """
 
     def __init__(self):
-        """
-        Args:
-            src: the source code as input.
-        """
         # the class SSA takes a module as the input
-        self.numbering = {}  # numbering variables
-        self.var_values = {}  # numbering variables
         self.global_live_idents = []
         self.ssa_blocks = []
-        self.error_paths = {}
-        self.dom = {}
-
-        self.block_ident_gen = {}
-        self.block_ident_use = {}
-        self.reachable_table = {}
-       
-        self.unreachable_names = {}
-        self.undefined_names_from = {}
         self.global_names = []
 
     def get_attribute_stmts(self, stmts):
@@ -234,7 +219,7 @@ class SSAConverter:
                                 # TODO: resolve attributes
                                 pass
             else:
-                # Note  in some python versions, there are more than one target for an assignment
+                # Note in some python versions, there are more than one target for an assignment
                 # while in some other python versions, multiple targets are deemed as ast.Tuple type in assignment statement
                 stmt_value_expr = value 
                 for target in stmt.targets:
@@ -379,10 +364,6 @@ class SSAConverter:
             if r["usage"] == "del":
                 del_set.append(r["name"])
         return stored_idents, loaded_idents, stmt_value_expr
-
-
-    def print_block(self, block):
-        return block.get_source()
 
     # compute dominance frontiers
     def compute_DF(self, ssa_blocks):
