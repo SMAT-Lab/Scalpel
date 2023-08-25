@@ -28,26 +28,6 @@ class SSAConverter:
         self.ssa_blocks = []
         self.global_names = []
 
-    def get_attribute_stmts(self, stmts):
-        call_stmts = []
-        for stmt in stmts:
-            if isinstance(stmt, ast.Call) and isinstance(stmt.func, ast.Attribute):
-                call_stmts += [stmt]
-
-    def get_identifiers(self, ast_node):
-        """
-        Extract all identifiers from the given AST node.
-        Args:
-            ast_node: AST node.
-        """
-        if ast_node is None:
-            return []
-        res = get_vars(ast_node)
-        idents = [
-            r["name"] for r in res if r["name"] is not None and "." not in r["name"]
-        ]
-        return idents
-
     def convert(self, cfg):
         """
         Compute single static assignment form representations for a given CFG.
