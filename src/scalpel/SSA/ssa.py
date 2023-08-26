@@ -11,7 +11,7 @@ Usage:
 import ast
 from collections import OrderedDict
 from functools import reduce
-
+from typing import Tuple, List
 import astor
 import networkx as nx
 
@@ -28,7 +28,7 @@ class SSAConverter:
         self.ssa_blocks = []
         self.global_names = []
 
-    def convert(self, cfg):
+    def convert(self, cfg)->Tuple[dict[int: list], dict[int:list], dict]:
         """
         Compute single static assignment form representations for a given CFG.
         During the computing, constant value and alias pairs are generated. The following steps are used to compute SSA representations:
@@ -147,7 +147,7 @@ class SSAConverter:
         # TODO: map loaded ident name to expressions in which they referenced 
         # if loaded ident is  a:0,1  and the experssion should be something like y = a+b
          
-        return block_renamed_loaded, ident_const_dict, loaded_value_exprs
+        return block_renamed_loaded, ident_const_dict, block_loaded_values
 
     def get_stmt_idents_ctx(self, stmt, del_set=[], const_dict={}):
         """

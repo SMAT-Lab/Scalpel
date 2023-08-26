@@ -63,7 +63,7 @@ class Reference:
     The index of the statement in the CFG block that this reference is in.
     """  
     stmt_idx: int
-  
+
 class Variable:
     """
     Represents a variable 
@@ -74,19 +74,20 @@ class Variable:
         uses (list): List of nodes where the variable is used. 
     """
 
-    def __init__(self, name, idx):
+
+    def __init__(self, name, count, scope):
         """
         Initialize a Variable instance.
         Args:
             name (str): The name of the variable.
         """
-        self.name:str = name
-        self.counter:int = idx  # numbers 
-        self.definition = None
+        self.name: str = name 
+        self.count: int = count # counter for SSA forms
+        self.scope: str  = scope# scope name 
+
+        self.ast_node: Optional[ast.AST] = None 
         self.uses:List[ast.expr] = []  # usages  # experssions  
-        self.value:ast.expr  = None  # for context sensitive analysis.
         self.type:type = any    # type for this variable 
-        self.scope_name:str = None  # the lexical scope it is defined 
 
     def define(self, definition_node):
         """
@@ -136,27 +137,39 @@ class DUC:
         self.definitions:List[Definition] = [] 
         self.references:List[ReferencedName] = []
         for scope, cfg in cfg_dict.items():
-            ssa_results, const_dict = SSAConverter().convert(cfg)
+            ssa_results, const_dict, loaded_value_exprs = SSAConverter().convert(cfg)
             #print(ssa_results)
             #print(const_dict)
+            value_exprs_unfold  = {}
+            for k, v in ssa_results.items():
+                n_stmt = len(v)
+                for stmt_idx in range(n_stmt):
+                    expr = loaded_value_exprs[k][stmt_idx]
+                    ssa_rep = v[stmt_idx]
+                    for var_name, counters in ssa_rep.items():
+                        for c in counters:
+                            value_exprs_unfold[(var_name, c)] = expr 
+                    #value_exprs_unfold.append(ssa_rep, expr)
+
             for (var_name, idx), val in const_dict.items():
               
-                 new_def = Definition(var_name, idx, val, scope) 
-                 # locate all usages
-                 # question: where is this variable accessed.     
-                 self.definitions.append(new_def)
-                 for b_id, stmt_rep in ssa_results.items():
-                     for ele in stmt_rep:
-                         # each statement 
-                         print(ele) 
-                         if new_def.name in ele and new_def.counter in ele:
-                             print("xx")
+                new_def = Variable(var_name, idx, scope) 
+                new_def.define(val)
+                # lookup its references 
+                if (var_name, idx) in value_exprs_unfold:
+                    used_expr = value_exprs_unfold[(var_name,idx)]
+                    new_def.add_use(used_expr)
+                 
+                self.definitions.append(new_def)
+                
+                 # this is to check usages 
+                       
+            
 
            
         
     def get_all_vars():
-        for k, v in self.variables.items():
-            pass 
+        pass  
     def get_or_create_variable(self, var_name):
         if var_name in self.variables:
             return self.variables[var_name]
@@ -296,15 +309,6 @@ class DUC:
             for block in self.cfgs[scope]
             if block.id == block_id
         )
-
-#Example usage
-#def_use_chain = DefUseChain()
-#def_use_chain.add_definition("x", "x = 10")
-#def_use_chain.add_use("x", "print(x)")
-#def_use_chain.add_use("x", "y = x + 5")
-#def_use_chain.add_definition("y", "y = x * 2")
-#def_use_chain.add_use("y", "z = y - 3")
-
 
 ContainerElement = Tuple[Optional[ReferencedName], ReferencedName]
 """
