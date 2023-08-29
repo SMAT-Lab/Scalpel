@@ -234,14 +234,73 @@ class ScopeGraph(ast.NodeVisitor):
 # need to write resolve a method name
 
 
-def create_MRO():
-    pass 
+class NameBinding:
+    def __init__(self, name, node):
+        self.name = name
+        self.node = node
 
-def test_this_module():
-    pass
+class Scope:
+    def __init__(self, name, parent=None):
+        self.name = name
+        self.parent = parent
+        self.children = []
+        self.bindings = []
+
+        if parent:
+            parent.add_child(self)
+
+    def add_child(self, child_scope):
+        self.children.append(child_scope)
+
+    def add_binding(self, name, node):
+        binding = NameBinding(name, node)
+        self.bindings.append(binding)
+        return binding
+
+class ScopeGraphBuilder(ast.NodeVisitor):
+    def __init__(self):
+        self.scope_graph = Scope("global")
+        self.current_scope = self.scope_graph
+
+    def visit_FunctionDef(self, node):
+        function_scope = Scope(node.name, self.current_scope)
+        self.current_scope = function_scope
+
+        for arg in node.args.args:
+            self.current_scope.add_binding(arg.arg, arg)
+
+        self.generic_visit(node)
+        self.current_scope = self.current_scope.parent
+
+    def visit_Assign(self, node):
+        for target in node.targets:
+            if isinstance(target, ast.Name):
+                self.current_scope.add_binding(target.id, target)
+        
+        self.generic_visit(node)
+
+    def build_scope_graph(self, node):
+        self.visit(node)
+        return self.scope_graph
 
 
 if __name__ == "__main__":
-    test_this_module()
+
+# Example usage: Parsing an example Python module
+    with open("example_module.py", "r") as file:
+        code = file.read()
+        module_ast = ast.parse(code)
+
+    builder = ScopeGraphBuilder()
+    scope_graph = builder.build_scope_graph(module_ast)
+    # Printing the scope graph with name bindings
+    def print_scope(scope, indent=""):
+        print(indent + scope.name)
+        for binding in scope.bindings:
+            print(indent + "  Binding:", binding.name, "at line", binding.node.lineno)
+        for child in scope.children:
+            print_scope(child, indent + "  ")
+    print_scope(scope_graph)
+
 
 
