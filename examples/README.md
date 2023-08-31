@@ -2,7 +2,7 @@
 
 Scalpel is a framework for static analysis of Python code. It provides a variety of functionalities, such as static single assignment (SSA), call graph construction, and control flow graph (CFG) analysis.
 
-This repository contains example tutorials that demonstrate how to use Scalpel to perform these functionalities. The tutorials are written in Python using Jupyter Notebooks and are accompanied by required background information and code snippets. 
+This repository contains example tutorials that demonstrate how to use Scalpel to perform these functionalities. The tutorials are written in Python using Jupyter Notebooks and are accompanied by required background information and code snippets.
 
 The tutorials are organized as follows:
 
@@ -10,6 +10,7 @@ The tutorials are organized as follows:
 * [Call Graph Construction](call_graph_tutorial.ipynb)
 * [Control Flow Graph (CFG)](CFG_tutorial.ipynb)
 * [Import Graph Construction](import_graph_tutorial.ipynb)
+* [Fully Qualified Name Resolution](FQN_tutorial.ipynb)
 * [API Name Qualification](API_name_qualifying_tutorial.ipynb)
 * [Code Rewriter](Rewriter_tutorial.ipynb)
 * [Type Inference](type_infer_tutorial.ipynb)

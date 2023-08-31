@@ -1,6 +1,8 @@
-"""Fully Qualified Name Inference module  in Python static code analysis is the process of determining the fully qualified name of an object or entity from its context.
-This module provides an option to perform either perform full name inference as implemented in Scalpel or further perform dynamic analysis, which is inherited from HeaderGen
-https://doi.org/10.48550/arXiv.2301.04419."""
+"""
+This module provides an option to perform Fully Qualified Name Resolution based on PyCG callgraph.
+Optionally, hybrid analysis can be performed to obtain true full name inference. This Functionality is inherited from HeaderGen https://doi.org/10.48550/arXiv.2301.04419.
+Authors: Ashwin Prasad & Rupesh Sapkota
+"""
 
 
 import importlib
@@ -20,8 +22,9 @@ class FullyQualifiedNameInference:
             print("file_path is empty")
             sys.exit(-1)
 
+        self.imported_modules = {}
         self.file_path = os.path.abspath(file_path)
-        self.file_name = os.path.basename(file_path)
+        self.file_folder = os.path.abspath(os.path.dirname(file_path))
 
         self.is_dynamic = dynamic
         self.mod_name = mod_name
@@ -30,9 +33,15 @@ class FullyQualifiedNameInference:
         self.built_in_calls = []
         self.external_calls = []
 
-        cg_generator = CallGraphGenerator([self.file_path], self.file_name)
+        cg_generator = CallGraphGenerator([self.file_path], self.file_folder)
         cg_generator.analyze()
         self.cg = cg_generator.output()
+        # Find external defs
+        self.external_calls = [
+            x
+            for x in cg_generator.def_manager.defs
+            if cg_generator.def_manager.defs[x].def_type == "EXTERNALDEF"
+        ]
 
     def process_func_calls(self):
         processed_calls = []
@@ -48,33 +57,15 @@ class FullyQualifiedNameInference:
                         _get_leaf_nodes(_c)
 
         for _src, _dest in self.cg.items():
-            if module_name is not None:
-                # Analyze call-sites only in the main module
-                if _src.split(".")[0] == module_name:
-                    for _call in _dest:
-                        _get_leaf_nodes(_call)
-                        if _call not in processed_calls:
-                            processed_calls.append(_call)
-
-            else:
-                for _call in _dest:
-                    _get_leaf_nodes(_call)
-                    if _call not in processed_calls:
-                        processed_calls.append(_call)
+            for _call in _dest:
+                _get_leaf_nodes(_call)
+                if _call not in processed_calls:
+                    processed_calls.append(_call)
 
         return processed_calls
 
-    def separate_func_calls(self, func_calls):
-        for func_call in func_calls:
-            dotted_call_names = func_call.split(".")
-            if dotted_call_names[0] == "<builtin>":
-                self.built_in_calls.append(dotted_call_names[1])
-            else:
-                self.external_calls.append(".".join(dotted_call_names))
-
     def infer(self):
         self.func_calls = self.process_func_calls()
-        # self.separate_func_calls(self.func_calls)
 
         if not self.is_dynamic:
             return self.func_calls
@@ -85,73 +76,88 @@ class FullyQualifiedNameInference:
             if call_name.startswith("<builtin>"):
                 qualified_names.append(call_name)
             else:
-                full_name = self.__get_dynamic(call_name)
-                qualified_names.append(full_name)
+                if call_name in self.external_calls:
+                    full_name = self._get_dynamic(call_name)
+                    qualified_names.append(full_name)
+                else:
+                    qualified_names.append(call_name)
 
         return qualified_names
 
-    def __get_dynamic(self, func_name):
-        mod_name = func_name.split(".")[0]
-        inspect_module_imports = {}
-        try:
-            inspect_module_imports[mod_name] = importlib.import_module(mod_name)
-            regex = f"^({mod_name}?)"
+    def _get_dynamic(self, func_name):
+        module_name = func_name.split(".")[0]
 
-            _dynamic_name = eval(
-                re.sub(regex, f"inspect_module_imports['{mod_name}']", func_name)
-            )
+        try:
+            # Try importing the module
+            if module_name not in self.imported_modules:
+                self.imported_modules[module_name] = importlib.import_module(
+                    module_name
+                )
+
+            # Replace the module name in the function name with the imported module
+            replacement = f"self.imported_modules['{module_name}']"
+            regex = f"^({module_name}?)"
+            dynamic_name = eval(re.sub(regex, replacement, func_name))
 
             info = {}
-            if getattr(inspect.unwrap(_dynamic_name), "__module__", None):
-                info["module_name"] = inspect.unwrap(_dynamic_name).__module__
-                self.__extracted_from___get_dynamic_16(_dynamic_name, info)
-                if info["module_name"] == "numpy":
-                    if getattr(inspect.unwrap(_dynamic_name), "__globals__", None):
-                        info["module_name"] = getattr(
-                            inspect.unwrap(_dynamic_name), "__globals__", None
-                        )["__name__"]
+            unwrapped_dynamic_name = inspect.unwrap(dynamic_name)
+            if isinstance(unwrapped_dynamic_name, types.BuiltinFunctionType):
+                info["module_name"] = module_name
+                info["qualified_name"] = unwrapped_dynamic_name.__qualname__
+                info["fullns"] = ".".join([info["module_name"], info["qualified_name"]])
+                if module_name == "numpy":
+                    if globals_ := getattr(unwrapped_dynamic_name, "__globals__", None):
+                        info["module_name"] = globals_["__name__"]
                     info["fullns"] = ".".join(
                         [info["module_name"], info["qualified_name"]]
                     )
 
-            elif getattr(inspect.unwrap(_dynamic_name), "__objclass__", None):
-                info["module_name"] = inspect.unwrap(
-                    _dynamic_name
-                ).__objclass__.__module__
-                self.__extracted_from___get_dynamic_16(_dynamic_name, info)
-            elif getattr(inspect.unwrap(_dynamic_name), "__package__", None):
-                info["module_name"] = inspect.unwrap(_dynamic_name).__name__
-                info["qualified_name"] = inspect.unwrap(_dynamic_name).__name__
-                info["fullns"] = inspect.unwrap(_dynamic_name).__name__
-                info["doc_string"] = inspect.getdoc(_dynamic_name)
-            else:
-                info["module_name"] = inspect.unwrap(_dynamic_name).__module__
-                info["qualified_name"] = inspect.unwrap(_dynamic_name).__qualname__
-                info["doc_string"] = inspect.getdoc(_dynamic_name)
+            elif module := getattr(unwrapped_dynamic_name, "__module__", None):
+                info["module_name"] = module
+                info["qualified_name"] = unwrapped_dynamic_name.__qualname__
+                info["fullns"] = ".".join([info["module_name"], info["qualified_name"]])
+                if module == "numpy":
+                    if globals_ := getattr(unwrapped_dynamic_name, "__globals__", None):
+                        info["module_name"] = globals_["__name__"]
+                    info["fullns"] = ".".join(
+                        [info["module_name"], info["qualified_name"]]
+                    )
 
-                if full_name := self.__get_qualname_from_text(_dynamic_name):
-                    if full_name["class"].startswith(mod_name):
-                        info["fullns"] = ".".join(
-                            [full_name["class"], full_name["func"]]
-                        )
+            elif objclass := getattr(unwrapped_dynamic_name, "__objclass__", None):
+                info["module_name"] = objclass.__module__
+                info["qualified_name"] = unwrapped_dynamic_name.__qualname__
+                info["fullns"] = ".".join([info["module_name"], info["qualified_name"]])
+            elif package := getattr(unwrapped_dynamic_name, "__package__", None):
+                info["module_name"] = unwrapped_dynamic_name.__name__
+                info["qualified_name"] = unwrapped_dynamic_name.__name__
+                info["fullns"] = unwrapped_dynamic_name.__name__
+
+            else:
+                info["module_name"] = getattr(
+                    unwrapped_dynamic_name, "__module__", None
+                )
+                info["qualified_name"] = getattr(
+                    unwrapped_dynamic_name, "__qualname__", None
+                )
+
+                if full_name := self._get_qualname_from_text(dynamic_name):
+                    if full_name["class"].startswith(module_name):
+                        info["fullns"] = f"{full_name['class']}.{full_name['func']}"
                     else:
                         info["fullns"] = func_name  # keep original if nothing works
                 else:
-                    info["fullns"] = ".".join(
-                        [info["module_name"], info["qualified_name"]]
-                    )
+                    info["fullns"] = f"{info['module_name']}.{info['qualified_name']}"
+
             return info["fullns"]
 
+        except ImportError:
+            print(f"Module not installed: {module_name}")
+            return func_name  # keep original if nothing works
         except Exception as e:
-            print("module not installed")
+            print(f"An unknown error occurred: {e}")
+            return func_name  # keep original if nothing works
 
-    # TODO Rename this here and in `__get_dynamic`
-    def __extracted_from___get_dynamic_16(self, _dynamic_name, info):
-        info["qualified_name"] = inspect.unwrap(_dynamic_name).__qualname__
-        info["fullns"] = ".".join([info["module_name"], info["qualified_name"]])
-        info["doc_string"] = inspect.getdoc(_dynamic_name)
-
-    def __get_qualname_from_text(self, input_dynamic_name):
+    def _get_qualname_from_text(self, input_dynamic_name):
         res = {"class": None, "func": None}
         try:
             input_str = inspect.unwrap(input_dynamic_name).__repr__()
