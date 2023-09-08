@@ -47,6 +47,16 @@ We will highly appreciate it if you can contribute to this project. Please feel 
 4. Code refactoring
 
 # Roadmap
+
+```{toctree}
+---
+maxdepth: 2
+caption: Contents
+---
+user-guide/index
+api/index
+```
+
 As a general-purpose framework, Scalpel is a layered structure designed to support tasks at different granularity. You can know more from this user guide about different modules.
 ![title](https://lucid.app/publicSegments/view/079f413f-8fd5-4c4f-9ad2-1a3cad30583d/image.png)
 
