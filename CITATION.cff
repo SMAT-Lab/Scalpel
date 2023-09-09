@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Li"
+  given-names: "Li"
+- family-names: "Wang"
+  given-names: "Jiawei"
+- family-names: "Quan"
+  given-names: "Haowei"
+title: "Scalpel: The Python Static Analysis Framework"
+date-released: 2022-02-24
+url: "https://github.com/SMAT-Lab/Scalpel"

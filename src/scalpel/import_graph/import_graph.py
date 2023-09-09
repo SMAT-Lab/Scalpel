@@ -39,7 +39,7 @@ class ImportGraph:
 
     def __init__(self, entry_point):
         """
-        To constuct a import graph.
+        To constuct an import graph.
         Args:
         entry_point: the top level folder path such as "my-python-projects/homework1".
         The argument must not endswith slash!

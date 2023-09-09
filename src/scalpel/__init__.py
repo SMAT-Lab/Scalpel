@@ -18,6 +18,7 @@ __all__ = [
     "file_system",
     "fqn",
 ]
+
 __version__ = "1.0dev"
 
 from .util import check_python_version
