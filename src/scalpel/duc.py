@@ -6,6 +6,9 @@ import ast
 from collections import defaultdict
 from dataclasses import dataclass
 from itertools import groupby
+import builtins
+
+
 from typing import (
     Dict,
     Iterable,
@@ -20,6 +23,10 @@ from scalpel.cfg import CFG
 from scalpel.SSA.ssa import SSAConverter 
 
 MODULE_SCOPE = "mod"
+BuiltinsSrc = builtins.__dict__
+Builtins = {k: v for k, v in BuiltinsSrc.items()}
+Builtins["__file__"] = __file__
+
 
 @dataclass
 class Definition:
@@ -114,25 +121,31 @@ class Variable:
             str: The name of the variable.
         """
         return self.name
+    
+"""
+A tuple `(key, value)`. 
+"""
+ContainerElement = Tuple[Optional[ReferencedName], ReferencedName]
+
+
+ContainerMap = Tuple[ReferencedName, ContainerElement]
+"""
+A tuple `(container, element)`, where `element` is a tuple `(key, value)`. 
+With this type can we describe the relationships between containers and their elements.
+"""
 
 class DUC:
     """
     Definition-use chain (DUC). This class provides methods to query the definitions and references for a name in a lexical scope.
     """
 
-    __slots__ = [
-        "variables",
-        "definitions",
-        "references"
-    ]
+    __slots__ = [ "variables", "definitions", "references"]
     def __init__(self, cfg_dict: dict[str:CFG]):
         """
         Constructs a def-use chain.
         Args:
             cfg: The control flow graph.
         """
-        #self.ssa_results: Dict[str, Dict[int, List[Dict[str, Set[int]]]]] = {}
-        #self.const_dicts: Dict[str, Dict[Tuple[str, int], ast.AST]] = {}
         self.definitions:List[Definition] = [] 
         self.references:List[ReferencedName] = []
         for scope, cfg in cfg_dict.items():
@@ -160,15 +173,8 @@ class DUC:
                     new_def.add_use(used_expr)
                  
                 self.definitions.append(new_def)
-                
                  # this is to check usages 
                        
-            
-
-           
-        
-    def get_all_vars():
-        pass  
     def get_or_create_variable(self, var_name):
         if var_name in self.variables:
             return self.variables[var_name]
@@ -198,24 +204,17 @@ class DUC:
                 result += "  Uses: " + ", ".join(str(use) for use in variable.uses) + "\n"
         return result
 
-    def get_lexical_scopes(self) -> Iterator[str]:
-        """
-        Iterates the names of all the lexical scopes.
-        Returns: An iterator of the lexical scope names.
-        """
-        yield from self.cfgs
-
-    def get_all_definitions(self, scope: str = MODULE_SCOPE) -> Iterator[Definition]:
+    def iter_definitions(self, scope: str = MODULE_SCOPE) -> Iterator[Definition]:
         """
         Retrieves the definitions for a variable in a lexical scope.
         Args:
             scope: The name of the scope (defaults to `"mod"`, the scope of the
             module).
         Returns: A iterator of definitions.
-        """
-        #for (name, counter), value in self.const_dicts[scope].items():
-        #    yield Definition(name, counter, value)
-        return self.definitions
+        """    
+        for (name, counter), value in self.const_dicts[scope].items():
+            yield Definition(name, counter, value)
+    
 
     def get_all_references(self, scope: str = MODULE_SCOPE) -> Iterator[Reference]:
         """
@@ -226,10 +225,7 @@ class DUC:
         Returns: An iterator of references.
         """
         return self.references
-        #for block_id, stmts in self.ssa_results[scope].items():
-        #    for stmt_idx, stmt in enumerate(stmts):
-        #        for name, counters in stmt.items():
-        #            yield Reference(ReferencedName(name, counters), block_id, stmt_idx)
+    
 
     def get_all_definitions_and_references(
         self, scope: str = MODULE_SCOPE
@@ -309,15 +305,7 @@ class DUC:
             if block.id == block_id
         )
 
-ContainerElement = Tuple[Optional[ReferencedName], ReferencedName]
-"""
-A tuple `(key, value)`.
-"""
 
-ContainerMap = Tuple[ReferencedName, ContainerElement]
-"""
-A tuple `(container, element)`, where `element` is a tuple `(key, value)`.
-"""
 
 
 class _ContainerRelationshipVisitor(ast.NodeVisitor):
@@ -469,5 +457,11 @@ class _ContainerRelationshipVisitor(ast.NodeVisitor):
 
     def _name(self, name: ast.Name) -> ReferencedName:
         return ReferencedName(name.id, self.name_to_counters[name.id])
+    
 
-
+def get_arguments_names(args):
+    """
+    return all arguments of the given ast.arguments instance.
+    """
+    return args.args + args.posonlyargs +args.vararg + args.kwonlyargs + args.kwarg
+   
