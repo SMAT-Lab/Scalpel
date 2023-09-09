@@ -6,7 +6,8 @@ setup(
     version="1.0beta",
     description="Scalpel: The Python Program Analysis Framework",
     url="https://github.com/SMAT-Lab/Scalpel",
-    packages=find_packages(include=["scalpel", "scalpel.*"]),
+    packages=find_packages(where="src"),
+    package_dir={"": "src"},
     install_requires=[
         "astor~=0.8.1",
         "graphviz~=0.17",
