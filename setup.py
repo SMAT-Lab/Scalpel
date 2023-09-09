@@ -3,7 +3,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="python-scalpel",
-    version="1.0beta",
+    version="1.0rcN",  # Release Candidate   
     description="Scalpel: The Python Program Analysis Framework",
     url="https://github.com/SMAT-Lab/Scalpel",
     packages=find_packages(include=["scalpel", "scalpel.*"]),
