@@ -7,8 +7,6 @@ from collections import defaultdict
 from dataclasses import dataclass
 from itertools import groupby
 import builtins
-
-
 from typing import (
     Dict,
     Iterable,
@@ -23,10 +21,8 @@ from scalpel.cfg import CFG
 from scalpel.SSA.ssa import SSAConverter 
 
 MODULE_SCOPE = "mod"
-BuiltinsSrc = builtins.__dict__
-Builtins = {k: v for k, v in BuiltinsSrc.items()}
+Builtins = {k: v for k, v in builtins.__dict__.items()}
 Builtins["__file__"] = __file__
-
 
 @dataclass
 class Definition:
@@ -34,6 +30,8 @@ class Definition:
     counter: int  # counter for SSA forms
     ast_node: ast.AST
     scope: str # scope name 
+    
+    __slots__ = "node", "_users", "islive"
     def add_use(self, use_node):
         """
         Add a use of the variable at a specific node.
@@ -42,22 +40,38 @@ class Definition:
             use_node: The node where the variable is used.
         """
         self.uses.append(use_node)
-
+        self.is_live: bool = True # whether this definition is live or not
     def __str__(self):
         """
         Return the string representation of the variable.
-
         Returns:
             str: The name of the variable.
         """
-        return self.name
+        return self.name()
+    
+    def is_live(self):
+        # check whether this definition is live or not
+        return self.is_live
+    def name(self):
+        # return the name of this definition
+        if type(ast_node) in [ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef]:
+            return ast_node.name 
+        elif isinstance(self.node, ast.arg):
+            pass 
+        elif type(ast_node) in [ast.Import, ast.ImportFrom]:
+            pass 
+        elif type(ast_node)  == ast.alias:
+            return ast_node.name.split(".", 1)[0]
+        elif isinstance(ast_node.id, ast.Name):
+            return ast_node.id
+        else:
+            return type(self.node).__name__
 
 
 @dataclass
 class ReferencedName:
     name: str
-    counters: Set[int] # which numbered variable used 
-
+    counters: Set[int] # which numbered variable used
 
 @dataclass
 class Reference:
