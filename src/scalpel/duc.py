@@ -117,8 +117,7 @@ class Variable:
 
 class DUC:
     """
-    Definition-use chain (DUC). This class provides methods to query the
-    definitions and references for a name in a lexical scope.
+    Definition-use chain (DUC). This class provides methods to query the definitions and references for a name in a lexical scope.
     """
 
     __slots__ = [
@@ -315,7 +314,7 @@ ContainerElement = Tuple[Optional[ReferencedName], ReferencedName]
 A tuple `(key, value)`.
 """
 
-ContainerRelationship = Tuple[ReferencedName, ContainerElement]
+ContainerMap = Tuple[ReferencedName, ContainerElement]
 """
 A tuple `(container, element)`, where `element` is a tuple `(key, value)`.
 """
@@ -324,7 +323,7 @@ A tuple `(container, element)`, where `element` is a tuple `(key, value)`.
 class _ContainerRelationshipVisitor(ast.NodeVisitor):
     def __init__(self, name_to_counters: Dict[str, Set[int]]):
         self.name_to_counters = name_to_counters
-        self.result: List[ContainerRelationship] = []
+        self.result: List[ContainerMap] = []
 
     def visit_Assign(self, node) -> None:
         self._visit_assign(node.targets, node.value)
@@ -470,3 +469,5 @@ class _ContainerRelationshipVisitor(ast.NodeVisitor):
 
     def _name(self, name: ast.Name) -> ReferencedName:
         return ReferencedName(name.id, self.name_to_counters[name.id])
+
+
