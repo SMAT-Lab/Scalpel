@@ -328,9 +328,6 @@ class DUC:
             if block.id == block_id
         )
 
-
-
-
 class _ContainerRelationshipVisitor(ast.NodeVisitor):
     def __init__(self, name_to_counters: Dict[str, Set[int]]):
         self.name_to_counters = name_to_counters

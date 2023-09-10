@@ -12,26 +12,6 @@ def make_duc(name: str, src: str) -> DUC:
     cfg_dict = CFGBuilder().build(name, ast_node, flattened=True)
     return get_duc(cfg_dict)
 
-def assert_num_defs_refs(duc: DUC, num_defs: int, num_refs: int, *args) -> None:
-    defs, refs = map(list, duc.get_all_definitions_and_references(*args))
-    assert len(defs) == num_defs, f"expected {num_defs} definitions, got {len(defs)}"
-    assert len(refs) == num_refs, f"expected {num_refs} references, got {len(refs)}"
-
-def get_defs(duc: DUC, num: int, *args) -> List[Definition]:
-    defs = list(duc.get_definitions(*args))
-    assert len(defs) == num, f"expected {num} definitions, got {len(defs)}"
-    return defs
-
-def get_def(duc: DUC, *args) -> Definition:
-    return get_defs(duc, 1, *args)[0]
-
-def get_refs(duc: DUC, num: int, *args) -> List[Reference]:
-    refs = list(duc.get_references(*args))
-    assert len(refs) == num, f"expected {num} references, got {len(refs)}"
-    return refs
-
-def get_ref(duc: DUC, *args) -> Reference:
-    return get_refs(duc, 1, *args)[0]
 
 #def test_definitions_and_references() -> None:
 # testing definitions and references
@@ -196,6 +176,28 @@ test_simple()
 
 
 '''
+This is to test number of references and denitions
+def assert_num_defs_refs(duc: DUC, num_defs: int, num_refs: int, *args) -> None:
+    defs, refs = map(list, duc.get_all_definitions_and_references(*args))
+    assert len(defs) == num_defs, f"expected {num_defs} definitions, got {len(defs)}"
+    assert len(refs) == num_refs, f"expected {num_refs} references, got {len(refs)}"
+
+def get_defs(duc: DUC, num: int, *args) -> List[Definition]:
+    defs = list(duc.get_definitions(*args))
+    assert len(defs) == num, f"expected {num} definitions, got {len(defs)}"
+    return defs
+
+def get_def(duc: DUC, *args) -> Definition:
+    return get_defs(duc, 1, *args)[0]
+
+def get_refs(duc: DUC, num: int, *args) -> List[Reference]:
+    refs = list(duc.get_references(*args))
+    assert len(refs) == num, f"expected {num} references, got {len(refs)}"
+    return refs
+
+def get_ref(duc: DUC, *args) -> Reference:
+    return get_refs(duc, 1, *args)[0]
+
 def test_relationships(src: str, *expected: Tuple[str, Optional[str], str]) -> None:
     relationships = list(make_duc(src, src).container_relationships())
     assert len(relationships) == len(expected), (
@@ -218,7 +220,7 @@ def test_relationships(src: str, *expected: Tuple[str, Optional[str], str]) -> N
             value.name == expected_value
         ), f"{src}: expected value {expected_value}, got {value}"
 
-
+In this section, to test the container relationships.
 def test_container_relationships() -> None:
     def test_simple():
         for method in ("add", "append", "appendleft"):
