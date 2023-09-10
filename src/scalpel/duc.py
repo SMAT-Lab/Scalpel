@@ -24,6 +24,14 @@ MODULE_SCOPE = "mod"
 Builtins = {k: v for k, v in builtins.__dict__.items()}
 Builtins["__file__"] = __file__
 
+
+def get_arguments_names(args) ->List[str]:
+    """
+    return all arguments of the given ast.arguments instance.
+    """
+    return args.args + args.posonlyargs +args.vararg + args.kwonlyargs + args.kwarg
+   
+
 @dataclass
 class Definition:
     name: str
@@ -41,6 +49,7 @@ class Definition:
         """
         self.uses.append(use_node)
         self.is_live: bool = True # whether this definition is live or not
+
     def __str__(self):
         """
         Return the string representation of the variable.
@@ -52,18 +61,19 @@ class Definition:
     def is_live(self):
         # check whether this definition is live or not
         return self.is_live
+    
     def name(self):
         # return the name of this definition
-        if type(ast_node) in [ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef]:
-            return ast_node.name 
+        if type(self.ast_node) in [ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef]:
+            return self.ast_node.name 
         elif isinstance(self.node, ast.arg):
             pass 
-        elif type(ast_node) in [ast.Import, ast.ImportFrom]:
+        elif type(self.ast_node) in [ast.Import, ast.ImportFrom]:
             pass 
-        elif type(ast_node)  == ast.alias:
-            return ast_node.name.split(".", 1)[0]
-        elif isinstance(ast_node.id, ast.Name):
-            return ast_node.id
+        elif type(self.ast_node)  == ast.alias:
+            return self.ast_node.name.split(".", 1)[0]
+        elif isinstance(self.ast_node.id, ast.Name):
+            return self.ast_node.id
         else:
             return type(self.node).__name__
 
@@ -141,12 +151,11 @@ A tuple `(key, value)`.
 """
 ContainerElement = Tuple[Optional[ReferencedName], ReferencedName]
 
-
-ContainerMap = Tuple[ReferencedName, ContainerElement]
 """
 A tuple `(container, element)`, where `element` is a tuple `(key, value)`. 
 With this type can we describe the relationships between containers and their elements.
 """
+ContainerMap = Tuple[ReferencedName, ContainerElement]
 
 class DUC:
     """
@@ -473,9 +482,12 @@ class _ContainerRelationshipVisitor(ast.NodeVisitor):
         return ReferencedName(name.id, self.name_to_counters[name.id])
     
 
-def get_arguments_names(args):
+
+def get_duc(cfg_dict: dict[str:CFG]) -> DUC:
     """
-    return all arguments of the given ast.arguments instance.
+    Constructs a def-use chain.
+    Args:
+        cfg: The control flow graph.
+    Returns: A def-use chain.
     """
-    return args.args + args.posonlyargs +args.vararg + args.kwonlyargs + args.kwarg
-   
+    return DUC(cfg_dict)
