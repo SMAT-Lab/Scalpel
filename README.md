@@ -68,6 +68,7 @@ This project has been inspired and supported by many existing works. If you thin
 7. [Restoring Execution Environments of Jupyter Notebooks](https://arxiv.org/ftp/arxiv/papers/2103/2103.02959.pdf)
 8. [Static Single Assignment Book](https://compilers.cs.uni-saarland.de/papers/bbhlmz13cc.pdf)
 
+Some of implementations are adapted from [mypy](https://github.com/python/mypy) project and [beniget](https://github.com/serge-sans-paille/beniget/blob/master/beniget/beniget.py) project. 
 
 ## Key functionalities
 
