@@ -11,6 +11,9 @@ import gast as ast
 
 __all__ = ["DefUseChains", "Def", "DeclarationStep", "DefinitionStep"]
 class _ordered_set(object):
+    """ 
+    use OrderedDict to implement ordered_set.
+    """
     def __init__(self, elements=None):
         self.values = OrderedDict.fromkeys(elements or [])
 
@@ -62,8 +65,8 @@ class Ancestors(ast.NodeVisitor):
     """
 
     def __init__(self):
-        self._parents = dict()
-        self._current = list()
+        self._parents = {}
+        self._current = []
 
     def generic_visit(self, node):
         self._parents[node] = list(self._current)
@@ -81,7 +84,7 @@ class Ancestors(ast.NodeVisitor):
         for n in reversed(self._parents[node]):
             if isinstance(n, cls):
                 return n
-        raise ValueError("{} has no parent of type {}".format(node, cls))
+        raise ValueError(f"{node} has no parent of type {cls}")
 
     def parentFunction(self, node):
         return self.parentInstance(node, (ast.FunctionDef,
@@ -157,13 +160,9 @@ class Def(object):
 
     def _str(self, nodes):
         if self in nodes:
-            return "(#{})".format(nodes[self])
-        else:
-            nodes[self] = len(nodes)
-            return "{} -> ({})".format(
-                self.name(), ", ".join(u._str(nodes.copy())
-                                       for u in self._users)
-            )
+            return f"(#{nodes[self]})"
+        nodes[self] = len(nodes)
+        return f'{self.name()} -> ({", ".join(u._str(nodes.copy()) for u in self._users)})'
 
 
 
@@ -235,7 +234,7 @@ class CollectLocals(ast.NodeVisitor):
     visit_ClassDef = visit_FunctionDef
 
     def visit_Nonlocal(self, node):
-        self.NonLocals.update(name for name in node.names)
+        self.NonLocals.update(iter(node.names))
 
     visit_Global = visit_Nonlocal
 
@@ -372,27 +371,19 @@ class DefUseChains(ast.NodeVisitor):
             return sorted(d.name() for d in self.locals[node])
 
     def dump_chains(self, node):
-        chains = []
-        for d in self.locals[node]:
-            chains.append(str(d))
-        return chains
+        return [str(d) for d in self.locals[node]]
 
     def location(self, node):
         if hasattr(node, "lineno"):
-            filename = "{}:".format(
-                "<unknown>" if self.filename is None else self.filename
-            )
-            return " at {}{}:{}".format(filename,
-                                            node.lineno,
-                                            node.col_offset)
-        else:
-            return ""
+            filename = f'{"<unknown>" if self.filename is None else self.filename}:'
+            return f" at {filename}{node.lineno}:{node.col_offset}"
+        return ""
 
     def unbound_identifier(self, name, node):
-        self.warn("unbound identifier '{}'".format(name), node)
+        self.warn(f"unbound identifier '{name}'", node)
     
     def warn(self, msg, node):
-        print("W: {}{}".format(msg, self.location(node)))
+        print(f"W: {msg}{self.location(node)}")
 
     def invalid_name_lookup(self, name, scope, precomputed_locals, local_defs):
         # We may hit the situation where we refer to a local variable which is
@@ -490,10 +481,9 @@ class DefUseChains(ast.NodeVisitor):
 
         if stars:
             return stars + [d]
-        else:
-            if not self._undefs and not quiet:
-                self.unbound_identifier(name, node)
-            return [d]
+        if not self._undefs and not quiet:
+            self.unbound_identifier(name, node)
+        return [d]
 
     defs = compute_defs
 
@@ -565,16 +555,14 @@ class DefUseChains(ast.NodeVisitor):
 
     def process_functions_bodies(self):
         for fnode, defs, scopes, scope_depths, precomputed_locals in self._defered:
-            visitor = getattr(self,
-                              "visit_{}".format(type(fnode).__name__))
+            visitor = getattr(self, "visit_{}".format(type(fnode).__name__))
             with self.SwitchScopeContext(defs, scopes, scope_depths, precomputed_locals):
                 visitor(fnode, step=DefinitionStep)
 
     def process_annotations(self):
         compute_defs, self.defs = self.defs,  self.compute_annotation_defs
         for annnode, heads, cb in self._defered_annotations[-1]:
-            visitor = getattr(self,
-                                "visit_{}".format(type(annnode).__name__))
+            visitor = getattr(self, f"visit_{type(annnode).__name__}")
             currenthead, self._scopes = self._scopes, heads
             cb(visitor(annnode)) if cb else visitor(annnode)
             self._scopes = currenthead
@@ -681,8 +669,7 @@ class DefUseChains(ast.NodeVisitor):
         DefUseChains.add_to_definition(self._definitions[0], name, dnode)
 
     def visit_annotation(self, node):
-        annotation = getattr(node, 'annotation', None)
-        if annotation:
+        if annotation := getattr(node, 'annotation', None):
             self.visit(annotation)
 
     def visit_skip_annotation(self, node):
@@ -1013,10 +1000,9 @@ class DefUseChains(ast.NodeVisitor):
             for d in reversed(self._definitions[:-1]):
                 if name not in d:
                     continue
-                else:
                     # this rightfully creates aliasing
-                    self.set_definition(name, d[name])
-                    break
+                self.set_definition(name, d[name])
+                break
             else:
                 self.unbound_identifier(name, node)
 
