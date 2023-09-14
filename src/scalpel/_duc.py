@@ -7,7 +7,7 @@ from collections import defaultdict, OrderedDict
 from contextlib import contextmanager
 import sys
 
-import gast as ast
+import ast
 
 __all__ = ["DefUseChains", "Def", "DeclarationStep", "DefinitionStep"]
 class _ordered_set(object):
@@ -47,21 +47,6 @@ class Ancestors(ast.NodeVisitor):
     """
     Build the ancestor tree, that associates a node to the list of node visited
     from the root node (the Module) to the current node
-
-    >>> import gast as ast
-    >>> code = 'def foo(x): return x + 1'
-    >>> module = ast.parse(code)
-
-    >>> from beniget import Ancestors
-    >>> ancestors = Ancestors()
-    >>> ancestors.visit(module)
-
-    >>> binop = module.body[0].body[0].value
-    >>> for n in ancestors.parents(binop):
-    ...    print(type(n))
-    <class 'gast.gast.Module'>
-    <class 'gast.gast.FunctionDef'>
-    <class 'gast.gast.Return'>
     """
 
     def __init__(self):
@@ -98,33 +83,18 @@ class Def(object):
     """
     Model a definition, either named or unnamed, and its users.
     """
-
     __slots__ = "node", "_users", "islive"
-
     def __init__(self, node):
-        """
-        Whether this definition might reach the final block of it's scope.
-        Meaning if islive is `False`, the definition will always be overriden
-        at the time we finished executing the module/class/function body.
-        So the definition could be ignored in the context of an attribute access for instance.
-        """
         self.node = node
         self._users = ordered_set()
         self.islive = True
-       
 
     def add_user(self, node):
         assert isinstance(node, Def)
         self._users.add(node)
 
     def name(self):
-        """
-        If the node associated to this Def has a name, returns this name.
-        Otherwise returns its type
-        """
-        if isinstance(self.node, (ast.ClassDef,
-                                  ast.FunctionDef,
-                                  ast.AsyncFunctionDef)):
+        if isinstance(self.node, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)):
             return self.node.name
         elif isinstance(self.node, ast.Name):
             return self.node.id
@@ -133,7 +103,7 @@ class Def(object):
             return self.node.asname or base
         elif isinstance(self.node, tuple):
             return self.node[1]
-        else:
+        else: # if no name with this node, return its type
             return type(self.node).__name__
 
     def users(self):
@@ -147,13 +117,9 @@ class Def(object):
 
     def _repr(self, nodes):
         if self in nodes:
-            return "(#{})".format(nodes[self])
-        else:
-            nodes[self] = len(nodes)
-            return "{} -> ({})".format(
-                self.node, ", ".join(u._repr(nodes.copy())
-                                     for u in self._users)
-            )
+            return f"(#{nodes[self]})"
+        nodes[self] = len(nodes)
+        return f'{self.node} -> ({", ".join(u._repr(nodes.copy()) for u in self._users)})'
 
     def __str__(self):
         return self._str({})
@@ -167,7 +133,7 @@ class Def(object):
 
 
 import builtins
-Builtins = {k: v for k, v in builtins.__dict__.items()}
+Builtins = dict(builtins.__dict__.items())
 Builtins["__file__"] = __file__
 
 DeclarationStep = object()
@@ -262,9 +228,7 @@ class CollectLocals(ast.NodeVisitor):
 
 def collect_locals(node):
     '''
-    Compute the set of identifiers local to a given node.
-
-    This is meant to emulate a call to locals()
+    Compute the set of identifiers local to a given node by emulating a call to locals()
     '''
     visitor = CollectLocals()
     visitor.generic_visit(node)
@@ -277,26 +241,9 @@ class DefUseChains(ast.NodeVisitor):
         - locals: Dict[node, List[Def]], a mapping between a node and the list
           of variable defined in this node,
         - chains: Dict[node, Def], a mapping between nodes and their chains.
-
-    >>> import gast as ast
-    >>> module = ast.parse("from b import c, d; c()")
-    >>> duc = DefUseChains()
-    >>> duc.visit(module)
-    >>> for head in duc.locals[module]:
-    ...     print("{}: {}".format(head.name(), len(head.users())))
-    c: 1
-    d: 0
-    >>> alias_def = duc.chains[module.body[0].names[0]]
-    >>> print(alias_def)
-    c -> (c -> (Call -> ()))
-
-    One instance of DefUseChains is only suitable to analyse one AST Module in it's lifecycle.
     """
 
     def __init__(self, filename=None):
-        """
-            - filename: str, included in error messages if specified
-        """
         self.chains = {}
         self.locals = defaultdict(list)
 
@@ -308,13 +255,10 @@ class DefUseChains(ast.NodeVisitor):
         # function body are not executed when the function definition is met
         # this holds a list of the functions met during body processing
         self._defered = []
-
         # stack of mapping between an id and Names
         self._definitions = []
-
         # stack of scope depth
         self._scope_depths = []
-
         # stack of variable defined with the global keywords
         self._globals = []
 
@@ -344,13 +288,11 @@ class DefUseChains(ast.NodeVisitor):
         self.module = None
         self.future_annotations = False
 
-    #
+    
     ## helpers
-    #
     def _dump_locals(self, node, only_live=False):
         """
         Like `dump_definitions` but returns the result grouped by symbol name and it includes linenos.
-
         :Returns: List of string formatted like: '{symbol name}:{def lines}'
         """
         groupped = defaultdict(list)
@@ -363,12 +305,11 @@ class DefUseChains(ast.NodeVisitor):
         ]
 
     def dump_definitions(self, node, ignore_builtins=True):
-        if isinstance(node, ast.Module) and not ignore_builtins:
-            builtins = {d for d in self._builtins.values()}
-            return sorted(d.name()
-                          for d in self.locals[node] if d not in builtins)
-        else:
+        if not isinstance(node, ast.Module) or ignore_builtins:
             return sorted(d.name() for d in self.locals[node])
+        builtins = set(self._builtins.values())
+        return sorted(d.name()
+                      for d in self.locals[node] if d not in builtins)
 
     def dump_chains(self, node):
         return [str(d) for d in self.locals[node]]
@@ -387,9 +328,7 @@ class DefUseChains(ast.NodeVisitor):
 
     def invalid_name_lookup(self, name, scope, precomputed_locals, local_defs):
         # We may hit the situation where we refer to a local variable which is
-        # not bound yet. This is a runtime error in Python, so we try to detec
-        # it statically.
-
+        # not bound yet. This is a runtime error in Python, so we try to detect it statically.
         # not a local variable => fine
         if name not in precomputed_locals:
             return
@@ -406,7 +345,7 @@ class DefUseChains(ast.NodeVisitor):
         # >>> class bar: a = a
         # >>> bar() # ok, and `bar.a is a`
         if isinstance(scope, ast.ClassDef):
-            top_level_definitions = self._definitions[0:-self._scope_depths[0]]
+            top_level_definitions = self._definitions[:-self._scope_depths[0]]
             isglobal = any((name in top_lvl_def or '*' in top_lvl_def)
                            for top_lvl_def in top_level_definitions)
             return not islocal and not isglobal
@@ -470,7 +409,7 @@ class DefUseChains(ast.NodeVisitor):
             if defs is StopIteration:
                 break
             elif name in defs:
-                return defs[name] if not stars else stars + list(defs[name])
+                return stars + list(defs[name]) if stars else defs[name]
             elif "*" in defs:
                 stars.extend(defs["*"])
 
@@ -555,7 +494,7 @@ class DefUseChains(ast.NodeVisitor):
 
     def process_functions_bodies(self):
         for fnode, defs, scopes, scope_depths, precomputed_locals in self._defered:
-            visitor = getattr(self, "visit_{}".format(type(fnode).__name__))
+            visitor = getattr(self, f"visit_{type(fnode).__name__}")
             with self.SwitchScopeContext(defs, scopes, scope_depths, precomputed_locals):
                 visitor(fnode, step=DefinitionStep)
 
@@ -580,11 +519,7 @@ class DefUseChains(ast.NodeVisitor):
 
         with self.ScopeContext(node):
 
-
-            self._definitions[-1].update(
-                {k: ordered_set((v,)) for k, v in self._builtins.items()}
-            )
-
+            self._definitions[-1].update( {k: ordered_set((v,)) for k, v in self._builtins.items()})
             self._defered_annotations.append([])
             self.process_body(node.body)
 
@@ -1252,7 +1187,6 @@ class DefUseChains(ast.NodeVisitor):
     visit_Tuple = visit_List
 
     # slice
-
     def visit_Slice(self, node):
         dnode = self.chains.setdefault(node, Def(node))
         if node.lower:
@@ -1311,8 +1245,7 @@ def _validate_comprehension(node):
     iter_names = set() # comprehension iteration variables
     for gen in node.generators:
         for _ in (n for n in ast.walk(gen.iter) if isinstance(n, ast.NamedExpr)):
-            raise SyntaxError('assignment expression cannot be used '
-                                'in a comprehension iterable expression')
+            raise SyntaxError('assignment expression cannot be used ''in a comprehension iterable expression')
         iter_names.update(n.id for n in ast.walk(gen.target) 
             if isinstance(n, ast.Name) and isinstance(n.ctx, ast.Store))
     for namedexpr in (n for n in ast.walk(node) if  isinstance(n, ast.NamedExpr)):
@@ -1357,31 +1290,12 @@ def lookup_annotation_name_defs(name, heads, locals_map):
     :raise ValueError: When the heads is empty.
 
     This function can be used by client code like this:
-
-    >>> import gast as ast
-    >>> module = ast.parse("from b import c;import typing as t\nclass C:\n def f(self):self.var = c.Thing()")
-    >>> duc = DefUseChains()
-    >>> duc.visit(module)
-    >>> ancestors = Ancestors()
-    >>> ancestors.visit(module)
-    ... # we're placing ourselves in the context of the function body
-    >>> fn_scope = module.body[-1].body[-1]
-    >>> assert isinstance(fn_scope, ast.FunctionDef)
-    >>> heads = ancestors.parents(fn_scope) + [fn_scope]
-    >>> print(lookup_annotation_name_defs('t', heads, duc.locals)[0])
-    t -> ()
-    >>> print(lookup_annotation_name_defs('c', heads, duc.locals)[0])
-    c -> (c -> (Attribute -> (Call -> ())))
-    >>> print(lookup_annotation_name_defs('C', heads, duc.locals)[0])
-    C -> ()
     """
     scopes = _get_lookup_scopes(heads)
     scopes_len = len(scopes)
     if scopes_len>1:
-        # start by looking at module scope first,
-        # then try the theoretical runtime scopes.
-        # putting the global scope last in the list so annotation are
-        # resolve using he global namespace first. this is the way pyright does.
+        # start by looking at module scope first, then try the theoretical runtime scopes.
+        # putting the global scope last in the list so annotation are esolve using he global namespace first. this is the way pyright does.
         scopes.append(scopes.pop(0))
     try:
         return _lookup(name, scopes, locals_map)
@@ -1414,11 +1328,11 @@ def _get_lookup_scopes(heads):
 
 def _lookup(name, scopes, locals_map):
     context = scopes.pop()
-    defs = []
-    for loc in locals_map.get(context, ()):
-        if loc.name() == name and loc.islive:
-            defs.append(loc)
-    if defs:
+    if defs := [
+        loc
+        for loc in locals_map.get(context, ())
+        if loc.name() == name and loc.islive
+    ]:
         return defs
     elif len(scopes)==0:
         raise LookupError()
