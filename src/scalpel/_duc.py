@@ -1,49 +1,20 @@
-
 """
 This is the module from duc construction, which is forked from [beniget project](https://github.com/serge-sans-paille/beniget/blob/master/beniget/beniget.py).
 """
-import sys
-from collections import defaultdict, OrderedDict
+import sys, builtins
+from collections import defaultdict
 from contextlib import contextmanager
+from .exceptions import _StopTraversal
 from .ordered_set import ordered_set
 import gast as ast 
 
-class Ancestors(ast.NodeVisitor):
-    """
-    Build the ancestor tree, that associates a node to the list of node visited from the root node (the Module) to the current node
-    """
 
-    def __init__(self):
-        self._parents = {}
-        self._current = []
+Builtins = dict(builtins.__dict__.items())
+Builtins["__file__"] = __file__
+DeclarationStep = object()
+DefinitionStep =  object()
 
-    def generic_visit(self, node):
-        self._parents[node] = list(self._current)
-        self._current.append(node)
-        super(Ancestors, self).generic_visit(node)
-        self._current.pop()
-
-    def parent(self, node):
-        return self._parents[node][-1]
-
-    def parents(self, node):
-        return self._parents[node]
-
-    def parentInstance(self, node, cls):
-        for n in reversed(self._parents[node]):
-            if isinstance(n, cls):
-                return n
-        raise ValueError(f"{node} has no parent of type {cls}")
-
-    def parentFunction(self, node):
-        return self.parentInstance(node, (ast.FunctionDef,
-                                          ast.AsyncFunctionDef))
-
-    def parentStmt(self, node):
-        return self.parentInstance(node, ast.stmt)
-
-
-class Def(object):
+class Def:
     """
     Model a definition, either named or unnamed, and its users.
     """
@@ -57,22 +28,19 @@ class Def(object):
         self._users.add(node)
 
     def name(self):
-        if isinstance(self.node, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)):
+        if type(self.node) in (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef):
             return self.node.name
-        elif isinstance(self.node, ast.Name):
+        elif type(self.node) ==  ast.Name:
             return self.node.id
-        elif isinstance(self.node, ast.alias):
+        elif type(self.node) ==  ast.alias:
             base = self.node.name.split(".", 1)[0]
             return self.node.asname or base
-        elif isinstance(self.node, tuple):
+        elif type(self.node) == tuple:
             return self.node[1]
-        else: # if no name with this node, return its type
+        else: # Return its type otherwise. 
             return type(self.node).__name__
 
     def users(self):
-        """
-        The list of ast entity that holds a reference to this node
-        """
         return self._users
 
     def __repr__(self):
@@ -93,26 +61,6 @@ class Def(object):
         nodes[self] = len(nodes)
         return f'{self.name()} -> ({", ".join(u._str(nodes.copy()) for u in self._users)})'
 
-
-
-import builtins
-Builtins = dict(builtins.__dict__.items())
-Builtins["__file__"] = __file__
-
-DeclarationStep = object()
-DefinitionStep =  object()
-
-def collect_future_imports(node):
-    """
-    Returns a set of future imports names for the given ast module.
-    """
-    assert isinstance(node, ast.Module)
-    cf = _CollectFutureImports()
-    cf.visit(node)
-    return cf.FutureImports
-
-class _StopTraversal(Exception):
-    pass
 
 class _CollectFutureImports(ast.NodeVisitor):
     """
@@ -157,28 +105,16 @@ class CollectLocals(ast.NodeVisitor):
     def visit_FunctionDef(self, node):
         # no recursion
         self.Locals.add(node.name)
-
-    visit_AsyncFunctionDef = visit_FunctionDef
-
-    visit_ClassDef = visit_FunctionDef
-
     def visit_Nonlocal(self, node):
         self.NonLocals.update(iter(node.names))
-
+    # some trivial cases
+    visit_AsyncFunctionDef = visit_FunctionDef
+    visit_ClassDef = visit_FunctionDef
     visit_Global = visit_Nonlocal
 
     def visit_Name(self, node):
         if isinstance(node.ctx, ast.Store) and node.id not in self.NonLocals:
             self.Locals.add(node.id)
-
-    def skip(self, _):
-        pass
-
-    if sys.version_info.major >= 3:
-        visit_SetComp = visit_DictComp = visit_ListComp = skip
-        visit_GeneratorExp = skip
-
-    visit_Lambda = skip
 
     def visit_Import(self, node):
         for alias in node.names:
@@ -188,8 +124,12 @@ class CollectLocals(ast.NodeVisitor):
     def visit_ImportFrom(self, node):
         for alias in node.names:
             self.Locals.add(alias.asname or alias.name)
+    def skip(self, _):
+        pass
+    visit_SetComp = visit_DictComp = visit_ListComp = skip
+    visit_GeneratorExp  = visit_Lambda = skip # skip generators
 
-def collect_locals(node):
+def collect_locals(node)->set:
     '''
     Compute the set of identifiers local to a given node by emulating a call to locals()
     '''
@@ -201,8 +141,7 @@ def collect_locals(node):
 class DefUseChains(ast.NodeVisitor):
     """
     Module visitor that gathers two kinds of informations:
-        - locals: Dict[node, List[Def]], a mapping between a node and the list
-          of variable defined in this node,
+        - locals: Dict[node, List[Def]], a mapping between a node and the list of variable defined in this node,
         - chains: Dict[node, Def], a mapping between nodes and their chains.
     """
 
@@ -286,6 +225,7 @@ class DefUseChains(ast.NodeVisitor):
         self.warn(f"unbound identifier '{name}'", node)
     
     def warn(self, msg, node):
+        ## TODO: add a logger
         print(f"W: {msg}{self.location(node)}")
 
     def invalid_name_lookup(self, name, scope, precomputed_locals, local_defs):
@@ -295,7 +235,7 @@ class DefUseChains(ast.NodeVisitor):
         if name not in precomputed_locals:
             return
 
-        # It's meant to be a local, but can we resolve it by a local lookup?
+        # It's meant to be a local variable, but it's not defined yet.
         islocal = any((name in defs or '*' in defs) for defs in local_defs)
 
         # At class scope, it's ok to refer to a global even if we also have a
@@ -327,8 +267,7 @@ class DefUseChains(ast.NodeVisitor):
 
     def compute_defs(self, node, quiet=False):
         '''
-        Performs an actual lookup of node's id in current context, returning
-        the list of def linked to that use.
+        Performs an actual lookup of node's id in current context, returning the list of def linked to that use.
         '''
         name = node.id
         stars = []
@@ -367,8 +306,7 @@ class DefUseChains(ast.NodeVisitor):
         depths_iter = iter(reversed(self._scope_depths))
         precomputed_locals_iter = iter(reversed(self._precomputed_locals))
 
-        # Keep the last scope because we could be in class scope, in which
-        # case we don't need fully qualified access.
+        # Keep the last scope because we could be in class scope, so no need need for fully qualified access.
         lvl = depth = next(depths_iter)
         precomputed_locals = next(precomputed_locals_iter)
         base_scope = next(scopes_iter)
@@ -428,14 +366,8 @@ class DefUseChains(ast.NodeVisitor):
         self._scope_depths.pop()
         self._scopes.pop()
 
-    if sys.version_info.major >= 3:
-        CompScopeContext = ScopeContext
-    else:
-        @contextmanager
-        def CompScopeContext(self, node):
-            yield
-
-
+    CompScopeContext = ScopeContext
+    
     @contextmanager
     def DefinitionContext(self, definitions):
         self._definitions.append(definitions)
@@ -472,11 +404,12 @@ class DefUseChains(ast.NodeVisitor):
             self._scopes = currenthead
         self.defs = compute_defs
 
-    # stmt
+    # Some functions to hanle each constructs in ASTs 
     def visit_Module(self, node):
-        self.module = node
-
-        futures = collect_future_imports(node)
+        self.module = node 
+        cf = _CollectFutureImports()
+        cf.visit(node)
+        futures =  cf.FutureImports
         # determine whether the PEP563 is enabled
         # allow manual enabling of DefUseChains.future_annotations
         self.future_annotations |= 'annotations' in futures
