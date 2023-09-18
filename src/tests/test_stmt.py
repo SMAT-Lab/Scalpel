@@ -1,6 +1,7 @@
-import unittest, ast, astor
-from ..scalpel.core.base.stmt import AssignStmt, SStmt
+import unittest, ast
 from _ast import AST, Assign, SetComp
+import astor
+from ..scalpel.core.base.stmt import AssignStmt, SStmt
 # from duc import _ContainerRelationshipVisitor
 
 class TestStmtMethods(unittest.TestCase):
