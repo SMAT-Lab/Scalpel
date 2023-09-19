@@ -2,11 +2,13 @@
 This is the module from duc construction, which is forked from [beniget project](https://github.com/serge-sans-paille/beniget/blob/master/beniget/beniget.py).
 """
 import sys, builtins
+from typing import List, Dict, Union, Set, Tuple, Callable, Optional, Any
 from collections import defaultdict
 from contextlib import contextmanager
 from .exceptions import _StopTraversal
 from .ordered_set import ordered_set
 import gast as ast 
+
 
 
 Builtins = dict(builtins.__dict__.items())
@@ -27,7 +29,7 @@ class Def:
         assert isinstance(node, Def)
         self._users.add(node)
 
-    def name(self):
+    def name(self)->str:
         if type(self.node) in (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef):
             return self.node.name
         elif type(self.node) ==  ast.Name:
@@ -40,13 +42,13 @@ class Def:
         else: # Return its type otherwise. 
             return type(self.node).__name__
 
-    def users(self):
+    def users(self)->List:
         return self._users
 
-    def __repr__(self):
+    def __repr__(self)->str:
         return self._repr({})
 
-    def _repr(self, nodes):
+    def _repr(self, nodes)->str:
         if self in nodes:
             return f"(#{nodes[self]})"
         nodes[self] = len(nodes)
@@ -64,13 +66,12 @@ class Def:
 
 class _CollectFutureImports(ast.NodeVisitor):
     """
-    A future statement must appear near the top of the module.
-     The only lines that can appear before a future statement are:
-     - the module docstring (if any),
-     - comments,
-     - blank lines, and
-     - other future statements.
-    # as soon as we're visiting something else, we can stop the visit.
+    A future statement must appear near the top of the module. So the only lines before a future statement are:
+     1. the module docstring (if any),
+     2. comments,
+     3. blank lines, and
+     4. other future statements.
+    As long as something else is visited, we can stop the visit.
     """
     def __init__(self):
         self.FutureImports:set[str] = set() 
@@ -139,48 +140,40 @@ def collect_locals(node)->set:
 
 
 class DefUseChains(ast.NodeVisitor):
-    """
-    Module visitor that gathers two kinds of informations:
+    def __init__(self, filename=None):
+        """
         - locals: Dict[node, List[Def]], a mapping between a node and the list of variable defined in this node,
         - chains: Dict[node, Def], a mapping between nodes and their chains.
-    """
+        """
+        self.chains:Dict[node, Def]= {}
+        self.locals:Dict[node, List[Def]] = defaultdict(list)
 
-    def __init__(self, filename=None):
-        self.chains = {}
-        self.locals = defaultdict(list)
-
-        self.filename = filename
-
+        self.filename = filename if filename is not None else "<unknown>"
         # deep copy of builtins, to remain reentrant
         self._builtins = {k: Def(v) for k, v in Builtins.items()}
 
         # function body are not executed when the function definition is met
         # this holds a list of the functions met during body processing
         self._defered = []
-        # stack of mapping between an id and Names
-        self._definitions = []
-        # stack of scope depth
-        self._scope_depths = []
-        # stack of variable defined with the global keywords
-        self._globals = []
+       
+        self._definitions = []  # stack of mapping between an id and Names
+        self._scope_depths = []  # stack of scope depth
+        self._globals = []   # stack of variable defined with the global keywords
+       
+        self._precomputed_locals = []  # stack of local identifiers, used to detect 'read before assign'
 
-        # stack of local identifiers, used to detect 'read before assign'
-        self._precomputed_locals = []
-
-        # stack of variable that were undefined when we met them, but that may
-        # be defined in another path of the control flow (esp. in loop)
-        self._undefs = []
-
-        # stack of nodes starting a scope: class, module, function, generator expression, comprehension...
-        self._scopes = []
+        self._undefs = [] # stack of variable that were undefined when we met them, but that may be defined in another path of the control flow
+        self._scopes = [] # stack of nodes starting a scope: class, module, function, generator expression, comprehension...
 
         self._breaks = []
         self._continues = []
 
-        # stack of list of annotations (annotation, heads, callback),
+        '''
+        stack of list of annotations (annotation, heads, callback),
         # only used in the case of from __future__ import annotations feature.
         # the annotations are analyzed when the whole module has been processed,
         # it should be compatible with PEP 563, and minor changes are required to support PEP 649.
+        '''
         self._defered_annotations = []
 
         # dead code levels, it's non null for code that cannot be executed
@@ -189,7 +182,7 @@ class DefUseChains(ast.NodeVisitor):
         # attributes set in visit_Module
         self.module = None
         self.future_annotations = False
-
+        
     
     ## helpers
     def _dump_locals(self, node, only_live=False):
@@ -236,7 +229,7 @@ class DefUseChains(ast.NodeVisitor):
             return
 
         # It's meant to be a local variable, but it's not defined yet.
-        islocal = any((name in defs or '*' in defs) for defs in local_defs)
+        is_local = any((name in defs or '*' in defs) for defs in local_defs)
 
         # At class scope, it's ok to refer to a global even if we also have a
         # local definition for that variable. Stated other wise
@@ -248,17 +241,16 @@ class DefUseChains(ast.NodeVisitor):
         # >>> bar() # ok, and `bar.a is a`
         if isinstance(scope, ast.ClassDef):
             top_level_definitions = self._definitions[:-self._scope_depths[0]]
-            isglobal = any((name in top_lvl_def or '*' in top_lvl_def)
-                           for top_lvl_def in top_level_definitions)
-            return not islocal and not isglobal
-        else:
-            return not islocal
+            tmp_is_global = [(name in top_lvl_def or '*' in top_lvl_def) for top_lvl_def in top_level_definitions]
+            is_global = any(tmp_is_global)
+            return  not (is_local or is_global) # not local, not global 
+        
+        return not is_local
 
     def compute_annotation_defs(self, node, quiet=False):
         name = node.id
-        # resolving an annotation is a bit different
-        # form other names.
         try:
+             # resolving an annotations is different.
             return lookup_annotation_name_defs(name, self._scopes, self.locals)
         except LookupError:
             # fallback to regular behaviour on module scope
@@ -314,9 +306,7 @@ class DefUseChains(ast.NodeVisitor):
         if not self.invalid_name_lookup(name, base_scope, precomputed_locals, defs):
             result.extend(reversed(defs))
                 # Iterate over scopes, filtering out class scopes.
-            for scope, depth, precomputed_locals in zip(scopes_iter,
-                                                            depths_iter,
-                                                            precomputed_locals_iter):
+            for scope, depth, precomputed_locals in zip(scopes_iter, depths_iter, precomputed_locals_iter):
                 if not isinstance(scope, ast.ClassDef):
                     defs = self._definitions[lvl + depth: lvl]
                     if self.invalid_name_lookup(name, base_scope, precomputed_locals, defs):
@@ -338,18 +328,30 @@ class DefUseChains(ast.NodeVisitor):
                 self._deadcode += 1
         if deadcode:
             self._deadcode -= 1
-
+            
     def process_undefs(self):
-        for undef_name, _undefs in self._undefs[-1].items():
-            if undef_name in self._definitions[-1]:
-                for newdef in self._definitions[-1][undef_name]:
-                    for undef, _ in _undefs:
-                        for user in undef.users():
-                            newdef.add_user(user)
+        if not self._undefs:
+            return
+        # Retrieve the latest (or last) sets of undefined variables and definitions
+        last_undefs = self._undefs[-1]
+        last_definitions = self._definitions[-1] if self._definitions else {}
+        # Iterate through each undefined variable/reference
+        for undef_name, undef_entries in last_undefs.items():
+            # If the undefined variable has a definition in the latest definitions
+            if undef_name in last_definitions:                
+                # For each new definition of the undefined variable,   
+                # Accumulate all users of the undefined variable and add each user to the new definition
+                for new_definition in last_definitions[undef_name]:
+                    users_to_add = [user for undef, _ in undef_entries for user in undef.users()]
+                    for user in users_to_add:
+                        new_definition.add_user(user)
             else:
-                for undef, stars in _undefs:
+                # If the variable is undefined and has no definition, If 'stars' flag is False, raise an "unbound identifier" exception
+                for undef, stars in undef_entries:
                     if not stars:
                         self.unbound_identifier(undef_name, undef.node)
+
+        # Remove the last processed set of undefined variables/references
         self._undefs.pop()
 
     @contextmanager
@@ -366,7 +368,7 @@ class DefUseChains(ast.NodeVisitor):
         self._scope_depths.pop()
         self._scopes.pop()
 
-    CompScopeContext = ScopeContext
+    CompScopeContext = ScopeContext # comphresion container is a scope, same as a function.
     
     @contextmanager
     def DefinitionContext(self, definitions):
@@ -481,7 +483,7 @@ class DefUseChains(ast.NodeVisitor):
         self._definitions[index][name] = dnodes
 
     @staticmethod
-    def add_to_definition(definition, name, dnode_or_dnodes):
+    def add_to_definition(definition, name, dnode_or_dnodes:Union[Def, List[Def]]):
         if isinstance(dnode_or_dnodes, Def):
             definition[name].add(dnode_or_dnodes)
         else:
@@ -1138,13 +1140,15 @@ class DefUseChains(ast.NodeVisitor):
             self.visit(node.optional_vars)
         return dnode
 
+
 def _validate_comprehension(node):
     """
     Raises SyntaxError if:
-     - a named expression is used in a comprehension iterable expression
-     - a named expression rebinds a comprehension iteration variable
+     1. a named expression is used in a comprehension iterable expression
+     2. a named expression rebinds a comprehension iteration variable
     """
     iter_names = set() # comprehension iteration variables
+    find_iter_names = lambda n: (n.id for n in ast.walk(n) if isinstance(n, ast.NamedExpr))
     for gen in node.generators:
         for _ in (n for n in ast.walk(gen.iter) if isinstance(n, ast.NamedExpr)):
             raise SyntaxError('assignment expression cannot be used ''in a comprehension iterable expression')
@@ -1206,11 +1210,13 @@ def lookup_annotation_name_defs(name, heads, locals_map):
         ) from e
 
 def _get_lookup_scopes(heads):
-    # heads[-1] is the direct enclosing scope and heads[0] is the module.
-    # returns a list based on the elements of heads, but with
-    # the ignorable scopes removed. Ignorable in the sens that the lookup
-    # will never happend in this scope for the given context.
-
+    '''
+    heads[-1] is the direct enclosing scope and heads[0] is the module.
+    returns a list based on the elements of heads, but with
+    the ignorable scopes removed. Ignorable in the sens that the lookup
+    will never happend in this scope for the given context.
+    More of less modeling in [Guido van Rossum's blog post](https://github.com/gvanrossum/gvanrossum.github.io/blob/main/formal/scopesblog.md)
+    '''
     heads = list(heads) # avoid modifying the list (important)
     try:
         direct_scope = heads.pop(-1) # this scope is the only one that can be a class
@@ -1221,12 +1227,8 @@ def _get_lookup_scopes(heads):
     except IndexError:
         # we got only a global scope
         return [direct_scope]
-    # more of less modeling what's described here.
-    # https://github.com/gvanrossum/gvanrossum.github.io/blob/main/formal/scopesblog.md
-    other_scopes = [s for s in heads if isinstance(s, (
-                  ast.FunctionDef, ast.AsyncFunctionDef,
-                  ast.Lambda, ast.DictComp, ast.ListComp,
-                  ast.SetComp, ast.GeneratorExp))]
+    other_scope_type = (ast.FunctionDef, ast.AsyncFunctionDef, ast.Lambda, ast.DictComp, ast.ListComp, ast.SetComp, ast.GeneratorExp)
+    other_scopes = list(filter(lambda s:type(s) in other_scope_type, heads))# [s for s in heads if isinstance(s, other_scope_type)]
     return [global_scope] + other_scopes + [direct_scope]
 
 def _lookup(name, scopes, locals_map):
