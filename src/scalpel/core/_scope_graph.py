@@ -93,18 +93,12 @@ class ScopeGraph(ast.NodeVisitor):
 
     def visit_Import(self, node):
         for alias in node.names:
-            if alias.asname is not None:
-                name = alias.asname
-            else:
-                name = alias.name
+            name = alias.asname if alias.asname is not None else alias.name
             self.imports[current_scope_name].append(alias.name)
 
     def visit_ImportFrom(self, node):
         for alias in node.names:
-            if alias.asname is not None:
-                name = alias.asname
-            else:
-                name = alias.name
+            name = alias.asname if alias.asname is not None else alias.name
             self.imports[current_scope_name].append(alias.name)
         pass
 
