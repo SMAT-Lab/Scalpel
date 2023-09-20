@@ -19,8 +19,11 @@ from typing import (
     Union,
 )
 from scalpel.cfg import CFG
-from scalpel.SSA.ssa import SSAConverter 
+from scalpel.SSA.ssa import SSAConverter
+from ._duc import DefUseChains, Definition, Reference, ReferencedName, Variable
 
+
+'''
 MODULE_SCOPE = "mod"
 Builtins = {k: v for k, v in builtins.__dict__.items()}
 Builtins["__file__"] = __file__
@@ -490,3 +493,4 @@ def get_duc(cfg_dict: dict[str:CFG]) -> DUC:
     """
     return DUC(cfg_dict)
 
+'''

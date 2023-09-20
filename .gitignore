@@ -16,4 +16,7 @@
 # python cache files
 
 *.pyc
+
 __pycache__
+
+.vscode/

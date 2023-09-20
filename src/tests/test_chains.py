@@ -25,13 +25,13 @@ def captured_output():
 
 class TestDefUseChains(TestCase):
     def checkChains(self, code, ref, strict=True):
+
+
+
         class StrictDefUseChains(beniget.DefUseChains):
             def warn(self, msg, node):
-                raise RuntimeError(
-                    "W: {} at {}:{}".format(
-                        msg, node.lineno, node.col_offset
-                    )
-                )
+                raise RuntimeError(f"W: {msg} at {node.lineno}:{node.col_offset}")
+
 
         node = ast.parse(code)
         if strict:
@@ -224,6 +224,7 @@ for _ in [1]:
 
     def test_straight_raise(self):
         code = "raise next([e for e in [1]])"
+        
         if sys.version_info.major >= 3:
             self.checkChains(code, [])
         else:

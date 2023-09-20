@@ -17,11 +17,9 @@ class ScopeGraph(ast.NodeVisitor):
         self.references = {}  # dictionary for refereced names
         self.declarations = {}  # dictionary for declared names
         self.current_scope_name = None
-        pass
 
     def build(self, ast_tree):
         self.visit(ast_tree)
-        pass
 
     def visit_FunctionDef(self, node):
         self.declarations[self.current_scope_name].append(node.name)
@@ -102,7 +100,7 @@ class ScopeGraph(ast.NodeVisitor):
             self.imports[current_scope_name].append(alias.name)
         pass
 
-    def resolve(name, working_scope):
+    def resolve(self, working_scope):
         """
         Find the name in given working scope
         That is, a path with fewer parent transitions is more specific than a path with
@@ -114,11 +112,7 @@ class ScopeGraph(ast.NodeVisitor):
         self._add_scope_name(scope_name, parent_name)
 
     def add_reference(self, scope_name, name, ctx):
-        if ctx == "load":
-            self.references[scope_name] = name
-
-        elif ctx == "del":
-            # deletion operation is deemed as using the reference
+        if ctx in ["load", "del"]:
             self.references[scope_name] = name
 
         elif ctx == "store":
@@ -222,7 +216,6 @@ class ScopeGraph(ast.NodeVisitor):
         # self.MRO_resolve(start_name)
         target_cls_name = self.MRO_resolve_method("D", "rk")
         print(target_cls_name)
-        pass
 
 
 # need to write resolve a method name
@@ -291,9 +284,9 @@ if __name__ == "__main__":
     def print_scope(scope, indent=""):
         print(indent + scope.name)
         for binding in scope.bindings:
-            print(indent + "  Binding:", binding.name, "at line", binding.node.lineno)
+            print(f"{indent}  Binding:", binding.name, "at line", binding.node.lineno)
         for child in scope.children:
-            print_scope(child, indent + "  ")
+            print_scope(child, f"{indent}  ")
     print_scope(scope_graph)
 
 

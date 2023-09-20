@@ -1,4 +1,4 @@
-from stmt import Stmt
+from .stmt import Stmt
 
 
 class AssignStmt(Stmt):
