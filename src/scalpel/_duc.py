@@ -1,6 +1,23 @@
-"""
-This is the module from duc construction, which is forked from [beniget project](https://github.com/serge-sans-paille/beniget/blob/master/beniget/beniget.py).
-"""
+'''
+In this module, we implement a Def-Use Chains (DUC) analysis for Python, based on [beniget project](https://github.com/serge-sans-paille/beniget/blob/master/beniget/beniget.py).
+To achieve sound results for every name variable, we need to perform a global analysis of the whole input program. 
+Lexical scopes play a key role in this analysis, as they are the only way to determine the definition of a variable.
+However, it is worth mentioning lexical scopes are not enough to determine the definition of a variable, because of the dynamic nature of Python. 
+Hierarchy for scopes in this process are:
+- OpenScope
+  - GlobalScope
+  - ToplevelScope
+  - ClassScope
+- ClosedScope
+  - FunctionScope
+    - LambdaScope
+  - ComprehensionScope
+
+A lexical scope corresponds to one of the following: Builtin, Global, Toplevel, Class, Function, Lambda, Comprehension (list, set or dict comprehension, or generator expression)
+The difference between global and toplevel scope is subtle: In a module, they are the same. In exec and eval, they may be different.
+The purpose of this module is to provide a way to compute the set of definitions and uses of each variable in a given program, with no intention for a specific use case.
+Therefore, users can see the results as something similar to immeterialized ASTs or immeterdiate represetations
+''' 
 import sys, builtins
 from typing import List, Dict, Union, Set, Tuple, Callable, Optional, Any
 from collections import defaultdict
@@ -8,7 +25,6 @@ from contextlib import contextmanager
 from .exceptions import _StopTraversal
 from .ordered_set import ordered_set
 import gast as ast 
-
 
 
 Builtins = dict(builtins.__dict__.items())
@@ -23,7 +39,7 @@ class Def:
     def __init__(self, node):
         self.node = node
         self._users = ordered_set()
-        self.islive = True
+        self.islive:bool = True
 
     def add_user(self, node):
         assert isinstance(node, Def)
@@ -108,10 +124,7 @@ class CollectLocals(ast.NodeVisitor):
         self.Locals.add(node.name)
     def visit_Nonlocal(self, node):
         self.NonLocals.update(iter(node.names))
-    # some trivial cases
-    visit_AsyncFunctionDef = visit_FunctionDef
-    visit_ClassDef = visit_FunctionDef
-    visit_Global = visit_Nonlocal
+   
 
     def visit_Name(self, node):
         if isinstance(node.ctx, ast.Store) and node.id not in self.NonLocals:
@@ -127,6 +140,11 @@ class CollectLocals(ast.NodeVisitor):
             self.Locals.add(alias.asname or alias.name)
     def skip(self, _):
         pass
+     # some trivial cases
+    visit_AsyncFunctionDef = visit_FunctionDef
+    visit_ClassDef = visit_FunctionDef 
+    visit_Global = visit_Nonlocal 
+
     visit_SetComp = visit_DictComp = visit_ListComp = skip
     visit_GeneratorExp  = visit_Lambda = skip # skip generators
 
@@ -328,7 +346,7 @@ class DefUseChains(ast.NodeVisitor):
                 self._deadcode += 1
         if deadcode:
             self._deadcode -= 1
-            
+
     def process_undefs(self):
         if not self._undefs:
             return
@@ -1148,13 +1166,13 @@ def _validate_comprehension(node):
      2. a named expression rebinds a comprehension iteration variable
     """
     iter_names = set() # comprehension iteration variables
-    find_iter_names = lambda n: (n.id for n in ast.walk(n) if isinstance(n, ast.NamedExpr))
+    find_iter_names = lambda tmp_node: (n for n in ast.walk(tmp_node) if isinstance(n, ast.NamedExpr))
     for gen in node.generators:
-        for _ in (n for n in ast.walk(gen.iter) if isinstance(n, ast.NamedExpr)):
+        for _ in find_iter_names(gen.iter):
             raise SyntaxError('assignment expression cannot be used ''in a comprehension iterable expression')
         iter_names.update(n.id for n in ast.walk(gen.target) 
             if isinstance(n, ast.Name) and isinstance(n.ctx, ast.Store))
-    for namedexpr in (n for n in ast.walk(node) if  isinstance(n, ast.NamedExpr)):
+    for namedexpr in find_iter_names(node):
         bound = getattr(namedexpr.target, 'id', None)
         if bound in iter_names:
             raise SyntaxError(
@@ -1194,7 +1212,6 @@ def lookup_annotation_name_defs(name, heads, locals_map):
         - unbound names
 
     :raise ValueError: When the heads is empty.
-    This function can be used by client code like this:
     """
     scopes = _get_lookup_scopes(heads)
     scopes_len = len(scopes)
@@ -1228,7 +1245,7 @@ def _get_lookup_scopes(heads):
         # we got only a global scope
         return [direct_scope]
     other_scope_type = (ast.FunctionDef, ast.AsyncFunctionDef, ast.Lambda, ast.DictComp, ast.ListComp, ast.SetComp, ast.GeneratorExp)
-    other_scopes = list(filter(lambda s:type(s) in other_scope_type, heads))# [s for s in heads if isinstance(s, other_scope_type)]
+    other_scopes = [s for s in heads if isinstance(s, other_scope_type)]
     return [global_scope] + other_scopes + [direct_scope]
 
 def _lookup(name, scopes, locals_map):
