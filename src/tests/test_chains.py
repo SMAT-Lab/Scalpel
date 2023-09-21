@@ -2,7 +2,7 @@ from contextlib import contextmanager
 from unittest import TestCase, skipIf
 import unittest
 import gast as ast
-import scalpel._duc as beniget
+import scalpel.duc as beniget
 import io
 import sys
 

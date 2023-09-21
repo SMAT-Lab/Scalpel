@@ -1,6 +1,6 @@
 import sys
 from unittest import TestCase
-from scalpel._duc import ordered_set as ordered_set
+from scalpel.duc import ordered_set as ordered_set
 
 class OrderedSetTest(TestCase):
 
