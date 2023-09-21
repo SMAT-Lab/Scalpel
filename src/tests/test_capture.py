@@ -1,7 +1,7 @@
 from unittest import TestCase
 from textwrap import dedent
 import gast as ast
-import scalpel._duc as beniget
+import scalpel.duc as beniget
 
 
 class Capture(ast.NodeVisitor):

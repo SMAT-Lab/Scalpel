@@ -1,7 +1,7 @@
 from textwrap import dedent
 from unittest import TestCase
 import gast as ast
-import scalpel._duc as beniget
+import scalpel.duc as beniget
 import sys
 
 

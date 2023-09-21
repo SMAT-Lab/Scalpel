@@ -1143,7 +1143,7 @@ fn = outer()
 
     def test_lookup_scopes(self):
         #from beniget.beniget import _get_lookup_scopes
-        from scalpel._duc import _get_lookup_scopes
+        from scalpel.duc import _get_lookup_scopes
         mod, fn, cls, lambd, gen, comp = ast.Module(), ast.FunctionDef(), ast.ClassDef(), ast.Lambda(), ast.GeneratorExp(), ast.DictComp()
         assert _get_lookup_scopes((mod, fn, fn, fn, cls)) == [mod, fn, fn, fn, cls]
         assert _get_lookup_scopes((mod, fn, fn, fn, cls, fn)) == [mod, fn, fn, fn, fn]

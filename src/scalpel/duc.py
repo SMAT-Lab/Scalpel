@@ -12,7 +12,9 @@ Hierarchy for scopes in this process are:
   - FunctionScope
     - LambdaScope
   - ComprehensionScope
-  
+    - ListComprehensionScope
+    - SetComprehensionScope
+    - DictComprehensionScope
 
 A lexical scope corresponds to one of the following: Builtin, Global, Toplevel, Class, Function, Lambda, Comprehension (list, set or dict comprehension, or generator expression)
 The difference between global and toplevel scope are the same in a module but different in runtime such as in exec and eval
@@ -37,8 +39,8 @@ from typing import (
 )
 from scalpel.cfg import CFG
 from scalpel.SSA.ssa import SSAConverter
-from ._duc import DefUseChains, Definition, Reference, ReferencedName, Variable
-
+#from .core._duc import DefUseChains, Definition, Reference, ReferencedName, Variable
+from .core._duc import DefUseChains, UseDefChains, Def, _get_lookup_scopes, ordered_set
 code = '''
 # beniget can probably understand this code without the future import
 from __future__ import annotations
