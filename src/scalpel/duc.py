@@ -1,7 +1,24 @@
-"""
-This module implements a `DUC` class for define-use chain construction.
-"""
+'''
+In this module, we implement a Def-Use Chains (DUC) analysis for Python, based on [beniget project](https://github.com/serge-sans-paille/beniget/blob/master/beniget/beniget.py).
+To achieve sound results for every name variable, we need to perform a global analysis of the whole input program. 
+Lexical scopes play a key role in this analysis, as they are the only way to determine the definition of a variable.
+However, it is worth mentioning lexical scopes are not enough to determine the definition of a variable, because of the dynamic nature of Python. 
+Hierarchy for scopes in this process are:
+- OpenScope
+  - GlobalScope
+  - ToplevelScope
+  - ClassScope
+- ClosedScope
+  - FunctionScope
+    - LambdaScope
+  - ComprehensionScope
+  
 
+A lexical scope corresponds to one of the following: Builtin, Global, Toplevel, Class, Function, Lambda, Comprehension (list, set or dict comprehension, or generator expression)
+The difference between global and toplevel scope are the same in a module but different in runtime such as in exec and eval
+The purpose of this module is to provide a way to compute the set of definitions and uses of each variable in a given program, with no intention for a specific use case.
+Therefore, users can see the results as something similar to immeterialized ASTs or immeterdiate represetations
+''' 
 import ast
 from collections import defaultdict
 from dataclasses import dataclass
@@ -22,6 +39,59 @@ from scalpel.cfg import CFG
 from scalpel.SSA.ssa import SSAConverter
 from ._duc import DefUseChains, Definition, Reference, ReferencedName, Variable
 
+code = '''
+# beniget can probably understand this code without the future import
+from __future__ import annotations
+from typing import TypeAlias, Mapping, Dict, Type
+class C:
+    
+    def method(self) -> C.field:  # this is OK
+        ...
+
+    def method(self) -> field:  # this is OK
+        ...
+
+    def method(self) -> C.D:  # this is OK
+        ...
+
+    def method(self, x:field) -> D:  # this is OK
+        ...
+
+    field:TypeAlias = 'Mapping'
+
+    class D:
+        field2:TypeAlias = 'Dict'
+        def method(self) -> C.D.field2:  # this is OK
+            ...
+
+        def method(self) -> D.field2:  # this FAILS, class D is local to C
+            ...                        # and is therefore only available
+                                       # as C.D. This was already true
+                                       # before the PEP. 
+                                       # We check first the globals, then the locals
+                                       # of the class D, and 'D' is not defined in either
+                                       # of those, it defined in the locals of class C.
+
+        def method(self, x:field2) -> field2:  # this is OK
+            ...
+
+        def method(self, x) -> field:  # this FAILS, field is local to C and
+                                    # is therefore not visible to D unless
+                                    # accessed as C.field. This was already
+                                    # true before the PEP.
+            ...
+
+        def Thing(self, y:Type[Thing]) -> Thing: # this is OK, and it links to the top level Thing.
+            ...
+
+Thing:TypeAlias = 'Mapping'
+''' 
+def gen_duc_chain():
+    node = ast.parse(code)
+    c = DefUseChains()
+    c.visit(node)
+
+    return node, c
 
 '''
 MODULE_SCOPE = "mod"

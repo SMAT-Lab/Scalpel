@@ -1,23 +1,4 @@
-'''
-In this module, we implement a Def-Use Chains (DUC) analysis for Python, based on [beniget project](https://github.com/serge-sans-paille/beniget/blob/master/beniget/beniget.py).
-To achieve sound results for every name variable, we need to perform a global analysis of the whole input program. 
-Lexical scopes play a key role in this analysis, as they are the only way to determine the definition of a variable.
-However, it is worth mentioning lexical scopes are not enough to determine the definition of a variable, because of the dynamic nature of Python. 
-Hierarchy for scopes in this process are:
-- OpenScope
-  - GlobalScope
-  - ToplevelScope
-  - ClassScope
-- ClosedScope
-  - FunctionScope
-    - LambdaScope
-  - ComprehensionScope
 
-A lexical scope corresponds to one of the following: Builtin, Global, Toplevel, Class, Function, Lambda, Comprehension (list, set or dict comprehension, or generator expression)
-The difference between global and toplevel scope is subtle: In a module, they are the same. In exec and eval, they may be different.
-The purpose of this module is to provide a way to compute the set of definitions and uses of each variable in a given program, with no intention for a specific use case.
-Therefore, users can see the results as something similar to immeterialized ASTs or immeterdiate represetations
-''' 
 import sys, builtins
 from typing import List, Dict, Union, Set, Tuple, Callable, Optional, Any
 from collections import defaultdict
@@ -240,28 +221,29 @@ class DefUseChains(ast.NodeVisitor):
         print(f"W: {msg}{self.location(node)}")
 
     def invalid_name_lookup(self, name, scope, precomputed_locals, local_defs):
-        # We may hit the situation where we refer to a local variable which is
-        # not bound yet. This is a runtime error in Python, so we try to detect it statically.
-        # not a local variable => fine
-        if name not in precomputed_locals:
-            return
-
-        # It's meant to be a local variable, but it's not defined yet.
-        is_local = any((name in defs or '*' in defs) for defs in local_defs)
-
-        # At class scope, it's ok to refer to a global even if we also have a
-        # local definition for that variable. Stated other wise
-        #
+        '''
+        It's possible to have a situation in which a local variable referenced but not bound yet. 
+        This is a runtime error in Python, so we try to detect it statically in such a way:
+        1. If no local variable, returns 
+        2. It's meant to be a local variable, but it's not defined yet.
+        3. At class scope, it's ok to refer to a global even if we also have a
         # >>> a = 1
         # >>> def foo(): a = a
         # >>> foo() # fails, a is a local referenced before being assigned
         # >>> class bar: a = a
-        # >>> bar() # ok, and `bar.a is a`
+        # >>> bar() # ok, and `bar.a is a`i
+        '''
+        if name not in precomputed_locals:
+            return
+
+        is_local = any((name in defs or '*' in defs) for defs in local_defs)
+
+       
         if isinstance(scope, ast.ClassDef):
             top_level_definitions = self._definitions[:-self._scope_depths[0]]
             tmp_is_global = [(name in top_lvl_def or '*' in top_lvl_def) for top_lvl_def in top_level_definitions]
             is_global = any(tmp_is_global)
-            return  not (is_local or is_global) # not local, not global 
+            return  not (is_local or is_global) # neither local nor global 
         
         return not is_local
 
@@ -308,8 +290,8 @@ class DefUseChains(ast.NodeVisitor):
 
     # TODO Rename this here and in `compute_defs`
     def _extracted_from_compute_defs_15(self, name):
-            # List of definitions to check. This includes all non-class definitions *and* the last definition. Class definitions are not
-            # included because they require fully qualified access.
+        # List of definitions to check. This includes all non-class definitions *and* the last definition. Class definitions are not
+        # included because they require fully qualified access.
         result = []
 
         scopes_iter = iter(reversed(self._scopes))
