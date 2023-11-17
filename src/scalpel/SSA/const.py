@@ -118,29 +118,30 @@ class SSA:
             for i in range(n_stmts):
                 stmt_stored_idents = stored_idents[i]
                 stmt_loaded_idents = loaded_idents[i]
+                stmt_renamed_stored = {}
 
-                # same block, number used identifiers
+                # as a preprocess, add missing 'ident_name_counter' 
+                # in the left hand side
+                for ident in stmt_stored_idents:
+                    if ident not in ident_name_counter:
+                        ident_name_counter[ident] = 0
+
+                # deal with right hand side first
                 for ident in stmt_loaded_idents:
                     # a list of dictions for each of idents used in this statement
                     phi_loaded_idents = block_renamed_loaded[block.id][i]
                     if ident in ident_name_counter:
                         phi_loaded_idents[ident].add(ident_name_counter[ident])
-
-                stmt_renamed_stored = {}
-
+                
+                # then deal with left hand side
                 for ident in stmt_stored_idents:
                     affected_idents.append(ident)
-                    if ident in ident_name_counter:
-                        ident_name_counter[ident] += 1
-                    else:
-                        ident_name_counter[ident] = 0
+                    ident_name_counter[ident] += 1
+
                     # rename the var name as the number of assignments
                     stmt_const_dict = tmp_const_dict[i]
                     if ident in stmt_const_dict:
-                        ident_const_dict[(ident, ident_name_counter[ident])] = (
-                            stmt_const_dict[ident]
-                        )
-
+                        ident_const_dict[(ident, ident_name_counter[ident])] = stmt_const_dict[ident]
                     stmt_renamed_stored[ident] = ident_name_counter[ident]
                 block_renamed_stored[block.id] += [stmt_renamed_stored]
 
