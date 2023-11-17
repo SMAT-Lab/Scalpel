@@ -288,7 +288,7 @@ class SSA:
 
         if isinstance(stmt, ast.ClassDef):
             stored_idents.append(stmt.name)
-            const_dict[stmt.name] = None
+            const_dict[stmt.name] = stmt
             func_names.append(stmt.name)
             return stored_idents, loaded_idents, func_names
 
