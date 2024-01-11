@@ -57,9 +57,9 @@ Scalpel is invited to be presented at EuroPython 2022. EuroPython is the oldest 
 
 
 ## Acknowledgement
-This project has been inspired and supported by many existing works. If you think your work appears in this project but has not been mentioned yet, please let us know by any means.
+This project has been inspired by many existing works. If you think your work appears in this project but has not been mentioned yet, please let us know by any means.
 
-1. [Fuzzyingbook](https://www.fuzzingbook.org/) by Andreas Zeller, Rahul Gopinath, Marcel Böhme, Gordon Fraser, and Christian Holler.
+1. [Fuzzingbook](https://www.fuzzingbook.org/) by Andreas Zeller, Rahul Gopinath, Marcel Böhme, Gordon Fraser, and Christian Holler.
 2. [Debugging book](https://www.debuggingbook.org/) by Andreas Zeller.
 3. [StaticCFG](https://github.com/coetaur0/staticfg).
 4. [PyCG: Practical Call Graph Generation in Python](https://vitsalis.com/papers/pycg.pdf), ICSE 2021.
