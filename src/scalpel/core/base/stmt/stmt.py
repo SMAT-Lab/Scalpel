@@ -142,7 +142,7 @@ class WhileStmt(SStmt):
     def get_line_number(self):
         return super().get_line_number()
     
- class FunctionDedfStmt(SStmt):
+class FunctionDedfStmt(SStmt):
     # overriding abstract method
     def get_declared_method(self):
         raise NotImplementedError
@@ -153,7 +153,7 @@ class WhileStmt(SStmt):
     def get_line_number(self):
         return super().get_line_number()
     
- class ClassDefStmt(SStmt):
+class ClassDefStmt(SStmt):
     # overriding abstract method
     def get_declared_method(self):
         raise NotImplementedError
@@ -164,7 +164,7 @@ class WhileStmt(SStmt):
     def get_line_number(self):
         return super().get_line_number()
     
- class MatchDefStmt(SStmt):
+class MatchDefStmt(SStmt):
     # overriding abstract method
     def get_declared_method(self):
         raise NotImplementedError
@@ -175,7 +175,7 @@ class WhileStmt(SStmt):
     def get_line_number(self):
         return super().get_line_number()
 
- class TryStmt(SStmt):
+class TryStmt(SStmt):
     # overriding abstract method
     def get_declared_method(self):
         raise NotImplementedError
@@ -185,7 +185,7 @@ class WhileStmt(SStmt):
     
     def get_line_number(self):
         return super().get_line_number()
- class ReturnStmt(SStmt):
+class ReturnStmt(SStmt):
     # overriding abstract method
     def get_declared_method(self):
         raise NotImplementedError
